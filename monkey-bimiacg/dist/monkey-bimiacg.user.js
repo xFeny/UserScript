@@ -141,7 +141,7 @@
             let nextRouteIndex = currRouteIndex + 1;
             if (nextRouteIndex >= routes.length) nextRouteIndex = 0;
             const currEpisodeIndex = this.index(currEpisode);
-            const episodes = routes[nextRouteIndex]?.querySelectorAll("a");
+            const episodes = this.querys("a", routes[nextRouteIndex]);
             episodes[currEpisodeIndex]?.click();
           }
           if (this.isFanTuan()) {
@@ -157,12 +157,12 @@
           if (this.isBimi()) {
             try {
               const routes = Array.from(this.querys(".play_box"));
+              const currEpisode = this.query(`a[href="${location.pathname}"]`)?.parentElement;
               const currRouteIndex = routes.findIndex((route) => route.classList.contains("show"));
               let nextRouteIndex = currRouteIndex + 1;
               if (nextRouteIndex >= routes.length) nextRouteIndex = 0;
-              const currEpisode = this.query(`a[href="${location.pathname}"]`)?.parentElement;
               const currEpisodeIndex = this.index(currEpisode);
-              const episodes = routes[nextRouteIndex]?.querySelectorAll("li");
+              const episodes = this.querys("li", routes[nextRouteIndex]);
               episodes[currEpisodeIndex]?.firstElementChild?.click();
             } catch (e) {
             }
