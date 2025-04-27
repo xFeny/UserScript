@@ -1,6 +1,7 @@
 // showToast 位置样式
 const positions = Object.freeze({
   bottomLeft: "bottom: 17%; left: 10px;",
+  bottomRight: "bottom: 17%; right: 10px;",
   center: "top: 50%; left: 50%; transform: translate(-50%, -50%);",
 });
 const ONE_SECOND = 1000;
@@ -22,5 +23,4 @@ export default Object.freeze({
     MULTIPLY: "×",
     DIVIDE: "÷",
   }),
-  
 });

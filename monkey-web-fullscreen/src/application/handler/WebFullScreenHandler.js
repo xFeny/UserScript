@@ -1,5 +1,6 @@
 // 网页全屏逻辑处理
 import Tools from "../common/Tools";
+import webSite from "../common/WebSite";
 export default {
   isFull() {
     return window.innerWidth === this.video.offsetWidth;
@@ -7,9 +8,9 @@ export default {
   webFullScreen(video) {
     const w = video?.offsetWidth || 0;
     if (Object.is(0, w)) return false;
-    if (this.isCloseAuto()) return true;
+    if (this.isClosedAuto()) return true;
     if (window.innerWidth === w || w > window.innerWidth) return true;
-    if (!this.isBiliLive()) return Tools.triggerClick(this.element);
+    if (!webSite.isBiliLive()) return Tools.triggerClick(this.element);
     return this.biliLiveWebFullScreen();
   },
   biliLiveWebFullScreen() {

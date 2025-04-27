@@ -1,4 +1,5 @@
 import Tools from "../common/Tools";
+import webSite from "../common/WebSite";
 import constants from "../common/Constants";
 /**
  * 未登录状态下，自动关闭网站的登录弹窗
@@ -23,13 +24,13 @@ export default {
     });
   },
   handleTencentLogin() {
-    if (!this.isTencent()) return;
+    if (!webSite.isTencent()) return;
     // 自动关闭腾讯视频登录弹窗
     const selector = ".main-login-wnd-module_close-button__mt9WU";
     this.loginObserver("#login_win", selector, selector);
   },
   handleIqyLogin() {
-    if (!this.isIqiyi()) return;
+    if (!webSite.isIqiyi()) return;
     // 自动关闭爱奇艺视频登录弹窗
     const selector = ".simple-buttons_close_btn__6N7HD";
     this.loginObserver("#qy_pca_login_root", selector, selector);
@@ -45,7 +46,7 @@ export default {
     });
   },
   handleBiliLogin() {
-    if (!this.isBili()) return;
+    if (!webSite.isBili()) return;
     if (document.cookie.includes("DedeUserID")) return player?.requestQuality(80); // 清晰度设置为 1080P
     // 自动关闭B站未登录观看视频1分钟左右的登录弹窗
     setTimeout(() => {

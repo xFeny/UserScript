@@ -1,5 +1,6 @@
 import douyu from "./DouyuHandler";
 import Tools from "../common/Tools";
+import webSite from "../common/WebSite";
 import storage from "../common/Storage";
 import constants from "../common/Constants";
 import eventCode from "../common/EventCode";
@@ -13,7 +14,8 @@ export default {
     // Tools.log(event);
     const overrideKey = [eventCode.Space, eventCode.ArrowLeft, eventCode.ArrowRight]; // 空格 ◀▶ 键
     const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(event.code);
-    if (!Tools.isNumber(event.key) && !isOverrideKey) return;
+    const isNumberKey = Tools.isNumber(event.key) && !this.isClosedPlayRate();
+    if (!isNumberKey && !isOverrideKey) return;
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
@@ -25,6 +27,7 @@ export default {
       const { data } = event;
       // Tools.log("接收到消息：", data, location.href);
       if (!data?.source || !data.source.includes(MSG_SOURCE)) return;
+      if (data?.defaultPlayRate) this.defaultPlayRate();
       if (data?.videoCenterPoint) return this.setParentFrameSrc(data.videoCenterPoint);
       this.processEvent(data);
     });
@@ -53,42 +56,42 @@ export default {
     if (this.normalWebsite()) return;
     const keyMapping = this.getKeyMapping();
     if (keyMapping[key]) return keyMapping[key]();
-    if (Tools.isNumber(key)) this.setPlayRate(key) && this.playRateToast(); // 倍速
+    if (Tools.isNumber(key)) this.setPlayRate(key); // 倍速
   },
   getKeyMapping() {
     return {
+      Z: () => this.defaultPlayRate(),
       N: () => this.triggerIconElement("next"),
       A: () => this.adjustPlayRate(SYMBOL.ADD),
       S: () => this.adjustPlayRate(SYMBOL.SUBTRACT),
       [SYMBOL.ADD]: () => this.adjustPlayRate(SYMBOL.ADD),
+      [SYMBOL.DIVIDE]: () => this.adjustPlayRate(SYMBOL.DIVIDE),
       [SYMBOL.SUBTRACT]: () => this.adjustPlayRate(SYMBOL.SUBTRACT),
       [SYMBOL.MULTIPLY]: () => this.adjustPlayRate(SYMBOL.MULTIPLY),
-      [SYMBOL.DIVIDE]: () => this.adjustPlayRate(SYMBOL.DIVIDE),
-      Z: () => this.setPlayRate(1) && this.showToast("已恢复正常倍速播放"),
-      F: () => (this.isDouyu() ? douyu.getFullIcon().click() : this.triggerIconElement("full", 0)),
-      D: () => (this.isDouyu() ? douyu.getDanmakuIcon().click() : this.triggerIconElement("danmaku", 3)),
+      F: () => (webSite.isDouyu() ? douyu.getFullIcon().click() : this.triggerIconElement("full", 0)),
+      D: () => (webSite.isDouyu() ? douyu.getDanmakuIcon().click() : this.triggerIconElement("danmaku", 3)),
       ARROWLEFT: () => (this.isOverrideKeyboard() ? this.adjustVideoTime(SYMBOL.SUBTRACT) : null),
       ARROWRIGHT: () => (this.isOverrideKeyboard() ? this.adjustVideoTime() : null),
       0: () => this.adjustVideoTime(VIDEO_FASTFORWARD_DURATION.get()),
       P: () => {
-        if (!this.inMatches()) return this.enhance();
-        if (this.isDouyu()) return douyu.getWebfullIcon().click();
-        this.isBiliLive() ? this.biliLiveWebFullScreen() : this.triggerIconElement("webfull");
+        if (!webSite.inMatches()) return this.enhance();
+        if (webSite.isDouyu()) return douyu.getWebfullIcon().click();
+        webSite.isBiliLive() ? this.biliLiveWebFullScreen() : this.triggerIconElement("webfull");
       },
       SPACE: () => {
         if (!this.video || !this.isOverrideKeyboard()) return;
-        if (this.isDouyu()) return this.video.paused ? douyu.play() : douyu.pause();
+        if (webSite.isDouyu()) return this.video.paused ? douyu.play() : douyu.pause();
         this.video.paused ? this.video.play() : this.video.pause();
       },
     };
   },
   triggerIconElement(name, index) {
-    if (!this.inMatches()) return;
-    if (this.isBiliLive()) return this.getBiliLiveIcons()?.[index]?.click();
+    if (!webSite.inMatches()) return;
+    if (webSite.isBiliLive()) return this.getBiliLiveIcons()?.[index]?.click();
     Tools.query(selectorConfig[location.host]?.[name])?.click();
   },
   adjustVideoTime(second = VIDEO_TIME_STEP.get(), _symbol) {
-    if (!this.video || !Tools.validVideoDur(this.video)) return;
+    if (!this.video || !Tools.validDuration(this.video)) return;
     if (_symbol && ![SYMBOL.ADD, SYMBOL.SUBTRACT].includes(_symbol)) return;
     if (Object.is(typeof second, typeof EMPTY) && !_symbol) {
       _symbol = second;

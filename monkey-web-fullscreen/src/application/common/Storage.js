@@ -22,6 +22,13 @@ export default {
       return Number.parseFloat(getStorage.bind(this, 0.25)()); //  倍速步进
     },
   }),
+  CLOSE_PLAY_RATE: Object.freeze({
+    name: "CLOSE_PLAY_RATE",
+    set: setStorage,
+    get() {
+      return getStorage.bind(this, false)(); //  是否关闭倍速设置功能
+    },
+  }),
   VIDEO_FASTFORWARD_DURATION: Object.freeze({
     name: "VIDEO_FASTFORWARD_DURATION",
     set: setStorage,

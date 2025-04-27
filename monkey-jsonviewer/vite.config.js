@@ -14,6 +14,7 @@ export default defineConfig({
     monkey({
       userscript,
       entry: "src/main.js",
+      homepage: "https://github.com/xFeny/UserScript/tree/main/monkey-jsonviewer",
       build: {
         systemjs: "inline",
         externalGlobals: {

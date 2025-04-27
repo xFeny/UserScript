@@ -1,3 +1,15 @@
+.webFullScreen {
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  position: fixed !important;
+  z-index: 2147483646 !important;
+}
+
 .MacPlayer {
   border-radius: 0 !important;
 }
@@ -6,20 +18,9 @@
   background: #000 !important;
 }
 
-.webFullScreen {
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  position: fixed !important;
-  z-index: 2147483646 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
 #zhuXian a {
-  font-size: 12px !important;
   margin: 0 !important;
+  font-size: 12px !important;
 }
 
 .nav-area {
@@ -27,11 +28,13 @@
 }
 
 #bkcl,
+.newhd,
 .ABP-Text,
 .tuiguang,
 .play-full,
 .login-box,
-.line_button2,
-.newhd:first-child {
+.line_button2 {
+  width: 0 !important;
+  height: 0 !important;
   display: none !important;
 }
