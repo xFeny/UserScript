@@ -1,0 +1,13 @@
+.mask,
+.modal,
+.popup,
+#notice,
+.box-bg,
+.pop-box,
+.shoutu-ad,
+.hl-pops-bg,
+.hl-poptips-wrap,
+section[no-account],
+.shortcuts-mobile-overlay {
+  display: none !important;
+}
