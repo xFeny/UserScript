@@ -1,0 +1,17 @@
+{
+  "name": "monkey-bimiacg",
+  "description": "哔咪动漫｜E站弹幕网｜饭团动漫｜噼哩噼哩，播放页自动网页全屏，快捷键(F)切换。",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "unplugin-auto-import": "^19.1.2",
+    "vite": "^6.0.5",
+    "vite-plugin-monkey": "^5.0.3"
+  }
+}

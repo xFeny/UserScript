@@ -37,6 +37,11 @@ jobs:
           cd monkey-scrollbar
           pnpm install
           pnpm build
+      - name: Build monkey-bimiacg
+        run: |
+          cd monkey-bimiacg
+          pnpm install
+          pnpm build
       - name: Git commit
         id: commit
         run: |
