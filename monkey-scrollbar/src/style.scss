@@ -1,0 +1,120 @@
+$size: 30px;
+$fill: 100%;
+$barWidth: 7px;
+$vertical-background: linear-gradient(to bottom, #ff567f, #fbeb91, #2ec2ff, #8375ff) !important;
+$horizontal-background: linear-gradient(to right, #ff567f, #fbeb91, #2ec2ff, #8375ff) !important;
+
+@mixin radius() {
+  border-radius: 5px !important;
+}
+
+@mixin scrollbar($bg) {
+  background: $bg;
+  @include radius();
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 1) !important;
+}
+
+@mixin box() {
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  pointer-events: none;
+}
+
+@mixin vertical() {
+  top: 0;
+  right: 0;
+}
+
+@mixin horizontal() {
+  left: 0;
+  bottom: 0;
+}
+
+:root {
+  scrollbar-width: none !important;
+}
+
+body::-webkit-scrollbar,
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner,
+::-webkit-scrollbar-button,
+::-webkit-scrollbar-track-piece,
+::-webkit-scrollbar-track:horizontal {
+  display: none !important;
+}
+
+::-webkit-scrollbar {
+  width: $barWidth;
+  height: $barWidth;
+  display: static !important;
+}
+
+::-webkit-scrollbar-thumb {
+  @include scrollbar($vertical-background);
+}
+
+::-webkit-scrollbar-thumb:horizontal {
+  @include scrollbar($horizontal-background);
+}
+
+/* 自定义滚动条 */
+.wsx_scroll {
+  @include box();
+  display: none;
+  position: fixed;
+  z-index: 999999999;
+  transition: opacity 200ms linear;
+}
+
+.wsx_scroll_bar {
+  @include box();
+  position: relative;
+}
+
+.wsx_fade {
+  @include box();
+  display: block;
+  position: fixed;
+  z-index: 9999999999;
+}
+
+.wsx_vertical_scroll {
+  @include vertical();
+  width: $size;
+}
+
+.wsx_vertical_scroll_bar {
+  left: 19px;
+  opacity: 0.6;
+  height: $fill;
+  width: $barWidth;
+  @include radius();
+  background: $vertical-background;
+}
+
+.wsx_vertical_fade {
+  @include vertical();
+  width: $size;
+  height: $fill;
+}
+
+.wsx_horizontal_scroll {
+  @include horizontal();
+  height: $size;
+}
+
+.wsx_horizontal_scroll_bar {
+  top: 20px;
+  width: $fill;
+  opacity: 0.6;
+  height: $barWidth;
+  @include radius();
+  background: $horizontal-background;
+}
+
+.wsx_horizontal_fade {
+  @include horizontal();
+  width: $fill;
+  height: $size;
+}

@@ -1,0 +1,41 @@
+// 网页全屏逻辑处理
+import Tools from "../common/Tools";
+export default {
+  isFull() {
+    return window.innerWidth === this.video.offsetWidth;
+  },
+  webFullScreen(video) {
+    const w = video?.offsetWidth || 0;
+    if (Object.is(0, w)) return false;
+    if (this.isCloseAuto()) return true;
+    if (window.innerWidth === w || w > window.innerWidth) return true;
+    if (!this.isBiliLive()) return Tools.triggerClick(this.element);
+    return this.biliLiveWebFullScreen();
+  },
+  biliLiveWebFullScreen() {
+    const control = this.getBiliLiveIcons();
+    if (control.length === 0) return false;
+    Tools.scrollTop(70);
+    const el = Tools.query(":is(.lite-room, #player-ctnr)", unsafeWindow.top.document);
+    if (el) Tools.scrollTop(el?.getBoundingClientRect()?.top || 0);
+    return Tools.triggerClick(control[1]);
+  },
+  exitWebFullScreen() {
+    if (window.innerWidth === this.video.offsetWidth) this.getElement()?.click();
+    const cancelButton = Tools.query(".bpx-player-ending-related-item-cancel"); // B站“取消连播”按钮
+    if (cancelButton) setTimeout(() => cancelButton.click(), 100);
+  },
+  biliLiveExtras() {
+    unsafeWindow.top?.livePlayer?.volume(100); // 声音100%
+    unsafeWindow.top?.livePlayer?.switchQuality("10000"); // 原画画质
+    localStorage.setItem("FULLSCREEN-GIFT-PANEL-SHOW", 0); // 关闭全屏礼物栏
+    document.body.classList.add("hide-asida-area", "hide-aside-area"); // 关闭侧边聊天栏
+  },
+  getBiliLiveIcons() {
+    const video = this.getVideo();
+    if (!video) return [];
+    Tools.triggerMousemoveEvent(video);
+    // 图标从右到左：全屏、网页全屏、弹幕设置、弹幕开关、小窗模式，即下标[0]是全屏图标
+    return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
+  },
+};

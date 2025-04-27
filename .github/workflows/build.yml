@@ -1,0 +1,54 @@
+name: Build Scripts
+
+on:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+      - name: Setup git
+        run: |-
+          git config --local user.email github-actions[bot]@users.noreply.github.com
+          git config --local user.name github-actions[bot]
+          git config --global core.autocrlf true
+          git config --global core.safecrlf false
+      - name: Install dependencies
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.1
+          run_install: true
+      # 进入monkey-jsonviewer目录执行命令
+      - name: Build monkey-jsonviewer
+        run: |
+          cd monkey-jsonviewer
+          pnpm install
+          pnpm build
+      - name: Build monkey-web-fullscreen
+        run: |
+          cd monkey-web-fullscreen
+          pnpm install
+          pnpm build
+      - name: Build monkey-scrollbar
+        run: |
+          cd monkey-scrollbar
+          pnpm install
+          pnpm build
+      - name: Git commit
+        id: commit
+        run: |
+          git add --all
+          git commit -m "CI build"
+        continue-on-error: true
+      - name: Git push
+        uses: ad-m/github-push-action@master
+        if: ${{ steps.commit.outcome == 'success' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+      - name: Log
+        if: ${{ steps.commit.outcome != 'success' }}
+        run: echo Nothing to commit.
