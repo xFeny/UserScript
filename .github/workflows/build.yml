@@ -42,6 +42,11 @@ jobs:
           cd monkey-bimiacg
           pnpm install
           pnpm build
+      - name: Build monkey-website-popup
+        run: |
+          cd monkey-website-popup
+          pnpm install
+          pnpm build
       - name: Git commit
         id: commit
         run: |
