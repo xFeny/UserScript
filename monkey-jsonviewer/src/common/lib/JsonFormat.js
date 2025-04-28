@@ -3,19 +3,19 @@ import Utils from "../Utils";
 const STYLE = Object.freeze({ TABLE: "table", VIEWER: "viewer" });
 const SORTED = Object.freeze({ NONE: "none", ASC: "ASC", DESC: "DESC" });
 class JsonFormat {
-  static STYLE = STYLE;
   Root = "Root";
+  static STYLE = STYLE;
   DEFAULTS = { json: null, style: null, container: null, theme: "default", sort: SORTED.NONE };
+  // 括号
+  BRACKET = Object.freeze({
+    array: { START: "[", END: "]", FULL: "[]" },
+    object: { START: "{", END: "}", FULL: "{}" },
+  });
   // 排序枚举
   SORT_ENUM = Object.freeze({
     [SORTED.NONE]: { value: SORTED.ASC, text: "升序" },
     [SORTED.ASC]: { value: SORTED.DESC, text: "降序" },
     [SORTED.DESC]: { value: SORTED.NONE, text: "排序" },
-  });
-  // 括号
-  BRACKET = Object.freeze({
-    array: { START: "[", END: "]", FULL: "[]" },
-    object: { START: "{", END: "}", FULL: "{}" },
   });
 
   constructor(options, tag, clazz) {
