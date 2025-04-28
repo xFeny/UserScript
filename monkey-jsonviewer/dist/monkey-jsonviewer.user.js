@@ -6,7 +6,7 @@
 // @description  格式化显示 JSON 使数据看起来更加漂亮。支持 JSON 主题色切换。支持 JSON 脑图，清晰明了的查看 JSON 层级。支持通过 JSON Crack 查看 JSON。支持手动输入 JSON，HTTP 请求获取 JSON
 // @license      GPL-3.0-only
 // @icon         data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAeAB4AAD/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAEAAAAAAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAgACADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9wvjF8bLX4ZrHZx+XNqlwnmKjH5YUyRvb6kEAd8H058d1b47XV5Ir3eoN++bagaXYrN6KOBn2FfPPx5/aEutX8a+KNWhIubhruZLSNj8u1WMcIOP4QoXOOwNS/wDBM79lDTfjh8YNe+IXj63TxRdeHfKjsE1KMTxtdSbmMmxvlAiVV2IBsUybgAyKR9ZTy6lhsM69Xovm2+iPmKmOqYjEKjT6v5WXU9e8beKrjxZpp/s/xFrfhjWIwWs9X0q42z2kmPlZo2zDcxjqYZ0eNv7obDDf/YL/AG8L745eJNc+G3xCttP0n4qeEWZZ2sVZNP8AENsu0rd2ysS0ZKPG7RMSQsisCcukWd+3x4RtfhpqGk+JNPjS0g1mV7a8iT5UM4XesgHYsofdjglQepJPxwPE1x4V/au8LePtNkeK40ma0lmdDgyorvHMhPo9uxjP+y1bUcHRxmGbS1adn1TXT0/4fcipiqmExCi3pfVdGn19f+GLni/w7ceGf2wPFXga+Vo5rW/vDbI3WWI/v4HA/wBqBg3tk+lfWX7AXia1+F/iDV9B1CRbWHXjFLayyHannpuUxk+rqy4zxlMdWAPQft7fsL33x91nQfiD4DutP0r4oeDXVrT7cWWx1y3UsTZ3LKCyAh5FEigkLLIpHzBk5vwj4JuvE2kLJfeHdY8N6lGAl5pepwBZrOT+JRIuYp0ByBNCzxPg4bIICqYyljMKot62Sa6prr6P/gBDC1MLiHJLS90+jT6ev/Dnmn/BVP8Aaw0nxv4/8P8Aw18KXK69qmk3MlxqEdiRMwuivlpbrtPLopkMnZNy5IIYLyPwa/Z8vvEmv+HtHu4/Ovr+5iS6KDcqAtukwe6om7nuEJxX0XoH7PK/bJG0vRoY5rr/AFslvbLGZf8AfcAf+PGvafgv8CbX4byNqFyI5tWmXYCoytsh6qvqx7t+A4yWiWYUsLhlRpbr72318kVHA1MTiHVqbP7kl0P/2Q==
-// @homepage     https://github.com/xFeny/monkey-jsonviewer
+// @homepage     https://github.com/xFeny/UserScript/tree/main/monkey-jsonviewer
 // @match        *://*/*
 // @require      https://unpkg.com/jsmind@0.8.5/es6/jsmind.js
 // @require      data:application/javascript,%3Bwindow.jsmind%3DjsMind%3B
@@ -42,7 +42,7 @@ System.set("user:beautifier", (()=>{const _=beautifier;('default' in _)||(_.defa
 System.set("user:jsmind", (()=>{const _=jsmind;('default' in _)||(_.default=_);return _})());
 System.set("user:dom-to-image", (()=>{const _=domtoimage;('default' in _)||(_.default=_);return _})());
 
-System.register("./__entry.js", ['./__monkey.entry-DaOPvC8e.js'], (function (exports, module) {
+System.register("./__entry.js", ['./__monkey.entry-HJBYvb1M.js'], (function (exports, module) {
 	'use strict';
 	return {
 		setters: [null],
@@ -54,7 +54,7 @@ System.register("./__entry.js", ['./__monkey.entry-DaOPvC8e.js'], (function (exp
 	};
 }));
 
-System.register("./__monkey.entry-DaOPvC8e.js", [], (function (exports, module) {
+System.register("./__monkey.entry-HJBYvb1M.js", [], (function (exports, module) {
   'use strict';
   return {
     execute: (function () {
@@ -809,7 +809,7 @@ System.register("./__monkey.entry-DaOPvC8e.js", [], (function (exports, module) 
         });
         const innerText = document.body.innerText;
         const { rawText, jsonpFun } = Utils.matchJsonp(innerText);
-        if (!Utils.isJSON(rawText)) return __vitePreload(() => module.import('./index-CKkjAZM9-vhvvI184.js'), void 0 );
+        if (!Utils.isJSON(rawText)) return __vitePreload(() => module.import('./index-BP5nJBK0-BfE6Kuo7.js'), void 0 );
         _unsafeWindow.RAW_TEXT = rawText;
         _unsafeWindow.GLOBAL_JSONP_FUN = jsonpFun;
         _unsafeWindow.GLOBAL_JSON = Utils.parse(_unsafeWindow.RAW_TEXT);
@@ -826,9 +826,9 @@ System.register("./__monkey.entry-DaOPvC8e.js", [], (function (exports, module) 
           document.body.insertAdjacentHTML("afterbegin", layout);
           const temp = Utils.query('template[data-for="viewFormater"]');
           Utils.query(".toolbar").innerHTML = temp.innerHTML;
-          __vitePreload(() => module.import('./index-CqxkcGYo-DJJBu7bl.js'), void 0 ).then(() => {
-            __vitePreload(() => module.import('./index-DYsfoP8L-BEh4MpbO.js'), void 0 );
-            __vitePreload(() => module.import('./index-DiPpoxj5-DJ0v9jbY.js'), void 0 );
+          __vitePreload(() => module.import('./index-Bq2JUt4J-7gcNwuNX.js'), void 0 ).then(() => {
+            __vitePreload(() => module.import('./index-DeXkXp-7-XTtoIWHO.js'), void 0 );
+            __vitePreload(() => module.import('./index-BXMvbCtq-DXsicTFy.js'), void 0 );
           });
         });
       })();
@@ -837,7 +837,7 @@ System.register("./__monkey.entry-DaOPvC8e.js", [], (function (exports, module) 
   };
 }));
 
-System.register("./index-CKkjAZM9-vhvvI184.js", ['highlight.js', 'beautifier', './__monkey.entry-DaOPvC8e.js'], (function (exports, module) {
+System.register("./index-BP5nJBK0-BfE6Kuo7.js", ['highlight.js', 'beautifier', './__monkey.entry-HJBYvb1M.js'], (function (exports, module) {
   'use strict';
   var hljs, css_beautify, js_beautify, Utils;
   return {
@@ -896,7 +896,7 @@ System.register("./index-CKkjAZM9-vhvvI184.js", ['highlight.js', 'beautifier', '
   };
 }));
 
-System.register("./index-CqxkcGYo-DJJBu7bl.js", ['./__monkey.entry-DaOPvC8e.js', './tippy.esm-Ot9MORvr-DNGa7Opj.js'], (function (exports, module) {
+System.register("./index-Bq2JUt4J-7gcNwuNX.js", ['./__monkey.entry-HJBYvb1M.js', './tippy.esm-Ot9MORvr-DNGa7Opj.js'], (function (exports, module) {
   'use strict';
   var _GM_setValue, _unsafeWindow, Utils, _GM_getValue, _GM_setClipboard, tippy;
   return {
@@ -920,16 +920,16 @@ System.register("./index-CqxkcGYo-DJJBu7bl.js", ['./__monkey.entry-DaOPvC8e.js',
         constructor(options, tag, clazz) {
           __publicField(this, "Root", "Root");
           __publicField(this, "DEFAULTS", { json: null, style: null, container: null, theme: "default", sort: SORTED.NONE });
+          // 括号
+          __publicField(this, "BRACKET", Object.freeze({
+            array: { START: "[", END: "]", FULL: "[]" },
+            object: { START: "{", END: "}", FULL: "{}" }
+          }));
           // 排序枚举
           __publicField(this, "SORT_ENUM", Object.freeze({
             [SORTED.NONE]: { value: SORTED.ASC, text: "升序" },
             [SORTED.ASC]: { value: SORTED.DESC, text: "降序" },
             [SORTED.DESC]: { value: SORTED.NONE, text: "排序" }
-          }));
-          // 括号
-          __publicField(this, "BRACKET", Object.freeze({
-            array: { START: "[", END: "]", FULL: "[]" },
-            object: { START: "{", END: "}", FULL: "{}" }
           }));
           this.tag = tag;
           this.clazz = clazz;
@@ -1308,7 +1308,7 @@ System.register("./index-CqxkcGYo-DJJBu7bl.js", ['./__monkey.entry-DaOPvC8e.js',
   };
 }));
 
-System.register("./index-DYsfoP8L-BEh4MpbO.js", ['./tippy.esm-Ot9MORvr-DNGa7Opj.js', 'jsmind', 'dom-to-image', './__monkey.entry-DaOPvC8e.js'], (function (exports, module) {
+System.register("./index-DeXkXp-7-XTtoIWHO.js", ['./tippy.esm-Ot9MORvr-DNGa7Opj.js', 'jsmind', 'dom-to-image', './__monkey.entry-HJBYvb1M.js'], (function (exports, module) {
   'use strict';
   var tippy, require$$0, require$$1, Utils, _unsafeWindow, _GM_setClipboard, _GM_getValue, URL$1, _GM_setValue;
   return {
@@ -1814,7 +1814,7 @@ System.register("./index-DYsfoP8L-BEh4MpbO.js", ['./tippy.esm-Ot9MORvr-DNGa7Opj.
   };
 }));
 
-System.register("./index-DiPpoxj5-DJ0v9jbY.js", ['./tippy.esm-Ot9MORvr-DNGa7Opj.js', './__monkey.entry-DaOPvC8e.js'], (function (exports, module) {
+System.register("./index-BXMvbCtq-DXsicTFy.js", ['./tippy.esm-Ot9MORvr-DNGa7Opj.js', './__monkey.entry-HJBYvb1M.js'], (function (exports, module) {
 	'use strict';
 	var tippy, Utils;
 	return {
