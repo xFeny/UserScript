@@ -64,6 +64,7 @@ const App = {
       });
     });
     observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+    setTimeout(() => observer.disconnect(), 10000);
   },
   closePopup() {
     try {

@@ -57,7 +57,7 @@ export default defineConfig({
         match,
         author: "Feny",
         license: "MIT",
-        version: "0.5.5",
+        version: "0.5.6",
         "run-at": "document-body",
         name: "关闭影视动漫网站的公告弹窗",
         namespace: "Violentmonkey Scripts",
