@@ -86,7 +86,6 @@ export default {
     return Tools.closest(target, `:is(${selector})`);
   },
   getVideoControls(element) {
-    const selector = ['[class*="Control"]', '[class*="control"]'];
-    return Tools.findSiblingInParent(element, selector);
+    return Tools.findSiblingInParent(element, ['[class*="Control"]', '[class*="control"]']);
   },
 };

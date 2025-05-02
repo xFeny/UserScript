@@ -1,10 +1,12 @@
-// localStorage或GM_setValue缓存
 const setStorage = function (value) {
   GM_setValue(this.name, value);
 };
 const getStorage = function (defaultValue) {
   return GM_getValue(this.name, defaultValue);
 };
+/**
+ * localStorage或GM_setValue相关key-value操作
+ */
 export default {
   CACHED_PLAY_RATE: Object.freeze({
     name: "FENY_SCRIPTS_V_PLAYBACK_RATE",

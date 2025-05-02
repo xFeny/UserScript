@@ -1,8 +1,8 @@
-// 网页全屏逻辑处理
 import Tools from "../common/Tools";
 import webSite from "../common/WebSite";
-import constants from "../common/Constants";
-const { ONE_SEC } = constants;
+/**
+ * 网页全屏逻辑处理
+ */
 export default {
   webFullScreen(video) {
     const w = video?.offsetWidth || 0;

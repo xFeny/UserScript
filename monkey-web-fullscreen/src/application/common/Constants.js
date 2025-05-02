@@ -5,6 +5,9 @@ const positions = Object.freeze({
   center: "top: 50%; left: 50%; transform: translate(-50%, -50%);",
 });
 const ONE_SECOND = 1000;
+/**
+ * 一些常量
+ */
 export default Object.freeze({
   EMPTY: "",
   DEF_PLAY_RATE: 1,

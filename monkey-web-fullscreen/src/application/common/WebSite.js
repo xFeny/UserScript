@@ -7,7 +7,7 @@ const matches = GM_info.script.matches
   .map((match) => new RegExp(match.replace(/\*/g, "\\S+")));
 
 /**
- *网站相关
+ * 网站信息相关
  */
 export default {
   isDouyu: () => location.host === "v.douyu.com",

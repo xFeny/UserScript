@@ -1,4 +1,6 @@
-// 监听的键盘code值
+/**
+ * 脚本使用到的键盘code值
+ */
 export default Object.freeze({
   KeyA: "KeyA",
   KeyD: "KeyD",

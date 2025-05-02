@@ -8,7 +8,9 @@ import selectorConfig from "../common/SelectorConfig";
 const { VIDEO_TIME_STEP, VIDEO_FASTFORWARD_DURATION } = storage;
 const { EMPTY, SYMBOL, MSG_SOURCE } = constants;
 
-// 快捷键逻辑处理
+/**
+ * 快捷键逻辑处理
+ */
 export default {
   preventDefault(event) {
     // Tools.log(event);

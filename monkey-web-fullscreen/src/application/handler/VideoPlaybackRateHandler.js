@@ -10,7 +10,9 @@ const strategy = {
   [SYMBOL.ADD]: (playRate) => playRate + PLAY_RATE_STEP.get(),
   [SYMBOL.SUBTRACT]: (playRate) => playRate - PLAY_RATE_STEP.get(),
 };
-// 倍速播放逻辑处理
+/**
+ * 倍速播放逻辑处理
+ */
 export default {
   checkUsable() {
     //是否可以设置倍速

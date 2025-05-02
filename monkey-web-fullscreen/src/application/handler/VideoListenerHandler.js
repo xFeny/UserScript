@@ -2,8 +2,10 @@ import App from "../index";
 import douyu from "./DouyuHandler";
 import Tools from "../common/Tools";
 import webSite from "../common/WebSite";
-// 视频事件监听器处理函数
-// this指向的是当前播放的video对象
+/**
+ * 视频事件监听器处理函数
+ * this指向的是当前播放的video对象
+ */
 export default {
   loadedmetadata() {
     this.volume = 1;

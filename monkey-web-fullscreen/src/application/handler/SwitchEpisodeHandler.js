@@ -1,7 +1,7 @@
 import Tools from "../common/Tools";
 
 /**
- * 通用性切换视频网站下集
+ * 通用性切换视频下集
  */
 export default {
   switchPrevEpisode: function () {

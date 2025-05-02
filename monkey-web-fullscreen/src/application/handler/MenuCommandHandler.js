@@ -12,7 +12,9 @@ const {
 // 网站是否使用增强功能，在视频播放时自动网页全屏
 const CLOSE_OTHER_WEBSITES_AUTO = "CLOSE_OTHER_WEBSITES_AUTO_";
 
-// 脚本菜单命令
+/**
+ * 脚本菜单命令
+ */
 export default {
   isClosedPlayRate: () => CLOSE_PLAY_RATE.get(),
   isOverrideKeyboard: () => OVERRIDE_KEYBOARD.get(),
@@ -89,7 +91,7 @@ export default {
     });
   },
   registerCloseAutoFullCommand() {
-    if (!webSite.inMatches() || webSite.isLivePage()) return;
+    if (!webSite.inMatches()) return;
     const isClose = this.isClosedAuto();
     const title = isClose ? "启用自动网页全屏" : "禁用自动网页全屏";
     GM_unregisterMenuCommand(this.close_auto_command_id);
