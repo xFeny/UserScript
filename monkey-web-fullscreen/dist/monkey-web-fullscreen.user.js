@@ -1011,6 +1011,7 @@
     },
     currVideoUseCachePlayRate(video) {
       if (this.isClosedPlayRate()) return;
+      if (!webSite.isIqiyi()) video.isToastShown = false;
       const playRate = this.getCachePlayRate();
       if (video.playbackRate === playRate) return;
       this.setPlayRate(playRate, !video.isToastShown);
