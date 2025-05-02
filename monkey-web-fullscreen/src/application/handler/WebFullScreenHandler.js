@@ -1,15 +1,14 @@
 // 网页全屏逻辑处理
 import Tools from "../common/Tools";
 import webSite from "../common/WebSite";
+import constants from "../common/Constants";
+const { ONE_SEC } = constants;
 export default {
-  isFull() {
-    return window.innerWidth === this.video.offsetWidth;
-  },
   webFullScreen(video) {
     const w = video?.offsetWidth || 0;
     if (Object.is(0, w)) return false;
     if (this.isClosedAuto()) return true;
-    if (window.innerWidth === w || w > window.innerWidth) return true;
+    if (w >= window.innerWidth) return true;
     if (!webSite.isBiliLive()) return Tools.triggerClick(this.element);
     return this.biliLiveWebFullScreen();
   },
@@ -18,7 +17,7 @@ export default {
     if (control.length === 0) return false;
     Tools.scrollTop(70);
     const el = Tools.query(":is(.lite-room, #player-ctnr)", unsafeWindow.top.document);
-    if (el) Tools.scrollTop(el?.getBoundingClientRect()?.top || 0);
+    if (el) Tools.scrollTop(Tools.getElementRect(el)?.top || 0);
     return Tools.triggerClick(control[1]);
   },
   exitWebFullScreen() {
@@ -35,8 +34,15 @@ export default {
   getBiliLiveIcons() {
     const video = this.getVideo();
     if (!video) return [];
-    Tools.triggerMousemoveEvent(video);
+    Tools.triggerMousemove(video);
     // 图标从右到左：全屏、网页全屏、弹幕设置、弹幕开关、小窗模式，即下标[0]是全屏图标
     return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
+  },
+  experimentWebFullScreen(video) {
+    if (webSite.inMatches() || video.isWebFullScreen || !this.topWinInfo || this.isClosedOtherWebsiteAuto()) return;
+    if (video.offsetWidth === this.topWinInfo.innerWidth) return (video.isWebFullScreen = true);
+    window.top.focus();
+    video.isWebFullScreen = true;
+    Tools.postMessage(window.top, { key: "P" });
   },
 };

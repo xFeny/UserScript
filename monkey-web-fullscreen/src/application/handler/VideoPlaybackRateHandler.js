@@ -1,3 +1,4 @@
+import Tools from "../common/Tools";
 import webSite from "../common/WebSite";
 import storage from "../common/Storage";
 import constants from "../common/Constants";
@@ -16,6 +17,7 @@ export default {
     if (!this.video) return false;
     if (webSite.isLivePage()) return false;
     if (this.isClosedPlayRate()) return false;
+    if (!Tools.validDuration(this.video)) return false;
     return true;
   },
   toFixed(playRate) {

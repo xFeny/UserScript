@@ -8,11 +8,13 @@ const match = [
   "*://www.mgtv.com/b/*",
   "*://www.acfun.cn/v/*",
   "*://www.iqiyi.com/v_*",
+  "*://v.pptv.com/show/*",
   "*://v.qq.com/x/page/*",
+  "*://v.douyu.com/show/*",
   "*://v.qq.com/x/cover/*",
-  "*://haokan.baidu.com/v*",
   "*://live.bilibili.com/*",
   "*://v.youku.com/video?*",
+  "*://haokan.baidu.com/v?*",
   "*://live.acfun.cn/live/*",
   "*://www.acfun.cn/bangumi/*",
   "*://www.bilibili.com/list/*",
@@ -20,7 +22,6 @@ const match = [
   "*://www.bilibili.com/*/play/*",
   "*://v.qq.com/live/p/newtopic/*",
   "*://www.bilibili.com/festival/*",
-  "*://v.douyu.com/show/*",
 ];
 
 // 无法自动网页全屏的，使用@include
@@ -48,7 +49,7 @@ export default defineConfig({
         match,
         include,
         author: "Feny",
-        version: "2.6.3",
+        version: "2.7.0",
         license: "GPL-3.0-only",
         name: "视频网站自动网页全屏｜倍速播放",
         namespace: "http://tampermonkey.net/",

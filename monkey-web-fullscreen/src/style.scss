@@ -31,3 +31,23 @@
   display: none !important;
 }
 /* B站直播样式 END */
+.monkey-auto-web-fullScreen {
+  ul,
+  li {
+    font-size: 24px;
+    list-style-type: none;
+  }
+
+  input {
+    width: 24px;
+    height: 24px;
+    vertical-align: bottom;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 15px;
+  }
+}

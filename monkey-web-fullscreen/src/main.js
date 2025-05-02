@@ -4,6 +4,7 @@ import KeydownHandler from "./application/handler/KeydownHandler";
 import MenuCommandHandler from "./application/handler/MenuCommandHandler";
 import WebSiteLoginHandler from "./application/handler/WebSiteLoginHandler";
 import WebFullScreenHandler from "./application/handler/WebFullScreenHandler";
+import SwitchEpisodeHandler from "./application/handler/SwitchEpisodeHandler";
 import ScriptsEnhanceHandler from "./application/handler/ScriptsEnhanceHandler";
 import VideoPlaybackRateHandler from "./application/handler/VideoPlaybackRateHandler";
 
@@ -12,6 +13,7 @@ const logicHandlers = [
   { handler: MenuCommandHandler },
   { handler: WebSiteLoginHandler },
   { handler: WebFullScreenHandler },
+  { handler: SwitchEpisodeHandler },
   { handler: VideoPlaybackRateHandler },
   { handler: ScriptsEnhanceHandler },
 ];
@@ -23,3 +25,4 @@ logicHandlers.forEach(({ handler }) => {
   }
 });
 App.init();
+unsafeWindow.MONKEY_WEB_FULLSCREEN = App;

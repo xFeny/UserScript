@@ -1,6 +1,6 @@
-#### 脚本说明
+#### 脚本合集
 
-| 文件夹                | 用处                                                         |
+| 目录                  | 脚本地址                                                     |
 | --------------------- | ------------------------------------------------------------ |
 | monkey-bimiacg        | [M站_哔咪动漫脚本](https://greasyfork.org/zh-CN/scripts/519873-m站-哔咪动漫脚本) |
 | monkey-jsonviewer     | [JSON Viewer](https://greasyfork.org/zh-CN/scripts/508417-json-viewer) |

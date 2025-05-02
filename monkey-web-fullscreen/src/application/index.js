@@ -12,6 +12,7 @@ export default {
     this.setupKeydownListener();
     this.setupMutationObserver();
     this.setupUrlChangeListener();
+    this.setupMouseMoveListener();
   },
   normalWebsite() {
     return !this.videoCenterPoint; // 普通页面，没有video标签
@@ -55,7 +56,7 @@ export default {
     const observer = Tools.createObserver(document.body, () => {
       const video = this.getVideo();
       this.element = this.getElement();
-      if (video?.play) this.setupVideoListener();
+      if (video?.play && !!video.offsetWidth) this.setupVideoListener();
       if (!webSite.inMatches() && this.video) return observer.disconnect();
       if (!video?.play || !this.element || !this.webFullScreen(video)) return;
       observer.disconnect();
@@ -102,16 +103,39 @@ export default {
     }
   },
   setVideoCenterPoint(video) {
-    const { left, top, width, height } = video.getBoundingClientRect();
-    const videoCenterPoint = { x: left + width / 2, y: top + height / 2, src: video.src };
+    const videoCenterPoint = { ...Tools.getElementCenterPoint(video) };
     this.setParentFrameSrc(videoCenterPoint);
   },
   setParentFrameSrc(videoCenterPoint) {
     this.videoCenterPoint = videoCenterPoint;
     if (Tools.isTopWin()) return this.setupScriptMenuCommand();
+    // video在iframe中，向父窗口传递它的href信息
     videoCenterPoint.frameSrc = location.href;
     Tools.postMessage(window.parent, { videoCenterPoint });
     // Tools.log("video元素中心点信息：", videoCenterPoint);
+  },
+  setupMouseMoveListener() {
+    if (this.isSetupMouseMoveListener) return;
+    const delay = ONE_SEC * 2;
+    this.isSetupMouseMoveListener = true;
+    let timer = setTimeout(this.showOrHideCursor, delay);
+    document.addEventListener("mousemove", (event) => {
+      if (!event.isTrusted) return;
+      clearTimeout(timer);
+      const target = event.target;
+      this.showOrHideCursor(false);
+      timer = setTimeout(this.showOrHideCursor, delay);
+      if (this.video === target || !(target instanceof HTMLVideoElement)) return;
+      this.addVideoEvtListener(target);
+    });
+  },
+  showOrHideCursor(isHide = true) {
+    Tools.querys(":is(video, iframe)").forEach((ele) => {
+      isHide ? (ele.style.cursor = "none") : (ele.style.cursor = EMPTY);
+    });
+    if (!isHide) return;
+    const mouseleave = new MouseEvent("mouseleave");
+    Tools.querys("body *").forEach((ele) => ele.dispatchEvent(mouseleave));
   },
   showToast(content, duration = SHOW_TOAST_TIME) {
     if (webSite.isDouyu()) douyu.addStyle();
@@ -120,7 +144,9 @@ export default {
     if (Object.is(typeof content, typeof EMPTY)) el.textContent = content;
     el.setAttribute("class", "showToast");
     el.setAttribute("style", SHOW_TOAST_POSITION);
-    const target = this.video?.parentElement?.parentElement;
+    const videoParent = this.video?.parentElement;
+    const videoContainer = this.getVideoContainer();
+    const target = this.video === videoContainer ? videoParent : videoContainer;
     Tools.query(".showToast", target)?.remove();
     target?.appendChild(el);
     setTimeout(() => {

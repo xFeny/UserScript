@@ -1,4 +1,5 @@
 import "./style.css";
+import siteConfigs from "./siteConfigs";
 
 function getTitle() {
   let title = document.title;
@@ -6,8 +7,10 @@ function getTitle() {
   title = title.substring(0, title.lastIndexOf(" ")).trim();
   return title;
 }
-const settings = { volume: 1, opacity: 0.88, autoPlay: true, defaultWide: true };
 const MSG_SOURCE = "FENY_SCRIPTS_ANIME";
+const settings = { volume: 1, opacity: 0.88, autoPlay: true, defaultWide: true };
+// https://www.moduzy7.com/search/-------------/?wd=${getTitle()}
+const searchAnime = `https://www.ezdmw.site/Index/search.html?searchText=${getTitle()}`;
 const App = {
   init() {
     this.videoSetting();
@@ -30,7 +33,7 @@ const App = {
   isEzSite: () => location.host.includes("ezdmw"),
   isBimi: () => location.host.includes("bimiacg"),
   getFrame() {
-    return this.query("iframe:not([src=''])");
+    return this.query("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])");
   },
   postMessage: (data) => parent?.postMessage({ source: MSG_SOURCE, ...data }, "*"),
   autoPlay() {
@@ -84,82 +87,53 @@ const App = {
   },
   getKeyMapping() {
     return {
-      F: () => {
-        // 切换网页全屏
-        this.toggleClass();
-        const player = this.query(":is(.player, .ty-play)");
-        window.scrollTo({ top: player?.getBoundingClientRect().top || 0 });
-      },
-      "[": () => {
-        // 上集
-        if (this.isBimi()) return this.query(".pre")?.click();
-        const episode = this.query(`a[href="${location.pathname}"]`);
-        if (this.isEzSite()) return episode?.nextElementSibling.click();
-        episode?.previousElementSibling.click();
-      },
-      "]": () => {
-        // 下集
-        if (this.isBimi()) return this.query(".next")?.click();
-        const episode = this.query(`a[href="${location.pathname}"]`);
-        if (this.isEzSite()) return episode?.previousElementSibling.click();
-        episode?.nextElementSibling.click();
-      },
+      V: () => (this.isBimi() ? GM_openInTab(searchAnime) : null),
+      F: () => this.toggleWebFullScreen(),
+      "[": () => this.switchEpisodes(true),
+      "]": () => this.switchEpisodes(),
       T: () => {
-        // 切换路线
-        // E站
+        // E站切换逻辑
         if (this.isEzSite()) {
-          const routes = Array.from(this.querys("div[class*='line_button']"));
-          const currRoute = this.query("div[class*='line_button'][style*='rgb']");
-          routes.find((route) => route !== currRoute)?.click();
+          const routes = siteConfigs.ezSite.getRoutes(this);
+          const currentRoute = siteConfigs.ezSite.getCurrentRoute(this);
+          siteConfigs.ezSite.switchRoute(routes, currentRoute);
         }
-        // P站
+        // P站切换逻辑
         if (this.isPili()) {
-          const routes = Array.from(this.querys(".c-player-episode ul"));
-          const currEpisode = this.query(`a[class*="current"][href="${location.pathname}"]`);
-          const currRouteIndex = routes.findIndex((route) => route === currEpisode.parentElement);
-          let nextRouteIndex = currRouteIndex + 1;
-          if (nextRouteIndex >= routes.length) nextRouteIndex = 0;
-          const currEpisodeIndex = this.index(currEpisode);
-          const episodes = this.querys("a", routes[nextRouteIndex]);
-          episodes[currEpisodeIndex]?.click();
+          const routes = siteConfigs.pili.getRoutes(this);
+          const currentEpisode = siteConfigs.pili.getCurrentEpisode();
+          siteConfigs.pili.switchRoute(routes, currentEpisode, this);
         }
-        // 饭团动漫
+        // 饭团动漫切换逻辑
         if (this.isFanTuan()) {
-          try {
-            const currRoute = this.query(".anime-episode.active");
-            let nextRoute = currRoute?.nextElementSibling;
-            if (!nextRoute) nextRoute = currRoute.parentElement.firstElementChild;
-            const index = this.index(this.query("a[class*='btn-episode active']"));
-            nextRoute.children[index].click();
-          } catch (e) {}
+          const currentRoute = siteConfigs.fanTuan.getCurrentRoute(this);
+          siteConfigs.fanTuan.switchRoute(currentRoute, this);
         }
-        // 哔咪动漫
+        // 哔咪动漫切换逻辑
         if (this.isBimi()) {
-          try {
-            const routes = Array.from(this.querys(".play_box"));
-            const currEpisode = this.query(`a[href="${location.pathname}"]`)?.parentElement;
-            const currRouteIndex = routes.findIndex((route) => route.classList.contains("show"));
-            let nextRouteIndex = currRouteIndex + 1;
-            if (nextRouteIndex >= routes.length) nextRouteIndex = 0;
-            const currEpisodeIndex = this.index(currEpisode);
-            const episodes = this.querys("li", routes[nextRouteIndex]);
-            episodes[currEpisodeIndex]?.firstElementChild?.click();
-          } catch (e) {}
+          const routes = siteConfigs.bimi.getRoutes(this);
+          const currentEpisode = siteConfigs.bimi.getCurrentEpisode();
+          siteConfigs.bimi.switchRoute(routes, currentEpisode, this);
         }
-      },
-      V: () => {
-        // 使用E站搜索视频
-        if (!this.isBimi()) return;
-        // https://www.moduzy7.com/search/-------------/?wd=${getTitle()}
-        GM_openInTab(`https://www.ezdmw.site/Index/search.html?searchText=${getTitle()}`);
       },
     };
   },
+  toggleWebFullScreen() {
+    const player = this.query(":is(.player, .ty-play)");
+    window.scrollTo({ top: player?.getBoundingClientRect().top || 0 });
+    this.toggleClass();
+  },
+  switchEpisodes(isPrev = false) {
+    if (this.isBimi()) return this.query(isPrev ? ".pre" : ".next")?.click();
+    const episode = this.query(`a[href="${location.pathname}"]`);
+    if (this.isEzSite()) return (isPrev ? episode?.nextElementSibling : episode?.previousElementSibling).click();
+    (isPrev ? episode?.previousElementSibling : episode?.nextElementSibling).click();
+  },
   index(element) {
     if (!element) return;
-    const parent = element.parentNode;
-    if (!parent) return -1;
-    const children = Array.from(parent.children);
+    const parentEle = element.parentElement;
+    if (!parentEle) return -1;
+    const children = Array.from(parentEle.children);
     return children.indexOf(element);
   },
   toggleClass() {

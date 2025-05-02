@@ -2,16 +2,14 @@
 
 建议先在浏览器上安装 [uBlock Origin](https://www.crxsoso.com/webstore/detail/cjpalhdlnbpafiamejdnhcphjbkeiagm) 或 [AdGuard](https://www.crxsoso.com/webstore/detail/bgnkhhnnamicmpeenaelnjfhikgbkllg) 扩展，可有效移除视频网站的视频广告。
 
-#### 脚本菜单  
+### 脚本菜单  
 
-脚本菜单项：  
-1. 开启/关闭倍速功能
+1. 启用/禁用倍速功能
 2. 设置倍速步进  
 3. 设置快进/快退秒数  
 4. 设置数字零键快进秒数  
-5. 开启/关闭自动网页全屏  
-6. 开启/关闭 空格 ◀▶ 键控制  
-![脚本菜单](./script_menu_command.png)  
+5. 启用/禁用自动网页全屏  
+6. 启用/禁用 空格 ◀▶ 键控制  
 
 ### 快捷键
 
@@ -31,11 +29,11 @@
 
 ### 关于自动网页全屏
 
-如果不需要打开视频播放页自动网页全屏，可在脚本菜单中关闭。关闭后不会影响快捷键(P)切换。
+如果不需要打开视频播放页自动网页全屏，可在脚本菜单中禁用。禁用后不会影响快捷键(P)切换。
 
-### 关于自动恢复网页全屏
+##### 关于自动恢复网页全屏
 
-在开启了自动网页全屏状态下，如果退出了网页全屏且视频暂停，重新播放后默认会恢复为网页全屏。  
+在启用了自动网页全屏状态下，如果退出了网页全屏且视频暂停，重新播放后默认会恢复为网页全屏。  
 如果不希望这样的效果，可注释掉如下代码：
 
 ```js
@@ -54,9 +52,9 @@ B站如果合集视频为最后一集、关闭了合集“自动连播”，也�
 ```
 ### 关于 空格 ◀▶ 键控制
 
-脚本默认为关闭状态，在脚本菜单中可开启，开启控制后，会覆盖播放器自带的操作。
+脚本默认为禁用状态，在脚本菜单中可启用，启用控制后，会覆盖播放器自带的操作。
 
-开启控制后，可在脚本菜单设置快进/快退秒数。
+启用控制后，可在脚本菜单设置快进/快退秒数。
 
 ### 关于倍速播放
 
@@ -96,7 +94,7 @@ SHOW_TOAST_POSITION: positions.center
 // 修改为右下角提示
 SHOW_TOAST_POSITION: positions.bottomRight
 ```
-> 如果不需要倍速播放功能，可在脚本菜单中关闭
+> 如果不需要倍速播放功能，可在脚本菜单中禁用
 
 ### 关于页面不可见时暂停播放
 
@@ -107,17 +105,23 @@ SHOW_TOAST_POSITION: positions.bottomRight
 ```js
 this.setupVisibleListener();
 ```
-### 网页全屏功能增强
+### 实验性功能
 
-本脚本配合[视频网页全屏（改）](https://greasyfork.org/zh-CN/scripts/495077-maximize-video-improve)使用，可以减少不必要的鼠标移动。  
+实验性功能不保证100%有效。
 
-[视频网页全屏（改）](https://greasyfork.org/zh-CN/scripts/495077-maximize-video-improve)需要鼠标移动到视频播放器上，出现了网页全屏按钮后，再按 快捷键 `Esc` 或 `网页全屏` 按钮 进行网页全屏。
+#### 一、网页全屏功能增强
 
-而配合本脚本后，播放器加载完毕后直接按 快捷键(P) 网页全屏。
+本脚本配合<a href="https://greasyfork.org/zh-CN/scripts/495077-maximize-video-improve" target="_blank">视频网页全屏（改）</a>使用，可以减少不必要的鼠标移动。  
 
-#### 前提
+<a href="https://greasyfork.org/zh-CN/scripts/495077-maximize-video-improve" target="_blank">视频网页全屏（改）</a>需要鼠标移动到视频播放器上，出现了网页全屏按钮后，再按 快捷键 `Esc` 或 `网页全屏` 按钮 进行网页全屏。
 
-安装[视频网页全屏（改）](https://greasyfork.org/zh-CN/scripts/495077-maximize-video-improve)  脚本。
+而配合本脚本后，播放器加载完毕后直接按 快捷键(P) 网页全屏（某些网站可能不成功）。
+
+##### 前提
+
+安装 <a href="https://greasyfork.org/zh-CN/scripts/495077-maximize-video-improve" target="_blank">视频网页全屏（改）</a> 脚本。
+
+##### 使用前
 
 把本脚本内的：
 
@@ -129,7 +133,7 @@ this.setupVisibleListener();
 ```js
 // @match        *://*/*
 ```
-或只针对某个网站使用，如 [咕咕番](https://www.gugu3.com)：
+或只针对某个网站使用，如<a href="https://www.gugu3.com" target="_blank">咕咕番</a>：
 
 ```js
 // @include      *://www.gugu3.com/*
@@ -139,15 +143,52 @@ this.setupVisibleListener();
 > 
 > 推荐使用匹配所有网站方式使用，只针对某个网站使用的话，如果网站视频是在跨域 `iframe` 中，还需要添加在框架的域名匹配。  
 > 
-> 例如[E站弹幕网](https://www.ezdmw.site/)，要按如下匹配才可以：  
+> 例如<a href="https://www.ezdmw.site/" target="_blank">E站弹幕网</a>，要按如下匹配才可以：  
 > 
-> ```
+> ```js
 > // @include      *://www.ezdmw.site/Index/video/*
 > // @include      *://player.ezdmw.com/danmuku/*
 > ```
 
+##### 启用/禁用自动网页全屏
+
+对于不在脚本默认 `@match` 匹配列表中的视频网站，又频繁性使用的，希望能自动进入网页全屏，减少按键操作。
+
+在使用 `快捷键(P)`  可<b style="color:red">成功网页全屏</b>的视频网站<b style="color:red">前提下</b>，可以在脚本菜单中 `此站点启用自动网页全屏`。
+
+功能启用后，在<b style="color:#e5b01e">视频开始播放</b>后会自动进入网页全屏（<a href="https://www.zxzja.com/" target="_blank">某些视频网站</a>会在自动网页全屏后播放器消失不见）。
+
+#### 二、通用切换下一集
+
+对第三方不在默认 `@match` 匹配列表中的视频网站，适配 `N` 键切换下一集。
+
+##### 适用性
+
+视频网站的剧集列表是通过链接式打开的。不是链接式会查找不到剧集列表。如：<a href="https://ddys.pro" target="_blank">低端影视</a>，就会切换下集失败。
+
+##### 使用前
+
+```js
+// @note        *://*/*
+```
+改成：
+
+```js
+// @match        *://*/*
+```
+
+##### 测试网站
+
+<a href="https://www.jspoo.com/" target="_blank">聚神铺导航</a>、<a href="https://yinghezhinan.com/" target="_blank">硬核指南</a>、<a href="https://www.shandiandh.com/" target="_blank">闪电导航</a> 内的动漫影视网站。
+
 ### 更新历史
 
+- 2.7.0
+  1. 优化非默认匹配网站，网页全屏功能的准确性。  
+  2. 新增：鼠标光标在播放器上移动，停止移动后一段时间自动隐藏光标（如<a href="https://www.mgtv.com/" target="_blank" style="color:#FF5F00">芒果TV</a>不会自动隐藏）。
+  3. 新增：不在脚本默认匹配列表中的视频网站，配合<a href="https://greasyfork.org/zh-CN/scripts/495077-maximize-video-improve" target="_blank">视频网页全屏（改）</a>脚本也可以启用自动网页全屏。
+  4. 新增：视频网站通用性切换下一集功能。
+  
 - 2.6.3  
   1. 新增脚本菜单：开/关倍速功能。  
 

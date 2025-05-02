@@ -29,7 +29,7 @@ export default defineConfig({
         match,
         author: "Feny",
         license: "MIT",
-        version: "1.1.5",
+        version: "1.1.6",
         name: "M站_哔咪动漫脚本",
         "run-at": "document-body",
         namespace: "http://tampermonkey.net/",

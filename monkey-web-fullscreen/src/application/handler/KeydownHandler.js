@@ -25,15 +25,16 @@ export default {
     window.addEventListener("keydown", (event) => this.keydownHandler.call(this, event), true);
     window.addEventListener("message", (event) => {
       const { data } = event;
-      // Tools.log("接收到消息：", data, location.href);
+      // Tools.log(location.href, "接收到消息：", data);
       if (!data?.source || !data.source.includes(MSG_SOURCE)) return;
+      if (data?.topWinInfo) this.topWinInfo = data.topWinInfo;
       if (data?.defaultPlayRate) this.defaultPlayRate();
       if (data?.videoCenterPoint) return this.setParentFrameSrc(data.videoCenterPoint);
       this.processEvent(data);
     });
   },
   keydownHandler(event) {
-    // Tools.log(event);
+    // Tools.log("键盘事件：", event);
     if (this.normalWebsite()) return;
     let key = event.key.toUpperCase();
     const { code, target, shiftKey } = event;
@@ -43,7 +44,9 @@ export default {
     if (eventCode.Space === code) key = eventCode.Space.toUpperCase();
     if (shiftKey && eventCode.NumpadAdd === code) key = SYMBOL.MULTIPLY; // shift + 组合快捷键
     if (shiftKey && eventCode.NumpadSubtract === code) key = SYMBOL.DIVIDE; // shift - 组合快捷键
-    if (!Tools.isTopWin() && eventCode.KeyP === code) return Tools.postMessage(window.top, { key });
+    if (!Tools.isTopWin() && (eventCode.KeyP === code || eventCode.KeyN === code)) {
+      return Tools.postMessage(window.top, { key });
+    }
     this.processEvent({ key });
   },
   processEvent(data) {
@@ -52,7 +55,7 @@ export default {
     if (data?.key) this.execHotKeyActions(data.key);
   },
   execHotKeyActions(key) {
-    // console.log({ key });
+    // Tools.log("按下的键：", { key });
     if (this.normalWebsite()) return;
     const keyMapping = this.getKeyMapping();
     if (keyMapping[key]) return keyMapping[key]();
@@ -61,13 +64,13 @@ export default {
   getKeyMapping() {
     return {
       Z: () => this.defaultPlayRate(),
-      N: () => this.triggerIconElement("next"),
       A: () => this.adjustPlayRate(SYMBOL.ADD),
       S: () => this.adjustPlayRate(SYMBOL.SUBTRACT),
       [SYMBOL.ADD]: () => this.adjustPlayRate(SYMBOL.ADD),
       [SYMBOL.DIVIDE]: () => this.adjustPlayRate(SYMBOL.DIVIDE),
       [SYMBOL.SUBTRACT]: () => this.adjustPlayRate(SYMBOL.SUBTRACT),
       [SYMBOL.MULTIPLY]: () => this.adjustPlayRate(SYMBOL.MULTIPLY),
+      N: () => (webSite.inMatches() ? this.triggerIconElement("next") : this.switchNextEpisode()),
       F: () => (webSite.isDouyu() ? douyu.getFullIcon().click() : this.triggerIconElement("full", 0)),
       D: () => (webSite.isDouyu() ? douyu.getDanmakuIcon().click() : this.triggerIconElement("danmaku", 3)),
       ARROWLEFT: () => (this.isOverrideKeyboard() ? this.adjustVideoTime(SYMBOL.SUBTRACT) : null),
@@ -89,6 +92,7 @@ export default {
     if (!webSite.inMatches()) return;
     if (webSite.isBiliLive()) return this.getBiliLiveIcons()?.[index]?.click();
     Tools.query(selectorConfig[location.host]?.[name])?.click();
+    Tools.triggerMousemove(this.video);
   },
   adjustVideoTime(second = VIDEO_TIME_STEP.get(), _symbol) {
     if (!this.video || !Tools.validDuration(this.video)) return;

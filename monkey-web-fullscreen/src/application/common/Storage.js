@@ -43,7 +43,7 @@ export default {
       return Number.parseInt(getStorage.bind(this, 5)()); // 快进、快退的秒数
     },
   }),
-  CLOSE_AUTO_WEB_FULL: Object.freeze({
+  CLOSE_AUTO_WEB_FULL_SCREEN: Object.freeze({
     name: "CLOSE_AUTO_WEB_FULL_SCREEN",
     set: setStorage,
     get() {
