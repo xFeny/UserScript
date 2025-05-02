@@ -362,7 +362,6 @@
     addVideoEvtListener(video) {
       this.video = video;
       this.setVideoCenterPoint(video);
-      if (webSite.isLivePage()) return;
       this.removeVideoEvtListener();
       for (const type of Object.keys(VideoListenerHandler)) {
         const handler = VideoListenerHandler[type];
@@ -652,6 +651,7 @@
       this.isSetupCommandChangeListener = true;
     },
     registerClosePlayRate() {
+      if (webSite.isLivePage()) return;
       const isClose = this.isClosedPlayRate();
       const title = isClose ? "启用倍速功能" : "禁用倍速功能";
       _GM_unregisterMenuCommand(this.close_play_rate_command_id);
@@ -661,6 +661,7 @@
       });
     },
     registerPlayRateCommand() {
+      if (webSite.isLivePage()) return;
       const title = "设置倍速步进";
       _GM_unregisterMenuCommand(this.play_rate_command_id);
       if (this.isClosedPlayRate()) return;
@@ -670,6 +671,7 @@
       });
     },
     registerVideoTimeCommand() {
+      if (webSite.isLivePage()) return;
       const title = "设置快进/退秒数";
       _GM_unregisterMenuCommand(this.video_time_command_id);
       if (!this.isOverrideKeyboard()) return;
@@ -679,6 +681,7 @@
       });
     },
     registerFastforwardCommand() {
+      if (webSite.isLivePage()) return;
       const title = "设置零键快进秒数";
       _GM_unregisterMenuCommand(this.fastforward_command_id);
       this.fastforward_command_id = _GM_registerMenuCommand(title, () => {
@@ -687,7 +690,7 @@
       });
     },
     registerCloseAutoFullCommand() {
-      if (!webSite.inMatches()) return;
+      if (!webSite.inMatches() || webSite.isLivePage()) return;
       const isClose = this.isClosedAuto();
       const title = isClose ? "启用自动网页全屏" : "禁用自动网页全屏";
       _GM_unregisterMenuCommand(this.close_auto_command_id);
