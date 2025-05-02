@@ -75,7 +75,6 @@ export default {
   addVideoEvtListener(video) {
     this.video = video;
     this.setVideoCenterPoint(video);
-    if (webSite.isLivePage()) return;
     this.removeVideoEvtListener();
     for (const type of Object.keys(VideoListenerHandler)) {
       const handler = VideoListenerHandler[type];
