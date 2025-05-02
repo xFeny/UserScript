@@ -690,7 +690,7 @@
       });
     },
     registerCloseAutoFullCommand() {
-      if (!webSite.inMatches() || webSite.isLivePage()) return;
+      if (!webSite.inMatches()) return;
       const isClose = this.isClosedAuto();
       const title = isClose ? "启用自动网页全屏" : "禁用自动网页全屏";
       _GM_unregisterMenuCommand(this.close_auto_command_id);
@@ -961,8 +961,7 @@
       return Tools.closest(target, `:is(${selector})`);
     },
     getVideoControls(element) {
-      const selector = ['[class*="Control"]', '[class*="control"]'];
-      return Tools.findSiblingInParent(element, selector);
+      return Tools.findSiblingInParent(element, ['[class*="Control"]', '[class*="control"]']);
     }
   };
   const { PLAY_RATE_STEP, CACHED_PLAY_RATE } = storage;
