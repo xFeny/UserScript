@@ -49,6 +49,7 @@ export default {
   },
   currVideoUseCachePlayRate(video) {
     if (this.isClosedPlayRate()) return;
+    if (!webSite.isIqiyi()) video.isToastShown = false;
     const playRate = this.getCachePlayRate();
     // Tools.log(`当前播放倍速为：${video.playbackRate}，记忆倍速为：${playRate}`);
     if (video.playbackRate === playRate) return;
