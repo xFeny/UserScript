@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         关闭影视动漫网站的公告弹窗
 // @namespace    Violentmonkey Scripts
-// @version      0.5.5
+// @version      0.5.6
 // @author       Feny
 // @description  自动关闭动漫网站的公告弹窗，支持的站点有：anfuns、次元方舟、Animoe动漫、漫次元、MuteFun、girigiri爱动漫、咕咕番、AcFuns、NyaFun、橘子动漫、acgNya等
 // @license      MIT
@@ -111,6 +111,7 @@
         });
       });
       observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+      setTimeout(() => observer.disconnect(), 1e4);
     },
     closePopup() {
       try {
