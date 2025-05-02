@@ -14,8 +14,11 @@ export default {
     this.setupUrlChangeListener();
     this.setupMouseMoveListener();
   },
+  isLive() {
+    return webSite.isLivePage() || this.videoInfo?.isLive;
+  },
   normalWebsite() {
-    return !this.videoCenterPoint; // 普通页面，没有video标签
+    return !this.videoInfo; // 普通页面，没有video标签
   },
   getVideo() {
     if (webSite.isDouyu()) return douyu.getVideo();
@@ -27,8 +30,8 @@ export default {
   },
   getVideoIframe() {
     // video所在的iframe标签
-    if (!this.videoCenterPoint?.frameSrc) return null;
-    const url = new URL(this.videoCenterPoint.frameSrc);
+    if (!this.videoInfo?.frameSrc) return null;
+    const url = new URL(this.videoInfo.frameSrc);
     const src = decodeURI(url.pathname + url.search);
     return Tools.query(`iframe[src*="${src}"]`);
   },
@@ -36,7 +39,7 @@ export default {
     window.addEventListener("visibilitychange", () => {
       window.top.focus();
       if (this.normalWebsite()) return;
-      const video = webSite.isLivePage() ? this.getVideo() : this.video;
+      const video = this.isLive() ? this.getVideo() : this.video;
       if (!video || video?.isEnded || !Tools.isVisible(video)) return;
       document.hidden ? video?.pause() : video?.play();
     });
@@ -74,7 +77,7 @@ export default {
   },
   addVideoEvtListener(video) {
     this.video = video;
-    this.setVideoCenterPoint(video);
+    this.setVideoInfo(video);
     this.removeVideoEvtListener();
     for (const type of Object.keys(VideoListenerHandler)) {
       const handler = VideoListenerHandler[type];
@@ -101,17 +104,24 @@ export default {
       return this.addVideoEvtListener(video); // 正在播放的video
     }
   },
-  setVideoCenterPoint(video) {
-    const videoCenterPoint = { ...Tools.getElementCenterPoint(video) };
-    this.setParentFrameSrc(videoCenterPoint);
+  setVideoInfo(video) {
+    const videoInfo = { ...Tools.getElementCenterPoint(video), isLive: video.duration === Infinity };
+    this.setParentVideoInfo(videoInfo);
   },
-  setParentFrameSrc(videoCenterPoint) {
-    this.videoCenterPoint = videoCenterPoint;
+  setParentVideoInfo(videoInfo) {
+    this.videoInfo = videoInfo;
     if (Tools.isTopWin()) return this.setupScriptMenuCommand();
     // video在iframe中，向父窗口传递它的href信息
-    videoCenterPoint.frameSrc = location.href;
-    Tools.postMessage(window.parent, { videoCenterPoint });
-    // Tools.log("video元素中心点信息：", videoCenterPoint);
+    videoInfo.frameSrc = location.href;
+    Tools.postMessage(window.parent, { videoInfo });
+    // Tools.log("video元素中心点信息：", videoInfo);
+  },
+  changeVideoInfo(video) {
+    if (!this.videoInfo) return;
+    const isLive = video.duration === Infinity;
+    if (this.videoInfo.isLive === isLive) return;
+    this.videoInfo.isLive = isLive;
+    this.setParentVideoInfo(this.videoInfo);
   },
   setupMouseMoveListener() {
     if (this.isSetupMouseMoveListener) return;

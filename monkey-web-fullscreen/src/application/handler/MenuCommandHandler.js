@@ -52,39 +52,37 @@ export default {
     this.isSetupCommandChangeListener = true; // 防止多次注册
   },
   registerClosePlayRate() {
-    if (webSite.isLivePage()) return;
     const isClose = this.isClosedPlayRate();
     const title = isClose ? "启用倍速功能" : "禁用倍速功能";
     GM_unregisterMenuCommand(this.close_play_rate_command_id);
+    if (this.isLive()) return;
     this.close_play_rate_command_id = GM_registerMenuCommand(title, () => {
       CLOSE_PLAY_RATE.set(!isClose);
       if (!isClose) Tools.postMessage(window, { defaultPlayRate: true });
     });
   },
   registerPlayRateCommand() {
-    if (webSite.isLivePage()) return;
     const title = "设置倍速步进";
     GM_unregisterMenuCommand(this.play_rate_command_id);
-    if (this.isClosedPlayRate()) return;
+    if (this.isLive() || this.isClosedPlayRate()) return;
     this.play_rate_command_id = GM_registerMenuCommand(title, () => {
       const input = prompt(title, PLAY_RATE_STEP.get());
       if (!isNaN(input) && Number.parseFloat(input)) PLAY_RATE_STEP.set(input);
     });
   },
   registerVideoTimeCommand() {
-    if (webSite.isLivePage()) return;
-    const title = "设置快进/退秒数";
     GM_unregisterMenuCommand(this.video_time_command_id);
-    if (!this.isOverrideKeyboard()) return;
+    if (this.isLive() || !this.isOverrideKeyboard()) return;
+    const title = "设置快进/退秒数";
     this.video_time_command_id = GM_registerMenuCommand(title, () => {
       const input = prompt(title, VIDEO_TIME_STEP.get());
       if (!isNaN(input) && Number.parseInt(input)) VIDEO_TIME_STEP.set(input);
     });
   },
   registerFastforwardCommand() {
-    if (webSite.isLivePage()) return;
-    const title = "设置零键快进秒数";
     GM_unregisterMenuCommand(this.fastforward_command_id);
+    if (this.isLive()) return;
+    const title = "设置零键快进秒数";
     this.fastforward_command_id = GM_registerMenuCommand(title, () => {
       const input = prompt(title, VIDEO_FASTFORWARD_DURATION.get());
       if (!isNaN(input) && Number.parseInt(input)) VIDEO_FASTFORWARD_DURATION.set(input);

@@ -31,7 +31,7 @@ export default {
       if (!data?.source || !data.source.includes(MSG_SOURCE)) return;
       if (data?.topWinInfo) this.topWinInfo = data.topWinInfo;
       if (data?.defaultPlayRate) this.defaultPlayRate();
-      if (data?.videoCenterPoint) return this.setParentFrameSrc(data.videoCenterPoint);
+      if (data?.videoInfo) return this.setParentVideoInfo(data.videoInfo);
       this.processEvent(data);
     });
   },

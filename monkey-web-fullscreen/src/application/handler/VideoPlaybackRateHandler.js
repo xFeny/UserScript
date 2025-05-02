@@ -26,11 +26,11 @@ export default {
     playRate = Number.parseFloat(playRate);
     return playRate.toFixed(2).replace(/\.?0+$/, "");
   },
-  setPlayRate(playRate) {
+  setPlayRate(playRate, show = true) {
     if (!this.checkUsable()) return;
     this.video.playbackRate = this.toFixed(playRate);
+    if (show) this.playRateToast();
     this.cachePlayRate();
-    this.playRateToast();
   },
   adjustPlayRate(_symbol) {
     if (!this.checkUsable()) return;
@@ -46,6 +46,14 @@ export default {
     if (this.isClosedPlayRate()) return;
     this.cachePlayRate();
     this.showToast("已恢复正常倍速播放");
+  },
+  currVideoUseCachePlayRate(video) {
+    if (this.isClosedPlayRate()) return;
+    const playRate = this.getCachePlayRate();
+    // Tools.log(`当前播放倍速为：${video.playbackRate}，记忆倍速为：${playRate}`);
+    if (video.playbackRate === playRate) return;
+    this.setPlayRate(playRate, !video.isToastShown);
+    video.isToastShown = true;
   },
   cachePlayRate() {
     CACHED_PLAY_RATE.set(this.video.playbackRate);

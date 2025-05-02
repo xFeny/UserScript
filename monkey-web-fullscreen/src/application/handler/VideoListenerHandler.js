@@ -9,24 +9,19 @@ import webSite from "../common/WebSite";
 export default {
   loadedmetadata() {
     this.volume = 1;
-    this.isToast = false;
+    this.isToastShown = false;
     this.isWebFullScreen = false;
   },
   loadeddata() {
     this.volume = 1;
-    this.isToast = false;
+    this.isToastShown = false;
     this.isWebFullScreen = false;
   },
   timeupdate() {
     if (isNaN(this.duration)) return;
+    App.changeVideoInfo(this);
     App.experimentWebFullScreen(this);
-    if (App.isClosedPlayRate()) return;
-    if (!webSite.isIqiyi()) this.isToast = false;
-    const playRate = App.getCachePlayRate();
-    // Tools.log(`当前播放倍速为：${this.playbackRate}，记忆倍速为：${playRate}`);
-    if (this.isToast || this.playbackRate === playRate) return;
-    App.setPlayRate(playRate);
-    this.isToast = true;
+    App.currVideoUseCachePlayRate(this);
   },
   canplay() {
     webSite.isDouyu() ? douyu.play() : this.play();
@@ -37,7 +32,7 @@ export default {
   },
   ended() {
     this.isEnded = true;
-    this.isToast = false;
+    this.isToastShown = false;
     // if (/[a-zA-z]+:\/\/[^\s]*/.test(location.href)) return;
     if (!webSite.isBili() && !webSite.isAcFun()) return;
     // B站视频合集播放的是合集最后一个或关闭了合集自动连播

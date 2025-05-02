@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      2.7.0
+// @version      2.7.1
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；快捷键切换：全屏(F)、网页全屏(P)、下一个视频(N)、弹幕开关(D)；支持任意视频倍速播放，提示记忆倍速；B站播放完自动退出网页全屏和取消连播。
 // @license      GPL-3.0-only
@@ -259,23 +259,19 @@
   const VideoListenerHandler = {
     loadedmetadata() {
       this.volume = 1;
-      this.isToast = false;
+      this.isToastShown = false;
       this.isWebFullScreen = false;
     },
     loadeddata() {
       this.volume = 1;
-      this.isToast = false;
+      this.isToastShown = false;
       this.isWebFullScreen = false;
     },
     timeupdate() {
       if (isNaN(this.duration)) return;
+      App.changeVideoInfo(this);
       App.experimentWebFullScreen(this);
-      if (App.isClosedPlayRate()) return;
-      if (!webSite.isIqiyi()) this.isToast = false;
-      const playRate = App.getCachePlayRate();
-      if (this.isToast || this.playbackRate === playRate) return;
-      App.setPlayRate(playRate);
-      this.isToast = true;
+      App.currVideoUseCachePlayRate(this);
     },
     canplay() {
       webSite.isDouyu() ? douyu.play() : this.play();
@@ -286,7 +282,7 @@
     },
     ended() {
       this.isEnded = true;
-      this.isToast = false;
+      this.isToastShown = false;
       if (!webSite.isBili() && !webSite.isAcFun()) return;
       const pod = Tools.query(".video-pod");
       const pods = Tools.querys('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
@@ -302,8 +298,11 @@
       this.setupUrlChangeListener();
       this.setupMouseMoveListener();
     },
+    isLive() {
+      return webSite.isLivePage() || this.videoInfo?.isLive;
+    },
     normalWebsite() {
-      return !this.videoCenterPoint;
+      return !this.videoInfo;
     },
     getVideo() {
       if (webSite.isDouyu()) return douyu.getVideo();
@@ -314,8 +313,8 @@
       return document.querySelector(selectorConfig[location.host]?.webfull);
     },
     getVideoIframe() {
-      if (!this.videoCenterPoint?.frameSrc) return null;
-      const url = new URL(this.videoCenterPoint.frameSrc);
+      if (!this.videoInfo?.frameSrc) return null;
+      const url = new URL(this.videoInfo.frameSrc);
       const src = decodeURI(url.pathname + url.search);
       return Tools.query(`iframe[src*="${src}"]`);
     },
@@ -323,7 +322,7 @@
       window.addEventListener("visibilitychange", () => {
         window.top.focus();
         if (this.normalWebsite()) return;
-        const video = webSite.isLivePage() ? this.getVideo() : this.video;
+        const video = this.isLive() ? this.getVideo() : this.video;
         if (!video || video?.isEnded || !Tools.isVisible(video)) return;
         document.hidden ? video?.pause() : video?.play();
       });
@@ -361,7 +360,7 @@
     },
     addVideoEvtListener(video) {
       this.video = video;
-      this.setVideoCenterPoint(video);
+      this.setVideoInfo(video);
       this.removeVideoEvtListener();
       for (const type of Object.keys(VideoListenerHandler)) {
         const handler = VideoListenerHandler[type];
@@ -388,15 +387,22 @@
         return this.addVideoEvtListener(video);
       }
     },
-    setVideoCenterPoint(video) {
-      const videoCenterPoint = { ...Tools.getElementCenterPoint(video) };
-      this.setParentFrameSrc(videoCenterPoint);
+    setVideoInfo(video) {
+      const videoInfo = { ...Tools.getElementCenterPoint(video), isLive: video.duration === Infinity };
+      this.setParentVideoInfo(videoInfo);
     },
-    setParentFrameSrc(videoCenterPoint) {
-      this.videoCenterPoint = videoCenterPoint;
+    setParentVideoInfo(videoInfo) {
+      this.videoInfo = videoInfo;
       if (Tools.isTopWin()) return this.setupScriptMenuCommand();
-      videoCenterPoint.frameSrc = location.href;
-      Tools.postMessage(window.parent, { videoCenterPoint });
+      videoInfo.frameSrc = location.href;
+      Tools.postMessage(window.parent, { videoInfo });
+    },
+    changeVideoInfo(video) {
+      if (!this.videoInfo) return;
+      const isLive = video.duration === Infinity;
+      if (this.videoInfo.isLive === isLive) return;
+      this.videoInfo.isLive = isLive;
+      this.setParentVideoInfo(this.videoInfo);
     },
     setupMouseMoveListener() {
       if (this.isSetupMouseMoveListener) return;
@@ -532,7 +538,7 @@
         if (!data?.source || !data.source.includes(MSG_SOURCE)) return;
         if (data?.topWinInfo) this.topWinInfo = data.topWinInfo;
         if (data?.defaultPlayRate) this.defaultPlayRate();
-        if (data?.videoCenterPoint) return this.setParentFrameSrc(data.videoCenterPoint);
+        if (data?.videoInfo) return this.setParentVideoInfo(data.videoInfo);
         this.processEvent(data);
       });
     },
@@ -651,39 +657,37 @@
       this.isSetupCommandChangeListener = true;
     },
     registerClosePlayRate() {
-      if (webSite.isLivePage()) return;
       const isClose = this.isClosedPlayRate();
       const title = isClose ? "启用倍速功能" : "禁用倍速功能";
       _GM_unregisterMenuCommand(this.close_play_rate_command_id);
+      if (this.isLive()) return;
       this.close_play_rate_command_id = _GM_registerMenuCommand(title, () => {
         CLOSE_PLAY_RATE.set(!isClose);
         if (!isClose) Tools.postMessage(window, { defaultPlayRate: true });
       });
     },
     registerPlayRateCommand() {
-      if (webSite.isLivePage()) return;
       const title = "设置倍速步进";
       _GM_unregisterMenuCommand(this.play_rate_command_id);
-      if (this.isClosedPlayRate()) return;
+      if (this.isLive() || this.isClosedPlayRate()) return;
       this.play_rate_command_id = _GM_registerMenuCommand(title, () => {
         const input = prompt(title, PLAY_RATE_STEP$1.get());
         if (!isNaN(input) && Number.parseFloat(input)) PLAY_RATE_STEP$1.set(input);
       });
     },
     registerVideoTimeCommand() {
-      if (webSite.isLivePage()) return;
-      const title = "设置快进/退秒数";
       _GM_unregisterMenuCommand(this.video_time_command_id);
-      if (!this.isOverrideKeyboard()) return;
+      if (this.isLive() || !this.isOverrideKeyboard()) return;
+      const title = "设置快进/退秒数";
       this.video_time_command_id = _GM_registerMenuCommand(title, () => {
         const input = prompt(title, VIDEO_TIME_STEP.get());
         if (!isNaN(input) && Number.parseInt(input)) VIDEO_TIME_STEP.set(input);
       });
     },
     registerFastforwardCommand() {
-      if (webSite.isLivePage()) return;
-      const title = "设置零键快进秒数";
       _GM_unregisterMenuCommand(this.fastforward_command_id);
+      if (this.isLive()) return;
+      const title = "设置零键快进秒数";
       this.fastforward_command_id = _GM_registerMenuCommand(title, () => {
         const input = prompt(title, VIDEO_FASTFORWARD_DURATION.get());
         if (!isNaN(input) && Number.parseInt(input)) VIDEO_FASTFORWARD_DURATION.set(input);
@@ -909,14 +913,14 @@
   };
   const ScriptsEnhanceHandler = {
     enhance() {
-      if (!this.videoCenterPoint) return;
+      if (!this.videoInfo) return;
       const ele = this.getHoverElement();
       Tools.triggerHoverEvent(ele);
       Tools.triggerEscapeEvent();
       this.backupTrigger();
     },
     backupTrigger() {
-      if (!this.video || this.videoCenterPoint.frameSrc) return;
+      if (!this.video || this.videoInfo.frameSrc) return;
       let oldWidth = this.video.oldWidth;
       let newWidth = this.video.offsetWidth;
       if (!Object.is(oldWidth, newWidth)) return;
@@ -928,7 +932,7 @@
       if (this.video) return this.getVideoContainer();
       const iframe = this.getVideoIframe();
       if (iframe) return iframe;
-      const { centerX, centerY } = this.videoCenterPoint;
+      const { centerX, centerY } = this.videoInfo;
       const iframes = Tools.getFrames();
       for (const element of iframes) {
         if (!Tools.isVisible(element)) continue;
@@ -943,7 +947,7 @@
       const player = this.getVideoPlayer(parentEle);
       const videoContainer = player || control?.parentElement;
       if (!videoContainer) return video;
-      if (this.videoCenterPoint.frameSrc) return videoContainer;
+      if (this.videoInfo.frameSrc) return videoContainer;
       const videoWidth = video.offsetWidth;
       const wrapWidth = videoContainer.offsetWidth;
       return wrapWidth !== videoWidth ? video : videoContainer;
@@ -984,11 +988,11 @@
       playRate = Number.parseFloat(playRate);
       return playRate.toFixed(2).replace(/\.?0+$/, "");
     },
-    setPlayRate(playRate) {
+    setPlayRate(playRate, show = true) {
       if (!this.checkUsable()) return;
       this.video.playbackRate = this.toFixed(playRate);
+      if (show) this.playRateToast();
       this.cachePlayRate();
-      this.playRateToast();
     },
     adjustPlayRate(_symbol) {
       if (!this.checkUsable()) return;
@@ -1004,6 +1008,13 @@
       if (this.isClosedPlayRate()) return;
       this.cachePlayRate();
       this.showToast("已恢复正常倍速播放");
+    },
+    currVideoUseCachePlayRate(video) {
+      if (this.isClosedPlayRate()) return;
+      const playRate = this.getCachePlayRate();
+      if (video.playbackRate === playRate) return;
+      this.setPlayRate(playRate, !video.isToastShown);
+      video.isToastShown = true;
     },
     cachePlayRate() {
       CACHED_PLAY_RATE.set(this.video.playbackRate);

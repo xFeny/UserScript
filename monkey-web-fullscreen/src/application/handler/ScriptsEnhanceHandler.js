@@ -27,14 +27,14 @@
 import Tools from "../common/Tools";
 export default {
   enhance() {
-    if (!this.videoCenterPoint) return; // 页面没有视频元素
+    if (!this.videoInfo) return; // 页面没有视频元素
     const ele = this.getHoverElement();
     Tools.triggerHoverEvent(ele);
     Tools.triggerEscapeEvent();
     this.backupTrigger();
   },
   backupTrigger() {
-    if (!this.video || this.videoCenterPoint.frameSrc) return;
+    if (!this.video || this.videoInfo.frameSrc) return;
     let oldWidth = this.video.oldWidth;
     let newWidth = this.video.offsetWidth;
     if (!Object.is(oldWidth, newWidth)) return;
@@ -50,7 +50,7 @@ export default {
     if (iframe) return iframe;
 
     // 根据video的中心点，判断是否在iframe的矩形范围内
-    const { centerX, centerY } = this.videoCenterPoint;
+    const { centerX, centerY } = this.videoInfo;
     const iframes = Tools.getFrames();
     for (const element of iframes) {
       if (!Tools.isVisible(element)) continue;
@@ -66,7 +66,7 @@ export default {
     // Tools.log("播放器控制栏：", control, "控制栏父元素：", control?.parentElement);
     const videoContainer = player || control?.parentElement;
     if (!videoContainer) return video;
-    if (this.videoCenterPoint.frameSrc) return videoContainer; // 播放器在iframe中
+    if (this.videoInfo.frameSrc) return videoContainer; // 播放器在iframe中
 
     const videoWidth = video.offsetWidth;
     const wrapWidth = videoContainer.offsetWidth;
