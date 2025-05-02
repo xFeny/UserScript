@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         M站_哔咪动漫脚本
 // @namespace    http://tampermonkey.net/
-// @version      1.1.5
+// @version      1.1.6
 // @author       Feny
 // @description  哔咪动漫｜E站弹幕网｜饭团动漫｜噼哩噼哩，播放页自动网页全屏，快捷键(F)切换。
 // @license      MIT
@@ -26,6 +26,53 @@
 (function () {
   'use strict';
 
+  const queryElements = (self, selector) => Array.from(self.querys(selector));
+  const siteConfigs = {
+    // E站配置
+    ezSite: {
+      getRoutes: (self) => queryElements(self, "div[class*='line_button']"),
+      getCurrentRoute: (self) => self.query("div[class*='line_button'][style*='rgb']"),
+      switchRoute: (routes, currentRoute) => {
+        routes.find((route) => route !== currentRoute)?.click();
+      }
+    },
+    // P站配置
+    pili: {
+      getRoutes: (self) => queryElements(self, ".c-player-episode ul"),
+      getCurrentEpisode: () => document.querySelector(`a[class*="current"][href="${location.pathname}"]`),
+      switchRoute: (routes, currentEpisode, self) => {
+        const currentRouteIndex = routes.findIndex((route) => route === currentEpisode.parentElement);
+        let nextRouteIndex = currentRouteIndex + 1;
+        if (nextRouteIndex >= routes.length) nextRouteIndex = 0;
+        const currentEpisodeIndex = self.index(currentEpisode);
+        const episodes = self.querys("a", routes[nextRouteIndex]);
+        episodes[currentEpisodeIndex]?.click();
+      }
+    },
+    // 饭团动漫配置
+    fanTuan: {
+      getCurrentRoute: (self) => self.query(".anime-episode.active"),
+      switchRoute: (currentRoute, self) => {
+        let nextRoute = currentRoute?.nextElementSibling;
+        if (!nextRoute) nextRoute = currentRoute.parentElement.firstElementChild;
+        const index = self.index(self.query("a[class*='btn-episode active']"));
+        nextRoute.children[index].click();
+      }
+    },
+    // 哔咪动漫配置
+    bimi: {
+      getRoutes: (self) => queryElements(self, ".play_box"),
+      getCurrentEpisode: () => document.querySelector(`a[href="${location.pathname}"]`)?.parentElement,
+      switchRoute: (routes, currentEpisode, self) => {
+        const currentRouteIndex = routes.findIndex((route) => route.classList.contains("show"));
+        let nextRouteIndex = currentRouteIndex + 1;
+        if (nextRouteIndex >= routes.length) nextRouteIndex = 0;
+        const currentEpisodeIndex = self.index(currentEpisode);
+        const episodes = self.querys("li", routes[nextRouteIndex]);
+        episodes[currentEpisodeIndex]?.firstElementChild?.click();
+      }
+    }
+  };
   var _GM_openInTab = /* @__PURE__ */ (() => typeof GM_openInTab != "undefined" ? GM_openInTab : void 0)();
   function getTitle() {
     let title = document.title;
@@ -33,8 +80,9 @@
     title = title.substring(0, title.lastIndexOf(" ")).trim();
     return title;
   }
-  const settings = { volume: 1, opacity: 0.88, autoPlay: true, defaultWide: true };
   const MSG_SOURCE = "FENY_SCRIPTS_ANIME";
+  const settings = { volume: 1, opacity: 0.88, autoPlay: true, defaultWide: true };
+  const searchAnime = `https://www.ezdmw.site/Index/search.html?searchText=${getTitle()}`;
   const App = {
     init() {
       this.videoSetting();
@@ -57,7 +105,7 @@
     isEzSite: () => location.host.includes("ezdmw"),
     isBimi: () => location.host.includes("bimiacg"),
     getFrame() {
-      return this.query("iframe:not([src=''])");
+      return this.query("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])");
     },
     postMessage: (data) => parent?.postMessage({ source: MSG_SOURCE, ...data }, "*"),
     autoPlay() {
@@ -111,74 +159,49 @@
     },
     getKeyMapping() {
       return {
-        F: () => {
-          this.toggleClass();
-          const player = this.query(":is(.player, .ty-play)");
-          window.scrollTo({ top: player?.getBoundingClientRect().top || 0 });
-        },
-        "[": () => {
-          if (this.isBimi()) return this.query(".pre")?.click();
-          const episode = this.query(`a[href="${location.pathname}"]`);
-          if (this.isEzSite()) return episode?.nextElementSibling.click();
-          episode?.previousElementSibling.click();
-        },
-        "]": () => {
-          if (this.isBimi()) return this.query(".next")?.click();
-          const episode = this.query(`a[href="${location.pathname}"]`);
-          if (this.isEzSite()) return episode?.previousElementSibling.click();
-          episode?.nextElementSibling.click();
-        },
+        V: () => this.isBimi() ? _GM_openInTab(searchAnime) : null,
+        F: () => this.toggleWebFullScreen(),
+        "[": () => this.switchEpisodes(true),
+        "]": () => this.switchEpisodes(),
         T: () => {
           if (this.isEzSite()) {
-            const routes = Array.from(this.querys("div[class*='line_button']"));
-            const currRoute = this.query("div[class*='line_button'][style*='rgb']");
-            routes.find((route) => route !== currRoute)?.click();
+            const routes = siteConfigs.ezSite.getRoutes(this);
+            const currentRoute = siteConfigs.ezSite.getCurrentRoute(this);
+            siteConfigs.ezSite.switchRoute(routes, currentRoute);
           }
           if (this.isPili()) {
-            const routes = Array.from(this.querys(".c-player-episode ul"));
-            const currEpisode = this.query(`a[class*="current"][href="${location.pathname}"]`);
-            const currRouteIndex = routes.findIndex((route) => route === currEpisode.parentElement);
-            let nextRouteIndex = currRouteIndex + 1;
-            if (nextRouteIndex >= routes.length) nextRouteIndex = 0;
-            const currEpisodeIndex = this.index(currEpisode);
-            const episodes = this.querys("a", routes[nextRouteIndex]);
-            episodes[currEpisodeIndex]?.click();
+            const routes = siteConfigs.pili.getRoutes(this);
+            const currentEpisode = siteConfigs.pili.getCurrentEpisode();
+            siteConfigs.pili.switchRoute(routes, currentEpisode, this);
           }
           if (this.isFanTuan()) {
-            try {
-              const currRoute = this.query(".anime-episode.active");
-              let nextRoute = currRoute?.nextElementSibling;
-              if (!nextRoute) nextRoute = currRoute.parentElement.firstElementChild;
-              const index = this.index(this.query("a[class*='btn-episode active']"));
-              nextRoute.children[index].click();
-            } catch (e) {
-            }
+            const currentRoute = siteConfigs.fanTuan.getCurrentRoute(this);
+            siteConfigs.fanTuan.switchRoute(currentRoute, this);
           }
           if (this.isBimi()) {
-            try {
-              const routes = Array.from(this.querys(".play_box"));
-              const currEpisode = this.query(`a[href="${location.pathname}"]`)?.parentElement;
-              const currRouteIndex = routes.findIndex((route) => route.classList.contains("show"));
-              let nextRouteIndex = currRouteIndex + 1;
-              if (nextRouteIndex >= routes.length) nextRouteIndex = 0;
-              const currEpisodeIndex = this.index(currEpisode);
-              const episodes = this.querys("li", routes[nextRouteIndex]);
-              episodes[currEpisodeIndex]?.firstElementChild?.click();
-            } catch (e) {
-            }
+            const routes = siteConfigs.bimi.getRoutes(this);
+            const currentEpisode = siteConfigs.bimi.getCurrentEpisode();
+            siteConfigs.bimi.switchRoute(routes, currentEpisode, this);
           }
-        },
-        V: () => {
-          if (!this.isBimi()) return;
-          _GM_openInTab(`https://www.ezdmw.site/Index/search.html?searchText=${getTitle()}`);
         }
       };
     },
+    toggleWebFullScreen() {
+      const player = this.query(":is(.player, .ty-play)");
+      window.scrollTo({ top: player?.getBoundingClientRect().top || 0 });
+      this.toggleClass();
+    },
+    switchEpisodes(isPrev = false) {
+      if (this.isBimi()) return this.query(isPrev ? ".pre" : ".next")?.click();
+      const episode = this.query(`a[href="${location.pathname}"]`);
+      if (this.isEzSite()) return (isPrev ? episode?.nextElementSibling : episode?.previousElementSibling).click();
+      (isPrev ? episode?.previousElementSibling : episode?.nextElementSibling).click();
+    },
     index(element) {
       if (!element) return;
-      const parent2 = element.parentNode;
-      if (!parent2) return -1;
-      const children = Array.from(parent2.children);
+      const parentEle = element.parentElement;
+      if (!parentEle) return -1;
+      const children = Array.from(parentEle.children);
       return children.indexOf(element);
     },
     toggleClass() {

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      2.6.3
+// @version      2.7.0
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；快捷键切换：全屏(F)、网页全屏(P)、下一个视频(N)、弹幕开关(D)；支持任意视频倍速播放，提示记忆倍速；B站播放完自动退出网页全屏和取消连播。
 // @license      GPL-3.0-only
@@ -17,11 +17,13 @@
 // @match        *://www.mgtv.com/b/*
 // @match        *://www.acfun.cn/v/*
 // @match        *://www.iqiyi.com/v_*
+// @match        *://v.pptv.com/show/*
 // @match        *://v.qq.com/x/page/*
+// @match        *://v.douyu.com/show/*
 // @match        *://v.qq.com/x/cover/*
-// @match        *://haokan.baidu.com/v*
 // @match        *://live.bilibili.com/*
 // @match        *://v.youku.com/video?*
+// @match        *://haokan.baidu.com/v?*
 // @match        *://live.acfun.cn/live/*
 // @match        *://www.acfun.cn/bangumi/*
 // @match        *://www.bilibili.com/list/*
@@ -29,7 +31,6 @@
 // @match        *://www.bilibili.com/*/play/*
 // @match        *://v.qq.com/live/p/newtopic/*
 // @match        *://www.bilibili.com/festival/*
-// @match        *://v.douyu.com/show/*
 // @grant        GM_addStyle
 // @grant        GM_addValueChangeListener
 // @grant        GM_getValue
@@ -41,7 +42,7 @@
 // @note         *://*/*
 // ==/UserScript==
 
-(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const o=document.createElement("style");o.textContent=t,document.head.append(o)})(' @charset "UTF-8";.showToast{color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in;background:#000000bf!important}#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,.live-room-app #sidebar-vm,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.login-tip{display:none!important} ');
+(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const t=document.createElement("style");t.textContent=e,document.head.append(t)})(' @charset "UTF-8";.showToast{color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in;background:#000000bf!important}#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,.live-room-app #sidebar-vm,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.login-tip{display:none!important}.monkey-auto-web-fullScreen ul,.monkey-auto-web-fullScreen li{font-size:24px;list-style-type:none}.monkey-auto-web-fullScreen input{width:24px;height:24px;vertical-align:bottom}.monkey-auto-web-fullScreen label{display:flex;align-items:center;justify-content:space-between;padding-top:15px} ');
 
 (function () {
   'use strict';
@@ -78,7 +79,7 @@
   var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
   var _GM_unregisterMenuCommand = /* @__PURE__ */ (() => typeof GM_unregisterMenuCommand != "undefined" ? GM_unregisterMenuCommand : void 0)();
   var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
-  const { ONE_SEC: ONE_SEC$1, MSG_SOURCE: MSG_SOURCE$1 } = constants;
+  const { ONE_SEC: ONE_SEC$2, MSG_SOURCE: MSG_SOURCE$1 } = constants;
   const Tools = {
     isTopWin: () => window.top === window,
     isNumber: (str) => /^[0-9]$/.test(str),
@@ -89,41 +90,56 @@
     triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
     postMessage: (win = null, data) => win?.postMessage({ source: MSG_SOURCE$1, ...data }, "*"),
     isVisible: (ele) => !!(ele?.offsetWidth || ele?.offsetHeight || ele?.getClientRects().length),
-    log: (...data) => console.log(...["%c******* 脚本日志 *******\n", "color:green;font-size:16px;", ...data]),
-    postMsgToFrames(data) {
-      this.querys("iframe:not([src=''])").forEach((iframe) => this.postMessage(iframe.contentWindow, data));
+    log: (...data) => console.log(...["%c======= 脚本日志 =======\n\n", "color:green;font-size:14px;", ...data, "\n\n"]),
+    alert: (...data) => window.alert(data.join(" ")),
+    getFrames() {
+      return this.querys("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])");
     },
-    debounce(fn, delay = ONE_SEC$1) {
+    postMsgToFrames(data) {
+      this.getFrames().forEach((iframe) => this.postMessage(iframe.contentWindow, data));
+    },
+    debounce(fn, delay = ONE_SEC$2) {
       let timer;
       return function() {
         if (timer) clearTimeout(timer);
         timer = setTimeout(() => fn.apply(this, arguments), delay);
       };
     },
-    triggerMousemoveEvent(element) {
-      const offsetWidth = element.offsetWidth;
-      const clientY = element.offsetHeight / 2;
-      const moveEvt = (clientX) => {
-        const dict = { clientX, clientY, bubbles: true };
-        const mousemove = new MouseEvent("mousemove", dict);
-        element.dispatchEvent(mousemove);
-      };
-      for (let i = 0; i < offsetWidth; i += 10) moveEvt(i);
+    getElementRect(element) {
+      return element?.getBoundingClientRect();
     },
-    triggerMouseoverEvent(element) {
-      if (!element) return;
-      console.log("鼠标悬停元素：", element);
-      const clientX = element?.offsetWidth / 2 || 0;
-      const clientY = element?.offsetHeight / 2 || 0;
+    getElementCenterPoint(element) {
+      const { top, left, width, height } = this.getElementRect(element);
+      return { centerX: left + width / 2, centerY: top + height / 2 };
+    },
+    isPointInElementRect(pointX, pointY, element) {
+      const { top, left, right, bottom } = this.getElementRect(element);
+      return pointX >= left && pointX <= right && pointY >= top && pointY <= bottom;
+    },
+    triggerMousemove(element) {
+      const offsetWidth = element.offsetWidth;
+      const { centerY } = this.getElementCenterPoint(element);
+      for (let clientX = 0; clientX < offsetWidth; clientX += 10) {
+        this.dispatchMousemove(element, clientX, centerY);
+      }
+    },
+    dispatchMousemove(element, clientX, clientY) {
       const dict = { clientX, clientY, bubbles: true };
+      const mousemove = new MouseEvent("mousemove", dict);
+      element.dispatchEvent(mousemove);
+    },
+    triggerHoverEvent(element) {
+      if (!element) return;
+      this.log("网页全屏元素：", element);
+      const { centerX, centerY } = this.getElementCenterPoint(element);
+      const dict = { clientX: centerX, clientY: centerY, bubbles: true };
       const mouseover = new MouseEvent("mouseover", dict);
       element?.dispatchEvent(mouseover);
     },
-    triggerEscapeEvent(element) {
-      if (!element) return;
+    triggerEscapeEvent() {
       const dict = { key: "Escape", keyCode: 27, bubbles: true };
       const keydown = new KeyboardEvent("keydown", dict);
-      element?.dispatchEvent(keydown);
+      document.body?.dispatchEvent(keydown);
     },
     createObserver(target, callback) {
       target = target instanceof HTMLElement ? target : this.query(target);
@@ -131,6 +147,42 @@
       const observer = new MutationObserver(callback);
       observer.observe(target, options);
       return observer;
+    },
+    closest(element, selector, maxLevel = 3) {
+      let curLevel = 0;
+      while (element && curLevel < maxLevel) {
+        if (element.matches(selector)) return element;
+        element = element.parentElement;
+        curLevel++;
+      }
+      return null;
+    },
+    findSiblingInParent(element, selector, maxLevel = 3) {
+      let curLevel = 0;
+      let curParent = element.parentElement;
+      while (curParent && curLevel < maxLevel) {
+        const sibs = curParent.children;
+        for (let sib of sibs) {
+          if (sib !== element && sib.matches(selector)) return sib;
+        }
+        curParent = curParent.parentElement;
+        curLevel++;
+      }
+      return null;
+    },
+    hasSiblings(element) {
+      return element.parentElement.children.length > 1;
+    },
+    extractNumbers(str) {
+      const numbers = str.match(/\d+/g);
+      return numbers ? numbers.map(Number) : [];
+    },
+    compareUrls(url1, url2) {
+      const parseUrl = (url) => {
+        const parsed = new URL(url);
+        return parsed.host + parsed.pathname + parsed.search + parsed.hash;
+      };
+      return parseUrl(url1) === parseUrl(url2);
     }
   };
   const { EMPTY: EMPTY$2, QQ_VID_REG, BILI_VID_REG, IQIYI_VID_REG, ACFUN_VID_REG } = constants;
@@ -208,13 +260,16 @@
     loadedmetadata() {
       this.volume = 1;
       this.isToast = false;
+      this.isWebFullScreen = false;
     },
     loadeddata() {
       this.volume = 1;
       this.isToast = false;
+      this.isWebFullScreen = false;
     },
     timeupdate() {
       if (isNaN(this.duration)) return;
+      App.experimentWebFullScreen(this);
       if (App.isClosedPlayRate()) return;
       if (!webSite.isIqiyi()) this.isToast = false;
       const playRate = App.getCachePlayRate();
@@ -235,16 +290,17 @@
       if (!webSite.isBili() && !webSite.isAcFun()) return;
       const pod = Tools.query(".video-pod");
       const pods = Tools.querys('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
-      if (!pod || pods.length > 0) App.exitWebFullScreen();
+      if (!pod || !!pods.length) App.exitWebFullScreen();
     }
   };
-  const { EMPTY: EMPTY$1, ONE_SEC, SHOW_TOAST_TIME, SHOW_TOAST_POSITION } = constants;
+  const { EMPTY: EMPTY$1, ONE_SEC: ONE_SEC$1, SHOW_TOAST_TIME, SHOW_TOAST_POSITION } = constants;
   const App = {
     init() {
       this.setupVisibleListener();
       this.setupKeydownListener();
       this.setupMutationObserver();
       this.setupUrlChangeListener();
+      this.setupMouseMoveListener();
     },
     normalWebsite() {
       return !this.videoCenterPoint;
@@ -287,14 +343,14 @@
       const observer = Tools.createObserver(document.body, () => {
         const video = this.getVideo();
         this.element = this.getElement();
-        if (video?.play) this.setupVideoListener();
+        if (video?.play && !!video.offsetWidth) this.setupVideoListener();
         if (!webSite.inMatches() && this.video) return observer.disconnect();
         if (!video?.play || !this.element || !this.webFullScreen(video)) return;
         observer.disconnect();
         this.biliLiveExtras();
         this.webSiteLoginObserver();
       });
-      setTimeout(() => observer.disconnect(), ONE_SEC * 10);
+      setTimeout(() => observer.disconnect(), ONE_SEC$1 * 10);
     },
     video: null,
     videoBoundListeners: [],
@@ -323,7 +379,7 @@
     },
     healthCurrentVideo() {
       if (this.healthID) clearInterval(this.healthID);
-      this.healthID = setInterval(() => this.getPlayingVideo(), ONE_SEC);
+      this.healthID = setInterval(() => this.getPlayingVideo(), ONE_SEC$1);
     },
     getPlayingVideo() {
       const videos = Tools.querys("video");
@@ -334,8 +390,7 @@
       }
     },
     setVideoCenterPoint(video) {
-      const { left, top, width, height } = video.getBoundingClientRect();
-      const videoCenterPoint = { x: left + width / 2, y: top + height / 2, src: video.src };
+      const videoCenterPoint = { ...Tools.getElementCenterPoint(video) };
       this.setParentFrameSrc(videoCenterPoint);
     },
     setParentFrameSrc(videoCenterPoint) {
@@ -344,6 +399,29 @@
       videoCenterPoint.frameSrc = location.href;
       Tools.postMessage(window.parent, { videoCenterPoint });
     },
+    setupMouseMoveListener() {
+      if (this.isSetupMouseMoveListener) return;
+      const delay = ONE_SEC$1 * 2;
+      this.isSetupMouseMoveListener = true;
+      let timer = setTimeout(this.showOrHideCursor, delay);
+      document.addEventListener("mousemove", (event) => {
+        if (!event.isTrusted) return;
+        clearTimeout(timer);
+        const target = event.target;
+        this.showOrHideCursor(false);
+        timer = setTimeout(this.showOrHideCursor, delay);
+        if (this.video === target || !(target instanceof HTMLVideoElement)) return;
+        this.addVideoEvtListener(target);
+      });
+    },
+    showOrHideCursor(isHide = true) {
+      Tools.querys(":is(video, iframe)").forEach((ele) => {
+        isHide ? ele.style.cursor = "none" : ele.style.cursor = EMPTY$1;
+      });
+      if (!isHide) return;
+      const mouseleave = new MouseEvent("mouseleave");
+      Tools.querys("body *").forEach((ele) => ele.dispatchEvent(mouseleave));
+    },
     showToast(content, duration = SHOW_TOAST_TIME) {
       if (webSite.isDouyu()) douyu.addStyle();
       const el = document.createElement("div");
@@ -351,12 +429,14 @@
       if (Object.is(typeof content, typeof EMPTY$1)) el.textContent = content;
       el.setAttribute("class", "showToast");
       el.setAttribute("style", SHOW_TOAST_POSITION);
-      const target = this.video?.parentElement?.parentElement;
+      const videoParent = this.video?.parentElement;
+      const videoContainer = this.getVideoContainer();
+      const target = this.video === videoContainer ? videoParent : videoContainer;
       Tools.query(".showToast", target)?.remove();
       target?.appendChild(el);
       setTimeout(() => {
         el.style.opacity = 0;
-        setTimeout(() => el.remove(), ONE_SEC / 3);
+        setTimeout(() => el.remove(), ONE_SEC$1 / 3);
       }, duration);
     }
   };
@@ -404,7 +484,7 @@
         return Number.parseInt(getStorage.bind(this, 5)());
       }
     }),
-    CLOSE_AUTO_WEB_FULL: Object.freeze({
+    CLOSE_AUTO_WEB_FULL_SCREEN: Object.freeze({
       name: "CLOSE_AUTO_WEB_FULL_SCREEN",
       set: setStorage,
       get() {
@@ -451,6 +531,7 @@
       window.addEventListener("message", (event) => {
         const { data } = event;
         if (!data?.source || !data.source.includes(MSG_SOURCE)) return;
+        if (data?.topWinInfo) this.topWinInfo = data.topWinInfo;
         if (data?.defaultPlayRate) this.defaultPlayRate();
         if (data?.videoCenterPoint) return this.setParentFrameSrc(data.videoCenterPoint);
         this.processEvent(data);
@@ -466,7 +547,9 @@
       if (eventCode.Space === code) key = eventCode.Space.toUpperCase();
       if (shiftKey && eventCode.NumpadAdd === code) key = SYMBOL$1.MULTIPLY;
       if (shiftKey && eventCode.NumpadSubtract === code) key = SYMBOL$1.DIVIDE;
-      if (!Tools.isTopWin() && eventCode.KeyP === code) return Tools.postMessage(window.top, { key });
+      if (!Tools.isTopWin() && (eventCode.KeyP === code || eventCode.KeyN === code)) {
+        return Tools.postMessage(window.top, { key });
+      }
       this.processEvent({ key });
     },
     processEvent(data) {
@@ -482,13 +565,13 @@
     getKeyMapping() {
       return {
         Z: () => this.defaultPlayRate(),
-        N: () => this.triggerIconElement("next"),
         A: () => this.adjustPlayRate(SYMBOL$1.ADD),
         S: () => this.adjustPlayRate(SYMBOL$1.SUBTRACT),
         [SYMBOL$1.ADD]: () => this.adjustPlayRate(SYMBOL$1.ADD),
         [SYMBOL$1.DIVIDE]: () => this.adjustPlayRate(SYMBOL$1.DIVIDE),
         [SYMBOL$1.SUBTRACT]: () => this.adjustPlayRate(SYMBOL$1.SUBTRACT),
         [SYMBOL$1.MULTIPLY]: () => this.adjustPlayRate(SYMBOL$1.MULTIPLY),
+        N: () => webSite.inMatches() ? this.triggerIconElement("next") : this.switchNextEpisode(),
         F: () => webSite.isDouyu() ? douyu.getFullIcon().click() : this.triggerIconElement("full", 0),
         D: () => webSite.isDouyu() ? douyu.getDanmakuIcon().click() : this.triggerIconElement("danmaku", 3),
         ARROWLEFT: () => this.isOverrideKeyboard() ? this.adjustVideoTime(SYMBOL$1.SUBTRACT) : null,
@@ -510,6 +593,7 @@
       if (!webSite.inMatches()) return;
       if (webSite.isBiliLive()) return this.getBiliLiveIcons()?.[index]?.click();
       Tools.query(selectorConfig[location.host]?.[name])?.click();
+      Tools.triggerMousemove(this.video);
     },
     adjustVideoTime(second = VIDEO_TIME_STEP$1.get(), _symbol) {
       if (!this.video || !Tools.validDuration(this.video)) return;
@@ -528,17 +612,24 @@
     CLOSE_PLAY_RATE,
     VIDEO_TIME_STEP,
     OVERRIDE_KEYBOARD,
-    CLOSE_AUTO_WEB_FULL,
+    CLOSE_AUTO_WEB_FULL_SCREEN,
     VIDEO_FASTFORWARD_DURATION
   } = storage;
+  const CLOSE_OTHER_WEBSITES_AUTO = "CLOSE_OTHER_WEBSITES_AUTO_";
   const MenuCommandHandler = {
-    isClosedAuto: () => CLOSE_AUTO_WEB_FULL.get(),
     isClosedPlayRate: () => CLOSE_PLAY_RATE.get(),
     isOverrideKeyboard: () => OVERRIDE_KEYBOARD.get(),
+    isClosedAuto: () => CLOSE_AUTO_WEB_FULL_SCREEN.get(),
+    isClosedOtherWebsiteAuto() {
+      const host = Tools.isTopWin() ? location.host : this.topWinInfo.host;
+      return _GM_getValue(CLOSE_OTHER_WEBSITES_AUTO + host, true);
+    },
     setupScriptMenuCommand() {
       if (!Tools.isTopWin() || webSite.isLivePage()) return;
       this.registerMenuCommand();
       this.setupCommandChangeListener();
+      const topWinInfo = this.topWinInfo = { innerWidth, host: location.host };
+      Tools.postMsgToFrames({ topWinInfo });
     },
     registerMenuCommand() {
       this.registerClosePlayRate();
@@ -547,18 +638,22 @@
       this.registerFastforwardCommand();
       this.registerCloseAutoFullCommand();
       this.registerOverrideKeyboardCommand();
+      this.registerCloseAutoExperimentCommand();
     },
     setupCommandChangeListener() {
       if (this.isSetupCommandChangeListener) return;
       const handler = () => this.registerMenuCommand();
-      [CLOSE_PLAY_RATE.name, OVERRIDE_KEYBOARD.name, CLOSE_AUTO_WEB_FULL.name].forEach(
-        (key) => _GM_addValueChangeListener(key, handler)
-      );
+      [
+        CLOSE_PLAY_RATE.name,
+        OVERRIDE_KEYBOARD.name,
+        CLOSE_AUTO_WEB_FULL_SCREEN.name,
+        CLOSE_OTHER_WEBSITES_AUTO + window.top.location.host
+      ].forEach((key) => _GM_addValueChangeListener(key, handler));
       this.isSetupCommandChangeListener = true;
     },
     registerClosePlayRate() {
       const isClose = this.isClosedPlayRate();
-      const title = isClose ? "开启倍速功能" : "关闭倍速功能";
+      const title = isClose ? "启用倍速功能" : "禁用倍速功能";
       _GM_unregisterMenuCommand(this.close_play_rate_command_id);
       this.close_play_rate_command_id = _GM_registerMenuCommand(title, () => {
         CLOSE_PLAY_RATE.set(!isClose);
@@ -575,7 +670,7 @@
       });
     },
     registerVideoTimeCommand() {
-      const title = "设置快进/快退秒数";
+      const title = "设置快进/退秒数";
       _GM_unregisterMenuCommand(this.video_time_command_id);
       if (!this.isOverrideKeyboard()) return;
       this.video_time_command_id = _GM_registerMenuCommand(title, () => {
@@ -584,7 +679,7 @@
       });
     },
     registerFastforwardCommand() {
-      const title = "设置数字零键快进秒数";
+      const title = "设置零键快进秒数";
       _GM_unregisterMenuCommand(this.fastforward_command_id);
       this.fastforward_command_id = _GM_registerMenuCommand(title, () => {
         const input = prompt(title, VIDEO_FASTFORWARD_DURATION.get());
@@ -594,17 +689,28 @@
     registerCloseAutoFullCommand() {
       if (!webSite.inMatches()) return;
       const isClose = this.isClosedAuto();
-      const title = isClose ? "开启自动网页全屏" : "关闭自动网页全屏";
+      const title = isClose ? "启用自动网页全屏" : "禁用自动网页全屏";
       _GM_unregisterMenuCommand(this.close_auto_command_id);
-      this.close_auto_command_id = _GM_registerMenuCommand(title, () => CLOSE_AUTO_WEB_FULL.set(!isClose));
+      this.close_auto_command_id = _GM_registerMenuCommand(title, () => CLOSE_AUTO_WEB_FULL_SCREEN.set(!isClose));
     },
     registerOverrideKeyboardCommand() {
       const isOverride = this.isOverrideKeyboard();
-      const title = isOverride ? "关闭 空格 ◀▶ 键控制" : "开启 空格 ◀▶ 键控制";
+      const title = isOverride ? "禁用 空格 ◀▶ 键控制" : "启用 空格 ◀▶ 键控制";
       _GM_unregisterMenuCommand(this.override_keyboard_command_id);
       this.override_keyboard_command_id = _GM_registerMenuCommand(title, () => OVERRIDE_KEYBOARD.set(!isOverride));
+    },
+    registerCloseAutoExperimentCommand() {
+      if (webSite.inMatches()) return;
+      if (Tools.querys("video").length > 1) return;
+      const isClose = this.isClosedOtherWebsiteAuto();
+      const title = isClose ? "此站点启用自动网页全屏" : "此站点禁用自动网页全屏";
+      _GM_unregisterMenuCommand(this.close_experiment_command_id);
+      this.close_experiment_command_id = _GM_registerMenuCommand(title, () => {
+        _GM_setValue(CLOSE_OTHER_WEBSITES_AUTO + location.host, !isClose);
+      });
     }
   };
+  const { ONE_SEC } = constants;
   const WebSiteLoginHandler = {
     webSiteLoginObserver() {
       this.handleIqyLogin();
@@ -634,7 +740,7 @@
       const selector = ".simple-buttons_close_btn__6N7HD";
       this.loginObserver("#qy_pca_login_root", selector, selector);
       Tools.createObserver(".cd-time", () => {
-        const selector2 = ":is(*[id*='mask-layer'], #modal-vip-cashier-scope)";
+        const selector2 = ":is([id*='mask-layer'], #modal-vip-cashier-scope)";
         Tools.querys(selector2).forEach((el) => el.remove());
         Tools.query(".simple-buttons_close_btn__6N7HD")?.click();
         const adTime = Tools.query(".public-time");
@@ -645,23 +751,20 @@
     },
     handleBiliLogin() {
       if (!webSite.isBili()) return;
-      if (document.cookie.includes("DedeUserID")) return player?.requestQuality(80);
+      if (document.cookie.includes("DedeUserID")) return _unsafeWindow.player?.requestQuality(80);
       setTimeout(() => {
         _unsafeWindow.__BiliUser__.isLogin = true;
         _unsafeWindow.__BiliUser__.cache.data.isLogin = true;
         _unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
-      }, constants.ONE_SEC * 3);
+      }, ONE_SEC * 3);
     }
   };
   const WebFullScreenHandler = {
-    isFull() {
-      return window.innerWidth === this.video.offsetWidth;
-    },
     webFullScreen(video) {
       const w = video?.offsetWidth || 0;
       if (Object.is(0, w)) return false;
       if (this.isClosedAuto()) return true;
-      if (window.innerWidth === w || w > window.innerWidth) return true;
+      if (w >= window.innerWidth) return true;
       if (!webSite.isBiliLive()) return Tools.triggerClick(this.element);
       return this.biliLiveWebFullScreen();
     },
@@ -670,7 +773,7 @@
       if (control.length === 0) return false;
       Tools.scrollTop(70);
       const el = Tools.query(":is(.lite-room, #player-ctnr)", _unsafeWindow.top.document);
-      if (el) Tools.scrollTop(el?.getBoundingClientRect()?.top || 0);
+      if (el) Tools.scrollTop(Tools.getElementRect(el)?.top || 0);
       return Tools.triggerClick(control[1]);
     },
     exitWebFullScreen() {
@@ -687,30 +790,175 @@
     getBiliLiveIcons() {
       const video = this.getVideo();
       if (!video) return [];
-      Tools.triggerMousemoveEvent(video);
+      Tools.triggerMousemove(video);
       return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
+    },
+    experimentWebFullScreen(video) {
+      if (webSite.inMatches() || video.isWebFullScreen || !this.topWinInfo || this.isClosedOtherWebsiteAuto()) return;
+      if (video.offsetWidth === this.topWinInfo.innerWidth) return video.isWebFullScreen = true;
+      window.top.focus();
+      video.isWebFullScreen = true;
+      Tools.postMessage(window.top, { key: "P" });
+    }
+  };
+  const SwitchEpisodeHandler = {
+    switchPrevEpisode: function() {
+      this.handleEpisodeChange(this.getPrevEpisode);
+    },
+    switchNextEpisode: function() {
+      this.handleEpisodeChange(this.getNextEpisode);
+    },
+    handleEpisodeChange(getTargetEpisode) {
+      if (!Tools.isTopWin()) return;
+      let curEpisode = this.getCurrentEpisode();
+      if (!curEpisode) curEpisode = this.getCurrentEpisodeFromAllLink();
+      const targetEpisode = getTargetEpisode.call(this, curEpisode);
+      this.jumpToEpisodeNumber(targetEpisode);
+    },
+    getCurrentEpisode() {
+      const ele = this.getCurrentEpisodeLinkElement();
+      return this.getCurrentEpisodeContainer(ele);
+    },
+    getCurrentEpisodeLinkElement() {
+      const href = location.href;
+      const path = location.pathname;
+      const lastPath = path.substring(path.lastIndexOf("/") + 1);
+      const links = Array.from(Tools.querys(`:is(a[href*="${path}"], a[href*="${lastPath}"])`));
+      if (links.length == 1) return links.shift();
+      const filter = [
+        "h1",
+        "header",
+        "[id*='history']",
+        "[class*='lishi']",
+        "[class*='record']",
+        "[class*='history']",
+        "[class*='tab-item']"
+      ];
+      return links.find((link) => {
+        const linkUrl = new URL(link.href);
+        if (Tools.closest(link, `:is(${filter})`, 5)) return false;
+        if (!Object.is(href, link.href) && !Object.is(path, linkUrl.pathname)) return false;
+        return !!this.getEpisodeNumber(link);
+      });
+    },
+    getEpisodeNumber(element) {
+      return Tools.extractNumbers(element.innerText).shift();
+    },
+    getPrevEpisode(element) {
+      const curNumber = this.getEpisodeNumber(element);
+      return this.getEpisodeNumberContainer(element, curNumber - 1);
+    },
+    getNextEpisode(element) {
+      const curNumber = this.getEpisodeNumber(element);
+      return this.getEpisodeNumberContainer(element, curNumber + 1);
+    },
+    getEpisodeNumberContainer(element, targetNumber) {
+      const allEpisode = this.getAllEpisodeElement(element);
+      for (const episode of allEpisode) {
+        if (element === episode) continue;
+        const episodeNumber = Tools.extractNumbers(episode.innerText).shift();
+        if (targetNumber === episodeNumber) return episode;
+      }
+    },
+    getAllEpisodeElement(element) {
+      const tagName = element.tagName;
+      const sibling = Tools.findSiblingInParent(element, tagName);
+      const children = Array.from(sibling.parentElement.children);
+      return children.filter((ele) => ele.tagName === tagName);
+    },
+    jumpToEpisodeNumber(element) {
+      const stack = [element];
+      while (stack.length > 0) {
+        const currentElement = stack.pop();
+        if (!(currentElement instanceof HTMLElement)) continue;
+        if (currentElement instanceof HTMLAnchorElement) {
+          currentElement.click();
+        }
+        const children = Array.from(currentElement.children).reverse();
+        for (const child of children) {
+          stack.push(child);
+        }
+      }
+    },
+    getCurrentEpisodeContainer(element) {
+      while (element) {
+        const parentEle = element.parentElement;
+        const hasLink = Tools.querys(element.tagName, parentEle).filter((el) => el !== element);
+        const hasSiblings = Tools.hasSiblings(element);
+        if (hasSiblings && !!hasLink.length) return element;
+        element = parentEle;
+      }
+      return element;
+    },
+    getCurrentEpisodeFromAllLink() {
+      const path = location.pathname;
+      const lastPath = path.substring(path.lastIndexOf("/") + 1);
+      const curNumber = [...Tools.extractNumbers(lastPath)].join("");
+      for (const link of Tools.querys("a")) {
+        const attrs = link.attributes;
+        for (const attr of attrs) {
+          const attrNumbers = [...Tools.extractNumbers(attr.value)].join("");
+          if (attrNumbers === curNumber) return link;
+        }
+      }
     }
   };
   const ScriptsEnhanceHandler = {
     enhance() {
       if (!this.videoCenterPoint) return;
-      const element = this.getHoverElement();
-      Tools.triggerMouseoverEvent(element);
-      Tools.triggerEscapeEvent(element);
+      const ele = this.getHoverElement();
+      Tools.triggerHoverEvent(ele);
+      Tools.triggerEscapeEvent();
+      this.backupTrigger();
+    },
+    backupTrigger() {
+      if (!this.video || this.videoCenterPoint.frameSrc) return;
+      let oldWidth = this.video.oldWidth;
+      let newWidth = this.video.offsetWidth;
+      if (!Object.is(oldWidth, newWidth)) return;
+      Tools.query("#playerControlBtn")?.click();
+      if (!Object.is(newWidth, this.video.offsetWidth)) return;
+      Tools.query("#playerControlBtn")?.click();
     },
     getHoverElement() {
-      if (this.hoverElement) return this.hoverElement;
-      if (this.video) return this.hoverElement = this.video?.parentElement?.parentElement;
+      if (this.video) return this.getVideoContainer();
       const iframe = this.getVideoIframe();
-      if (iframe) return this.hoverElement = iframe;
-      const { x, y } = this.videoCenterPoint;
-      const iframes = Tools.querys("iframe:not([src=''])");
+      if (iframe) return iframe;
+      const { centerX, centerY } = this.videoCenterPoint;
+      const iframes = Tools.getFrames();
       for (const element of iframes) {
-        const rect = element.getBoundingClientRect();
-        const isInRect = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
-        if (!isInRect) continue;
-        return this.hoverElement = element;
+        if (!Tools.isVisible(element)) continue;
+        if (Tools.isPointInElementRect(centerX, centerY, element)) return element;
       }
+    },
+    getVideoContainer() {
+      const video = this.video;
+      video.oldWidth = video.offsetWidth;
+      const parentEle = video?.parentElement;
+      const control = this.getVideoControls(video);
+      const player = this.getVideoPlayer(parentEle);
+      const videoContainer = player || control?.parentElement;
+      if (!videoContainer) return video;
+      if (this.videoCenterPoint.frameSrc) return videoContainer;
+      const videoWidth = video.offsetWidth;
+      const wrapWidth = videoContainer.offsetWidth;
+      return wrapWidth !== videoWidth ? video : videoContainer;
+    },
+    getVideoPlayer(target) {
+      const selector = [
+        ".video-js",
+        '[class*="wrap"]',
+        '[class*="video"]',
+        '[class*="Player"]',
+        '[class*="player"]',
+        '[aria-label="视频播放器"]',
+        '[aria-label="Video Player"]'
+      ];
+      return Tools.closest(target, `:is(${selector})`);
+    },
+    getVideoControls(element) {
+      const selector = ['[class*="Control"]', '[class*="control"]'];
+      return Tools.findSiblingInParent(element, selector);
     }
   };
   const { PLAY_RATE_STEP, CACHED_PLAY_RATE } = storage;
@@ -726,6 +974,7 @@
       if (!this.video) return false;
       if (webSite.isLivePage()) return false;
       if (this.isClosedPlayRate()) return false;
+      if (!Tools.validDuration(this.video)) return false;
       return true;
     },
     toFixed(playRate) {
@@ -773,6 +1022,7 @@
     { handler: MenuCommandHandler },
     { handler: WebSiteLoginHandler },
     { handler: WebFullScreenHandler },
+    { handler: SwitchEpisodeHandler },
     { handler: VideoPlaybackRateHandler },
     { handler: ScriptsEnhanceHandler }
   ];
@@ -783,5 +1033,6 @@
     }
   });
   App.init();
+  _unsafeWindow.MONKEY_WEB_FULLSCREEN = App;
 
 })();
