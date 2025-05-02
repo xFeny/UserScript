@@ -22,7 +22,7 @@ export default {
     return GM_getValue(CLOSE_OTHER_WEBSITES_AUTO + host, true);
   },
   setupScriptMenuCommand() {
-    if (!Tools.isTopWin() || webSite.isLivePage()) return;
+    if (!Tools.isTopWin()) return;
     this.registerMenuCommand();
     this.setupCommandChangeListener();
     // 向iframe传递顶级窗口信息
@@ -99,7 +99,8 @@ export default {
   },
   registerCloseAutoExperimentCommand() {
     if (webSite.inMatches()) return;
-    if (Tools.querys("video").length > 1) return;
+    const videos = Array.from(Tools.querys("video")).filter((video) => !isNaN(video));
+    if (videos.length > 1) return;
     const isClose = this.isClosedOtherWebsiteAuto();
     const title = isClose ? "此站点启用自动网页全屏" : "此站点禁用自动网页全屏";
     GM_unregisterMenuCommand(this.close_experiment_command_id);
