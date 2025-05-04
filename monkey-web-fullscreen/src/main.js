@@ -16,10 +16,11 @@ const logicHandlers = [
   { handler: WebFullScreenHandler },
   { handler: SwitchEpisodeHandler },
   { handler: PickerEpisodeHandler },
-  { handler: VideoPlaybackRateHandler },
   { handler: ScriptsEnhanceHandler },
+  { handler: VideoPlaybackRateHandler },
 ];
-// 使方法内部this指向Application
+
+// 将Handler方法变为App的方法，内部this指向App
 logicHandlers.forEach(({ handler }) => {
   for (const key of Object.keys(handler)) {
     const method = handler[key];

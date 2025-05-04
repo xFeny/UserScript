@@ -61,7 +61,7 @@ export default {
       const video = this.getVideo();
       this.element = this.getElement();
       if (video?.play && !!video.offsetWidth) this.setupVideoListener();
-      if (!webSite.inMatches() && this.video) return observer.disconnect();
+      if (!webSite.inMatches() && this.topWinInfo) return observer.disconnect();
       if (!video?.play || !this.element || !this.webFullScreen(video)) return;
       observer.disconnect();
       this.biliLiveExtras();

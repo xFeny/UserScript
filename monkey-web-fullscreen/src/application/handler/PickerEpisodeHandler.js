@@ -5,7 +5,7 @@ import "sweetalert2/dist/sweetalert2.css";
 const { ALL_EPISODE_CHAIN, CURRENT_EPISODE_CHAIN } = Storage;
 
 /**
- * 手动采集剧集元素所在
+ * 手动采集剧集元素选择器
  */
 export default {
   setupPickerEpisodeListener() {
@@ -16,6 +16,7 @@ export default {
         if (!Tools.isTopWin()) return Swal.fire("当前窗口无法抓取元素！");
         event.preventDefault();
         event.stopPropagation();
+        event.stopImmediatePropagation();
 
         const hasPickerAllEpisode = ALL_EPISODE_CHAIN.get(location.host);
         const hasPickerCurrEpisode = CURRENT_EPISODE_CHAIN.get(location.host);
@@ -47,7 +48,7 @@ export default {
       validBtnCallback(value) {
         const container = this.getEpisodeContainer(Tools.query(value));
         const allEpisode = this.getAllEpisodeElement(container);
-        const numbers = Array.from(allEpisode).map((ele) => this.getEpisodeNumber(ele));
+        const numbers = allEpisode.map(this.getEpisodeNumber);
         !!numbers.length ? Tools.alert("获取到所有集数：", numbers.join(" ")) : Tools.alert("获取不到所有剧集！");
       },
       confirmCallback(value) {

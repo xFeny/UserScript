@@ -106,7 +106,7 @@ export default {
   },
   registerCloseAutoExperimentCommand() {
     if (webSite.inMatches()) return;
-    const videos = Array.from(Tools.querys("video")).filter((video) => !isNaN(video));
+    const videos = Tools.querys("video").filter((video) => !isNaN(video));
     if (videos.length > 1) return;
     const isClose = this.isClosedOtherWebsiteAuto();
     const title = isClose ? "此站点启用自动网页全屏" : "此站点禁用自动网页全屏";

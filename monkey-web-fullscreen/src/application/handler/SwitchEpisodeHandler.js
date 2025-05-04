@@ -32,7 +32,7 @@ export default {
     const href = location.href;
     const path = location.pathname;
     const lastPath = path.substring(path.lastIndexOf("/") + 1);
-    const links = Array.from(Tools.querys(`:is(a[href*="${path}"], a[href*="${lastPath}"])`));
+    const links = Tools.querys(`:is(a[href*="${path}"], a[href*="${lastPath}"])`);
     // Tools.log("匹配到所有的链接：", links);
     if (links.length == 1) return links.shift();
     // 过滤：历史记录、标题、线路(tab-item)
@@ -70,7 +70,7 @@ export default {
   getAllEpisodeElement(element) {
     const tagName = element.tagName;
     const sibling = Tools.findSiblingInParent(element, tagName);
-    const children = Array.from(sibling.parentElement.children);
+    const children = Array.from(sibling?.parentElement.children);
     return children.filter((ele) => ele.tagName === tagName);
   },
   jumpToEpisodeNumber(element) {
@@ -106,22 +106,13 @@ export default {
     // 		<ul><li><a>第02集</a></li></ul>
     // 	</div>
     // </ul>
-    // while (element) {
-    //   const tagName = element.tagName;
-    //   const parentEle = element.parentElement;
-    //   const nextTagName = element?.nextElementSibling?.tagName;
-    //   const hasLink = Tools.querys(tagName, parentEle).filter((el) => el !== element);
-    //   const hasSiblings = Tools.hasSiblings(element);
-    //   if (hasSiblings && nextTagName === tagName && !!hasLink.length) return element;
-    //   element = parentEle;
-    // }
     while (element) {
       const tagName = element.tagName;
       const parentEle = element.parentElement;
-      const hasLink = Tools.querys(tagName, parentEle).filter((el) => el !== element);
-      const hasSib = Tools.hasSiblings(element);
+      const haveSib = Tools.haveSiblings(element);
       const nextTagName = element?.nextElementSibling?.tagName;
-      if (hasSib && nextTagName === tagName && !!hasLink.length) return element;
+      const hasEqualsTag = Tools.querys(tagName, parentEle).filter((el) => el !== element);
+      if (haveSib && nextTagName === tagName && !!hasEqualsTag.length) return element;
       element = parentEle;
     }
     return element;

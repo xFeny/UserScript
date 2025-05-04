@@ -8,7 +8,7 @@ export default {
   isNumber: (str) => /^[0-9]$/.test(str),
   scrollTop: (top) => unsafeWindow.top.scrollTo({ top }),
   query: (selector, context) => (context || document).querySelector(selector),
-  querys: (selector, context) => (context || document).querySelectorAll(selector),
+  querys: (selector, context) => Array.from((context || document).querySelectorAll(selector)),
   validDuration: (video) => !isNaN(video.duration) && video.duration !== Infinity,
   triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
   postMessage: (win = null, data) => win?.postMessage({ source: MSG_SOURCE, ...data }, "*"),
@@ -19,7 +19,7 @@ export default {
     return this.querys("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])");
   },
   postMsgToFrames(data) {
-    this.getFrames().forEach((iframe) => this.postMessage(iframe.contentWindow, data));
+    this.getFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
   },
   debounce(fn, delay = ONE_SEC) {
     let timer;
@@ -93,7 +93,7 @@ export default {
     }
     return null;
   },
-  hasSiblings(element) {
+  haveSiblings(element) {
     return element.parentElement.children.length > 1;
   },
   extractNumbers(str) {

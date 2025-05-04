@@ -12,12 +12,8 @@
  */
 
 (function () {
-  function index(element) {
-    if (!element) return;
-    const parentEle = element.parentElement;
-    if (!parentEle) return -1;
-    const children = Array.from(parentEle.children);
-    return children.indexOf(element);
+  function querys(selector, context) {
+    return Array.from((context || document).querySelectorAll(selector));
   }
 
   /** 提取字符串中的数字 */
@@ -40,7 +36,7 @@
     return null;
   }
   /** 是否有同级元素 */
-  function hasSiblings(element) {
+  function haveSiblings(element) {
     return element.parentElement.children.length > 1;
   }
 
@@ -49,10 +45,10 @@
     while (element) {
       const tagName = element.tagName;
       const parentEle = element.parentElement;
-      const hasLink = parentEle.querySelectorAll(tagName).filter((el) => el !== element);
-      const hasSib = hasSiblings(element);
+      const haveSib = haveSiblings(element);
       const nextTagName = element?.nextElementSibling?.tagName;
-      if (hasSib && nextTagName === tagName && !!hasLink.length) return element;
+      const hasEqualsTag = querys(tagName, parentEle).filter((el) => el !== element);
+      if (haveSib && nextTagName === tagName && !!hasEqualsTag.length) return element;
       element = parentEle;
     }
     return element;
@@ -68,7 +64,7 @@
     const href = location.href;
     const path = location.pathname;
     const lastPath = path.substring(path.lastIndexOf("/") + 1);
-    const links = Array.from(document.querySelectorAll(`:is(a[href*="${path}"], a[href*="${lastPath}"])`));
+    const links = querys(`:is(a[href*="${path}"], a[href*="${lastPath}"])`);
     console.log("匹配到所有的链接：", links);
     if (links.length == 1) return links.shift();
 
@@ -94,15 +90,16 @@
   }
 
   function getEpisodeNumberContainer(element, isPrev = false) {
-    const curIndex = index(element);
-    const allEpisode = getAllEpisodeElement(element);
-    return isPrev ? allEpisode[curIndex - 1] : allEpisode[curIndex + 1];
+    if (!element) return;
+    const episodes = getAllEpisodeElement(element);
+    const index = episodes.indexOf(element);
+    return isPrev ? episodes[index - 1] : episodes[index + 1];
   }
 
   function getAllEpisodeElement(element) {
     const tagName = element.tagName;
     const sibling = findSiblingInParent(element, tagName);
-    const children = Array.from(sibling.parentElement.children);
+    const children = Array.from(sibling?.parentElement.children);
     return children.filter((ele) => ele.tagName === tagName);
   }
 
