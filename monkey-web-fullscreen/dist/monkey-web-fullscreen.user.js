@@ -184,34 +184,25 @@
       const numbers = str.match(/\d+/g);
       return numbers ? numbers.map(Number) : [];
     },
-    index(element) {
-      if (!element) return;
-      const parentEle = element.parentElement;
-      if (!parentEle) return -1;
-      const children = Array.from(parentEle.children);
-      return children.indexOf(element);
-    },
     getParentChain(element) {
       let parents = [];
-      let unique = false;
       let current = element;
       while (current && current.tagName !== "BODY") {
-        let tagInfo = current.tagName.toLowerCase();
-        let hasId = false;
+        let tagInfo;
         if (current.id) {
-          hasId = true;
-          unique = true;
-          tagInfo += `#${current.id}`;
+          tagInfo = `#${current.id}`;
+          parents.unshift(tagInfo);
+          break;
+        } else {
+          tagInfo = current.tagName.toLowerCase();
+          if (current.classList.length > 0) {
+            let classList = current.classList;
+            tagInfo += `.${Array.from(classList).join(".")}`;
+          }
+          parents.unshift(tagInfo);
         }
-        if (!hasId && current.classList.length > 0) {
-          let classList = current.classList;
-          tagInfo += `.${Array.from(classList).join(".")}`;
-        }
-        parents.unshift(tagInfo);
         current = current.parentNode;
-        if (hasId) break;
       }
-      if (!unique) parents.unshift("body");
       return parents.join(" > ");
     }
   };
@@ -903,7 +894,7 @@
     },
     getCurrentEpisode() {
       const ele = ALL_EPISODE_CHAIN$1.get(location.host) ? this.getCurrentEpisodeForChain() : this.getCurrentEpisodeLinkElement();
-      return this.getCurrentEpisodeContainer(ele);
+      return this.getEpisodeContainer(ele);
     },
     getCurrentEpisodeLinkElement() {
       const href = location.href;
@@ -938,9 +929,9 @@
     },
     getEpisodeNumberContainer(element, isPrev = false) {
       if (!element) return;
-      const curIndex = Tools.index(element);
-      const allEpisode = this.getAllEpisodeElement(element);
-      return isPrev ? allEpisode[curIndex - 1] : allEpisode[curIndex + 1];
+      const episodes = this.getAllEpisodeElement(element);
+      const index = episodes.indexOf(element);
+      return isPrev ? episodes[index - 1] : episodes[index + 1];
     },
     getAllEpisodeElement(element) {
       const tagName = element.tagName;
@@ -963,7 +954,7 @@
         }
       }
     },
-    getCurrentEpisodeContainer(element) {
+    getEpisodeContainer(element) {
       while (element) {
         const tagName = element.tagName;
         const parentEle = element.parentElement;
@@ -1032,7 +1023,7 @@
       const chain = Tools.getParentChain(eventTarget);
       this.pickerEpisodeDialog(chain, {
         validBtnCallback(value) {
-          const container = this.getCurrentEpisodeContainer(Tools.query(value));
+          const container = this.getEpisodeContainer(Tools.query(value));
           const allEpisode = this.getAllEpisodeElement(container);
           const numbers = Array.from(allEpisode).map((ele) => this.getEpisodeNumber(ele));
           !!numbers.length ? Tools.alert("获取到所有集数：", numbers.join(" ")) : Tools.alert("获取不到所有剧集！");
@@ -1044,13 +1035,14 @@
       });
     },
     getCurrentEpisodeForChain() {
-      const currNumberChain = CURRENT_EPISODE_CHAIN.get(location.host);
-      if (!currNumberChain) return;
-      const currNumber = this.getEpisodeNumber(Tools.query(currNumberChain));
+      const currChain = CURRENT_EPISODE_CHAIN.get(location.host);
+      if (!currChain) return;
+      const currEpisode = Tools.query(currChain);
+      const currNumber = this.getEpisodeNumber(currEpisode);
       const chain = ALL_EPISODE_CHAIN.get(location.host);
-      const container = this.getCurrentEpisodeContainer(Tools.query(chain));
-      const allEpisode = this.getAllEpisodeElement(container);
-      return Array.from(allEpisode).find((ele) => this.getEpisodeNumber(ele) === currNumber);
+      const container = this.getEpisodeContainer(Tools.query(chain));
+      const episodes = this.getAllEpisodeElement(container);
+      return episodes.includes(currEpisode) ? currEpisode : episodes.find((ele) => this.getEpisodeNumber(ele) === currNumber);
     },
     pickerEpisodeDialog(chain, { validBtnCallback, confirmCallback }) {
       Swal.fire({
