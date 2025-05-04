@@ -26,7 +26,7 @@ export default {
       ? this.getCurrentEpisodeForChain()
       : this.getCurrentEpisodeLinkElement();
     // console.log("当前集数所在的<a>标签：", ele);
-    return this.getCurrentEpisodeContainer(ele);
+    return this.getEpisodeContainer(ele);
   },
   getCurrentEpisodeLinkElement() {
     const href = location.href;
@@ -63,9 +63,9 @@ export default {
   },
   getEpisodeNumberContainer(element, isPrev = false) {
     if (!element) return;
-    const curIndex = Tools.index(element);
-    const allEpisode = this.getAllEpisodeElement(element);
-    return isPrev ? allEpisode[curIndex - 1] : allEpisode[curIndex + 1];
+    const episodes = this.getAllEpisodeElement(element);
+    const index = episodes.indexOf(element);
+    return isPrev ? episodes[index - 1] : episodes[index + 1];
   },
   getAllEpisodeElement(element) {
     const tagName = element.tagName;
@@ -88,9 +88,8 @@ export default {
       }
     }
   },
-  getCurrentEpisodeContainer(element) {
-    // element 为通过地址匹配过滤后的 <a>当前集数</a> 标签
-    //  当前集数相对于所有集数所在的同级标签
+  getEpisodeContainer(element) {
+    //  集数相对于所有集数所在的同级标签
     // 示例一：得到<a>标签
     // <div><a>第01集</a><a>第02集</a></div>
     // 示例二：得到<li>标签

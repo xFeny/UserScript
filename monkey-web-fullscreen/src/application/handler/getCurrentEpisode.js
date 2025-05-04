@@ -44,7 +44,7 @@
     return element.parentElement.children.length > 1;
   }
 
-  function getCurrentEpisodeContainer(element) {
+  function getEpisodeContainer(element) {
     //  当前集相对所有集所在的标签
     while (element) {
       const tagName = element.tagName;
@@ -61,7 +61,7 @@
   function getCurrentEpisode() {
     const ele = getCurrentEpisodeLinkElement();
     console.log("当前集的<a>标签：", ele);
-    return getCurrentEpisodeContainer(ele);
+    return getEpisodeContainer(ele);
   }
 
   function getCurrentEpisodeLinkElement() {

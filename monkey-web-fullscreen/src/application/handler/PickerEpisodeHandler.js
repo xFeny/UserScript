@@ -45,7 +45,7 @@ export default {
     const chain = Tools.getParentChain(eventTarget);
     this.pickerEpisodeDialog(chain, {
       validBtnCallback(value) {
-        const container = this.getCurrentEpisodeContainer(Tools.query(value));
+        const container = this.getEpisodeContainer(Tools.query(value));
         const allEpisode = this.getAllEpisodeElement(container);
         const numbers = Array.from(allEpisode).map((ele) => this.getEpisodeNumber(ele));
         !!numbers.length ? Tools.alert("获取到所有集数：", numbers.join(" ")) : Tools.alert("获取不到所有剧集！");
@@ -57,13 +57,16 @@ export default {
     });
   },
   getCurrentEpisodeForChain() {
-    const currNumberChain = CURRENT_EPISODE_CHAIN.get(location.host);
-    if (!currNumberChain) return;
-    const currNumber = this.getEpisodeNumber(Tools.query(currNumberChain));
+    const currChain = CURRENT_EPISODE_CHAIN.get(location.host);
+    if (!currChain) return;
+    const currEpisode = Tools.query(currChain);
+    const currNumber = this.getEpisodeNumber(currEpisode);
     const chain = ALL_EPISODE_CHAIN.get(location.host);
-    const container = this.getCurrentEpisodeContainer(Tools.query(chain));
-    const allEpisode = this.getAllEpisodeElement(container);
-    return Array.from(allEpisode).find((ele) => this.getEpisodeNumber(ele) === currNumber);
+    const container = this.getEpisodeContainer(Tools.query(chain));
+    const episodes = this.getAllEpisodeElement(container);
+    return episodes.includes(currEpisode)
+      ? currEpisode
+      : episodes.find((ele) => this.getEpisodeNumber(ele) === currNumber);
   },
   pickerEpisodeDialog(chain, { validBtnCallback, confirmCallback }) {
     Swal.fire({

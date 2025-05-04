@@ -38,7 +38,7 @@ export default {
   },
   setAllEpisodeChain(eventTarget) {
     if (ALL_EPISODE_CHAIN.get(location.host)) return;
-    const container = this.getCurrentEpisodeContainer(eventTarget);
+    const container = this.getEpisodeContainer(eventTarget);
     const allEpisodeElement = this.getAllEpisodeElement(container);
     const numbers = Array.from(allEpisodeElement).map((ele) => this.getEpisodeNumber(ele));
     const result = confirm("所有剧集数：\n" + numbers.join(" ") + "\n是否能正确获取到所有剧集？");
