@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      2.7.3
+// @version      2.7.4
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；快捷键切换：全屏(F)、网页全屏(P)、下一个视频(N)、弹幕开关(D)；支持任意视频倍速播放，提示记忆倍速；B站播放完自动退出网页全屏和取消连播。
 // @license      GPL-3.0-only
@@ -91,7 +91,7 @@
     isNumber: (str) => /^[0-9]$/.test(str),
     scrollTop: (top) => _unsafeWindow.top.scrollTo({ top }),
     query: (selector, context) => (context || document).querySelector(selector),
-    querys: (selector, context) => (context || document).querySelectorAll(selector),
+    querys: (selector, context) => Array.from((context || document).querySelectorAll(selector)),
     validDuration: (video) => !isNaN(video.duration) && video.duration !== Infinity,
     triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
     postMessage: (win = null, data) => win?.postMessage({ source: MSG_SOURCE$1, ...data }, "*"),
@@ -102,7 +102,7 @@
       return this.querys("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])");
     },
     postMsgToFrames(data) {
-      this.getFrames().forEach((iframe) => this.postMessage(iframe.contentWindow, data));
+      this.getFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
     },
     debounce(fn, delay = ONE_SEC$2) {
       let timer;
@@ -176,7 +176,7 @@
       }
       return null;
     },
-    hasSiblings(element) {
+    haveSiblings(element) {
       return element.parentElement.children.length > 1;
     },
     extractNumbers(str) {
@@ -365,7 +365,7 @@
         const video = this.getVideo();
         this.element = this.getElement();
         if (video?.play && !!video.offsetWidth) this.setupVideoListener();
-        if (!webSite.inMatches() && this.video) return observer.disconnect();
+        if (!webSite.inMatches() && this.topWinInfo) return observer.disconnect();
         if (!video?.play || !this.element || !this.webFullScreen(video)) return;
         observer.disconnect();
         this.biliLiveExtras();
@@ -767,7 +767,7 @@
     },
     registerCloseAutoExperimentCommand() {
       if (webSite.inMatches()) return;
-      const videos = Array.from(Tools.querys("video")).filter((video) => !isNaN(video));
+      const videos = Tools.querys("video").filter((video) => !isNaN(video));
       if (videos.length > 1) return;
       const isClose = this.isClosedOtherWebsiteAuto();
       const title = isClose ? "此站点启用自动网页全屏" : "此站点禁用自动网页全屏";
@@ -900,7 +900,7 @@
       const href = location.href;
       const path = location.pathname;
       const lastPath = path.substring(path.lastIndexOf("/") + 1);
-      const links = Array.from(Tools.querys(`:is(a[href*="${path}"], a[href*="${lastPath}"])`));
+      const links = Tools.querys(`:is(a[href*="${path}"], a[href*="${lastPath}"])`);
       if (links.length == 1) return links.shift();
       const filter = [
         "h1",
@@ -936,7 +936,7 @@
     getAllEpisodeElement(element) {
       const tagName = element.tagName;
       const sibling = Tools.findSiblingInParent(element, tagName);
-      const children = Array.from(sibling.parentElement.children);
+      const children = Array.from(sibling?.parentElement.children);
       return children.filter((ele) => ele.tagName === tagName);
     },
     jumpToEpisodeNumber(element) {
@@ -958,10 +958,10 @@
       while (element) {
         const tagName = element.tagName;
         const parentEle = element.parentElement;
-        const hasLink = Tools.querys(tagName, parentEle).filter((el) => el !== element);
-        const hasSib = Tools.hasSiblings(element);
+        const haveSib = Tools.haveSiblings(element);
         const nextTagName = element?.nextElementSibling?.tagName;
-        if (hasSib && nextTagName === tagName && !!hasLink.length) return element;
+        const hasEqualsTag = Tools.querys(tagName, parentEle).filter((el) => el !== element);
+        if (haveSib && nextTagName === tagName && !!hasEqualsTag.length) return element;
         element = parentEle;
       }
       return element;
@@ -996,6 +996,7 @@
           if (!Tools.isTopWin()) return Swal.fire("当前窗口无法抓取元素！");
           event.preventDefault();
           event.stopPropagation();
+          event.stopImmediatePropagation();
           const hasPickerAllEpisode = ALL_EPISODE_CHAIN.get(location.host);
           const hasPickerCurrEpisode = CURRENT_EPISODE_CHAIN.get(location.host);
           if (hasPickerCurrEpisode && hasPickerAllEpisode) return Swal.fire("已抓取过！\n请先删除已抓取的");
@@ -1025,7 +1026,7 @@
         validBtnCallback(value) {
           const container = this.getEpisodeContainer(Tools.query(value));
           const allEpisode = this.getAllEpisodeElement(container);
-          const numbers = Array.from(allEpisode).map((ele) => this.getEpisodeNumber(ele));
+          const numbers = allEpisode.map(this.getEpisodeNumber);
           !!numbers.length ? Tools.alert("获取到所有集数：", numbers.join(" ")) : Tools.alert("获取不到所有剧集！");
         },
         confirmCallback(value) {
@@ -1201,8 +1202,8 @@
     { handler: WebFullScreenHandler },
     { handler: SwitchEpisodeHandler },
     { handler: PickerEpisodeHandler },
-    { handler: VideoPlaybackRateHandler },
-    { handler: ScriptsEnhanceHandler }
+    { handler: ScriptsEnhanceHandler },
+    { handler: VideoPlaybackRateHandler }
   ];
   logicHandlers.forEach(({ handler }) => {
     for (const key of Object.keys(handler)) {
