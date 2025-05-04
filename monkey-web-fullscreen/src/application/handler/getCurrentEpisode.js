@@ -9,11 +9,17 @@
  * https://www.a8ys.vip/
  * https://www.vv3nwjk.com
  * https://www.dandanju.tv/
- * 失败：
- * https://www.skr2.cc/
  */
 
 (function () {
+  function index(element) {
+    if (!element) return;
+    const parentEle = element.parentElement;
+    if (!parentEle) return -1;
+    const children = Array.from(parentEle.children);
+    return children.indexOf(element);
+  }
+
   /** 提取字符串中的数字 */
   function extractNumbers(str) {
     const numbers = str.match(/\d+/g);
@@ -41,10 +47,12 @@
   function getCurrentEpisodeContainer(element) {
     //  当前集相对所有集所在的标签
     while (element) {
+      const tagName = element.tagName;
       const parentEle = element.parentElement;
-      const hasLink = parentEle.querySelectorAll(element.tagName).filter((el) => el !== element);
+      const hasLink = parentEle.querySelectorAll(tagName).filter((el) => el !== element);
       const hasSib = hasSiblings(element);
-      if (hasSib && !!hasLink.length) return element;
+      const nextTagName = element?.nextElementSibling?.tagName;
+      if (hasSib && nextTagName === tagName && !!hasLink.length) return element;
       element = parentEle;
     }
     return element;
@@ -52,7 +60,7 @@
 
   function getCurrentEpisode() {
     const ele = getCurrentEpisodeLinkElement();
-    console.log("当前集数所在的<a>标签：", ele);
+    console.log("当前集的<a>标签：", ele);
     return getCurrentEpisodeContainer(ele);
   }
 
@@ -81,6 +89,38 @@
     });
   }
 
+  function getNextEpisode(element) {
+    return getEpisodeNumberContainer(element);
+  }
+
+  function getEpisodeNumberContainer(element, isPrev = false) {
+    const curIndex = index(element);
+    const allEpisode = getAllEpisodeElement(element);
+    return isPrev ? allEpisode[curIndex - 1] : allEpisode[curIndex + 1];
+  }
+
+  function getAllEpisodeElement(element) {
+    const tagName = element.tagName;
+    const sibling = findSiblingInParent(element, tagName);
+    const children = Array.from(sibling.parentElement.children);
+    return children.filter((ele) => ele.tagName === tagName);
+  }
+
+  function findSiblingInParent(element, selector, maxLevel = 3) {
+    let curLevel = 0;
+    let curParent = element.parentElement;
+    while (curParent && curLevel < maxLevel) {
+      const sibs = curParent.children;
+      for (let sib of sibs) {
+        if (sib !== element && sib.matches(selector)) return sib;
+      }
+      curParent = curParent.parentElement;
+      curLevel++;
+    }
+    return null;
+  }
   const currentEpisode = getCurrentEpisode();
-  console.log("当前集相对所有剧集所在的元素：", currentEpisode);
+  const nextEpisode = getNextEpisode(currentEpisode);
+  console.log("当前集元素：", currentEpisode);
+  console.log("下一集的元素：", nextEpisode);
 })();

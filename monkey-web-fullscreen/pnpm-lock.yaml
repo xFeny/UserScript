@@ -11,6 +11,9 @@ importers:
       sass:
         specifier: ^1.83.4
         version: 1.83.4
+      sweetalert2:
+        specifier: ^11.20.0
+        version: 11.20.0
       unplugin-auto-import:
         specifier: ^0.19.0
         version: 0.19.0(rollup@4.29.1)
@@ -639,6 +642,9 @@ packages:
   strip-literal@2.1.1:
     resolution: {integrity: sha512-631UJ6O00eNGfMiWG78ck80dfBab8X6IVFB51jZK5Icd7XAs60Z5y7QdSd/wGIklnWvRbUNloVzhOKKmutxQ6Q==}
 
+  sweetalert2@11.20.0:
+    resolution: {integrity: sha512-MuiRY4UcWvdOBg12WUWWdUAFH+njnx7Ot/ibzPRa9Tk2TXfZqGYK4Nlq5c/u9P1EKCgRkkNsMZuoB8SCvSrwgQ==}
+
   systemjs@6.15.1:
     resolution: {integrity: sha512-Nk8c4lXvMB98MtbmjX7JwJRgJOL8fluecYCfCeYBznwmpOs8Bf15hLM6z4z71EDAhQVrQrI+wt1aLWSXZq+hXA==}
 
@@ -1216,6 +1222,8 @@ snapshots:
   strip-literal@2.1.1:
     dependencies:
       js-tokens: 9.0.1
+
+  sweetalert2@11.20.0: {}
 
   systemjs@6.15.1: {}
 

@@ -31,23 +31,26 @@
   display: none !important;
 }
 /* B站直播样式 END */
-.monkey-auto-web-fullScreen {
-  ul,
-  li {
-    font-size: 24px;
-    list-style-type: none;
+
+.picker-episode-dialog {
+  h4 {
+    color: red;
   }
 
-  input {
-    width: 24px;
-    height: 24px;
-    vertical-align: bottom;
+  p {
+    float: left;
+    color: #999;
+    font-size: 12px;
+    padding-left: 6px;
   }
 
-  label {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 15px;
+  .custom-textarea {
+    width: 400px;
+    height: auto;
+    font-size: 14px;
+    max-width: 100%;
+    margin-bottom: 0;
+    min-height: 130px;
+    resize: vertical;
   }
 }

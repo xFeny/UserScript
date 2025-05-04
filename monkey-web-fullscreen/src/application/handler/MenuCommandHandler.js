@@ -6,11 +6,12 @@ const {
   CLOSE_PLAY_RATE,
   VIDEO_TIME_STEP,
   OVERRIDE_KEYBOARD,
+  ALL_EPISODE_CHAIN,
+  CURRENT_EPISODE_CHAIN,
+  CLOSE_OTHER_WEBSITES_AUTO,
   CLOSE_AUTO_WEB_FULL_SCREEN,
   VIDEO_FASTFORWARD_DURATION,
 } = storage;
-// 网站是否使用增强功能，在视频播放时自动网页全屏
-const CLOSE_OTHER_WEBSITES_AUTO = "CLOSE_OTHER_WEBSITES_AUTO_";
 
 /**
  * 脚本菜单命令
@@ -21,7 +22,7 @@ export default {
   isClosedAuto: () => CLOSE_AUTO_WEB_FULL_SCREEN.get(),
   isClosedOtherWebsiteAuto() {
     const host = Tools.isTopWin() ? location.host : this.topWinInfo.host;
-    return GM_getValue(CLOSE_OTHER_WEBSITES_AUTO + host, true);
+    return CLOSE_OTHER_WEBSITES_AUTO.get(host);
   },
   setupScriptMenuCommand() {
     if (!Tools.isTopWin()) return;
@@ -39,6 +40,7 @@ export default {
     this.registerCloseAutoFullCommand();
     this.registerOverrideKeyboardCommand();
     this.registerCloseAutoExperimentCommand();
+    this.registerDeletePickerEpisodeCommand();
   },
   setupCommandChangeListener() {
     if (this.isSetupCommandChangeListener) return;
@@ -47,7 +49,8 @@ export default {
       CLOSE_PLAY_RATE.name,
       OVERRIDE_KEYBOARD.name,
       CLOSE_AUTO_WEB_FULL_SCREEN.name,
-      CLOSE_OTHER_WEBSITES_AUTO + window.top.location.host,
+      CURRENT_EPISODE_CHAIN.name + location.host,
+      CLOSE_OTHER_WEBSITES_AUTO.name + location.host,
     ].forEach((key) => GM_addValueChangeListener(key, handler));
     this.isSetupCommandChangeListener = true; // 防止多次注册
   },
@@ -109,7 +112,16 @@ export default {
     const title = isClose ? "此站点启用自动网页全屏" : "此站点禁用自动网页全屏";
     GM_unregisterMenuCommand(this.close_experiment_command_id);
     this.close_experiment_command_id = GM_registerMenuCommand(title, () => {
-      GM_setValue(CLOSE_OTHER_WEBSITES_AUTO + location.host, !isClose);
+      CLOSE_OTHER_WEBSITES_AUTO.set(location.host, !isClose);
+    });
+  },
+  registerDeletePickerEpisodeCommand() {
+    const title = "删除此站点的剧集选择器";
+    GM_unregisterMenuCommand(this.del_piker_episode_command_id);
+    if (webSite.inMatches() || !CURRENT_EPISODE_CHAIN.get(location.host)) return;
+    this.del_piker_episode_command_id = GM_registerMenuCommand(title, () => {
+      ALL_EPISODE_CHAIN.delete(location.host);
+      CURRENT_EPISODE_CHAIN.delete(location.host);
     });
   },
 };

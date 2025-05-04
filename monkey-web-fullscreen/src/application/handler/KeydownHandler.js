@@ -46,7 +46,7 @@ export default {
     if (eventCode.Space === code) key = eventCode.Space.toUpperCase();
     if (shiftKey && eventCode.NumpadAdd === code) key = SYMBOL.MULTIPLY; // shift + 组合快捷键
     if (shiftKey && eventCode.NumpadSubtract === code) key = SYMBOL.DIVIDE; // shift - 组合快捷键
-    if (!Tools.isTopWin() && (eventCode.KeyP === code || eventCode.KeyN === code)) {
+    if (!Tools.isTopWin() && [eventCode.KeyP, eventCode.KeyN].includes(code)) {
       return Tools.postMessage(window.top, { key });
     }
     this.processEvent({ key });

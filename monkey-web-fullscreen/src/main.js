@@ -5,6 +5,7 @@ import MenuCommandHandler from "./application/handler/MenuCommandHandler";
 import WebSiteLoginHandler from "./application/handler/WebSiteLoginHandler";
 import WebFullScreenHandler from "./application/handler/WebFullScreenHandler";
 import SwitchEpisodeHandler from "./application/handler/SwitchEpisodeHandler";
+import PickerEpisodeHandler from "./application/handler/PickerEpisodeHandler";
 import ScriptsEnhanceHandler from "./application/handler/ScriptsEnhanceHandler";
 import VideoPlaybackRateHandler from "./application/handler/VideoPlaybackRateHandler";
 
@@ -14,6 +15,7 @@ const logicHandlers = [
   { handler: WebSiteLoginHandler },
   { handler: WebFullScreenHandler },
   { handler: SwitchEpisodeHandler },
+  { handler: PickerEpisodeHandler },
   { handler: VideoPlaybackRateHandler },
   { handler: ScriptsEnhanceHandler },
 ];

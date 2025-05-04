@@ -13,6 +13,7 @@ export default {
     this.setupMutationObserver();
     this.setupUrlChangeListener();
     this.setupMouseMoveListener();
+    this.setupPickerEpisodeListener();
   },
   isLive() {
     return webSite.isLivePage() || this.videoInfo?.isLive;

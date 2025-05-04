@@ -1,4 +1,6 @@
 import Tools from "../common/Tools";
+import Storage from "../common/Storage";
+const { ALL_EPISODE_CHAIN } = Storage;
 
 /**
  * 通用性切换视频下集
@@ -20,7 +22,9 @@ export default {
     this.jumpToEpisodeNumber(targetEpisode);
   },
   getCurrentEpisode() {
-    const ele = this.getCurrentEpisodeLinkElement();
+    const ele = ALL_EPISODE_CHAIN.get(location.host)
+      ? this.getCurrentEpisodeForChain()
+      : this.getCurrentEpisodeLinkElement();
     // console.log("当前集数所在的<a>标签：", ele);
     return this.getCurrentEpisodeContainer(ele);
   },
@@ -49,23 +53,19 @@ export default {
     });
   },
   getEpisodeNumber(element) {
-    return Tools.extractNumbers(element.innerText).shift(); // 提取数字
+    return Tools.extractNumbers(element?.innerText).shift();
   },
   getPrevEpisode(element) {
-    const curNumber = this.getEpisodeNumber(element);
-    return this.getEpisodeNumberContainer(element, curNumber - 1);
+    return this.getEpisodeNumberContainer(element, true);
   },
   getNextEpisode(element) {
-    const curNumber = this.getEpisodeNumber(element);
-    return this.getEpisodeNumberContainer(element, curNumber + 1);
+    return this.getEpisodeNumberContainer(element);
   },
-  getEpisodeNumberContainer(element, targetNumber) {
+  getEpisodeNumberContainer(element, isPrev = false) {
+    if (!element) return;
+    const curIndex = Tools.index(element);
     const allEpisode = this.getAllEpisodeElement(element);
-    for (const episode of allEpisode) {
-      if (element === episode) continue;
-      const episodeNumber = Tools.extractNumbers(episode.innerText).shift(); // 提取数字
-      if (targetNumber === episodeNumber) return episode;
-    }
+    return isPrev ? allEpisode[curIndex - 1] : allEpisode[curIndex + 1];
   },
   getAllEpisodeElement(element) {
     const tagName = element.tagName;
@@ -74,14 +74,15 @@ export default {
     return children.filter((ele) => ele.tagName === tagName);
   },
   jumpToEpisodeNumber(element) {
+    if (!element) return;
+    if (element instanceof HTMLAnchorElement) return element.click();
     const stack = [element];
     while (stack.length > 0) {
-      const currentElement = stack.pop();
-      if (!(currentElement instanceof HTMLElement)) continue;
-      if (currentElement instanceof HTMLAnchorElement) {
-        currentElement.click();
-      }
-      const children = Array.from(currentElement.children).reverse();
+      const current = stack.pop();
+      if (!(current instanceof HTMLElement) || !this.getEpisodeNumber(current)) continue;
+      if (current instanceof HTMLAnchorElement || current instanceof HTMLButtonElement) return current.click();
+      current.click();
+      const children = Array.from(current.children).reverse();
       for (const child of children) {
         stack.push(child);
       }
@@ -90,11 +91,12 @@ export default {
   getCurrentEpisodeContainer(element) {
     // element 为通过地址匹配过滤后的 <a>当前集数</a> 标签
     //  当前集数相对于所有集数所在的同级标签
-    // 示例一：<div>	<a>第01集</a>	<a>第02集</a> </div> 得到<a>标签
+    // 示例一：得到<a>标签
+    // <div><a>第01集</a><a>第02集</a></div>
     // 示例二：得到<li>标签
     // <ul class="player_list">
-    // 	<li><a href="/bangumi/36918/play/1/1/">第01话</a></li>
-    // 	<li><a href="/bangumi/36918/play/1/2/">第02话</a></li>
+    // 	<li><a>第01话</a></li>
+    // 	<li><a>第02话</a></li>
     // </ul>
     // 示例三：得到<div>标签
     // <ul class="urlli">
@@ -105,11 +107,22 @@ export default {
     // 		<ul><li><a>第02集</a></li></ul>
     // 	</div>
     // </ul>
+    // while (element) {
+    //   const tagName = element.tagName;
+    //   const parentEle = element.parentElement;
+    //   const nextTagName = element?.nextElementSibling?.tagName;
+    //   const hasLink = Tools.querys(tagName, parentEle).filter((el) => el !== element);
+    //   const hasSiblings = Tools.hasSiblings(element);
+    //   if (hasSiblings && nextTagName === tagName && !!hasLink.length) return element;
+    //   element = parentEle;
+    // }
     while (element) {
+      const tagName = element.tagName;
       const parentEle = element.parentElement;
-      const hasLink = Tools.querys(element.tagName, parentEle).filter((el) => el !== element);
-      const hasSiblings = Tools.hasSiblings(element);
-      if (hasSiblings && !!hasLink.length) return element;
+      const hasLink = Tools.querys(tagName, parentEle).filter((el) => el !== element);
+      const hasSib = Tools.hasSiblings(element);
+      const nextTagName = element?.nextElementSibling?.tagName;
+      if (hasSib && nextTagName === tagName && !!hasLink.length) return element;
       element = parentEle;
     }
     return element;
@@ -123,7 +136,9 @@ export default {
       const attrs = link.attributes;
       for (const attr of attrs) {
         const attrNumbers = [...Tools.extractNumbers(attr.value)].join("");
-        if (attrNumbers === curNumber) return link;
+        if (attrNumbers === curNumber) {
+          return link;
+        }
       }
     }
   },

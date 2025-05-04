@@ -97,15 +97,40 @@ export default {
     return element.parentElement.children.length > 1;
   },
   extractNumbers(str) {
-    // 提取字符串中的数字
+    if (!str) return [];
     const numbers = str.match(/\d+/g);
     return numbers ? numbers.map(Number) : [];
   },
-  compareUrls(url1, url2) {
-    const parseUrl = (url) => {
-      const parsed = new URL(url);
-      return parsed.host + parsed.pathname + parsed.search + parsed.hash;
-    };
-    return parseUrl(url1) === parseUrl(url2);
+  index(element) {
+    if (!element) return;
+    const parentEle = element.parentElement;
+    if (!parentEle) return -1;
+    const children = Array.from(parentEle.children);
+    return children.indexOf(element);
+  },
+  getParentChain(element) {
+    let parents = [];
+    let unique = false;
+    let current = element;
+    while (current && current.tagName !== "BODY") {
+      let tagInfo = current.tagName.toLowerCase();
+      let hasId = false;
+      if (current.id) {
+        hasId = true;
+        unique = true;
+        tagInfo += `#${current.id}`;
+      }
+
+      if (!hasId && current.classList.length > 0) {
+        let classList = current.classList;
+        tagInfo += `.${Array.from(classList).join(".")}`;
+      }
+      parents.unshift(tagInfo);
+      current = current.parentNode;
+      if (hasId) break;
+    }
+
+    if (!unique) parents.unshift("body");
+    return parents.join(" > ");
   },
 };
