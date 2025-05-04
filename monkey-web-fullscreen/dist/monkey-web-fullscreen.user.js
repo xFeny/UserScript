@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      2.7.1
+// @version      2.7.3
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；快捷键切换：全屏(F)、网页全屏(P)、下一个视频(N)、弹幕开关(D)；支持任意视频倍速播放，提示记忆倍速；B站播放完自动退出网页全屏和取消连播。
 // @license      GPL-3.0-only
@@ -31,8 +31,13 @@
 // @match        *://www.bilibili.com/*/play/*
 // @match        *://v.qq.com/live/p/newtopic/*
 // @match        *://www.bilibili.com/festival/*
+// @require      https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.js
+// @require      data:application/javascript,%3Bwindow.sweetalert2%3DSweetalert2%3B
+// @resource     sweetalert2  https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.css
 // @grant        GM_addStyle
 // @grant        GM_addValueChangeListener
+// @grant        GM_deleteValue
+// @grant        GM_getResourceText
 // @grant        GM_getValue
 // @grant        GM_info
 // @grant        GM_registerMenuCommand
@@ -42,9 +47,9 @@
 // @note         *://*/*
 // ==/UserScript==
 
-(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const t=document.createElement("style");t.textContent=e,document.head.append(t)})(' @charset "UTF-8";.showToast{color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in;background:#000000bf!important}#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,.live-room-app #sidebar-vm,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.login-tip{display:none!important}.monkey-auto-web-fullScreen ul,.monkey-auto-web-fullScreen li{font-size:24px;list-style-type:none}.monkey-auto-web-fullScreen input{width:24px;height:24px;vertical-align:bottom}.monkey-auto-web-fullScreen label{display:flex;align-items:center;justify-content:space-between;padding-top:15px} ');
+(i=>{if(typeof GM_addStyle=="function"){GM_addStyle(i);return}const t=document.createElement("style");t.textContent=i,document.head.append(t)})(' @charset "UTF-8";.showToast{color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in;background:#000000bf!important}#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,.live-room-app #sidebar-vm,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.login-tip{display:none!important}.picker-episode-dialog h4{color:red}.picker-episode-dialog p{float:left;color:#999;font-size:12px;padding-left:6px}.picker-episode-dialog .custom-textarea{width:400px;height:auto;font-size:14px;max-width:100%;margin-bottom:0;min-height:130px;resize:vertical} ');
 
-(function () {
+(function (Swal) {
   'use strict';
 
   const positions = Object.freeze({
@@ -73,6 +78,7 @@
     })
   });
   var _GM_addValueChangeListener = /* @__PURE__ */ (() => typeof GM_addValueChangeListener != "undefined" ? GM_addValueChangeListener : void 0)();
+  var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
   var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
   var _GM_info = /* @__PURE__ */ (() => typeof GM_info != "undefined" ? GM_info : void 0)();
   var _GM_registerMenuCommand = /* @__PURE__ */ (() => typeof GM_registerMenuCommand != "undefined" ? GM_registerMenuCommand : void 0)();
@@ -174,15 +180,39 @@
       return element.parentElement.children.length > 1;
     },
     extractNumbers(str) {
+      if (!str) return [];
       const numbers = str.match(/\d+/g);
       return numbers ? numbers.map(Number) : [];
     },
-    compareUrls(url1, url2) {
-      const parseUrl = (url) => {
-        const parsed = new URL(url);
-        return parsed.host + parsed.pathname + parsed.search + parsed.hash;
-      };
-      return parseUrl(url1) === parseUrl(url2);
+    index(element) {
+      if (!element) return;
+      const parentEle = element.parentElement;
+      if (!parentEle) return -1;
+      const children = Array.from(parentEle.children);
+      return children.indexOf(element);
+    },
+    getParentChain(element) {
+      let parents = [];
+      let unique = false;
+      let current = element;
+      while (current && current.tagName !== "BODY") {
+        let tagInfo = current.tagName.toLowerCase();
+        let hasId = false;
+        if (current.id) {
+          hasId = true;
+          unique = true;
+          tagInfo += `#${current.id}`;
+        }
+        if (!hasId && current.classList.length > 0) {
+          let classList = current.classList;
+          tagInfo += `.${Array.from(classList).join(".")}`;
+        }
+        parents.unshift(tagInfo);
+        current = current.parentNode;
+        if (hasId) break;
+      }
+      if (!unique) parents.unshift("body");
+      return parents.join(" > ");
     }
   };
   const { EMPTY: EMPTY$2, QQ_VID_REG, BILI_VID_REG, IQIYI_VID_REG, ACFUN_VID_REG } = constants;
@@ -297,6 +327,7 @@
       this.setupMutationObserver();
       this.setupUrlChangeListener();
       this.setupMouseMoveListener();
+      this.setupPickerEpisodeListener();
     },
     isLive() {
       return webSite.isLivePage() || this.videoInfo?.isLive;
@@ -465,42 +496,75 @@
       name: "PLAY_RATE_STEP",
       set: setStorage,
       get() {
-        return Number.parseFloat(getStorage.bind(this, 0.25)());
+        return Number.parseFloat(getStorage.call(this, 0.25));
       }
     }),
     CLOSE_PLAY_RATE: Object.freeze({
       name: "CLOSE_PLAY_RATE",
       set: setStorage,
       get() {
-        return getStorage.bind(this, false)();
+        return getStorage.call(this, false);
       }
     }),
     VIDEO_FASTFORWARD_DURATION: Object.freeze({
       name: "VIDEO_FASTFORWARD_DURATION",
       set: setStorage,
       get() {
-        return Number.parseInt(getStorage.bind(this, 30)());
+        return Number.parseInt(getStorage.call(this, 30));
       }
     }),
     VIDEO_TIME_STEP: Object.freeze({
       name: "VIDEO_TIME_STEP",
       set: setStorage,
       get() {
-        return Number.parseInt(getStorage.bind(this, 5)());
+        return Number.parseInt(getStorage.call(this, 5));
       }
     }),
     CLOSE_AUTO_WEB_FULL_SCREEN: Object.freeze({
       name: "CLOSE_AUTO_WEB_FULL_SCREEN",
       set: setStorage,
       get() {
-        return getStorage.bind(this, false)();
+        return getStorage.call(this, false);
       }
     }),
     OVERRIDE_KEYBOARD: Object.freeze({
       name: "OVERRIDE_KEYBOARD",
       set: setStorage,
       get() {
-        return getStorage.bind(this, false)();
+        return getStorage.call(this, false);
+      }
+    }),
+    CLOSE_OTHER_WEBSITES_AUTO: Object.freeze({
+      name: "CLOSE_OTHER_WEBSITES_AUTO_",
+      set(key, value) {
+        _GM_setValue(this.name + key, value);
+      },
+      get(key) {
+        return _GM_getValue(this.name + key, true);
+      }
+    }),
+    CURRENT_EPISODE_CHAIN: Object.freeze({
+      name: "CURRENT_EPISODE_CHAIN_",
+      set(key, value) {
+        _GM_setValue(this.name + key, value);
+      },
+      get(key) {
+        return _GM_getValue(this.name + key);
+      },
+      delete(key) {
+        _GM_deleteValue(this.name + key);
+      }
+    }),
+    ALL_EPISODE_CHAIN: Object.freeze({
+      name: "ALL_EPISODE_CHAIN_",
+      set(key, value) {
+        _GM_setValue(this.name + key, value);
+      },
+      get(key) {
+        return _GM_getValue(this.name + key);
+      },
+      delete(key) {
+        _GM_deleteValue(this.name + key);
       }
     })
   };
@@ -552,7 +616,7 @@
       if (eventCode.Space === code) key = eventCode.Space.toUpperCase();
       if (shiftKey && eventCode.NumpadAdd === code) key = SYMBOL$1.MULTIPLY;
       if (shiftKey && eventCode.NumpadSubtract === code) key = SYMBOL$1.DIVIDE;
-      if (!Tools.isTopWin() && (eventCode.KeyP === code || eventCode.KeyN === code)) {
+      if (!Tools.isTopWin() && [eventCode.KeyP, eventCode.KeyN].includes(code)) {
         return Tools.postMessage(window.top, { key });
       }
       this.processEvent({ key });
@@ -617,17 +681,19 @@
     CLOSE_PLAY_RATE,
     VIDEO_TIME_STEP,
     OVERRIDE_KEYBOARD,
+    ALL_EPISODE_CHAIN: ALL_EPISODE_CHAIN$2,
+    CURRENT_EPISODE_CHAIN: CURRENT_EPISODE_CHAIN$1,
+    CLOSE_OTHER_WEBSITES_AUTO,
     CLOSE_AUTO_WEB_FULL_SCREEN,
     VIDEO_FASTFORWARD_DURATION
   } = storage;
-  const CLOSE_OTHER_WEBSITES_AUTO = "CLOSE_OTHER_WEBSITES_AUTO_";
   const MenuCommandHandler = {
     isClosedPlayRate: () => CLOSE_PLAY_RATE.get(),
     isOverrideKeyboard: () => OVERRIDE_KEYBOARD.get(),
     isClosedAuto: () => CLOSE_AUTO_WEB_FULL_SCREEN.get(),
     isClosedOtherWebsiteAuto() {
       const host = Tools.isTopWin() ? location.host : this.topWinInfo.host;
-      return _GM_getValue(CLOSE_OTHER_WEBSITES_AUTO + host, true);
+      return CLOSE_OTHER_WEBSITES_AUTO.get(host);
     },
     setupScriptMenuCommand() {
       if (!Tools.isTopWin()) return;
@@ -644,6 +710,7 @@
       this.registerCloseAutoFullCommand();
       this.registerOverrideKeyboardCommand();
       this.registerCloseAutoExperimentCommand();
+      this.registerDeletePickerEpisodeCommand();
     },
     setupCommandChangeListener() {
       if (this.isSetupCommandChangeListener) return;
@@ -652,7 +719,8 @@
         CLOSE_PLAY_RATE.name,
         OVERRIDE_KEYBOARD.name,
         CLOSE_AUTO_WEB_FULL_SCREEN.name,
-        CLOSE_OTHER_WEBSITES_AUTO + window.top.location.host
+        CURRENT_EPISODE_CHAIN$1.name + location.host,
+        CLOSE_OTHER_WEBSITES_AUTO.name + location.host
       ].forEach((key) => _GM_addValueChangeListener(key, handler));
       this.isSetupCommandChangeListener = true;
     },
@@ -714,7 +782,16 @@
       const title = isClose ? "此站点启用自动网页全屏" : "此站点禁用自动网页全屏";
       _GM_unregisterMenuCommand(this.close_experiment_command_id);
       this.close_experiment_command_id = _GM_registerMenuCommand(title, () => {
-        _GM_setValue(CLOSE_OTHER_WEBSITES_AUTO + location.host, !isClose);
+        CLOSE_OTHER_WEBSITES_AUTO.set(location.host, !isClose);
+      });
+    },
+    registerDeletePickerEpisodeCommand() {
+      const title = "删除此站点的剧集选择器";
+      _GM_unregisterMenuCommand(this.del_piker_episode_command_id);
+      if (webSite.inMatches() || !CURRENT_EPISODE_CHAIN$1.get(location.host)) return;
+      this.del_piker_episode_command_id = _GM_registerMenuCommand(title, () => {
+        ALL_EPISODE_CHAIN$2.delete(location.host);
+        CURRENT_EPISODE_CHAIN$1.delete(location.host);
       });
     }
   };
@@ -809,6 +886,7 @@
       Tools.postMessage(window.top, { key: "P" });
     }
   };
+  const { ALL_EPISODE_CHAIN: ALL_EPISODE_CHAIN$1 } = storage;
   const SwitchEpisodeHandler = {
     switchPrevEpisode: function() {
       this.handleEpisodeChange(this.getPrevEpisode);
@@ -824,7 +902,7 @@
       this.jumpToEpisodeNumber(targetEpisode);
     },
     getCurrentEpisode() {
-      const ele = this.getCurrentEpisodeLinkElement();
+      const ele = ALL_EPISODE_CHAIN$1.get(location.host) ? this.getCurrentEpisodeForChain() : this.getCurrentEpisodeLinkElement();
       return this.getCurrentEpisodeContainer(ele);
     },
     getCurrentEpisodeLinkElement() {
@@ -850,23 +928,19 @@
       });
     },
     getEpisodeNumber(element) {
-      return Tools.extractNumbers(element.innerText).shift();
+      return Tools.extractNumbers(element?.innerText).shift();
     },
     getPrevEpisode(element) {
-      const curNumber = this.getEpisodeNumber(element);
-      return this.getEpisodeNumberContainer(element, curNumber - 1);
+      return this.getEpisodeNumberContainer(element, true);
     },
     getNextEpisode(element) {
-      const curNumber = this.getEpisodeNumber(element);
-      return this.getEpisodeNumberContainer(element, curNumber + 1);
+      return this.getEpisodeNumberContainer(element);
     },
-    getEpisodeNumberContainer(element, targetNumber) {
+    getEpisodeNumberContainer(element, isPrev = false) {
+      if (!element) return;
+      const curIndex = Tools.index(element);
       const allEpisode = this.getAllEpisodeElement(element);
-      for (const episode of allEpisode) {
-        if (element === episode) continue;
-        const episodeNumber = Tools.extractNumbers(episode.innerText).shift();
-        if (targetNumber === episodeNumber) return episode;
-      }
+      return isPrev ? allEpisode[curIndex - 1] : allEpisode[curIndex + 1];
     },
     getAllEpisodeElement(element) {
       const tagName = element.tagName;
@@ -875,14 +949,15 @@
       return children.filter((ele) => ele.tagName === tagName);
     },
     jumpToEpisodeNumber(element) {
+      if (!element) return;
+      if (element instanceof HTMLAnchorElement) return element.click();
       const stack = [element];
       while (stack.length > 0) {
-        const currentElement = stack.pop();
-        if (!(currentElement instanceof HTMLElement)) continue;
-        if (currentElement instanceof HTMLAnchorElement) {
-          currentElement.click();
-        }
-        const children = Array.from(currentElement.children).reverse();
+        const current = stack.pop();
+        if (!(current instanceof HTMLElement) || !this.getEpisodeNumber(current)) continue;
+        if (current instanceof HTMLAnchorElement || current instanceof HTMLButtonElement) return current.click();
+        current.click();
+        const children = Array.from(current.children).reverse();
         for (const child of children) {
           stack.push(child);
         }
@@ -890,10 +965,12 @@
     },
     getCurrentEpisodeContainer(element) {
       while (element) {
+        const tagName = element.tagName;
         const parentEle = element.parentElement;
-        const hasLink = Tools.querys(element.tagName, parentEle).filter((el) => el !== element);
-        const hasSiblings = Tools.hasSiblings(element);
-        if (hasSiblings && !!hasLink.length) return element;
+        const hasLink = Tools.querys(tagName, parentEle).filter((el) => el !== element);
+        const hasSib = Tools.hasSiblings(element);
+        const nextTagName = element?.nextElementSibling?.tagName;
+        if (hasSib && nextTagName === tagName && !!hasLink.length) return element;
         element = parentEle;
       }
       return element;
@@ -906,9 +983,102 @@
         const attrs = link.attributes;
         for (const attr of attrs) {
           const attrNumbers = [...Tools.extractNumbers(attr.value)].join("");
-          if (attrNumbers === curNumber) return link;
+          if (attrNumbers === curNumber) {
+            return link;
+          }
         }
       }
+    }
+  };
+  const cssLoader = (e) => {
+    const t = GM_getResourceText(e);
+    return GM_addStyle(t), t;
+  };
+  cssLoader("sweetalert2");
+  const { ALL_EPISODE_CHAIN, CURRENT_EPISODE_CHAIN } = storage;
+  const PickerEpisodeHandler = {
+    setupPickerEpisodeListener() {
+      document.body.addEventListener(
+        "click",
+        (event) => {
+          if (!event.ctrlKey || !event.altKey) return;
+          if (!Tools.isTopWin()) return Swal.fire("当前窗口无法抓取元素！");
+          event.preventDefault();
+          event.stopPropagation();
+          const hasPickerAllEpisode = ALL_EPISODE_CHAIN.get(location.host);
+          const hasPickerCurrEpisode = CURRENT_EPISODE_CHAIN.get(location.host);
+          if (hasPickerCurrEpisode && hasPickerAllEpisode) return Swal.fire("已抓取过！\n请先删除已抓取的");
+          !hasPickerCurrEpisode ? this.setCurrentEpisodeChain(event.target) : this.setAllEpisodeChain(event.target);
+        },
+        true
+      );
+    },
+    setCurrentEpisodeChain(eventTarget) {
+      if (CURRENT_EPISODE_CHAIN.get(location.host)) return;
+      const chain = Tools.getParentChain(eventTarget);
+      this.pickerEpisodeDialog(chain, {
+        validBtnCallback(value) {
+          const number = this.getEpisodeNumber(Tools.query(value));
+          !!number ? Tools.alert("获取到当前集数：", number) : Tools.alert("获取不到当前集数！");
+        },
+        confirmCallback(value) {
+          CURRENT_EPISODE_CHAIN.set(location.host, value);
+          Swal.fire("请继续操作抓取元素！");
+        }
+      });
+    },
+    setAllEpisodeChain(eventTarget) {
+      if (ALL_EPISODE_CHAIN.get(location.host)) return;
+      const chain = Tools.getParentChain(eventTarget);
+      this.pickerEpisodeDialog(chain, {
+        validBtnCallback(value) {
+          const container = this.getCurrentEpisodeContainer(Tools.query(value));
+          const allEpisode = this.getAllEpisodeElement(container);
+          const numbers = Array.from(allEpisode).map((ele) => this.getEpisodeNumber(ele));
+          !!numbers.length ? Tools.alert("获取到所有集数：", numbers.join(" ")) : Tools.alert("获取不到所有剧集！");
+        },
+        confirmCallback(value) {
+          ALL_EPISODE_CHAIN.set(location.host, value);
+          Swal.fire("操作完成！\n请测试能否成功切换剧集");
+        }
+      });
+    },
+    getCurrentEpisodeForChain() {
+      const currNumberChain = CURRENT_EPISODE_CHAIN.get(location.host);
+      if (!currNumberChain) return;
+      const currNumber = this.getEpisodeNumber(Tools.query(currNumberChain));
+      const chain = ALL_EPISODE_CHAIN.get(location.host);
+      const container = this.getCurrentEpisodeContainer(Tools.query(chain));
+      const allEpisode = this.getAllEpisodeElement(container);
+      return Array.from(allEpisode).find((ele) => this.getEpisodeNumber(ele) === currNumber);
+    },
+    pickerEpisodeDialog(chain, { validBtnCallback, confirmCallback }) {
+      Swal.fire({
+        html: `<div class="picker-episode-dialog">
+          <h4>验证能获取到剧集数信息，再确认保存</h4>
+          <button id="validateButton" class="swal2-confirm swal2-styled">验证元素</button>
+          <textarea id="customTextarea" class="swal2-textarea custom-textarea" placeholder="请输入内容"></textarea>
+          <p>可编辑内容确保能获取到剧集信息</p>
+        </div>`,
+        title: "抓取剧集元素选择器",
+        confirmButtonText: "保存",
+        preConfirm: () => {
+          return Tools.query("#customTextarea").value;
+        },
+        didOpen: () => {
+          const textarea = Tools.query("#customTextarea");
+          textarea.value = chain.trim();
+          Tools.query("#validateButton").addEventListener("click", () => {
+            const value = textarea.value;
+            if (!value) return Tools.alert("元素选择器不能为空！");
+            validBtnCallback.call(this, value);
+          });
+        }
+      }).then((result) => {
+        if (!result.isConfirmed) return;
+        if (!result.value) return Tools.alert("元素选择器不能为空！");
+        confirmCallback.call(this, result.value);
+      });
     }
   };
   const ScriptsEnhanceHandler = {
@@ -1038,6 +1208,7 @@
     { handler: WebSiteLoginHandler },
     { handler: WebFullScreenHandler },
     { handler: SwitchEpisodeHandler },
+    { handler: PickerEpisodeHandler },
     { handler: VideoPlaybackRateHandler },
     { handler: ScriptsEnhanceHandler }
   ];
@@ -1050,4 +1221,4 @@
   App.init();
   _unsafeWindow.MONKEY_WEB_FULLSCREEN = App;
 
-})();
+})(sweetalert2);
