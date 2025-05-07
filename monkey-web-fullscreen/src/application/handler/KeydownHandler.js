@@ -18,9 +18,7 @@ export default {
     const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(event.code);
     const isNumberKey = Tools.isNumber(event.key) && !this.isClosedPlayRate();
     if (!isNumberKey && !isOverrideKey) return;
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
+    Tools.preventDefault(event);
   },
   setupKeydownListener() {
     window.addEventListener("keyup", (event) => this.preventDefault(event), true);
@@ -29,9 +27,9 @@ export default {
       const { data } = event;
       // Tools.log(location.href, "接收到消息：", data);
       if (!data?.source || !data.source.includes(MSG_SOURCE)) return;
-      if (data?.topWinInfo) this.topWinInfo = data.topWinInfo;
-      if (data?.defaultPlayRate) this.defaultPlayRate();
       if (data?.videoInfo) return this.setParentVideoInfo(data.videoInfo);
+      if (data?.defaultPlaybackRate) this.defaultPlaybackRate();
+      if (data?.topWinInfo) this.topWinInfo = data.topWinInfo;
       this.processEvent(data);
     });
   },
@@ -61,26 +59,23 @@ export default {
     if (this.normalWebsite()) return;
     const keyMapping = this.getKeyMapping();
     if (keyMapping[key]) return keyMapping[key]();
-    if (Tools.isNumber(key)) this.setPlayRate(key); // 倍速
+    if (Tools.isNumber(key)) this.setPlaybackRate(key); // 倍速
   },
   getKeyMapping() {
     return {
-      Z: () => this.defaultPlayRate(),
-      A: () => this.adjustPlayRate(SYMBOL.ADD),
-      S: () => this.adjustPlayRate(SYMBOL.SUBTRACT),
-      [SYMBOL.ADD]: () => this.adjustPlayRate(SYMBOL.ADD),
-      [SYMBOL.DIVIDE]: () => this.adjustPlayRate(SYMBOL.DIVIDE),
-      [SYMBOL.SUBTRACT]: () => this.adjustPlayRate(SYMBOL.SUBTRACT),
-      [SYMBOL.MULTIPLY]: () => this.adjustPlayRate(SYMBOL.MULTIPLY),
+      Z: () => this.defaultPlaybackRate(),
+      A: () => this.adjustPlaybackRate(SYMBOL.ADD),
+      S: () => this.adjustPlaybackRate(SYMBOL.SUBTRACT),
+      [SYMBOL.ADD]: () => this.adjustPlaybackRate(SYMBOL.ADD),
+      [SYMBOL.DIVIDE]: () => this.adjustPlaybackRate(SYMBOL.DIVIDE),
+      [SYMBOL.SUBTRACT]: () => this.adjustPlaybackRate(SYMBOL.SUBTRACT),
+      [SYMBOL.MULTIPLY]: () => this.adjustPlaybackRate(SYMBOL.MULTIPLY),
       N: () => (webSite.inMatches() ? this.triggerIconElement("next") : this.switchNextEpisode()),
-      F: () => (webSite.isDouyu() ? douyu.getFullIcon().click() : this.triggerIconElement("full", 0)),
-      D: () => (webSite.isDouyu() ? douyu.getDanmakuIcon().click() : this.triggerIconElement("danmaku", 3)),
       ARROWLEFT: () => (this.isOverrideKeyboard() ? this.adjustVideoTime(SYMBOL.SUBTRACT) : null),
       ARROWRIGHT: () => (this.isOverrideKeyboard() ? this.adjustVideoTime() : null),
       0: () => this.adjustVideoTime(VIDEO_FASTFORWARD_DURATION.get()),
       P: () => {
         if (!webSite.inMatches()) return this.enhance();
-        if (webSite.isDouyu()) return douyu.getWebfullIcon().click();
         webSite.isBiliLive() ? this.biliLiveWebFullScreen() : this.triggerIconElement("webfull");
       },
       SPACE: () => {
@@ -88,13 +83,14 @@ export default {
         if (webSite.isDouyu()) return this.video.paused ? douyu.play() : douyu.pause();
         this.video.paused ? this.video.play() : this.video.pause();
       },
+      F: () => this.triggerIconElement("full", 0),
+      D: () => this.triggerIconElement("danmaku", 3),
     };
   },
   triggerIconElement(name, index) {
     if (!webSite.inMatches()) return;
     if (webSite.isBiliLive()) return this.getBiliLiveIcons()?.[index]?.click();
     Tools.query(selectorConfig[location.host]?.[name])?.click();
-    Tools.triggerMousemove(this.video);
   },
   adjustVideoTime(second = VIDEO_TIME_STEP.get(), _symbol) {
     if (!this.video || !Tools.validDuration(this.video)) return;

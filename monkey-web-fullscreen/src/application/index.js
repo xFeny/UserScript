@@ -13,7 +13,6 @@ export default {
     this.setupMutationObserver();
     this.setupUrlChangeListener();
     this.setupMouseMoveListener();
-    this.setupPickerEpisodeListener();
   },
   isLive() {
     return webSite.isLivePage() || this.videoInfo?.isLive;
@@ -21,14 +20,8 @@ export default {
   normalWebsite() {
     return !this.videoInfo; // 普通页面，没有video标签
   },
-  getVideo() {
-    if (webSite.isDouyu()) return douyu.getVideo();
-    return Tools.query("video:not([loop]):not([src=''])") || Tools.query("video:not([loop])");
-  },
-  getElement() {
-    if (webSite.isDouyu()) return douyu.getWebfullIcon();
-    return document.querySelector(selectorConfig[location.host]?.webfull);
-  },
+  getVideo: () => Tools.query("video:not([loop]):not([src=''])") || Tools.query("video:not([loop])"),
+  getElement: () => Tools.query(selectorConfig[location.host]?.webfull),
   getVideoIframe() {
     // video所在的iframe标签
     if (!this.videoInfo?.frameSrc) return null;
@@ -111,11 +104,11 @@ export default {
   },
   setParentVideoInfo(videoInfo) {
     this.videoInfo = videoInfo;
-    if (Tools.isTopWin()) return this.setupScriptMenuCommand();
-    // video在iframe中，向父窗口传递它的href信息
-    videoInfo.frameSrc = location.href;
-    Tools.postMessage(window.parent, { videoInfo });
-    // Tools.log("video元素中心点信息：", videoInfo);
+    if (!Tools.isTopWin()) videoInfo.frameSrc = location.href;
+    if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo });
+    this.setupPickerEpisodeListener();
+    this.setupScriptMenuCommand();
+    this.sendTopWinInfo();
   },
   changeVideoInfo(video) {
     if (!this.videoInfo) return;
@@ -124,31 +117,36 @@ export default {
     this.videoInfo.isLive = isLive;
     this.setParentVideoInfo(this.videoInfo);
   },
+  sendTopWinInfo() {
+    // 向iframe传递顶级窗口信息
+    const topWinInfo = (this.topWinInfo = { innerWidth, host: location.host });
+    Tools.postMsgToFrames({ topWinInfo });
+  },
   setupMouseMoveListener() {
     if (this.isSetupMouseMoveListener) return;
     const delay = ONE_SEC * 2;
     this.isSetupMouseMoveListener = true;
-    let timer = setTimeout(this.showOrHideCursor, delay);
+    let timer = setTimeout(() => this.showOrHideCursor(), delay);
     document.addEventListener("mousemove", (event) => {
       if (!event.isTrusted) return;
       clearTimeout(timer);
       const target = event.target;
       this.showOrHideCursor(false);
-      timer = setTimeout(this.showOrHideCursor, delay);
+      timer = setTimeout(() => this.showOrHideCursor(), delay);
       if (this.video === target || !(target instanceof HTMLVideoElement)) return;
       this.addVideoEvtListener(target);
     });
   },
   showOrHideCursor(isHide = true) {
-    Tools.querys(":is(video, iframe)").forEach((ele) => {
+    if (!this.videoInfo) return;
+    const videoWrap = this.getVideoLocation();
+    const elements = Array.from([...videoWrap.children, videoWrap, videoWrap.parentElement]);
+    elements.forEach((ele) => {
+      if (isHide) ele?.dispatchEvent(new MouseEvent("mouseleave"));
       isHide ? (ele.style.cursor = "none") : (ele.style.cursor = EMPTY);
     });
-    if (!isHide) return;
-    const mouseleave = new MouseEvent("mouseleave");
-    Tools.querys("body *").forEach((ele) => ele.dispatchEvent(mouseleave));
   },
   showToast(content, duration = SHOW_TOAST_TIME) {
-    if (webSite.isDouyu()) douyu.addStyle();
     const el = document.createElement("div");
     if (content instanceof HTMLElement) el.appendChild(content);
     if (Object.is(typeof content, typeof EMPTY)) el.textContent = content;
@@ -157,6 +155,7 @@ export default {
     const videoParent = this.video?.parentElement;
     const videoContainer = this.getVideoContainer();
     const target = this.video === videoContainer ? videoParent : videoContainer;
+    if (webSite.isDouyu()) douyu.addStyle(target);
     Tools.query(".showToast", target)?.remove();
     target?.appendChild(el);
     setTimeout(() => {

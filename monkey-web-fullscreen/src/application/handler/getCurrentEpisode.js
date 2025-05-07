@@ -27,11 +27,11 @@
   }
   /** 向上查找元素 */
   function closest(element, selector, maxLevel = 3) {
-    let curLevel = 0;
-    while (element && curLevel < maxLevel) {
+    let currLevel = 0;
+    while (element && currLevel < maxLevel) {
       if (element.matches(selector)) return element;
       element = element.parentElement;
-      curLevel++;
+      currLevel++;
     }
     return null;
   }
@@ -46,9 +46,8 @@
       const tagName = element.tagName;
       const parentEle = element.parentElement;
       const haveSib = haveSiblings(element);
-      const nextTagName = element?.nextElementSibling?.tagName;
-      const hasEqualsTag = querys(tagName, parentEle).filter((el) => el !== element);
-      if (haveSib && nextTagName === tagName && !!hasEqualsTag.length) return element;
+      const hasEqualsTag = querys(tagName, parentEle).find((el) => el !== element);
+      if (haveSib && hasEqualsTag) return element;
       element = parentEle;
     }
     return element;
@@ -76,6 +75,7 @@
       "[class*='record']",
       "[class*='history']",
       "[class*='tab-item']",
+      "[class*='play-channel']",
     ];
     return links.find((link) => {
       const linkUrl = new URL(link.href);
@@ -85,39 +85,68 @@
     });
   }
 
+  function getPrevEpisode(element) {
+    return getEpisodeNumberContainer(element, true);
+  }
+
   function getNextEpisode(element) {
     return getEpisodeNumberContainer(element);
   }
 
   function getEpisodeNumberContainer(element, isPrev = false) {
     if (!element) return;
+    const currNumber = getEpisodeNumber(element);
     const episodes = getAllEpisodeElement(element);
+    if (episodes.length <= 1) return null;
+    const numbers = episodes.map(getEpisodeNumber);
     const index = episodes.indexOf(element);
-    return isPrev ? episodes[index - 1] : episodes[index + 1];
+    const prev = episodes[index - 1];
+    const next = episodes[index + 1];
+    const { leftSmall, rightLarge } = compareLeftRight(numbers, currNumber, index);
+    if (leftSmall || rightLarge) return isPrev ? prev : next; // 剧集是正序：[1, 2, 3, 4, 5]
+    return isPrev ? next : prev; // 剧集是倒序：[5, 4, 3, 2, 1]
+  }
+
+  function compareLeftRight(numbers, compareNumber, index) {
+    const leftSmall = numbers.findIndex((val, i) => i < index && val < compareNumber) > -1;
+    const rightLarge = numbers.findIndex((val, i) => i > index && val > compareNumber) > -1;
+    return { leftSmall, rightLarge };
   }
 
   function getAllEpisodeElement(element) {
-    const tagName = element.tagName;
-    const sibling = findSiblingInParent(element, tagName);
+    const eleName = element.tagName;
+    const eleClass = Array.from(element.classList);
+    const sibling = findSiblingInParent(element, eleName);
     const children = Array.from(sibling?.parentElement.children);
-    return children.filter((ele) => ele.tagName === tagName);
+    return children.filter((ele) => {
+      const currClass = Array.from(ele.classList);
+      const haveSomeClass = eleClass.some((value) => currClass.includes(value));
+      if (!!currClass.length && !haveSomeClass) return false;
+      return ele.tagName === eleName;
+    });
   }
 
   function findSiblingInParent(element, selector, maxLevel = 3) {
-    let curLevel = 0;
-    let curParent = element.parentElement;
-    while (curParent && curLevel < maxLevel) {
-      const sibs = curParent.children;
+    let currLevel = 0;
+    let currParent = element.parentElement;
+    while (currParent && currLevel < maxLevel) {
+      const sibs = currParent.children;
       for (let sib of sibs) {
         if (sib !== element && sib.matches(selector)) return sib;
       }
-      curParent = curParent.parentElement;
-      curLevel++;
+      currParent = currParent.parentElement;
+      currLevel++;
     }
     return null;
   }
-  const currentEpisode = getCurrentEpisode();
-  const nextEpisode = getNextEpisode(currentEpisode);
-  console.log("当前集元素：", currentEpisode);
-  console.log("下一集的元素：", nextEpisode);
+
+  const currEpisode = getCurrentEpisode();
+  const allEpisode = getAllEpisodeElement(currEpisode);
+  const prevEpisode = getPrevEpisode(currEpisode);
+  const nextEpisode = getNextEpisode(currEpisode);
+
+  console.log("当前集元素：", currEpisode);
+  console.log("所有剧集元素：", allEpisode);
+  console.log("上集的元素：", prevEpisode);
+  console.log("下集的元素：", nextEpisode);
 })();

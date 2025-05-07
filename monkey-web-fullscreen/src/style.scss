@@ -32,25 +32,44 @@
 }
 /* B站直播样式 END */
 
-.picker-episode-dialog {
+.monkey-web-fullscreen {
+  h2 {
+    font-size: 24px;
+  }
+
   h4 {
     color: red;
+    margin: 0 auto;
   }
 
   p {
-    float: left;
     color: #999;
     font-size: 12px;
-    padding-left: 6px;
   }
 
-  .custom-textarea {
-    width: 400px;
+  #picker-chain {
+    width: 25em;
     height: auto;
     font-size: 14px;
-    max-width: 100%;
     margin-bottom: 0;
-    min-height: 130px;
+    min-height: 10em;
     resize: vertical;
   }
+
+  .swal2-confirm {
+    background-color: #7066e0 !important;
+  }
+
+  .swal2-deny {
+    background-color: #dc3741 !important;
+  }
+}
+
+.notyf__message {
+  overflow: hidden;
+  display: -webkit-box;
+  line-clamp: 4;
+  -webkit-line-clamp: 4;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
 }

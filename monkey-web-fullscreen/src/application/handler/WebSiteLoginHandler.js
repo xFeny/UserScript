@@ -1,7 +1,6 @@
+import Constants from "../common/Constants";
 import Tools from "../common/Tools";
 import webSite from "../common/WebSite";
-import constants from "../common/Constants";
-const { ONE_SEC } = constants;
 /**
  * 未登录状态下，自动关闭网站的登录弹窗
  */
@@ -54,6 +53,6 @@ export default {
       unsafeWindow.__BiliUser__.isLogin = true;
       unsafeWindow.__BiliUser__.cache.data.isLogin = true;
       unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
-    }, ONE_SEC * 3);
+    }, Constants.ONE_SEC * 3);
   },
 };

@@ -1,59 +1,82 @@
+import Swal from "sweetalert2";
 import Tools from "../common/Tools";
 import Storage from "../common/Storage";
-import Swal from "sweetalert2/dist/sweetalert2";
-import "sweetalert2/dist/sweetalert2.css";
+import WebSite from "../common/WebSite";
+import "sweetalert2/dist/sweetalert2.min.css";
+
 const { ALL_EPISODE_CHAIN, CURRENT_EPISODE_CHAIN } = Storage;
 
 /**
  * 手动采集剧集元素选择器
+ * https://gqc7.top/
+ * https://ddys.pro/
+ * https://gaze.run/
+ * https://miao101.com/
+ * https://www.xuandm.com/
+ * https://www.freeok123.com/
  */
 export default {
   setupPickerEpisodeListener() {
+    if (WebSite.inMatches()) return;
     document.body.addEventListener(
       "click",
       (event) => {
-        if (!event.ctrlKey || !event.altKey) return;
-        if (!Tools.isTopWin()) return Swal.fire("当前窗口无法抓取元素！");
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
+        if (!event.ctrlKey || !event.altKey || !event.isTrusted) return;
+        if (!Tools.isTopWin()) return Tools.notyf("此页面不能抓取 (•ิ_•ิ)?", true);
+        Tools.preventDefault(event);
 
         const hasPickerAllEpisode = ALL_EPISODE_CHAIN.get(location.host);
         const hasPickerCurrEpisode = CURRENT_EPISODE_CHAIN.get(location.host);
-        if (hasPickerCurrEpisode && hasPickerAllEpisode) return Swal.fire("已抓取过！\n请先删除已抓取的");
-        !hasPickerCurrEpisode ? this.setCurrentEpisodeChain(event.target) : this.setAllEpisodeChain(event.target);
+        if (hasPickerCurrEpisode && hasPickerAllEpisode) {
+          return Tools.notyf("已提取过剧集元素 (￣ー￣)", true);
+        }
+
+        const target = event.target;
+        const number = this.getEpisodeNumber(target);
+        if (!number) return Tools.notyf("点击位置无数字 (•ิ_•ิ)?", true);
+
+        !hasPickerCurrEpisode ? this.setCurrentEpisodeChain(target) : this.setAllEpisodeChain(target);
       },
       true
     );
   },
-  setCurrentEpisodeChain(eventTarget) {
+  setCurrentEpisodeChain(element) {
     if (CURRENT_EPISODE_CHAIN.get(location.host)) return;
-    const chain = Tools.getParentChain(eventTarget);
-
-    this.pickerEpisodeDialog(chain, {
+    this.pickerEpisodeDialog(element, {
       validBtnCallback(value) {
-        const number = this.getEpisodeNumber(Tools.query(value));
-        !!number ? Tools.alert("获取到当前集数：", number) : Tools.alert("获取不到当前集数！");
+        try {
+          const number = this.getEpisodeNumber(Tools.query(value));
+          !!number ? Tools.notyf(`当前集数：${number}`) : Tools.notyf("获取集数失败 〒▽〒", true);
+        } catch (e) {
+          Tools.notyf("获取集数失败 〒▽〒", true);
+          console.error(e);
+        }
       },
       confirmCallback(value) {
         CURRENT_EPISODE_CHAIN.set(location.host, value);
-        Swal.fire("请继续操作抓取元素！");
+        Tools.notyf("继续提取元素 ＼(＞０＜)／");
       },
     });
   },
-  setAllEpisodeChain(eventTarget) {
+  setAllEpisodeChain(element) {
     if (ALL_EPISODE_CHAIN.get(location.host)) return;
-    const chain = Tools.getParentChain(eventTarget);
-    this.pickerEpisodeDialog(chain, {
+    this.pickerEpisodeDialog(element, {
       validBtnCallback(value) {
-        const container = this.getEpisodeContainer(Tools.query(value));
-        const allEpisode = this.getAllEpisodeElement(container);
-        const numbers = allEpisode.map(this.getEpisodeNumber);
-        !!numbers.length ? Tools.alert("获取到所有集数：", numbers.join(" ")) : Tools.alert("获取不到所有剧集！");
+        try {
+          const container = this.getEpisodeContainer(Tools.query(value));
+          if (!container) return Tools.notyf("获取集数失败 〒▽〒", true);
+          const allEpisode = this.getAllEpisodeElement(container);
+          const numbers = allEpisode.map(this.getEpisodeNumber);
+          const numJoin = numbers.join(" ");
+          !!numbers.length ? Tools.notyf(`所有集数：${numJoin}`) : Tools.notyf("获取集数失败 〒▽〒", true);
+        } catch (e) {
+          Tools.notyf("获取集数失败 〒▽〒", true);
+          console.error(e);
+        }
       },
       confirmCallback(value) {
         ALL_EPISODE_CHAIN.set(location.host, value);
-        Swal.fire("操作完成！\n请测试能否成功切换剧集");
+        Tools.notyf("操作完成 []~(￣▽￣)~* 干杯");
       },
     });
   },
@@ -69,31 +92,37 @@ export default {
       ? currEpisode
       : episodes.find((ele) => this.getEpisodeNumber(ele) === currNumber);
   },
-  pickerEpisodeDialog(chain, { validBtnCallback, confirmCallback }) {
+  pickerEpisodeDialog(element, { validBtnCallback, confirmCallback }) {
     Swal.fire({
-      html: `<div class="picker-episode-dialog">
-          <h4>验证能获取到剧集数信息，再确认保存</h4>
-          <button id="validateButton" class="swal2-confirm swal2-styled">验证元素</button>
-          <textarea id="customTextarea" class="swal2-textarea custom-textarea" placeholder="请输入内容"></textarea>
-          <p>可编辑内容确保能获取到剧集信息</p>
-        </div>`,
+      html: `<h4>验证能正确获取到集数，再确定保存</h4>
+      <textarea id="picker-chain" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
+      <p>编辑选择器确保能正确获取到集数</p>`,
+      customClass: { popup: "monkey-web-fullscreen" },
       title: "抓取剧集元素选择器",
       confirmButtonText: "保存",
+      denyButtonText: "验证",
+      showCloseButton: true,
+      showDenyButton: true,
+      reverseButtons: true,
+      focusDeny: true,
+      preDeny: () => {
+        const value = Tools.query("#picker-chain").value.trim();
+        if (!value) return Tools.notyf("元素选择器不能为空！", true);
+        validBtnCallback.call(this, value);
+        return false;
+      },
       preConfirm: () => {
-        return Tools.query("#customTextarea").value;
+        const value = Tools.query("#picker-chain").value.trim();
+        if (value) return value;
+        Tools.notyf("元素选择器不能为空！", true);
+        return false;
       },
       didOpen: () => {
-        const textarea = Tools.query("#customTextarea");
-        textarea.value = chain.trim();
-        Tools.query("#validateButton").addEventListener("click", () => {
-          const value = textarea.value;
-          if (!value) return Tools.alert("元素选择器不能为空！");
-          validBtnCallback.call(this, value);
-        });
+        const textarea = Tools.query("#picker-chain");
+        textarea.value = Tools.getParentChain(element);
       },
     }).then((result) => {
       if (!result.isConfirmed) return;
-      if (!result.value) return Tools.alert("元素选择器不能为空！");
       confirmCallback.call(this, result.value);
     });
   },

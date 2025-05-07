@@ -26,41 +26,41 @@ export default {
     playRate = Number.parseFloat(playRate);
     return playRate.toFixed(2).replace(/\.?0+$/, "");
   },
-  setPlayRate(playRate, show = true) {
+  setPlaybackRate(playRate, show = true) {
     if (!this.checkUsable()) return;
     this.video.playbackRate = this.toFixed(playRate);
-    if (show) this.playRateToast();
-    this.cachePlayRate();
+    if (show) this.playbackRateToast();
+    this.cachePlaybackRate();
   },
-  adjustPlayRate(_symbol) {
+  adjustPlaybackRate(_symbol) {
     if (!this.checkUsable()) return;
     let playRate = this.video.playbackRate;
     playRate = strategy[_symbol](playRate);
     playRate = Math.max(PLAY_RATE_STEP.get(), playRate);
     playRate = Math.min(MAX_PLAY_RATE, playRate);
-    this.setPlayRate(playRate);
+    this.setPlaybackRate(playRate);
   },
-  defaultPlayRate() {
+  defaultPlaybackRate() {
     if (!this.video) return;
     this.video.playbackRate = DEF_PLAY_RATE;
     if (this.isClosedPlayRate()) return;
-    this.cachePlayRate();
+    this.cachePlaybackRate();
     this.showToast("已恢复正常倍速播放");
   },
   currVideoUseCachePlayRate(video) {
     if (this.isClosedPlayRate()) return;
     if (!webSite.isIqiyi()) video.isToastShown = false;
-    const playRate = this.getCachePlayRate();
+    const playRate = this.getCachePlaybackRate();
     // Tools.log(`当前播放倍速为：${video.playbackRate}，记忆倍速为：${playRate}`);
     if (video.playbackRate === playRate) return;
-    this.setPlayRate(playRate, !video.isToastShown);
+    this.setPlaybackRate(playRate, !video.isToastShown);
     video.isToastShown = true;
   },
-  cachePlayRate() {
+  cachePlaybackRate() {
     CACHED_PLAY_RATE.set(this.video.playbackRate);
   },
-  getCachePlayRate: () => Number.parseFloat(CACHED_PLAY_RATE.get() || DEF_PLAY_RATE),
-  playRateToast() {
+  getCachePlaybackRate: () => Number.parseFloat(CACHED_PLAY_RATE.get() || DEF_PLAY_RATE),
+  playbackRateToast() {
     const span = document.createElement("span");
     span.appendChild(document.createTextNode("正在以"));
     const child = span.cloneNode(true);

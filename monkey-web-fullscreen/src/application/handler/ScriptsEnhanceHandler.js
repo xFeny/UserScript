@@ -1,34 +1,13 @@
 /**
  * 对网页全屏（改）脚本增强
  * 安装网页全屏（改）脚本：https://greasyfork.org/zh-CN/scripts/495077-maximize-video-improve
- * 不需要滑动鼠标指针到播放器上，按 `P` 键直接网页全屏
- *
- * 测试网站列表：
- * 酷燃视频     https://krcom.cn
- * 新传宽频     https://v.zhibo.tv
- * 风行网       https://www.fun.tv
- * 56网         https://www.56.com
- * 齐鲁网       https://v.iqilu.com
- * 凤凰视频	    https://v.ifeng.com
- * YouTube      https://youtube.com
- * TED          https://www.ted.com
- * 虎牙         https://www.huya.com
- * 微博TV       https://weibo.com/tv
- * 斗鱼         https://www.douyu.com
- * FC2 Video	  https://video.fc2.com
- * 中国体育     https://video.zhibo.tv
- * 36氪         https://36kr.com/video/
- * 网易公开课   https://open.163.com/ted
- * 今日头条     https://www.toutiao.com/
- * 酷狗音乐-MV	https://www.kugou.com/mvweb/html/
- * QQ音乐-MV	  https://y.qq.com/portal/mv_lib.html
- * 小红书       https://www.xiaohongshu.com/explore
+ * 不需要滑动鼠标光标到播放器上，按 `P` 键直接网页全屏
  */
 import Tools from "../common/Tools";
 export default {
   enhance() {
     if (!this.videoInfo) return; // 页面没有视频元素
-    const ele = this.getHoverElement();
+    const ele = this.getVideoLocation();
     Tools.triggerHoverEvent(ele);
     Tools.triggerEscapeEvent();
     this.backupTrigger();
@@ -42,13 +21,11 @@ export default {
     if (!Object.is(newWidth, this.video.offsetWidth)) return;
     Tools.query("#playerControlBtn")?.click(); // 再次尝试
   },
-  getHoverElement() {
+  getVideoLocation() {
     if (this.video) return this.getVideoContainer();
-
     // video所在的iframe
     const iframe = this.getVideoIframe();
     if (iframe) return iframe;
-
     // 根据video的中心点，判断是否在iframe的矩形范围内
     const { centerX, centerY } = this.videoInfo;
     const iframes = Tools.getFrames();
@@ -86,6 +63,6 @@ export default {
     return Tools.closest(target, `:is(${selector})`);
   },
   getVideoControls(element) {
-    return Tools.findSiblingInParent(element, ['[class*="Control"]', '[class*="control"]']);
+    return Tools.findSiblingInParent(element, ['[class*="bar"]', '[class*="Control"]', '[class*="control"]']);
   },
 };

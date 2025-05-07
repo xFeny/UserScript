@@ -1,20 +1,39 @@
+import { Notyf } from "notyf";
+import "notyf/notyf.min.css";
 import constants from "./Constants";
+import { querySelector, querySelectorAll } from "shadow-dom-utils";
+
 const { ONE_SEC, MSG_SOURCE } = constants;
+
 /**
  * 公共方法
  */
 export default {
   isTopWin: () => window.top === window,
+  noNumber: (str) => !/\d/.test(str),
   isNumber: (str) => /^[0-9]$/.test(str),
   scrollTop: (top) => unsafeWindow.top.scrollTo({ top }),
-  query: (selector, context) => (context || document).querySelector(selector),
-  querys: (selector, context) => Array.from((context || document).querySelectorAll(selector)),
+  query: (selector, context) => querySelector(selector, context),
+  querys: (selector, context) => querySelectorAll(selector, context),
   validDuration: (video) => !isNaN(video.duration) && video.duration !== Infinity,
   triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
   postMessage: (win = null, data) => win?.postMessage({ source: MSG_SOURCE, ...data }, "*"),
   isVisible: (ele) => !!(ele?.offsetWidth || ele?.offsetHeight || ele?.getClientRects().length),
   log: (...data) => console.log(...["%c======= 脚本日志 =======\n\n", "color:green;font-size:14px;", ...data, "\n\n"]),
   alert: (...data) => window.alert(data.join(" ")),
+  preventDefault(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+  },
+  notyf(msg, isError = false) {
+    const notyf = new Notyf({
+      duration: ONE_SEC * 3,
+      position: { x: "center", y: "top" },
+    });
+    isError ? notyf.error(msg) : notyf.success(msg);
+    return false;
+  },
   getFrames() {
     return this.querys("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])");
   },
@@ -72,29 +91,29 @@ export default {
     return observer;
   },
   closest(element, selector, maxLevel = 3) {
-    let curLevel = 0;
-    while (element && curLevel < maxLevel) {
+    let currLevel = 0;
+    while (element && currLevel < maxLevel) {
       if (element.matches(selector)) return element;
       element = element.parentElement;
-      curLevel++;
+      currLevel++;
     }
     return null;
   },
   findSiblingInParent(element, selector, maxLevel = 3) {
-    let curLevel = 0;
-    let curParent = element.parentElement;
-    while (curParent && curLevel < maxLevel) {
-      const sibs = curParent.children;
+    let currLevel = 0;
+    let currParent = element.parentElement;
+    while (currParent && currLevel < maxLevel) {
+      const sibs = currParent.children;
       for (let sib of sibs) {
         if (sib !== element && sib.matches(selector)) return sib;
       }
-      curParent = curParent.parentElement;
-      curLevel++;
+      currParent = currParent.parentElement;
+      currLevel++;
     }
     return null;
   },
   haveSiblings(element) {
-    return element.parentElement.children.length > 1;
+    return element?.parentElement?.children.length > 1;
   },
   extractNumbers(str) {
     if (!str) return [];
@@ -105,21 +124,25 @@ export default {
     let parents = [];
     let current = element;
     while (current && current.tagName !== "BODY") {
-      let tagInfo;
-      if (current.id) {
-        tagInfo = `#${current.id}`;
-        parents.unshift(tagInfo);
-        break;
-      } else {
-        tagInfo = current.tagName.toLowerCase();
-        if (current.classList.length > 0) {
-          let classList = current.classList;
-          tagInfo += `.${Array.from(classList).join(".")}`;
-        }
-        parents.unshift(tagInfo);
-      }
+      const tagInfo = this.getTagInfo(current);
+      parents.unshift(tagInfo);
+      if (current.id && this.noNumber(current.id)) break;
       current = current.parentNode;
     }
     return parents.join(" > ");
+  },
+  getTagInfo(ele) {
+    if (ele.id && this.noNumber(ele.id)) return `#${ele.id}`;
+    const classList = ele.classList;
+    let tagInfo = ele.tagName.toLowerCase();
+    if (!!classList.length) {
+      if (/[:\[\]]/.test(ele.className)) {
+        tagInfo += `[class="${ele.className}"]`;
+      } else {
+        const filterClass = Array.from(classList).filter((cls) => this.noNumber(cls));
+        if (!!filterClass.length) tagInfo += `.${filterClass.join(".")}`;
+      }
+    }
+    return tagInfo;
   },
 };

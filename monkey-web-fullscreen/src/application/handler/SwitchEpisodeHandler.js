@@ -1,5 +1,6 @@
 import Tools from "../common/Tools";
 import Storage from "../common/Storage";
+import Constants from "../common/Constants";
 const { ALL_EPISODE_CHAIN } = Storage;
 
 /**
@@ -14,10 +15,10 @@ export default {
   },
   handleEpisodeChange(getTargetEpisode) {
     if (!Tools.isTopWin()) return;
-    let curEpisode = this.getCurrentEpisode();
-    if (!curEpisode) curEpisode = this.getCurrentEpisodeFromAllLink();
-    // Tools.log("当前集元素：", curEpisode);
-    const targetEpisode = getTargetEpisode.call(this, curEpisode);
+    let currEpisode = this.getCurrentEpisode();
+    if (!currEpisode) currEpisode = this.getCurrentEpisodeFromAllLink();
+    // Tools.log("当前集元素：", currEpisode);
+    const targetEpisode = getTargetEpisode.call(this, currEpisode);
     // Tools.log("目标集元素：", targetEpisode);
     this.jumpToEpisodeNumber(targetEpisode);
   },
@@ -35,7 +36,7 @@ export default {
     const links = Tools.querys(`:is(a[href*="${path}"], a[href*="${lastPath}"])`);
     // Tools.log("匹配到所有的链接：", links);
     if (links.length == 1) return links.shift();
-    // 过滤：历史记录、标题、线路(tab-item)
+    // 过滤：历史记录、标题、线路(tab-item、play-channel)
     const filter = [
       "h1",
       "header",
@@ -44,6 +45,7 @@ export default {
       "[class*='record']",
       "[class*='history']",
       "[class*='tab-item']",
+      "[class*='play-channel']",
     ];
     return links.find((link) => {
       const linkUrl = new URL(link.href);
@@ -63,15 +65,33 @@ export default {
   },
   getEpisodeNumberContainer(element, isPrev = false) {
     if (!element) return;
+    const currNumber = this.getEpisodeNumber(element);
     const episodes = this.getAllEpisodeElement(element);
+    if (episodes.length <= 1) return null;
+    const numbers = episodes.map(this.getEpisodeNumber);
     const index = episodes.indexOf(element);
-    return isPrev ? episodes[index - 1] : episodes[index + 1];
+    const prev = episodes[index - 1];
+    const next = episodes[index + 1];
+    const { leftSmall, rightLarge } = this.compareLeftRight(numbers, currNumber, index);
+    if (leftSmall || rightLarge) return isPrev ? prev : next; // 剧集是正序：[1, 2, 3, 4, 5]
+    return isPrev ? next : prev; // 剧集是倒序：[5, 4, 3, 2, 1]
+  },
+  compareLeftRight(numbers, compareNumber, index) {
+    const leftSmall = numbers.findIndex((val, i) => i < index && val < compareNumber) > -1;
+    const rightLarge = numbers.findIndex((val, i) => i > index && val > compareNumber) > -1;
+    return { leftSmall, rightLarge };
   },
   getAllEpisodeElement(element) {
-    const tagName = element.tagName;
-    const sibling = Tools.findSiblingInParent(element, tagName);
+    const eleName = element.tagName;
+    const eleClass = Array.from(element.classList);
+    const sibling = Tools.findSiblingInParent(element, eleName);
     const children = Array.from(sibling?.parentElement.children);
-    return children.filter((ele) => ele.tagName === tagName);
+    return children.filter((ele) => {
+      const currClass = Array.from(ele.classList);
+      const haveSomeClass = eleClass.some((value) => currClass.includes(value));
+      if (!!currClass.length && !haveSomeClass) return false;
+      return ele.tagName === eleName;
+    });
   },
   jumpToEpisodeNumber(element) {
     if (!element) return;
@@ -110,9 +130,8 @@ export default {
       const tagName = element.tagName;
       const parentEle = element.parentElement;
       const haveSib = Tools.haveSiblings(element);
-      const nextTagName = element?.nextElementSibling?.tagName;
-      const hasEqualsTag = Tools.querys(tagName, parentEle).filter((el) => el !== element);
-      if (haveSib && nextTagName === tagName && !!hasEqualsTag.length) return element;
+      const hasEqualsTag = Tools.querys(tagName, parentEle).find((el) => el !== element);
+      if (haveSib && hasEqualsTag) return element;
       element = parentEle;
     }
     return element;
@@ -121,14 +140,13 @@ export default {
     // https://www.dmb0u.art/index/home.html
     const path = location.pathname;
     const lastPath = path.substring(path.lastIndexOf("/") + 1);
-    const curNumber = [...Tools.extractNumbers(lastPath)].join("");
+    if (lastPath === Constants.EMPTY) return null;
+    const currNumber = [...Tools.extractNumbers(lastPath)].join("");
     for (const link of Tools.querys("a")) {
       const attrs = link.attributes;
       for (const attr of attrs) {
         const attrNumbers = [...Tools.extractNumbers(attr.value)].join("");
-        if (attrNumbers === curNumber) {
-          return link;
-        }
+        if (attrNumbers === currNumber) return link;
       }
     }
   },

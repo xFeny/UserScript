@@ -5,16 +5,15 @@ import webSite from "../common/WebSite";
  */
 export default {
   webFullScreen(video) {
-    const w = video?.offsetWidth || 0;
-    if (Object.is(0, w)) return false;
-    if (this.isClosedAuto()) return true;
-    if (w >= window.innerWidth) return true;
+    const width = video?.offsetWidth;
+    if (!width) return false;
+    if (this.isClosedAuto() || width >= window.innerWidth) return true;
     if (!webSite.isBiliLive()) return Tools.triggerClick(this.element);
     return this.biliLiveWebFullScreen();
   },
   biliLiveWebFullScreen() {
     const control = this.getBiliLiveIcons();
-    if (control.length === 0) return false;
+    if (!control.length) return false;
     Tools.scrollTop(70);
     const el = Tools.query(":is(.lite-room, #player-ctnr)", unsafeWindow.top.document);
     if (el) Tools.scrollTop(Tools.getElementRect(el)?.top || 0);
@@ -41,8 +40,7 @@ export default {
   experimentWebFullScreen(video) {
     if (webSite.inMatches() || video.isWebFullScreen || !this.topWinInfo || this.isClosedOtherWebsiteAuto()) return;
     if (video.offsetWidth === this.topWinInfo.innerWidth) return (video.isWebFullScreen = true);
-    window.top.focus();
-    video.isWebFullScreen = true;
     Tools.postMessage(window.top, { key: "P" });
+    video.isWebFullScreen = true;
   },
 };
