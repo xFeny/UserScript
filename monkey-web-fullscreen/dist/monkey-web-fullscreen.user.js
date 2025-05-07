@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      2.7.4
+// @version      2.7.5
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；快捷键切换：全屏(F)、网页全屏(P)、下一个视频(N)、弹幕开关(D)；支持任意视频倍速播放，提示记忆倍速；B站播放完自动退出网页全屏和取消连播。
 // @license      GPL-3.0-only
@@ -31,9 +31,12 @@
 // @match        *://www.bilibili.com/*/play/*
 // @match        *://v.qq.com/live/p/newtopic/*
 // @match        *://www.bilibili.com/festival/*
+// @require      https://unpkg.com/notyf@3.10.0/notyf.min.js
+// @require      data:application/javascript,%3Bwindow.notyf%3D%7BNotyf%7D%3B
 // @require      https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.js
-// @require      data:application/javascript,%3Bwindow.sweetalert2%3DSweetalert2%3B
-// @resource     sweetalert2  https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.css
+// @require      data:application/javascript,%3Bwindow.sweetalert2%3DSwal%3B
+// @resource     notyf/notyf.min.css  https://unpkg.com/notyf@3.10.0/notyf.min.css
+// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.css
 // @grant        GM_addStyle
 // @grant        GM_addValueChangeListener
 // @grant        GM_deleteValue
@@ -47,11 +50,16 @@
 // @note         *://*/*
 // ==/UserScript==
 
-(i=>{if(typeof GM_addStyle=="function"){GM_addStyle(i);return}const t=document.createElement("style");t.textContent=i,document.head.append(t)})(' @charset "UTF-8";.showToast{color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in;background:#000000bf!important}#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,.live-room-app #sidebar-vm,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.login-tip{display:none!important}.picker-episode-dialog h4{color:red}.picker-episode-dialog p{float:left;color:#999;font-size:12px;padding-left:6px}.picker-episode-dialog .custom-textarea{width:400px;height:auto;font-size:14px;max-width:100%;margin-bottom:0;min-height:130px;resize:vertical} ');
+(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const o=document.createElement("style");o.textContent=e,document.head.append(o)})(' @charset "UTF-8";.showToast{color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in;background:#000000bf!important}#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,.live-room-app #sidebar-vm,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.login-tip{display:none!important}.monkey-web-fullscreen h2{font-size:24px}.monkey-web-fullscreen h4{color:red;margin:0 auto}.monkey-web-fullscreen p{color:#999;font-size:12px}.monkey-web-fullscreen #picker-chain{width:25em;height:auto;font-size:14px;margin-bottom:0;min-height:10em;resize:vertical}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical} ');
 
-(function (Swal) {
+(function (notyf, Swal) {
   'use strict';
 
+  const cssLoader = (e) => {
+    const t = GM_getResourceText(e);
+    return GM_addStyle(t), t;
+  };
+  cssLoader("notyf/notyf.min.css");
   const positions = Object.freeze({
     bottomLeft: "bottom: 17%; left: 10px;",
     bottomRight: "bottom: 17%; right: 10px;",
@@ -77,6 +85,115 @@
       DIVIDE: "÷"
     })
   });
+  function isElement(node) {
+    return node.nodeType === Node.ELEMENT_NODE;
+  }
+  function isDocument(node) {
+    return node.nodeType === Node.DOCUMENT_NODE;
+  }
+  function* getShadowRoots(node, deep) {
+    if (!isElement(node) && !isDocument(node)) {
+      return;
+    }
+    const doc = isDocument(node) ? node : node.getRootNode({ composed: true });
+    if (isElement(node) && node.shadowRoot) {
+      yield node.shadowRoot;
+    }
+    const toWalk = [node];
+    let currentNode = void 0;
+    while (currentNode = toWalk.pop()) {
+      const walker = doc.createTreeWalker(currentNode, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_DOCUMENT_FRAGMENT, {
+        acceptNode(node2) {
+          if (isElement(node2) && node2.shadowRoot) {
+            return NodeFilter.FILTER_ACCEPT;
+          }
+          return NodeFilter.FILTER_SKIP;
+        }
+      });
+      let walkerNode = walker.nextNode();
+      while (walkerNode) {
+        if (isElement(walkerNode) && walkerNode.shadowRoot) {
+          {
+            toWalk.push(walkerNode.shadowRoot);
+          }
+          yield walkerNode.shadowRoot;
+        }
+        walkerNode = walker.nextNode();
+      }
+    }
+    return;
+  }
+  function queryCrossBoundary(selector, subject = document) {
+    const immediate = subject.querySelector(selector);
+    if (immediate) {
+      return immediate;
+    }
+    const shadowRoots = [...getShadowRoots(subject)];
+    for (const root of shadowRoots) {
+      const child = root.querySelector(selector);
+      if (child) {
+        return child;
+      }
+    }
+    return null;
+  }
+  function queryAllCrossBoundary(selector, subject = document) {
+    const results = [...subject.querySelectorAll(selector)];
+    const shadowRoots = [...getShadowRoots(subject)];
+    for (const root of shadowRoots) {
+      const children = root.querySelectorAll(selector);
+      for (const child of children) {
+        results.push(child);
+      }
+    }
+    return results;
+  }
+  function querySelector(selectors, subject = document, _options) {
+    const selectorList = Array.isArray(selectors) ? selectors : [selectors];
+    if (selectorList.length === 0) {
+      return null;
+    }
+    let currentSubjects = [subject];
+    let result = null;
+    for (const selector of selectorList) {
+      const newSubjects = [];
+      for (const currentSubject of currentSubjects) {
+        const child = queryCrossBoundary(selector, currentSubject);
+        if (child) {
+          result = child;
+          newSubjects.push(child);
+        }
+      }
+      if (newSubjects.length === 0) {
+        return null;
+      }
+      currentSubjects = newSubjects;
+    }
+    return result;
+  }
+  function querySelectorAll(selectors, subject = document, _options) {
+    const selectorList = Array.isArray(selectors) ? selectors : [selectors];
+    if (selectorList.length === 0) {
+      return [];
+    }
+    let currentSubjects = [subject];
+    let results = [];
+    for (const selector of selectorList) {
+      const newSubjects = [];
+      for (const currentSubject of currentSubjects) {
+        const children = queryAllCrossBoundary(selector, currentSubject);
+        for (const child of children) {
+          newSubjects.push(child);
+        }
+      }
+      if (newSubjects.length === 0) {
+        return [];
+      }
+      currentSubjects = newSubjects;
+      results = newSubjects;
+    }
+    return results;
+  }
   var _GM_addValueChangeListener = /* @__PURE__ */ (() => typeof GM_addValueChangeListener != "undefined" ? GM_addValueChangeListener : void 0)();
   var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
   var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
@@ -85,26 +202,40 @@
   var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
   var _GM_unregisterMenuCommand = /* @__PURE__ */ (() => typeof GM_unregisterMenuCommand != "undefined" ? GM_unregisterMenuCommand : void 0)();
   var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
-  const { ONE_SEC: ONE_SEC$2, MSG_SOURCE: MSG_SOURCE$1 } = constants;
+  const { ONE_SEC: ONE_SEC$1, MSG_SOURCE: MSG_SOURCE$1 } = constants;
   const Tools = {
     isTopWin: () => window.top === window,
+    noNumber: (str) => !/\d/.test(str),
     isNumber: (str) => /^[0-9]$/.test(str),
     scrollTop: (top) => _unsafeWindow.top.scrollTo({ top }),
-    query: (selector, context) => (context || document).querySelector(selector),
-    querys: (selector, context) => Array.from((context || document).querySelectorAll(selector)),
+    query: (selector, context) => querySelector(selector, context),
+    querys: (selector, context) => querySelectorAll(selector, context),
     validDuration: (video) => !isNaN(video.duration) && video.duration !== Infinity,
     triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
     postMessage: (win = null, data) => win?.postMessage({ source: MSG_SOURCE$1, ...data }, "*"),
     isVisible: (ele) => !!(ele?.offsetWidth || ele?.offsetHeight || ele?.getClientRects().length),
     log: (...data) => console.log(...["%c======= 脚本日志 =======\n\n", "color:green;font-size:14px;", ...data, "\n\n"]),
     alert: (...data) => window.alert(data.join(" ")),
+    preventDefault(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    },
+    notyf(msg, isError = false) {
+      const notyf$1 = new notyf.Notyf({
+        duration: ONE_SEC$1 * 3,
+        position: { x: "center", y: "top" }
+      });
+      isError ? notyf$1.error(msg) : notyf$1.success(msg);
+      return false;
+    },
     getFrames() {
       return this.querys("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])");
     },
     postMsgToFrames(data) {
       this.getFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
     },
-    debounce(fn, delay = ONE_SEC$2) {
+    debounce(fn, delay = ONE_SEC$1) {
       let timer;
       return function() {
         if (timer) clearTimeout(timer);
@@ -155,29 +286,29 @@
       return observer;
     },
     closest(element, selector, maxLevel = 3) {
-      let curLevel = 0;
-      while (element && curLevel < maxLevel) {
+      let currLevel = 0;
+      while (element && currLevel < maxLevel) {
         if (element.matches(selector)) return element;
         element = element.parentElement;
-        curLevel++;
+        currLevel++;
       }
       return null;
     },
     findSiblingInParent(element, selector, maxLevel = 3) {
-      let curLevel = 0;
-      let curParent = element.parentElement;
-      while (curParent && curLevel < maxLevel) {
-        const sibs = curParent.children;
+      let currLevel = 0;
+      let currParent = element.parentElement;
+      while (currParent && currLevel < maxLevel) {
+        const sibs = currParent.children;
         for (let sib of sibs) {
           if (sib !== element && sib.matches(selector)) return sib;
         }
-        curParent = curParent.parentElement;
-        curLevel++;
+        currParent = currParent.parentElement;
+        currLevel++;
       }
       return null;
     },
     haveSiblings(element) {
-      return element.parentElement.children.length > 1;
+      return element?.parentElement?.children.length > 1;
     },
     extractNumbers(str) {
       if (!str) return [];
@@ -188,22 +319,26 @@
       let parents = [];
       let current = element;
       while (current && current.tagName !== "BODY") {
-        let tagInfo;
-        if (current.id) {
-          tagInfo = `#${current.id}`;
-          parents.unshift(tagInfo);
-          break;
-        } else {
-          tagInfo = current.tagName.toLowerCase();
-          if (current.classList.length > 0) {
-            let classList = current.classList;
-            tagInfo += `.${Array.from(classList).join(".")}`;
-          }
-          parents.unshift(tagInfo);
-        }
+        const tagInfo = this.getTagInfo(current);
+        parents.unshift(tagInfo);
+        if (current.id && this.noNumber(current.id)) break;
         current = current.parentNode;
       }
       return parents.join(" > ");
+    },
+    getTagInfo(ele) {
+      if (ele.id && this.noNumber(ele.id)) return `#${ele.id}`;
+      const classList = ele.classList;
+      let tagInfo = ele.tagName.toLowerCase();
+      if (!!classList.length) {
+        if (/[:\[\]]/.test(ele.className)) {
+          tagInfo += `[class="${ele.className}"]`;
+        } else {
+          const filterClass = Array.from(classList).filter((cls) => this.noNumber(cls));
+          if (!!filterClass.length) tagInfo += `.${filterClass.join(".")}`;
+        }
+      }
+      return tagInfo;
     }
   };
   const { EMPTY: EMPTY$2, QQ_VID_REG, BILI_VID_REG, IQIYI_VID_REG, ACFUN_VID_REG } = constants;
@@ -229,52 +364,18 @@
     "v.qq.com": { full: ".txp_btn_fullscreen", webfull: "div[aria-label='网页全屏']", danmaku: ".barrage-switch", next: ".txp_btn_next_u" },
     "v.pptv.com": { full: ".w-zoom-container > div", webfull: ".w-expand-container > div", danmaku: ".w-barrage", next: ".w-next-container" },
     "www.acfun.cn": { full: ".fullscreen-screen", webfull: ".fullscreen-web", danmaku: ".danmaku-enabled", next: ".btn-next-part .control-btn" },
-    "v.youku.com": { full: "#fullscreen-icon", webfull: "#webfullscreen-icon", danmaku: "div[class*='switch-img_12hDa turn-']", next: ".kui-next-icon-0" }
+    "v.youku.com": { full: "#fullscreen-icon", webfull: "#webfullscreen-icon", danmaku: "div[class*='switch-img_12hDa turn-']", next: ".kui-next-icon-0" },
+    "v.douyu.com": { full: ".ControllerBar-WindowFull-Icon", webfull: ".ControllerBar-PageFull-Icon", danmaku: ".BarrageSwitch-icon" }
   };
   const douyu = {
-    getRoot() {
-      return document.querySelector("demand-video").shadowRoot;
-    },
-    getControllerBar() {
-      return this.getRoot().querySelector("#demandcontroller-bar").shadowRoot;
-    },
-    getVideo() {
-      return this.getRoot().querySelector("video");
-    },
-    play() {
-      this.getControllerBar().querySelector(".ControllerBarPlay")?.click();
-    },
-    pause() {
-      this.getControllerBar().querySelector(".ControllerBarStop")?.click();
-    },
-    getWebfullIcon() {
-      return this.getControllerBar().querySelector(".ControllerBar-PageFull-Icon");
-    },
-    getFullIcon() {
-      return this.getControllerBar().querySelector(".ControllerBar-WindowFull-Icon");
-    },
-    getDanmakuIcon() {
-      return document.querySelector("demand-player-extension").shadowRoot.querySelector(".BarrageSwitch-icon");
-    },
-    addStyle() {
-      const root = this.getRoot();
-      let style = root.querySelector("style");
+    play: () => Tools.query(".ControllerBarPlay")?.click(),
+    pause: () => Tools.query(".ControllerBarStop")?.click(),
+    addStyle(ele) {
+      let style = Tools.query("style", ele);
       if (style) return;
       style = document.createElement("style");
-      style.textContent = `
-      .showToast {
-        color: #fff !important;
-        font-size: 13.5px !important;
-        padding: 5px 15px !important;
-        border-radius: 5px !important;
-        position: absolute !important;
-        z-index: 2147483647 !important;
-        font-weight: normal !important;
-        transition: opacity 500ms ease-in;
-        background: rgba(0, 0, 0, 0.75) !important;
-      }
-    `;
-      root.prepend(style);
+      style.textContent = ".showToast{color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity 300ms ease-in;background:rgba(0,0,0,.75)!important}";
+      ele.appendChild(style);
     }
   };
   const VideoListenerHandler = {
@@ -310,7 +411,7 @@
       if (!pod || !!pods.length) App.exitWebFullScreen();
     }
   };
-  const { EMPTY: EMPTY$1, ONE_SEC: ONE_SEC$1, SHOW_TOAST_TIME, SHOW_TOAST_POSITION } = constants;
+  const { EMPTY: EMPTY$1, ONE_SEC, SHOW_TOAST_TIME, SHOW_TOAST_POSITION } = constants;
   const App = {
     init() {
       this.setupVisibleListener();
@@ -318,7 +419,6 @@
       this.setupMutationObserver();
       this.setupUrlChangeListener();
       this.setupMouseMoveListener();
-      this.setupPickerEpisodeListener();
     },
     isLive() {
       return webSite.isLivePage() || this.videoInfo?.isLive;
@@ -326,14 +426,8 @@
     normalWebsite() {
       return !this.videoInfo;
     },
-    getVideo() {
-      if (webSite.isDouyu()) return douyu.getVideo();
-      return Tools.query("video:not([loop]):not([src=''])") || Tools.query("video:not([loop])");
-    },
-    getElement() {
-      if (webSite.isDouyu()) return douyu.getWebfullIcon();
-      return document.querySelector(selectorConfig[location.host]?.webfull);
-    },
+    getVideo: () => Tools.query("video:not([loop]):not([src=''])") || Tools.query("video:not([loop])"),
+    getElement: () => Tools.query(selectorConfig[location.host]?.webfull),
     getVideoIframe() {
       if (!this.videoInfo?.frameSrc) return null;
       const url = new URL(this.videoInfo.frameSrc);
@@ -371,7 +465,7 @@
         this.biliLiveExtras();
         this.webSiteLoginObserver();
       });
-      setTimeout(() => observer.disconnect(), ONE_SEC$1 * 10);
+      setTimeout(() => observer.disconnect(), ONE_SEC * 10);
     },
     video: null,
     videoBoundListeners: [],
@@ -399,7 +493,7 @@
     },
     healthCurrentVideo() {
       if (this.healthID) clearInterval(this.healthID);
-      this.healthID = setInterval(() => this.getPlayingVideo(), ONE_SEC$1);
+      this.healthID = setInterval(() => this.getPlayingVideo(), ONE_SEC);
     },
     getPlayingVideo() {
       const videos = Tools.querys("video");
@@ -415,9 +509,11 @@
     },
     setParentVideoInfo(videoInfo) {
       this.videoInfo = videoInfo;
-      if (Tools.isTopWin()) return this.setupScriptMenuCommand();
-      videoInfo.frameSrc = location.href;
-      Tools.postMessage(window.parent, { videoInfo });
+      if (!Tools.isTopWin()) videoInfo.frameSrc = location.href;
+      if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo });
+      this.setupPickerEpisodeListener();
+      this.setupScriptMenuCommand();
+      this.sendTopWinInfo();
     },
     changeVideoInfo(video) {
       if (!this.videoInfo) return;
@@ -426,31 +522,35 @@
       this.videoInfo.isLive = isLive;
       this.setParentVideoInfo(this.videoInfo);
     },
+    sendTopWinInfo() {
+      const topWinInfo = this.topWinInfo = { innerWidth, host: location.host };
+      Tools.postMsgToFrames({ topWinInfo });
+    },
     setupMouseMoveListener() {
       if (this.isSetupMouseMoveListener) return;
-      const delay = ONE_SEC$1 * 2;
+      const delay = ONE_SEC * 2;
       this.isSetupMouseMoveListener = true;
-      let timer = setTimeout(this.showOrHideCursor, delay);
+      let timer = setTimeout(() => this.showOrHideCursor(), delay);
       document.addEventListener("mousemove", (event) => {
         if (!event.isTrusted) return;
         clearTimeout(timer);
         const target = event.target;
         this.showOrHideCursor(false);
-        timer = setTimeout(this.showOrHideCursor, delay);
+        timer = setTimeout(() => this.showOrHideCursor(), delay);
         if (this.video === target || !(target instanceof HTMLVideoElement)) return;
         this.addVideoEvtListener(target);
       });
     },
     showOrHideCursor(isHide = true) {
-      Tools.querys(":is(video, iframe)").forEach((ele) => {
+      if (!this.videoInfo) return;
+      const videoWrap = this.getVideoLocation();
+      const elements = Array.from([...videoWrap.children, videoWrap, videoWrap.parentElement]);
+      elements.forEach((ele) => {
+        if (isHide) ele?.dispatchEvent(new MouseEvent("mouseleave"));
         isHide ? ele.style.cursor = "none" : ele.style.cursor = EMPTY$1;
       });
-      if (!isHide) return;
-      const mouseleave = new MouseEvent("mouseleave");
-      Tools.querys("body *").forEach((ele) => ele.dispatchEvent(mouseleave));
     },
     showToast(content, duration = SHOW_TOAST_TIME) {
-      if (webSite.isDouyu()) douyu.addStyle();
       const el = document.createElement("div");
       if (content instanceof HTMLElement) el.appendChild(content);
       if (Object.is(typeof content, typeof EMPTY$1)) el.textContent = content;
@@ -459,11 +559,12 @@
       const videoParent = this.video?.parentElement;
       const videoContainer = this.getVideoContainer();
       const target = this.video === videoContainer ? videoParent : videoContainer;
+      if (webSite.isDouyu()) douyu.addStyle(target);
       Tools.query(".showToast", target)?.remove();
       target?.appendChild(el);
       setTimeout(() => {
         el.style.opacity = 0;
-        setTimeout(() => el.remove(), ONE_SEC$1 / 3);
+        setTimeout(() => el.remove(), ONE_SEC / 3);
       }, duration);
     }
   };
@@ -581,9 +682,7 @@
       const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(event.code);
       const isNumberKey = Tools.isNumber(event.key) && !this.isClosedPlayRate();
       if (!isNumberKey && !isOverrideKey) return;
-      event.preventDefault();
-      event.stopPropagation();
-      event.stopImmediatePropagation();
+      Tools.preventDefault(event);
     },
     setupKeydownListener() {
       window.addEventListener("keyup", (event) => this.preventDefault(event), true);
@@ -591,9 +690,9 @@
       window.addEventListener("message", (event) => {
         const { data } = event;
         if (!data?.source || !data.source.includes(MSG_SOURCE)) return;
-        if (data?.topWinInfo) this.topWinInfo = data.topWinInfo;
-        if (data?.defaultPlayRate) this.defaultPlayRate();
         if (data?.videoInfo) return this.setParentVideoInfo(data.videoInfo);
+        if (data?.defaultPlaybackRate) this.defaultPlaybackRate();
+        if (data?.topWinInfo) this.topWinInfo = data.topWinInfo;
         this.processEvent(data);
       });
     },
@@ -620,40 +719,38 @@
       if (this.normalWebsite()) return;
       const keyMapping = this.getKeyMapping();
       if (keyMapping[key]) return keyMapping[key]();
-      if (Tools.isNumber(key)) this.setPlayRate(key);
+      if (Tools.isNumber(key)) this.setPlaybackRate(key);
     },
     getKeyMapping() {
       return {
-        Z: () => this.defaultPlayRate(),
-        A: () => this.adjustPlayRate(SYMBOL$1.ADD),
-        S: () => this.adjustPlayRate(SYMBOL$1.SUBTRACT),
-        [SYMBOL$1.ADD]: () => this.adjustPlayRate(SYMBOL$1.ADD),
-        [SYMBOL$1.DIVIDE]: () => this.adjustPlayRate(SYMBOL$1.DIVIDE),
-        [SYMBOL$1.SUBTRACT]: () => this.adjustPlayRate(SYMBOL$1.SUBTRACT),
-        [SYMBOL$1.MULTIPLY]: () => this.adjustPlayRate(SYMBOL$1.MULTIPLY),
+        Z: () => this.defaultPlaybackRate(),
+        A: () => this.adjustPlaybackRate(SYMBOL$1.ADD),
+        S: () => this.adjustPlaybackRate(SYMBOL$1.SUBTRACT),
+        [SYMBOL$1.ADD]: () => this.adjustPlaybackRate(SYMBOL$1.ADD),
+        [SYMBOL$1.DIVIDE]: () => this.adjustPlaybackRate(SYMBOL$1.DIVIDE),
+        [SYMBOL$1.SUBTRACT]: () => this.adjustPlaybackRate(SYMBOL$1.SUBTRACT),
+        [SYMBOL$1.MULTIPLY]: () => this.adjustPlaybackRate(SYMBOL$1.MULTIPLY),
         N: () => webSite.inMatches() ? this.triggerIconElement("next") : this.switchNextEpisode(),
-        F: () => webSite.isDouyu() ? douyu.getFullIcon().click() : this.triggerIconElement("full", 0),
-        D: () => webSite.isDouyu() ? douyu.getDanmakuIcon().click() : this.triggerIconElement("danmaku", 3),
         ARROWLEFT: () => this.isOverrideKeyboard() ? this.adjustVideoTime(SYMBOL$1.SUBTRACT) : null,
         ARROWRIGHT: () => this.isOverrideKeyboard() ? this.adjustVideoTime() : null,
         0: () => this.adjustVideoTime(VIDEO_FASTFORWARD_DURATION$1.get()),
         P: () => {
           if (!webSite.inMatches()) return this.enhance();
-          if (webSite.isDouyu()) return douyu.getWebfullIcon().click();
           webSite.isBiliLive() ? this.biliLiveWebFullScreen() : this.triggerIconElement("webfull");
         },
         SPACE: () => {
           if (!this.video || !this.isOverrideKeyboard()) return;
           if (webSite.isDouyu()) return this.video.paused ? douyu.play() : douyu.pause();
           this.video.paused ? this.video.play() : this.video.pause();
-        }
+        },
+        F: () => this.triggerIconElement("full", 0),
+        D: () => this.triggerIconElement("danmaku", 3)
       };
     },
     triggerIconElement(name, index) {
       if (!webSite.inMatches()) return;
       if (webSite.isBiliLive()) return this.getBiliLiveIcons()?.[index]?.click();
       Tools.query(selectorConfig[location.host]?.[name])?.click();
-      Tools.triggerMousemove(this.video);
     },
     adjustVideoTime(second = VIDEO_TIME_STEP$1.get(), _symbol) {
       if (!this.video || !Tools.validDuration(this.video)) return;
@@ -687,11 +784,10 @@
       return CLOSE_OTHER_WEBSITES_AUTO.get(host);
     },
     setupScriptMenuCommand() {
-      if (!Tools.isTopWin()) return;
+      if (!Tools.isTopWin() || this.hasRegisterMenu) return;
       this.registerMenuCommand();
       this.setupCommandChangeListener();
-      const topWinInfo = this.topWinInfo = { innerWidth, host: location.host };
-      Tools.postMsgToFrames({ topWinInfo });
+      this.hasRegisterMenu = true;
     },
     registerMenuCommand() {
       this.registerClosePlayRate();
@@ -704,7 +800,7 @@
       this.registerDeletePickerEpisodeCommand();
     },
     setupCommandChangeListener() {
-      if (this.isSetupCommandChangeListener) return;
+      if (this.hasCommandListener) return;
       const handler = () => this.registerMenuCommand();
       [
         CLOSE_PLAY_RATE.name,
@@ -713,21 +809,21 @@
         CURRENT_EPISODE_CHAIN$1.name + location.host,
         CLOSE_OTHER_WEBSITES_AUTO.name + location.host
       ].forEach((key) => _GM_addValueChangeListener(key, handler));
-      this.isSetupCommandChangeListener = true;
+      this.hasCommandListener = true;
     },
     registerClosePlayRate() {
       const isClose = this.isClosedPlayRate();
       const title = isClose ? "启用倍速功能" : "禁用倍速功能";
-      _GM_unregisterMenuCommand(this.close_play_rate_command_id);
+      this.unregisterMenuCommand(this.close_play_rate_command_id);
       if (this.isLive()) return;
       this.close_play_rate_command_id = _GM_registerMenuCommand(title, () => {
+        if (!isClose) Tools.postMessage(window, { defaultPlaybackRate: true });
         CLOSE_PLAY_RATE.set(!isClose);
-        if (!isClose) Tools.postMessage(window, { defaultPlayRate: true });
       });
     },
     registerPlayRateCommand() {
       const title = "设置倍速步进";
-      _GM_unregisterMenuCommand(this.play_rate_command_id);
+      this.unregisterMenuCommand(this.play_rate_command_id);
       if (this.isLive() || this.isClosedPlayRate()) return;
       this.play_rate_command_id = _GM_registerMenuCommand(title, () => {
         const input = prompt(title, PLAY_RATE_STEP$1.get());
@@ -735,7 +831,7 @@
       });
     },
     registerVideoTimeCommand() {
-      _GM_unregisterMenuCommand(this.video_time_command_id);
+      this.unregisterMenuCommand(this.video_time_command_id);
       if (this.isLive() || !this.isOverrideKeyboard()) return;
       const title = "设置快进/退秒数";
       this.video_time_command_id = _GM_registerMenuCommand(title, () => {
@@ -744,7 +840,7 @@
       });
     },
     registerFastforwardCommand() {
-      _GM_unregisterMenuCommand(this.fastforward_command_id);
+      this.unregisterMenuCommand(this.fastforward_command_id);
       if (this.isLive()) return;
       const title = "设置零键快进秒数";
       this.fastforward_command_id = _GM_registerMenuCommand(title, () => {
@@ -756,13 +852,13 @@
       if (!webSite.inMatches()) return;
       const isClose = this.isClosedAuto();
       const title = isClose ? "启用自动网页全屏" : "禁用自动网页全屏";
-      _GM_unregisterMenuCommand(this.close_auto_command_id);
+      this.unregisterMenuCommand(this.close_auto_command_id);
       this.close_auto_command_id = _GM_registerMenuCommand(title, () => CLOSE_AUTO_WEB_FULL_SCREEN.set(!isClose));
     },
     registerOverrideKeyboardCommand() {
       const isOverride = this.isOverrideKeyboard();
       const title = isOverride ? "禁用 空格 ◀▶ 键控制" : "启用 空格 ◀▶ 键控制";
-      _GM_unregisterMenuCommand(this.override_keyboard_command_id);
+      this.unregisterMenuCommand(this.override_keyboard_command_id);
       this.override_keyboard_command_id = _GM_registerMenuCommand(title, () => OVERRIDE_KEYBOARD.set(!isOverride));
     },
     registerCloseAutoExperimentCommand() {
@@ -771,22 +867,25 @@
       if (videos.length > 1) return;
       const isClose = this.isClosedOtherWebsiteAuto();
       const title = isClose ? "此站点启用自动网页全屏" : "此站点禁用自动网页全屏";
-      _GM_unregisterMenuCommand(this.close_experiment_command_id);
+      this.unregisterMenuCommand(this.close_experiment_command_id);
       this.close_experiment_command_id = _GM_registerMenuCommand(title, () => {
         CLOSE_OTHER_WEBSITES_AUTO.set(location.host, !isClose);
       });
     },
     registerDeletePickerEpisodeCommand() {
       const title = "删除此站点的剧集选择器";
-      _GM_unregisterMenuCommand(this.del_piker_episode_command_id);
+      this.unregisterMenuCommand(this.del_piker_episode_command_id);
       if (webSite.inMatches() || !CURRENT_EPISODE_CHAIN$1.get(location.host)) return;
       this.del_piker_episode_command_id = _GM_registerMenuCommand(title, () => {
-        ALL_EPISODE_CHAIN$2.delete(location.host);
         CURRENT_EPISODE_CHAIN$1.delete(location.host);
+        ALL_EPISODE_CHAIN$2.delete(location.host);
       });
+    },
+    unregisterMenuCommand(command_id) {
+      _GM_unregisterMenuCommand(command_id);
+      command_id = null;
     }
   };
-  const { ONE_SEC } = constants;
   const WebSiteLoginHandler = {
     webSiteLoginObserver() {
       this.handleIqyLogin();
@@ -832,21 +931,20 @@
         _unsafeWindow.__BiliUser__.isLogin = true;
         _unsafeWindow.__BiliUser__.cache.data.isLogin = true;
         _unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
-      }, ONE_SEC * 3);
+      }, constants.ONE_SEC * 3);
     }
   };
   const WebFullScreenHandler = {
     webFullScreen(video) {
-      const w = video?.offsetWidth || 0;
-      if (Object.is(0, w)) return false;
-      if (this.isClosedAuto()) return true;
-      if (w >= window.innerWidth) return true;
+      const width = video?.offsetWidth;
+      if (!width) return false;
+      if (this.isClosedAuto() || width >= window.innerWidth) return true;
       if (!webSite.isBiliLive()) return Tools.triggerClick(this.element);
       return this.biliLiveWebFullScreen();
     },
     biliLiveWebFullScreen() {
       const control = this.getBiliLiveIcons();
-      if (control.length === 0) return false;
+      if (!control.length) return false;
       Tools.scrollTop(70);
       const el = Tools.query(":is(.lite-room, #player-ctnr)", _unsafeWindow.top.document);
       if (el) Tools.scrollTop(Tools.getElementRect(el)?.top || 0);
@@ -872,9 +970,8 @@
     experimentWebFullScreen(video) {
       if (webSite.inMatches() || video.isWebFullScreen || !this.topWinInfo || this.isClosedOtherWebsiteAuto()) return;
       if (video.offsetWidth === this.topWinInfo.innerWidth) return video.isWebFullScreen = true;
-      window.top.focus();
-      video.isWebFullScreen = true;
       Tools.postMessage(window.top, { key: "P" });
+      video.isWebFullScreen = true;
     }
   };
   const { ALL_EPISODE_CHAIN: ALL_EPISODE_CHAIN$1 } = storage;
@@ -887,9 +984,9 @@
     },
     handleEpisodeChange(getTargetEpisode) {
       if (!Tools.isTopWin()) return;
-      let curEpisode = this.getCurrentEpisode();
-      if (!curEpisode) curEpisode = this.getCurrentEpisodeFromAllLink();
-      const targetEpisode = getTargetEpisode.call(this, curEpisode);
+      let currEpisode = this.getCurrentEpisode();
+      if (!currEpisode) currEpisode = this.getCurrentEpisodeFromAllLink();
+      const targetEpisode = getTargetEpisode.call(this, currEpisode);
       this.jumpToEpisodeNumber(targetEpisode);
     },
     getCurrentEpisode() {
@@ -909,7 +1006,8 @@
         "[class*='lishi']",
         "[class*='record']",
         "[class*='history']",
-        "[class*='tab-item']"
+        "[class*='tab-item']",
+        "[class*='play-channel']"
       ];
       return links.find((link) => {
         const linkUrl = new URL(link.href);
@@ -929,15 +1027,33 @@
     },
     getEpisodeNumberContainer(element, isPrev = false) {
       if (!element) return;
+      const currNumber = this.getEpisodeNumber(element);
       const episodes = this.getAllEpisodeElement(element);
+      if (episodes.length <= 1) return null;
+      const numbers = episodes.map(this.getEpisodeNumber);
       const index = episodes.indexOf(element);
-      return isPrev ? episodes[index - 1] : episodes[index + 1];
+      const prev = episodes[index - 1];
+      const next = episodes[index + 1];
+      const { leftSmall, rightLarge } = this.compareLeftRight(numbers, currNumber, index);
+      if (leftSmall || rightLarge) return isPrev ? prev : next;
+      return isPrev ? next : prev;
+    },
+    compareLeftRight(numbers, compareNumber, index) {
+      const leftSmall = numbers.findIndex((val, i) => i < index && val < compareNumber) > -1;
+      const rightLarge = numbers.findIndex((val, i) => i > index && val > compareNumber) > -1;
+      return { leftSmall, rightLarge };
     },
     getAllEpisodeElement(element) {
-      const tagName = element.tagName;
-      const sibling = Tools.findSiblingInParent(element, tagName);
+      const eleName = element.tagName;
+      const eleClass = Array.from(element.classList);
+      const sibling = Tools.findSiblingInParent(element, eleName);
       const children = Array.from(sibling?.parentElement.children);
-      return children.filter((ele) => ele.tagName === tagName);
+      return children.filter((ele) => {
+        const currClass = Array.from(ele.classList);
+        const haveSomeClass = eleClass.some((value) => currClass.includes(value));
+        if (!!currClass.length && !haveSomeClass) return false;
+        return ele.tagName === eleName;
+      });
     },
     jumpToEpisodeNumber(element) {
       if (!element) return;
@@ -959,9 +1075,8 @@
         const tagName = element.tagName;
         const parentEle = element.parentElement;
         const haveSib = Tools.haveSiblings(element);
-        const nextTagName = element?.nextElementSibling?.tagName;
-        const hasEqualsTag = Tools.querys(tagName, parentEle).filter((el) => el !== element);
-        if (haveSib && nextTagName === tagName && !!hasEqualsTag.length) return element;
+        const hasEqualsTag = Tools.querys(tagName, parentEle).find((el) => el !== element);
+        if (haveSib && hasEqualsTag) return element;
         element = parentEle;
       }
       return element;
@@ -969,69 +1084,78 @@
     getCurrentEpisodeFromAllLink() {
       const path = location.pathname;
       const lastPath = path.substring(path.lastIndexOf("/") + 1);
-      const curNumber = [...Tools.extractNumbers(lastPath)].join("");
+      if (lastPath === constants.EMPTY) return null;
+      const currNumber = [...Tools.extractNumbers(lastPath)].join("");
       for (const link of Tools.querys("a")) {
         const attrs = link.attributes;
         for (const attr of attrs) {
           const attrNumbers = [...Tools.extractNumbers(attr.value)].join("");
-          if (attrNumbers === curNumber) {
-            return link;
-          }
+          if (attrNumbers === currNumber) return link;
         }
       }
     }
-  };
-  const cssLoader = (e) => {
-    const t = GM_getResourceText(e);
-    return GM_addStyle(t), t;
   };
   cssLoader("sweetalert2");
   const { ALL_EPISODE_CHAIN, CURRENT_EPISODE_CHAIN } = storage;
   const PickerEpisodeHandler = {
     setupPickerEpisodeListener() {
+      if (webSite.inMatches()) return;
       document.body.addEventListener(
         "click",
         (event) => {
-          if (!event.ctrlKey || !event.altKey) return;
-          if (!Tools.isTopWin()) return Swal.fire("当前窗口无法抓取元素！");
-          event.preventDefault();
-          event.stopPropagation();
-          event.stopImmediatePropagation();
+          if (!event.ctrlKey || !event.altKey || !event.isTrusted) return;
+          if (!Tools.isTopWin()) return Tools.notyf("此页面不能抓取 (•ิ_•ิ)?", true);
+          Tools.preventDefault(event);
           const hasPickerAllEpisode = ALL_EPISODE_CHAIN.get(location.host);
           const hasPickerCurrEpisode = CURRENT_EPISODE_CHAIN.get(location.host);
-          if (hasPickerCurrEpisode && hasPickerAllEpisode) return Swal.fire("已抓取过！\n请先删除已抓取的");
-          !hasPickerCurrEpisode ? this.setCurrentEpisodeChain(event.target) : this.setAllEpisodeChain(event.target);
+          if (hasPickerCurrEpisode && hasPickerAllEpisode) {
+            return Tools.notyf("已提取过剧集元素 (￣ー￣)", true);
+          }
+          const target = event.target;
+          const number = this.getEpisodeNumber(target);
+          if (!number) return Tools.notyf("点击位置无数字 (•ิ_•ิ)?", true);
+          !hasPickerCurrEpisode ? this.setCurrentEpisodeChain(target) : this.setAllEpisodeChain(target);
         },
         true
       );
     },
-    setCurrentEpisodeChain(eventTarget) {
+    setCurrentEpisodeChain(element) {
       if (CURRENT_EPISODE_CHAIN.get(location.host)) return;
-      const chain = Tools.getParentChain(eventTarget);
-      this.pickerEpisodeDialog(chain, {
+      this.pickerEpisodeDialog(element, {
         validBtnCallback(value) {
-          const number = this.getEpisodeNumber(Tools.query(value));
-          !!number ? Tools.alert("获取到当前集数：", number) : Tools.alert("获取不到当前集数！");
+          try {
+            const number = this.getEpisodeNumber(Tools.query(value));
+            !!number ? Tools.notyf(`当前集数：${number}`) : Tools.notyf("获取集数失败 〒▽〒", true);
+          } catch (e) {
+            Tools.notyf("获取集数失败 〒▽〒", true);
+            console.error(e);
+          }
         },
         confirmCallback(value) {
           CURRENT_EPISODE_CHAIN.set(location.host, value);
-          Swal.fire("请继续操作抓取元素！");
+          Tools.notyf("继续提取元素 ＼(＞０＜)／");
         }
       });
     },
-    setAllEpisodeChain(eventTarget) {
+    setAllEpisodeChain(element) {
       if (ALL_EPISODE_CHAIN.get(location.host)) return;
-      const chain = Tools.getParentChain(eventTarget);
-      this.pickerEpisodeDialog(chain, {
+      this.pickerEpisodeDialog(element, {
         validBtnCallback(value) {
-          const container = this.getEpisodeContainer(Tools.query(value));
-          const allEpisode = this.getAllEpisodeElement(container);
-          const numbers = allEpisode.map(this.getEpisodeNumber);
-          !!numbers.length ? Tools.alert("获取到所有集数：", numbers.join(" ")) : Tools.alert("获取不到所有剧集！");
+          try {
+            const container = this.getEpisodeContainer(Tools.query(value));
+            if (!container) return Tools.notyf("获取集数失败 〒▽〒", true);
+            const allEpisode = this.getAllEpisodeElement(container);
+            const numbers = allEpisode.map(this.getEpisodeNumber);
+            const numJoin = numbers.join(" ");
+            !!numbers.length ? Tools.notyf(`所有集数：${numJoin}`) : Tools.notyf("获取集数失败 〒▽〒", true);
+          } catch (e) {
+            Tools.notyf("获取集数失败 〒▽〒", true);
+            console.error(e);
+          }
         },
         confirmCallback(value) {
           ALL_EPISODE_CHAIN.set(location.host, value);
-          Swal.fire("操作完成！\n请测试能否成功切换剧集");
+          Tools.notyf("操作完成 []~(￣▽￣)~* 干杯");
         }
       });
     },
@@ -1045,31 +1169,37 @@
       const episodes = this.getAllEpisodeElement(container);
       return episodes.includes(currEpisode) ? currEpisode : episodes.find((ele) => this.getEpisodeNumber(ele) === currNumber);
     },
-    pickerEpisodeDialog(chain, { validBtnCallback, confirmCallback }) {
+    pickerEpisodeDialog(element, { validBtnCallback, confirmCallback }) {
       Swal.fire({
-        html: `<div class="picker-episode-dialog">
-          <h4>验证能获取到剧集数信息，再确认保存</h4>
-          <button id="validateButton" class="swal2-confirm swal2-styled">验证元素</button>
-          <textarea id="customTextarea" class="swal2-textarea custom-textarea" placeholder="请输入内容"></textarea>
-          <p>可编辑内容确保能获取到剧集信息</p>
-        </div>`,
+        html: `<h4>验证能正确获取到集数，再确定保存</h4>
+      <textarea id="picker-chain" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
+      <p>编辑选择器确保能正确获取到集数</p>`,
+        customClass: { popup: "monkey-web-fullscreen" },
         title: "抓取剧集元素选择器",
         confirmButtonText: "保存",
+        denyButtonText: "验证",
+        showCloseButton: true,
+        showDenyButton: true,
+        reverseButtons: true,
+        focusDeny: true,
+        preDeny: () => {
+          const value = Tools.query("#picker-chain").value.trim();
+          if (!value) return Tools.notyf("元素选择器不能为空！", true);
+          validBtnCallback.call(this, value);
+          return false;
+        },
         preConfirm: () => {
-          return Tools.query("#customTextarea").value;
+          const value = Tools.query("#picker-chain").value.trim();
+          if (value) return value;
+          Tools.notyf("元素选择器不能为空！", true);
+          return false;
         },
         didOpen: () => {
-          const textarea = Tools.query("#customTextarea");
-          textarea.value = chain.trim();
-          Tools.query("#validateButton").addEventListener("click", () => {
-            const value = textarea.value;
-            if (!value) return Tools.alert("元素选择器不能为空！");
-            validBtnCallback.call(this, value);
-          });
+          const textarea = Tools.query("#picker-chain");
+          textarea.value = Tools.getParentChain(element);
         }
       }).then((result) => {
         if (!result.isConfirmed) return;
-        if (!result.value) return Tools.alert("元素选择器不能为空！");
         confirmCallback.call(this, result.value);
       });
     }
@@ -1077,7 +1207,7 @@
   const ScriptsEnhanceHandler = {
     enhance() {
       if (!this.videoInfo) return;
-      const ele = this.getHoverElement();
+      const ele = this.getVideoLocation();
       Tools.triggerHoverEvent(ele);
       Tools.triggerEscapeEvent();
       this.backupTrigger();
@@ -1091,7 +1221,7 @@
       if (!Object.is(newWidth, this.video.offsetWidth)) return;
       Tools.query("#playerControlBtn")?.click();
     },
-    getHoverElement() {
+    getVideoLocation() {
       if (this.video) return this.getVideoContainer();
       const iframe = this.getVideoIframe();
       if (iframe) return iframe;
@@ -1128,7 +1258,7 @@
       return Tools.closest(target, `:is(${selector})`);
     },
     getVideoControls(element) {
-      return Tools.findSiblingInParent(element, ['[class*="Control"]', '[class*="control"]']);
+      return Tools.findSiblingInParent(element, ['[class*="bar"]', '[class*="Control"]', '[class*="control"]']);
     }
   };
   const { PLAY_RATE_STEP, CACHED_PLAY_RATE } = storage;
@@ -1151,40 +1281,40 @@
       playRate = Number.parseFloat(playRate);
       return playRate.toFixed(2).replace(/\.?0+$/, "");
     },
-    setPlayRate(playRate, show = true) {
+    setPlaybackRate(playRate, show = true) {
       if (!this.checkUsable()) return;
       this.video.playbackRate = this.toFixed(playRate);
-      if (show) this.playRateToast();
-      this.cachePlayRate();
+      if (show) this.playbackRateToast();
+      this.cachePlaybackRate();
     },
-    adjustPlayRate(_symbol) {
+    adjustPlaybackRate(_symbol) {
       if (!this.checkUsable()) return;
       let playRate = this.video.playbackRate;
       playRate = strategy[_symbol](playRate);
       playRate = Math.max(PLAY_RATE_STEP.get(), playRate);
       playRate = Math.min(MAX_PLAY_RATE, playRate);
-      this.setPlayRate(playRate);
+      this.setPlaybackRate(playRate);
     },
-    defaultPlayRate() {
+    defaultPlaybackRate() {
       if (!this.video) return;
       this.video.playbackRate = DEF_PLAY_RATE;
       if (this.isClosedPlayRate()) return;
-      this.cachePlayRate();
+      this.cachePlaybackRate();
       this.showToast("已恢复正常倍速播放");
     },
     currVideoUseCachePlayRate(video) {
       if (this.isClosedPlayRate()) return;
       if (!webSite.isIqiyi()) video.isToastShown = false;
-      const playRate = this.getCachePlayRate();
+      const playRate = this.getCachePlaybackRate();
       if (video.playbackRate === playRate) return;
-      this.setPlayRate(playRate, !video.isToastShown);
+      this.setPlaybackRate(playRate, !video.isToastShown);
       video.isToastShown = true;
     },
-    cachePlayRate() {
+    cachePlaybackRate() {
       CACHED_PLAY_RATE.set(this.video.playbackRate);
     },
-    getCachePlayRate: () => Number.parseFloat(CACHED_PLAY_RATE.get() || DEF_PLAY_RATE),
-    playRateToast() {
+    getCachePlaybackRate: () => Number.parseFloat(CACHED_PLAY_RATE.get() || DEF_PLAY_RATE),
+    playbackRateToast() {
       const span = document.createElement("span");
       span.appendChild(document.createTextNode("正在以"));
       const child = span.cloneNode(true);
@@ -1214,4 +1344,4 @@
   App.init();
   _unsafeWindow.MONKEY_WEB_FULLSCREEN = App;
 
-})(sweetalert2);
+})(notyf, sweetalert2);
