@@ -1,6 +1,3 @@
-const deleteStorage = function () {
-  GM_deleteValue(this.name);
-};
 const setStorage = function (value) {
   GM_setValue(this.name, value);
 };
@@ -62,13 +59,13 @@ export default {
       return getStorage.call(this, false); // 是否开启空格 ◀▶ 键控制
     },
   }),
-  CLOSE_OTHER_WEBSITES_AUTO: Object.freeze({
-    name: "CLOSE_OTHER_WEBSITES_AUTO_",
+  ENABLE_THIS_SITE_AUTO: Object.freeze({
+    name: "ENABLE_THIS_SITE_AUTO_",
     set(key, value) {
       GM_setValue(this.name + key, value);
     },
     get(key) {
-      return GM_getValue(this.name + key, true); // 其他网站是否禁用自动网页全屏
+      return GM_getValue(this.name + key, false); // 其他网站是否启用自动网页全屏
     },
   }),
   CURRENT_EPISODE_CHAIN: Object.freeze({

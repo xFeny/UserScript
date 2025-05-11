@@ -38,7 +38,7 @@ export default {
     return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
   },
   experimentWebFullScreen(video) {
-    if (webSite.inMatches() || video.isWebFullScreen || !this.topWinInfo || this.isClosedOtherWebsiteAuto()) return;
+    if (webSite.inMatches() || video.isWebFullScreen || !this.topWinInfo || !this.isEnbleThisWebSiteAuto()) return;
     if (video.offsetWidth === this.topWinInfo.innerWidth) return (video.isWebFullScreen = true);
     Tools.postMessage(window.top, { key: "P" });
     video.isWebFullScreen = true;

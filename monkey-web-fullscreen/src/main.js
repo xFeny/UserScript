@@ -1,4 +1,3 @@
-import "./style.scss";
 import App from "./application";
 import KeydownHandler from "./application/handler/KeydownHandler";
 import MenuCommandHandler from "./application/handler/MenuCommandHandler";
@@ -8,6 +7,8 @@ import SwitchEpisodeHandler from "./application/handler/SwitchEpisodeHandler";
 import PickerEpisodeHandler from "./application/handler/PickerEpisodeHandler";
 import ScriptsEnhanceHandler from "./application/handler/ScriptsEnhanceHandler";
 import VideoPlaybackRateHandler from "./application/handler/VideoPlaybackRateHandler";
+import "sweetalert2/dist/sweetalert2.min.css";
+import "./style.scss";
 
 const logicHandlers = [
   { handler: KeydownHandler },

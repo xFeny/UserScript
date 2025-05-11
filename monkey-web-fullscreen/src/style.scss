@@ -33,6 +33,8 @@
 /* B站直播样式 END */
 
 .monkey-web-fullscreen {
+  z-index: 9999999999 !important;
+
   h2 {
     font-size: 24px;
   }
@@ -47,6 +49,14 @@
     font-size: 12px;
   }
 
+  .swal2-confirm {
+    background-color: #7066e0 !important;
+  }
+
+  .swal2-deny {
+    background-color: #dc3741 !important;
+  }
+
   #picker-chain {
     width: 25em;
     height: auto;
@@ -56,20 +66,39 @@
     resize: vertical;
   }
 
-  .swal2-confirm {
-    background-color: #7066e0 !important;
+  .hide {
+    display: none;
   }
 
-  .swal2-deny {
-    background-color: #dc3741 !important;
+  ._menuitem_ {
+    font-size: 20px;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 15px;
+
+    label {
+      display: flex;
+      cursor: pointer;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    input {
+      width: 20px !important;
+      height: 20px !important;
+    }
   }
 }
 
-.notyf__message {
-  overflow: hidden;
-  display: -webkit-box;
-  line-clamp: 4;
-  -webkit-line-clamp: 4;
-  text-overflow: ellipsis;
-  -webkit-box-orient: vertical;
+.notyf {
+  z-index: 9999999999 !important;
+
+  .notyf__message {
+    overflow: hidden;
+    display: -webkit-box;
+    line-clamp: 4;
+    -webkit-line-clamp: 4;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+  }
 }

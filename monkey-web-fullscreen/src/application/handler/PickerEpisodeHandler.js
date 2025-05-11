@@ -1,8 +1,7 @@
-import Swal from "sweetalert2";
-import Tools from "../common/Tools";
 import Storage from "../common/Storage";
 import WebSite from "../common/WebSite";
-import "sweetalert2/dist/sweetalert2.min.css";
+import Tools from "../common/Tools";
+import Swal from "sweetalert2";
 
 const { ALL_EPISODE_CHAIN, CURRENT_EPISODE_CHAIN } = Storage;
 
@@ -28,7 +27,7 @@ export default {
         const hasPickerAllEpisode = ALL_EPISODE_CHAIN.get(location.host);
         const hasPickerCurrEpisode = CURRENT_EPISODE_CHAIN.get(location.host);
         if (hasPickerCurrEpisode && hasPickerAllEpisode) {
-          return Tools.notyf("已提取过剧集元素 (￣ー￣)", true);
+          return Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
         }
 
         const target = event.target;
@@ -54,7 +53,7 @@ export default {
       },
       confirmCallback(value) {
         CURRENT_EPISODE_CHAIN.set(location.host, value);
-        Tools.notyf("继续提取元素 ＼(＞０＜)／");
+        Tools.notyf("继续拾取元素 ＼(＞０＜)／");
       },
     });
   },
@@ -97,7 +96,7 @@ export default {
       html: `<h4>验证能正确获取到集数，再确定保存</h4>
       <textarea id="picker-chain" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
       <p>编辑选择器确保能正确获取到集数</p>`,
-      customClass: { popup: "monkey-web-fullscreen" },
+      customClass: { container: "monkey-web-fullscreen" },
       title: "抓取剧集元素选择器",
       confirmButtonText: "保存",
       denyButtonText: "验证",
