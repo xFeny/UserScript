@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      2.7.5
+// @version      2.7.6
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；快捷键切换：全屏(F)、网页全屏(P)、下一个视频(N)、弹幕开关(D)；支持任意视频倍速播放，提示记忆倍速；B站播放完自动退出网页全屏和取消连播。
 // @license      GPL-3.0-only
@@ -50,7 +50,7 @@
 // @note         *://*/*
 // ==/UserScript==
 
-(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const o=document.createElement("style");o.textContent=e,document.head.append(o)})(' @charset "UTF-8";.showToast{color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in;background:#000000bf!important}#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,.live-room-app #sidebar-vm,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.login-tip{display:none!important}.monkey-web-fullscreen h2{font-size:24px}.monkey-web-fullscreen h4{color:red;margin:0 auto}.monkey-web-fullscreen p{color:#999;font-size:12px}.monkey-web-fullscreen #picker-chain{width:25em;height:auto;font-size:14px;margin-bottom:0;min-height:10em;resize:vertical}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical} ');
+(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const t=document.createElement("style");t.textContent=e,document.head.append(t)})(' @charset "UTF-8";.showToast{color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in;background:#000000bf!important}#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,.live-room-app #sidebar-vm,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.login-tip{display:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen h2{font-size:24px}.monkey-web-fullscreen h4{color:red;margin:0 auto}.monkey-web-fullscreen p{color:#999;font-size:12px}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen #picker-chain{width:25em;height:auto;font-size:14px;margin-bottom:0;min-height:10em;resize:vertical}.monkey-web-fullscreen .hide{display:none}.monkey-web-fullscreen ._menuitem_{font-size:20px;cursor:pointer;text-align:left;margin-bottom:15px}.monkey-web-fullscreen ._menuitem_ label{display:flex;cursor:pointer;align-items:center;justify-content:space-between}.monkey-web-fullscreen ._menuitem_ input{width:20px!important;height:20px!important}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical} ');
 
 (function (notyf, Swal) {
   'use strict';
@@ -626,13 +626,13 @@
         return getStorage.call(this, false);
       }
     }),
-    CLOSE_OTHER_WEBSITES_AUTO: Object.freeze({
-      name: "CLOSE_OTHER_WEBSITES_AUTO_",
+    ENABLE_THIS_SITE_AUTO: Object.freeze({
+      name: "ENABLE_THIS_SITE_AUTO_",
       set(key, value) {
         _GM_setValue(this.name + key, value);
       },
       get(key) {
-        return _GM_getValue(this.name + key, true);
+        return _GM_getValue(this.name + key, false);
       }
     }),
     CURRENT_EPISODE_CHAIN: Object.freeze({
@@ -771,7 +771,7 @@
     OVERRIDE_KEYBOARD,
     ALL_EPISODE_CHAIN: ALL_EPISODE_CHAIN$2,
     CURRENT_EPISODE_CHAIN: CURRENT_EPISODE_CHAIN$1,
-    CLOSE_OTHER_WEBSITES_AUTO,
+    ENABLE_THIS_SITE_AUTO,
     CLOSE_AUTO_WEB_FULL_SCREEN,
     VIDEO_FASTFORWARD_DURATION
   } = storage;
@@ -779,9 +779,9 @@
     isClosedPlayRate: () => CLOSE_PLAY_RATE.get(),
     isOverrideKeyboard: () => OVERRIDE_KEYBOARD.get(),
     isClosedAuto: () => CLOSE_AUTO_WEB_FULL_SCREEN.get(),
-    isClosedOtherWebsiteAuto() {
+    isEnbleThisWebSiteAuto() {
       const host = Tools.isTopWin() ? location.host : this.topWinInfo.host;
-      return CLOSE_OTHER_WEBSITES_AUTO.get(host);
+      return ENABLE_THIS_SITE_AUTO.get(host);
     },
     setupScriptMenuCommand() {
       if (!Tools.isTopWin() || this.hasRegisterMenu) return;
@@ -790,14 +790,12 @@
       this.hasRegisterMenu = true;
     },
     registerMenuCommand() {
-      this.registerClosePlayRate();
       this.registerPlayRateCommand();
       this.registerVideoTimeCommand();
       this.registerFastforwardCommand();
-      this.registerCloseAutoFullCommand();
-      this.registerOverrideKeyboardCommand();
-      this.registerCloseAutoExperimentCommand();
-      this.registerDeletePickerEpisodeCommand();
+      this.registerThisSiteAutoCommand();
+      this.registerDeletePickerCommand();
+      this.registerMoreSettingMenuCommand();
     },
     setupCommandChangeListener() {
       if (this.hasCommandListener) return;
@@ -805,25 +803,14 @@
       [
         CLOSE_PLAY_RATE.name,
         OVERRIDE_KEYBOARD.name,
-        CLOSE_AUTO_WEB_FULL_SCREEN.name,
         CURRENT_EPISODE_CHAIN$1.name + location.host,
-        CLOSE_OTHER_WEBSITES_AUTO.name + location.host
+        ENABLE_THIS_SITE_AUTO.name + location.host
       ].forEach((key) => _GM_addValueChangeListener(key, handler));
       this.hasCommandListener = true;
     },
-    registerClosePlayRate() {
-      const isClose = this.isClosedPlayRate();
-      const title = isClose ? "启用倍速功能" : "禁用倍速功能";
-      this.unregisterMenuCommand(this.close_play_rate_command_id);
-      if (this.isLive()) return;
-      this.close_play_rate_command_id = _GM_registerMenuCommand(title, () => {
-        if (!isClose) Tools.postMessage(window, { defaultPlaybackRate: true });
-        CLOSE_PLAY_RATE.set(!isClose);
-      });
-    },
     registerPlayRateCommand() {
       const title = "设置倍速步进";
-      this.unregisterMenuCommand(this.play_rate_command_id);
+      _GM_unregisterMenuCommand(this.play_rate_command_id);
       if (this.isLive() || this.isClosedPlayRate()) return;
       this.play_rate_command_id = _GM_registerMenuCommand(title, () => {
         const input = prompt(title, PLAY_RATE_STEP$1.get());
@@ -831,7 +818,7 @@
       });
     },
     registerVideoTimeCommand() {
-      this.unregisterMenuCommand(this.video_time_command_id);
+      _GM_unregisterMenuCommand(this.video_time_command_id);
       if (this.isLive() || !this.isOverrideKeyboard()) return;
       const title = "设置快进/退秒数";
       this.video_time_command_id = _GM_registerMenuCommand(title, () => {
@@ -840,7 +827,7 @@
       });
     },
     registerFastforwardCommand() {
-      this.unregisterMenuCommand(this.fastforward_command_id);
+      _GM_unregisterMenuCommand(this.fastforward_command_id);
       if (this.isLive()) return;
       const title = "设置零键快进秒数";
       this.fastforward_command_id = _GM_registerMenuCommand(title, () => {
@@ -848,42 +835,53 @@
         if (!isNaN(input) && Number.parseInt(input)) VIDEO_FASTFORWARD_DURATION.set(input);
       });
     },
-    registerCloseAutoFullCommand() {
-      if (!webSite.inMatches()) return;
-      const isClose = this.isClosedAuto();
-      const title = isClose ? "启用自动网页全屏" : "禁用自动网页全屏";
-      this.unregisterMenuCommand(this.close_auto_command_id);
-      this.close_auto_command_id = _GM_registerMenuCommand(title, () => CLOSE_AUTO_WEB_FULL_SCREEN.set(!isClose));
-    },
-    registerOverrideKeyboardCommand() {
-      const isOverride = this.isOverrideKeyboard();
-      const title = isOverride ? "禁用 空格 ◀▶ 键控制" : "启用 空格 ◀▶ 键控制";
-      this.unregisterMenuCommand(this.override_keyboard_command_id);
-      this.override_keyboard_command_id = _GM_registerMenuCommand(title, () => OVERRIDE_KEYBOARD.set(!isOverride));
-    },
-    registerCloseAutoExperimentCommand() {
+    registerThisSiteAutoCommand() {
       if (webSite.inMatches()) return;
       const videos = Tools.querys("video").filter((video) => !isNaN(video));
       if (videos.length > 1) return;
-      const isClose = this.isClosedOtherWebsiteAuto();
-      const title = isClose ? "此站点启用自动网页全屏" : "此站点禁用自动网页全屏";
-      this.unregisterMenuCommand(this.close_experiment_command_id);
-      this.close_experiment_command_id = _GM_registerMenuCommand(title, () => {
-        CLOSE_OTHER_WEBSITES_AUTO.set(location.host, !isClose);
+      const isEnble = this.isEnbleThisWebSiteAuto();
+      const title = isEnble ? "此站禁用自动网页全屏" : "此站启用自动网页全屏";
+      _GM_unregisterMenuCommand(this.enble_this_site_auto_command_id);
+      this.enble_this_site_auto_command_id = _GM_registerMenuCommand(title, () => {
+        ENABLE_THIS_SITE_AUTO.set(location.host, !isEnble);
       });
     },
-    registerDeletePickerEpisodeCommand() {
-      const title = "删除此站点的剧集选择器";
-      this.unregisterMenuCommand(this.del_piker_episode_command_id);
+    registerDeletePickerCommand() {
+      _GM_unregisterMenuCommand(this.del_piker_command_id);
       if (webSite.inMatches() || !CURRENT_EPISODE_CHAIN$1.get(location.host)) return;
-      this.del_piker_episode_command_id = _GM_registerMenuCommand(title, () => {
+      this.del_piker_command_id = _GM_registerMenuCommand("删除此站的剧集选择器", () => {
         CURRENT_EPISODE_CHAIN$1.delete(location.host);
         ALL_EPISODE_CHAIN$2.delete(location.host);
       });
     },
-    unregisterMenuCommand(command_id) {
-      _GM_unregisterMenuCommand(command_id);
-      command_id = null;
+    registerMoreSettingMenuCommand() {
+      _GM_unregisterMenuCommand(this.more_setting_command_id);
+      this.more_setting_command_id = _GM_registerMenuCommand("更多设置", () => {
+        Swal.fire({
+          width: 350,
+          title: "更多设置",
+          backdrop: false,
+          showCancelButton: true,
+          cancelButtonText: "关闭",
+          showConfirmButton: false,
+          customClass: { container: "monkey-web-fullscreen" },
+          html: `<div class="_menuitem_"><label>关闭自动网页全屏<input type="checkbox"/></label></div>
+      		<div class="_menuitem_"><label>关闭视频倍速调节<input type="checkbox"/></label></div>
+      		<div class="_menuitem_"><label>空格 ◀▶ 键控制<input type="checkbox"/></label></div>`,
+          didOpen() {
+            const menuitem = [CLOSE_AUTO_WEB_FULL_SCREEN, CLOSE_PLAY_RATE, OVERRIDE_KEYBOARD];
+            Tools.querys("._menuitem_ input").forEach((ele, i) => {
+              ele.checked = menuitem[i].get(location.host);
+              if (i === 0 && !webSite.inMatches()) Tools.closest(ele, "._menuitem_")?.classList.add("hide");
+              ele.addEventListener("click", () => {
+                if (i === 1 && ele.checked) Tools.postMessage(window, { defaultPlaybackRate: true });
+                menuitem[i].set(ele.checked);
+                Tools.notyf("修改成功！");
+              });
+            });
+          }
+        });
+      });
     }
   };
   const WebSiteLoginHandler = {
@@ -968,7 +966,7 @@
       return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
     },
     experimentWebFullScreen(video) {
-      if (webSite.inMatches() || video.isWebFullScreen || !this.topWinInfo || this.isClosedOtherWebsiteAuto()) return;
+      if (webSite.inMatches() || video.isWebFullScreen || !this.topWinInfo || !this.isEnbleThisWebSiteAuto()) return;
       if (video.offsetWidth === this.topWinInfo.innerWidth) return video.isWebFullScreen = true;
       Tools.postMessage(window.top, { key: "P" });
       video.isWebFullScreen = true;
@@ -1095,7 +1093,6 @@
       }
     }
   };
-  cssLoader("sweetalert2");
   const { ALL_EPISODE_CHAIN, CURRENT_EPISODE_CHAIN } = storage;
   const PickerEpisodeHandler = {
     setupPickerEpisodeListener() {
@@ -1109,7 +1106,7 @@
           const hasPickerAllEpisode = ALL_EPISODE_CHAIN.get(location.host);
           const hasPickerCurrEpisode = CURRENT_EPISODE_CHAIN.get(location.host);
           if (hasPickerCurrEpisode && hasPickerAllEpisode) {
-            return Tools.notyf("已提取过剧集元素 (￣ー￣)", true);
+            return Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
           }
           const target = event.target;
           const number = this.getEpisodeNumber(target);
@@ -1133,7 +1130,7 @@
         },
         confirmCallback(value) {
           CURRENT_EPISODE_CHAIN.set(location.host, value);
-          Tools.notyf("继续提取元素 ＼(＞０＜)／");
+          Tools.notyf("继续拾取元素 ＼(＞０＜)／");
         }
       });
     },
@@ -1174,7 +1171,7 @@
         html: `<h4>验证能正确获取到集数，再确定保存</h4>
       <textarea id="picker-chain" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
       <p>编辑选择器确保能正确获取到集数</p>`,
-        customClass: { popup: "monkey-web-fullscreen" },
+        customClass: { container: "monkey-web-fullscreen" },
         title: "抓取剧集元素选择器",
         confirmButtonText: "保存",
         denyButtonText: "验证",
@@ -1325,6 +1322,7 @@
       this.showToast(span);
     }
   };
+  cssLoader("sweetalert2");
   const logicHandlers = [
     { handler: KeydownHandler },
     { handler: MenuCommandHandler },
