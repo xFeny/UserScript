@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      2.7.6
+// @version      2.8.0
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；快捷键切换：全屏(F)、网页全屏(P)、下一个视频(N)、弹幕开关(D)；支持任意视频倍速播放，提示记忆倍速；B站播放完自动退出网页全屏和取消连播。
 // @license      GPL-3.0-only
@@ -43,14 +43,16 @@
 // @grant        GM_getResourceText
 // @grant        GM_getValue
 // @grant        GM_info
+// @grant        GM_listValues
 // @grant        GM_registerMenuCommand
 // @grant        GM_setValue
 // @grant        GM_unregisterMenuCommand
 // @grant        unsafeWindow
+// @run-at       document-body
 // @note         *://*/*
 // ==/UserScript==
 
-(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const t=document.createElement("style");t.textContent=e,document.head.append(t)})(' @charset "UTF-8";.showToast{color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in;background:#000000bf!important}#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,.live-room-app #sidebar-vm,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.login-tip{display:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen h2{font-size:24px}.monkey-web-fullscreen h4{color:red;margin:0 auto}.monkey-web-fullscreen p{color:#999;font-size:12px}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen #picker-chain{width:25em;height:auto;font-size:14px;margin-bottom:0;min-height:10em;resize:vertical}.monkey-web-fullscreen .hide{display:none}.monkey-web-fullscreen ._menuitem_{font-size:20px;cursor:pointer;text-align:left;margin-bottom:15px}.monkey-web-fullscreen ._menuitem_ label{display:flex;cursor:pointer;align-items:center;justify-content:space-between}.monkey-web-fullscreen ._menuitem_ input{width:20px!important;height:20px!important}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical} ');
+(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const t=document.createElement("style");t.textContent=e,document.head.append(t)})(' @charset "UTF-8";[part=monkey-show-toast],::part(monkey-show-toast){color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in;background:#000000bf!important}#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,.live-room-app #sidebar-vm,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.login-tip{display:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen h2{font-size:24px}.monkey-web-fullscreen h4{color:red;margin:0 auto}.monkey-web-fullscreen p{color:#999;font-size:12px}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen #monkey-picker{width:25em;height:auto;font-size:14px;margin-bottom:0;min-height:10em;resize:vertical}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen ._menuitem{font-size:20px;cursor:pointer;text-align:left;margin-bottom:15px}.monkey-web-fullscreen ._menuitem label{display:flex;cursor:pointer;align-items:center;justify-content:space-between}.monkey-web-fullscreen ._menuitem input{width:20px!important;height:20px!important;appearance:auto!important;-webkit-appearance:auto!important}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical}.player-overlay,.memory-play-wrap,.atom-notice-click,#player #loading-box,.xgplayer [id*=tips],.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}}@supports not (selector(:has(div))){#loading.not-player{display:none!important}} ');
 
 (function (notyf, Swal) {
   'use strict';
@@ -66,7 +68,7 @@
     center: "top: 50%; left: 50%; transform: translate(-50%, -50%);"
   });
   const ONE_SECOND = 1e3;
-  const constants = Object.freeze({
+  const Constants = Object.freeze({
     EMPTY: "",
     DEF_PLAY_RATE: 1,
     MAX_PLAY_RATE: 16,
@@ -198,11 +200,12 @@
   var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
   var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
   var _GM_info = /* @__PURE__ */ (() => typeof GM_info != "undefined" ? GM_info : void 0)();
+  var _GM_listValues = /* @__PURE__ */ (() => typeof GM_listValues != "undefined" ? GM_listValues : void 0)();
   var _GM_registerMenuCommand = /* @__PURE__ */ (() => typeof GM_registerMenuCommand != "undefined" ? GM_registerMenuCommand : void 0)();
   var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
   var _GM_unregisterMenuCommand = /* @__PURE__ */ (() => typeof GM_unregisterMenuCommand != "undefined" ? GM_unregisterMenuCommand : void 0)();
   var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
-  const { ONE_SEC: ONE_SEC$1, MSG_SOURCE: MSG_SOURCE$1 } = constants;
+  const { ONE_SEC: ONE_SEC$2, MSG_SOURCE: MSG_SOURCE$1 } = Constants;
   const Tools = {
     isTopWin: () => window.top === window,
     noNumber: (str) => !/\d/.test(str),
@@ -223,7 +226,7 @@
     },
     notyf(msg, isError = false) {
       const notyf$1 = new notyf.Notyf({
-        duration: ONE_SEC$1 * 3,
+        duration: ONE_SEC$2 * 3,
         position: { x: "center", y: "top" }
       });
       isError ? notyf$1.error(msg) : notyf$1.success(msg);
@@ -235,7 +238,7 @@
     postMsgToFrames(data) {
       this.getFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
     },
-    debounce(fn, delay = ONE_SEC$1) {
+    debounce(fn, delay = ONE_SEC$2) {
       let timer;
       return function() {
         if (timer) clearTimeout(timer);
@@ -296,7 +299,7 @@
     },
     findSiblingInParent(element, selector, maxLevel = 3) {
       let currLevel = 0;
-      let currParent = element.parentElement;
+      let currParent = element?.parentElement;
       while (currParent && currLevel < maxLevel) {
         const sibs = currParent.children;
         for (let sib of sibs) {
@@ -339,18 +342,26 @@
         }
       }
       return tagInfo;
+    },
+    simpleHash(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) + hash + str.charCodeAt(i);
+        hash |= 0;
+      }
+      return hash >>> 0;
     }
   };
-  const { EMPTY: EMPTY$2, QQ_VID_REG, BILI_VID_REG, IQIYI_VID_REG, ACFUN_VID_REG } = constants;
+  const { EMPTY: EMPTY$2, QQ_VID_REG, BILI_VID_REG, IQIYI_VID_REG, ACFUN_VID_REG } = Constants;
   const matches = _GM_info.script.matches.filter((match) => match !== "*://*/*").map((match) => new RegExp(match.replace(/\*/g, "\\S+")));
-  const webSite = {
+  const WebSite = {
     isDouyu: () => location.host === "v.douyu.com",
     isBili: () => BILI_VID_REG.test(location.href),
     isTencent: () => QQ_VID_REG.test(location.href),
     isIqiyi: () => IQIYI_VID_REG.test(location.href),
     isAcFun: () => ACFUN_VID_REG.test(location.href),
-    isLivePage: () => location.href.includes("live"),
     isBiliLive: () => location.host === "live.bilibili.com",
+    isLivePage: () => !location.host.endsWith(".live") && /\blive\b/.test(location.href),
     inMatches: () => matches.some((matche) => matche.test(location.href.replace(location.search, EMPTY$2)))
   };
   const selectorConfig = {
@@ -367,51 +378,49 @@
     "v.youku.com": { full: "#fullscreen-icon", webfull: "#webfullscreen-icon", danmaku: "div[class*='switch-img_12hDa turn-']", next: ".kui-next-icon-0" },
     "v.douyu.com": { full: ".ControllerBar-WindowFull-Icon", webfull: ".ControllerBar-PageFull-Icon", danmaku: ".BarrageSwitch-icon" }
   };
-  const douyu = {
-    play: () => Tools.query(".ControllerBarPlay")?.click(),
-    pause: () => Tools.query(".ControllerBarStop")?.click(),
-    addStyle(ele) {
-      let style = Tools.query("style", ele);
-      if (style) return;
-      style = document.createElement("style");
-      style.textContent = ".showToast{color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity 300ms ease-in;background:rgba(0,0,0,.75)!important}";
-      ele.appendChild(style);
-    }
-  };
   const VideoListenerHandler = {
     loadedmetadata() {
       this.volume = 1;
-      this.isToastShown = false;
+      this.hasToast = false;
       this.isWebFullScreen = false;
+      Tools.querys('[id*="loading"]').filter((ele) => !Tools.query('[class*="player"]', ele)).forEach((ele) => ele.classList.add("not-player"));
     },
     loadeddata() {
       this.volume = 1;
-      this.isToastShown = false;
+      this.hasToast = false;
       this.isWebFullScreen = false;
+      App.experWebFullScreen(this);
+      App.tryplay(this);
     },
     timeupdate() {
       if (isNaN(this.duration)) return;
+      Tools.query(".conplaying")?.click();
+      App.useCachePlaybackRate(this);
+      App.experWebFullScreen(this);
+      App.useCachePlayTime(this);
       App.changeVideoInfo(this);
-      App.experimentWebFullScreen(this);
-      App.currVideoUseCachePlayRate(this);
+      App.cachePlayTime(this);
     },
     canplay() {
-      webSite.isDouyu() ? douyu.play() : this.play();
+      App.tryplay(this);
     },
     play() {
       this.isEnded = false;
       App.webFullScreen(this);
     },
+    pause() {
+      Tools.query(".ec-no")?.click();
+      Tools.query('[id*="loading"].not-player')?.remove();
+      Tools.query('[id*="loading"]:not(:has([class*="player"]))')?.remove();
+    },
     ended() {
       this.isEnded = true;
-      this.isToastShown = false;
-      if (!webSite.isBili() && !webSite.isAcFun()) return;
-      const pod = Tools.query(".video-pod");
-      const pods = Tools.querys('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
-      if (!pod || !!pods.length) App.exitWebFullScreen();
+      this.hasToast = false;
+      App.delCachePlayTime();
+      App.exitWebFullScreen();
     }
   };
-  const { EMPTY: EMPTY$1, ONE_SEC, SHOW_TOAST_TIME, SHOW_TOAST_POSITION } = constants;
+  const { EMPTY: EMPTY$1, ONE_SEC: ONE_SEC$1, SHOW_TOAST_TIME, SHOW_TOAST_POSITION } = Constants;
   const App = {
     init() {
       this.setupVisibleListener();
@@ -421,7 +430,7 @@
       this.setupMouseMoveListener();
     },
     isLive() {
-      return webSite.isLivePage() || this.videoInfo?.isLive;
+      return WebSite.isLivePage() || this.videoInfo?.isLive;
     },
     normalWebsite() {
       return !this.videoInfo;
@@ -456,16 +465,25 @@
     },
     setupMutationObserver() {
       const observer = Tools.createObserver(document.body, () => {
+        this.triggerVideoStart();
         const video = this.getVideo();
         this.element = this.getElement();
         if (video?.play && !!video.offsetWidth) this.setupVideoListener();
-        if (!webSite.inMatches() && this.topWinInfo) return observer.disconnect();
+        if (!WebSite.inMatches() && this.topInfo) return observer.disconnect();
         if (!video?.play || !this.element || !this.webFullScreen(video)) return;
         observer.disconnect();
         this.biliLiveExtras();
         this.webSiteLoginObserver();
       });
-      setTimeout(() => observer.disconnect(), ONE_SEC * 10);
+      setTimeout(() => observer.disconnect(), ONE_SEC$1 * 10);
+    },
+    triggerVideoStart() {
+      const element = Tools.query(
+        ".ec-no, .conplaying, #start, [class*='poster'], .choice-true, .close-btn, .closeclick"
+      );
+      if (!element || this.isTriggerVideoStart) return;
+      setTimeout(() => element?.click() & element?.remove(), 100);
+      this.isTriggerVideoStart = true;
     },
     video: null,
     videoBoundListeners: [],
@@ -493,7 +511,7 @@
     },
     healthCurrentVideo() {
       if (this.healthID) clearInterval(this.healthID);
-      this.healthID = setInterval(() => this.getPlayingVideo(), ONE_SEC);
+      this.healthID = setInterval(() => this.getPlayingVideo(), ONE_SEC$1);
     },
     getPlayingVideo() {
       const videos = Tools.querys("video");
@@ -504,7 +522,8 @@
       }
     },
     setVideoInfo(video) {
-      const videoInfo = { ...Tools.getElementCenterPoint(video), isLive: video.duration === Infinity };
+      const isLive = Object.is(video.duration, Infinity);
+      const videoInfo = { ...Tools.getElementCenterPoint(video), isLive };
       this.setParentVideoInfo(videoInfo);
     },
     setParentVideoInfo(videoInfo) {
@@ -513,23 +532,24 @@
       if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo });
       this.setupPickerEpisodeListener();
       this.setupScriptMenuCommand();
-      this.sendTopWinInfo();
+      this.sendTopInfo();
     },
     changeVideoInfo(video) {
       if (!this.videoInfo) return;
-      const isLive = video.duration === Infinity;
+      const isLive = Object.is(video.duration, Infinity);
       if (this.videoInfo.isLive === isLive) return;
       this.videoInfo.isLive = isLive;
       this.setParentVideoInfo(this.videoInfo);
     },
-    sendTopWinInfo() {
-      const topWinInfo = this.topWinInfo = { innerWidth, host: location.host };
-      Tools.postMsgToFrames({ topWinInfo });
+    sendTopInfo() {
+      const { host, href } = location;
+      const topInfo = this.topInfo = { innerWidth, host, href, hash: Tools.simpleHash(href) };
+      Tools.postMsgToFrames({ topInfo });
     },
     setupMouseMoveListener() {
-      if (this.isSetupMouseMoveListener) return;
-      const delay = ONE_SEC * 2;
-      this.isSetupMouseMoveListener = true;
+      if (this.isMoveListener) return;
+      const delay = ONE_SEC$1 * 2;
+      this.isMoveListener = true;
       let timer = setTimeout(() => this.showOrHideCursor(), delay);
       document.addEventListener("mousemove", (event) => {
         if (!event.isTrusted) return;
@@ -537,128 +557,107 @@
         const target = event.target;
         this.showOrHideCursor(false);
         timer = setTimeout(() => this.showOrHideCursor(), delay);
-        if (this.video === target || !(target instanceof HTMLVideoElement)) return;
+        if (this.video === target || !(target instanceof HTMLVideoElement) || target.offsetWidth > innerWidth) return;
         this.addVideoEvtListener(target);
       });
     },
     showOrHideCursor(isHide = true) {
       if (!this.videoInfo) return;
       const videoWrap = this.getVideoLocation();
-      const elements = Array.from([...videoWrap.children, videoWrap, videoWrap.parentElement]);
+      const elements = Array.from([...videoWrap?.children || [], videoWrap, videoWrap?.parentElement]);
       elements.forEach((ele) => {
         if (isHide) ele?.dispatchEvent(new MouseEvent("mouseleave"));
-        isHide ? ele.style.cursor = "none" : ele.style.cursor = EMPTY$1;
+        isHide ? ele?.style.setProperty("cursor", "none") : ele?.style.setProperty("cursor", EMPTY$1);
       });
     },
-    showToast(content, duration = SHOW_TOAST_TIME) {
+    showToast(content, duration = SHOW_TOAST_TIME, isRemoveOther = true) {
       const el = document.createElement("div");
-      if (content instanceof HTMLElement) el.appendChild(content);
-      if (Object.is(typeof content, typeof EMPTY$1)) el.textContent = content;
-      el.setAttribute("class", "showToast");
+      el.setAttribute("part", "monkey-show-toast");
       el.setAttribute("style", SHOW_TOAST_POSITION);
-      const videoParent = this.video?.parentElement;
+      if (isRemoveOther) Tools.query('[part="monkey-show-toast"]')?.remove();
+      content instanceof HTMLElement ? el.appendChild(content) : el.innerHTML = content;
       const videoContainer = this.getVideoContainer();
-      const target = this.video === videoContainer ? videoParent : videoContainer;
-      if (webSite.isDouyu()) douyu.addStyle(target);
-      Tools.query(".showToast", target)?.remove();
+      const target = Object.is(this.video, videoContainer) ? this.video?.parentElement : videoContainer;
       target?.appendChild(el);
       setTimeout(() => {
         el.style.opacity = 0;
-        setTimeout(() => el.remove(), ONE_SEC / 3);
+        setTimeout(() => el.remove(), ONE_SEC$1 / 3);
       }, duration);
     }
   };
-  const setStorage = function(value) {
-    _GM_setValue(this.name, value);
-  };
-  const getStorage = function(defaultValue) {
-    return _GM_getValue(this.name, defaultValue);
-  };
-  const storage = {
-    CACHED_PLAY_RATE: Object.freeze({
-      name: "FENY_SCRIPTS_V_PLAYBACK_RATE",
-      set(value) {
-        localStorage.setItem(this.name, value);
-      },
-      get() {
-        return localStorage.getItem(this.name);
+  class StorageItem {
+    constructor(name, defaultValue, useLocalStorage = false, valueParser = null) {
+      this.name = name;
+      this.valueParser = valueParser;
+      this.defaultValue = defaultValue;
+      this.useLocalStorage = useLocalStorage;
+    }
+    set(value) {
+      this.setItem(this.name, value);
+    }
+    setItem(key, value) {
+      this.useLocalStorage ? localStorage.setItem(key, value) : _GM_setValue(key, value);
+    }
+    get() {
+      return this.parser(this.getItem(this.name) ?? this.defaultValue);
+    }
+    getItem(key) {
+      const value = this.useLocalStorage ? localStorage.getItem(key) : _GM_getValue(key);
+      try {
+        return JSON.parse(value);
+      } catch (e) {
+        return value;
       }
-    }),
-    PLAY_RATE_STEP: Object.freeze({
-      name: "PLAY_RATE_STEP",
-      set: setStorage,
-      get() {
-        return Number.parseFloat(getStorage.call(this, 0.25));
-      }
-    }),
-    CLOSE_PLAY_RATE: Object.freeze({
-      name: "CLOSE_PLAY_RATE",
-      set: setStorage,
-      get() {
-        return getStorage.call(this, false);
-      }
-    }),
-    VIDEO_FASTFORWARD_DURATION: Object.freeze({
-      name: "VIDEO_FASTFORWARD_DURATION",
-      set: setStorage,
-      get() {
-        return Number.parseInt(getStorage.call(this, 30));
-      }
-    }),
-    VIDEO_TIME_STEP: Object.freeze({
-      name: "VIDEO_TIME_STEP",
-      set: setStorage,
-      get() {
-        return Number.parseInt(getStorage.call(this, 5));
-      }
-    }),
-    CLOSE_AUTO_WEB_FULL_SCREEN: Object.freeze({
-      name: "CLOSE_AUTO_WEB_FULL_SCREEN",
-      set: setStorage,
-      get() {
-        return getStorage.call(this, false);
-      }
-    }),
-    OVERRIDE_KEYBOARD: Object.freeze({
-      name: "OVERRIDE_KEYBOARD",
-      set: setStorage,
-      get() {
-        return getStorage.call(this, false);
-      }
-    }),
-    ENABLE_THIS_SITE_AUTO: Object.freeze({
-      name: "ENABLE_THIS_SITE_AUTO_",
-      set(key, value) {
-        _GM_setValue(this.name + key, value);
-      },
-      get(key) {
-        return _GM_getValue(this.name + key, false);
-      }
-    }),
-    CURRENT_EPISODE_CHAIN: Object.freeze({
-      name: "CURRENT_EPISODE_CHAIN_",
-      set(key, value) {
-        _GM_setValue(this.name + key, value);
-      },
-      get(key) {
-        return _GM_getValue(this.name + key);
-      },
-      delete(key) {
-        _GM_deleteValue(this.name + key);
-      }
-    }),
-    ALL_EPISODE_CHAIN: Object.freeze({
-      name: "ALL_EPISODE_CHAIN_",
-      set(key, value) {
-        _GM_setValue(this.name + key, value);
-      },
-      get(key) {
-        return _GM_getValue(this.name + key);
-      },
-      delete(key) {
-        _GM_deleteValue(this.name + key);
-      }
-    })
+    }
+    parser(value) {
+      return this.valueParser ? this.valueParser(value) : value;
+    }
+    del() {
+      this.removeItem(this.name);
+    }
+    removeItem(key) {
+      this.useLocalStorage ? localStorage.removeItem(key) : _GM_deleteValue(key);
+    }
+  }
+  class TimedStorageItem extends StorageItem {
+    constructor(name, defaultValue, useLocalStorage, valueParser) {
+      super(name, defaultValue, useLocalStorage, valueParser);
+      this.clearExpired();
+    }
+    set(suffix, value, expires) {
+      const key = this.name + suffix;
+      if (expires) expires = Date.now() + expires * 864e5;
+      expires ? this.setItem(key, JSON.stringify({ value, expires })) : this.setItem(key, value);
+    }
+    get(suffix) {
+      const storage = this.getItem(this.name + suffix);
+      if (!storage?.value) return this.parser(storage ?? this.defaultValue);
+      return storage.expires > Date.now() ? this.parser(storage.value) : this.defaultValue;
+    }
+    del(suffix) {
+      this.removeItem(this.name + suffix);
+    }
+    clearExpired() {
+      const keys = this.useLocalStorage ? Object.keys(localStorage) : _GM_listValues();
+      keys.filter((key) => key.includes(this.name)).forEach((key) => {
+        const storage = this.getItem(key);
+        if (storage?.expires && storage.expires < Date.now()) this.removeItem(key);
+      });
+    }
+  }
+  const Storage = {
+    PLAY_RATE_STEP: new StorageItem("PLAY_RATE_STEP", 0.25, false, parseFloat),
+    CACHED_PLAY_RATE: new StorageItem("FENY_SCRIPTS_V_PLAYBACK_RATE", 1, true, parseFloat),
+    CLOSE_PLAY_RATE: new StorageItem("CLOSE_PLAY_RATE", false, false, (value) => Boolean(value)),
+    OVERRIDE_KEYBOARD: new StorageItem("OVERRIDE_KEYBOARD", false, false, (value) => Boolean(value)),
+    DISABLE_AUTO: new StorageItem("CLOSE_AUTO_WEB_FULL_SCREEN", false, false, (value) => Boolean(value)),
+    VIDEO_SKIP_INTERVAL: new StorageItem("VIDEO_SKIP_INTERVAL", 5, false, (value) => parseInt(value, 10)),
+    ZERO_KEY_SKIP_INTERVAL: new StorageItem("ZERO_KEY_SKIP_INTERVAL", 30, false, (value) => parseInt(value, 10)),
+    ENABLE_THIS_SITE_AUTO: new TimedStorageItem("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
+    DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
+    RELATIVE_EPISODE_SELECTOR: new TimedStorageItem("RELATIVE_EPISODE_SELECTOR_", null),
+    CURRENT_EPISODE_SELECTOR: new TimedStorageItem("CURRENT_EPISODE_SELECTOR_", null),
+    PLAY_TIME: new TimedStorageItem("PLAY_TIME_", 0, true, parseFloat)
   };
   const eventCode = Object.freeze({
     KeyA: "KeyA",
@@ -674,13 +673,13 @@
     NumpadAdd: "NumpadAdd",
     NumpadSubtract: "NumpadSubtract"
   });
-  const { VIDEO_TIME_STEP: VIDEO_TIME_STEP$1, VIDEO_FASTFORWARD_DURATION: VIDEO_FASTFORWARD_DURATION$1 } = storage;
-  const { EMPTY, SYMBOL: SYMBOL$1, MSG_SOURCE } = constants;
+  const { ZERO_KEY_SKIP_INTERVAL: ZERO_KEY_SKIP_INTERVAL$1 } = Storage;
+  const { SYMBOL: SYMBOL$1, MSG_SOURCE } = Constants;
   const KeydownHandler = {
     preventDefault(event) {
       const overrideKey = [eventCode.Space, eventCode.ArrowLeft, eventCode.ArrowRight];
       const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(event.code);
-      const isNumberKey = Tools.isNumber(event.key) && !this.isClosedPlayRate();
+      const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
       if (!isNumberKey && !isOverrideKey) return;
       Tools.preventDefault(event);
     },
@@ -692,15 +691,16 @@
         if (!data?.source || !data.source.includes(MSG_SOURCE)) return;
         if (data?.videoInfo) return this.setParentVideoInfo(data.videoInfo);
         if (data?.defaultPlaybackRate) this.defaultPlaybackRate();
-        if (data?.topWinInfo) this.topWinInfo = data.topWinInfo;
+        if (data?.topInfo) this.topInfo = data.topInfo;
         this.processEvent(data);
       });
     },
     keydownHandler(event) {
       if (this.normalWebsite()) return;
+      const { code, shiftKey } = event;
       let key = event.key.toUpperCase();
-      const { code, target, shiftKey } = event;
-      if (["INPUT", "TEXTAREA", "DEMAND-SEARCH-BOX"].includes(target.tagName)) return;
+      const target = event.composedPath().shift();
+      if (["INPUT", "TEXTAREA"].includes(target.tagName) || target?.isContentEditable) return;
       if (!Object.keys(eventCode).includes(code) && !Tools.isNumber(key)) return;
       this.preventDefault(event);
       if (eventCode.Space === code) key = eventCode.Space.toUpperCase();
@@ -730,17 +730,17 @@
         [SYMBOL$1.DIVIDE]: () => this.adjustPlaybackRate(SYMBOL$1.DIVIDE),
         [SYMBOL$1.SUBTRACT]: () => this.adjustPlaybackRate(SYMBOL$1.SUBTRACT),
         [SYMBOL$1.MULTIPLY]: () => this.adjustPlaybackRate(SYMBOL$1.MULTIPLY),
-        N: () => webSite.inMatches() ? this.triggerIconElement("next") : this.switchNextEpisode(),
+        N: () => WebSite.inMatches() ? this.triggerIconElement("next") : this.switchNextEpisode(),
         ARROWLEFT: () => this.isOverrideKeyboard() ? this.adjustVideoTime(SYMBOL$1.SUBTRACT) : null,
         ARROWRIGHT: () => this.isOverrideKeyboard() ? this.adjustVideoTime() : null,
-        0: () => this.adjustVideoTime(VIDEO_FASTFORWARD_DURATION$1.get()),
+        0: () => this.adjustVideoTime(ZERO_KEY_SKIP_INTERVAL$1.get()),
         P: () => {
-          if (!webSite.inMatches()) return this.enhance();
-          webSite.isBiliLive() ? this.biliLiveWebFullScreen() : this.triggerIconElement("webfull");
+          if (!WebSite.inMatches()) return this.enhance();
+          WebSite.isBiliLive() ? this.biliLiveWebFullScreen() : this.triggerIconElement("webfull");
         },
         SPACE: () => {
           if (!this.video || !this.isOverrideKeyboard()) return;
-          if (webSite.isDouyu()) return this.video.paused ? douyu.play() : douyu.pause();
+          if (WebSite.isDouyu()) return Tools.triggerClick(this.video);
           this.video.paused ? this.video.play() : this.video.pause();
         },
         F: () => this.triggerIconElement("full", 0),
@@ -748,115 +748,103 @@
       };
     },
     triggerIconElement(name, index) {
-      if (!webSite.inMatches()) return;
-      if (webSite.isBiliLive()) return this.getBiliLiveIcons()?.[index]?.click();
+      if (!WebSite.inMatches()) return;
+      if (WebSite.isBiliLive()) return this.getBiliLiveIcons()?.[index]?.click();
       Tools.query(selectorConfig[location.host]?.[name])?.click();
-    },
-    adjustVideoTime(second = VIDEO_TIME_STEP$1.get(), _symbol) {
-      if (!this.video || !Tools.validDuration(this.video)) return;
-      if (_symbol && ![SYMBOL$1.ADD, SYMBOL$1.SUBTRACT].includes(_symbol)) return;
-      if (Object.is(typeof second, typeof EMPTY) && !_symbol) {
-        _symbol = second;
-        second = VIDEO_TIME_STEP$1.get();
-      }
-      second = Object.is(SYMBOL$1.SUBTRACT, _symbol) ? -second : second;
-      const currentTime = this.video.currentTime + second;
-      this.video.currentTime = Math.max(0, currentTime);
     }
   };
   const {
+    DISABLE_AUTO,
     PLAY_RATE_STEP: PLAY_RATE_STEP$1,
     CLOSE_PLAY_RATE,
-    VIDEO_TIME_STEP,
     OVERRIDE_KEYBOARD,
-    ALL_EPISODE_CHAIN: ALL_EPISODE_CHAIN$2,
-    CURRENT_EPISODE_CHAIN: CURRENT_EPISODE_CHAIN$1,
+    VIDEO_SKIP_INTERVAL: VIDEO_SKIP_INTERVAL$1,
+    DISABLE_MEMORY_TIME: DISABLE_MEMORY_TIME$1,
     ENABLE_THIS_SITE_AUTO,
-    CLOSE_AUTO_WEB_FULL_SCREEN,
-    VIDEO_FASTFORWARD_DURATION
-  } = storage;
+    ZERO_KEY_SKIP_INTERVAL,
+    CURRENT_EPISODE_SELECTOR: CURRENT_EPISODE_SELECTOR$1,
+    RELATIVE_EPISODE_SELECTOR: RELATIVE_EPISODE_SELECTOR$2
+  } = Storage;
   const MenuCommandHandler = {
-    isClosedPlayRate: () => CLOSE_PLAY_RATE.get(),
+    isDisableAuto: () => DISABLE_AUTO.get(),
+    isDisablePlaybackRate: () => CLOSE_PLAY_RATE.get(),
     isOverrideKeyboard: () => OVERRIDE_KEYBOARD.get(),
-    isClosedAuto: () => CLOSE_AUTO_WEB_FULL_SCREEN.get(),
     isEnbleThisWebSiteAuto() {
-      const host = Tools.isTopWin() ? location.host : this.topWinInfo.host;
+      const host = Tools.isTopWin() ? location.host : this.topInfo.host;
       return ENABLE_THIS_SITE_AUTO.get(host);
     },
     setupScriptMenuCommand() {
-      if (!Tools.isTopWin() || this.hasRegisterMenu) return;
-      this.registerMenuCommand();
-      this.setupCommandChangeListener();
-      this.hasRegisterMenu = true;
+      if (!Tools.isTopWin() || this.hasMenu) return;
+      this.setupMenuChangeListener();
+      this.registMenuCommand();
+      this.hasMenu = true;
     },
-    registerMenuCommand() {
-      this.registerPlayRateCommand();
-      this.registerVideoTimeCommand();
-      this.registerFastforwardCommand();
-      this.registerThisSiteAutoCommand();
-      this.registerDeletePickerCommand();
-      this.registerMoreSettingMenuCommand();
+    registMenuCommand() {
+      this.registPlayRateCommand();
+      this.registSkipTimeCommand();
+      this.registZeroKeySkipCommand();
+      this.registWebSiteAutoCommand();
+      this.registDeletePickerCommand();
+      this.registMoreSettingCommand();
     },
-    setupCommandChangeListener() {
+    setupMenuChangeListener() {
       if (this.hasCommandListener) return;
-      const handler = () => this.registerMenuCommand();
       [
         CLOSE_PLAY_RATE.name,
         OVERRIDE_KEYBOARD.name,
-        CURRENT_EPISODE_CHAIN$1.name + location.host,
-        ENABLE_THIS_SITE_AUTO.name + location.host
-      ].forEach((key) => _GM_addValueChangeListener(key, handler));
+        ENABLE_THIS_SITE_AUTO.name + location.host,
+        CURRENT_EPISODE_SELECTOR$1.name + location.host
+      ].forEach((key) => _GM_addValueChangeListener(key, () => this.registMenuCommand()));
       this.hasCommandListener = true;
     },
-    registerPlayRateCommand() {
+    registPlayRateCommand() {
       const title = "设置倍速步进";
-      _GM_unregisterMenuCommand(this.play_rate_command_id);
-      if (this.isLive() || this.isClosedPlayRate()) return;
-      this.play_rate_command_id = _GM_registerMenuCommand(title, () => {
+      _GM_unregisterMenuCommand(this.play_rate_menu_id);
+      if (this.isLive() || this.isDisablePlaybackRate()) return;
+      this.play_rate_menu_id = _GM_registerMenuCommand(title, () => {
         const input = prompt(title, PLAY_RATE_STEP$1.get());
         if (!isNaN(input) && Number.parseFloat(input)) PLAY_RATE_STEP$1.set(input);
       });
     },
-    registerVideoTimeCommand() {
-      _GM_unregisterMenuCommand(this.video_time_command_id);
+    registSkipTimeCommand() {
+      _GM_unregisterMenuCommand(this.skip_time_menu_id);
       if (this.isLive() || !this.isOverrideKeyboard()) return;
       const title = "设置快进/退秒数";
-      this.video_time_command_id = _GM_registerMenuCommand(title, () => {
-        const input = prompt(title, VIDEO_TIME_STEP.get());
-        if (!isNaN(input) && Number.parseInt(input)) VIDEO_TIME_STEP.set(input);
+      this.skip_time_menu_id = _GM_registerMenuCommand(title, () => {
+        const input = prompt(title, VIDEO_SKIP_INTERVAL$1.get());
+        if (!isNaN(input) && Number.parseInt(input)) VIDEO_SKIP_INTERVAL$1.set(input);
       });
     },
-    registerFastforwardCommand() {
-      _GM_unregisterMenuCommand(this.fastforward_command_id);
+    registZeroKeySkipCommand() {
+      _GM_unregisterMenuCommand(this.zero_key_menu_id);
       if (this.isLive()) return;
       const title = "设置零键快进秒数";
-      this.fastforward_command_id = _GM_registerMenuCommand(title, () => {
-        const input = prompt(title, VIDEO_FASTFORWARD_DURATION.get());
-        if (!isNaN(input) && Number.parseInt(input)) VIDEO_FASTFORWARD_DURATION.set(input);
+      this.zero_key_menu_id = _GM_registerMenuCommand(title, () => {
+        const input = prompt(title, ZERO_KEY_SKIP_INTERVAL.get());
+        if (!isNaN(input) && Number.parseInt(input)) ZERO_KEY_SKIP_INTERVAL.set(input);
       });
     },
-    registerThisSiteAutoCommand() {
-      if (webSite.inMatches()) return;
-      const videos = Tools.querys("video").filter((video) => !isNaN(video));
-      if (videos.length > 1) return;
+    registWebSiteAutoCommand() {
+      if (WebSite.inMatches()) return;
       const isEnble = this.isEnbleThisWebSiteAuto();
       const title = isEnble ? "此站禁用自动网页全屏" : "此站启用自动网页全屏";
-      _GM_unregisterMenuCommand(this.enble_this_site_auto_command_id);
-      this.enble_this_site_auto_command_id = _GM_registerMenuCommand(title, () => {
+      _GM_unregisterMenuCommand(this.enble_this_site_auto_menu_id);
+      this.enble_this_site_auto_menu_id = _GM_registerMenuCommand(title, () => {
+        if (this.isMultipleVideo()) return Tools.notyf("多视频不能启用自动", true);
         ENABLE_THIS_SITE_AUTO.set(location.host, !isEnble);
       });
     },
-    registerDeletePickerCommand() {
-      _GM_unregisterMenuCommand(this.del_piker_command_id);
-      if (webSite.inMatches() || !CURRENT_EPISODE_CHAIN$1.get(location.host)) return;
-      this.del_piker_command_id = _GM_registerMenuCommand("删除此站的剧集选择器", () => {
-        CURRENT_EPISODE_CHAIN$1.delete(location.host);
-        ALL_EPISODE_CHAIN$2.delete(location.host);
+    registDeletePickerCommand() {
+      _GM_unregisterMenuCommand(this.del_piker_menu_id);
+      if (WebSite.inMatches() || !CURRENT_EPISODE_SELECTOR$1.get(location.host)) return;
+      this.del_piker_menu_id = _GM_registerMenuCommand("删除此站的剧集选择器", () => {
+        CURRENT_EPISODE_SELECTOR$1.del(location.host);
+        RELATIVE_EPISODE_SELECTOR$2.del(location.host);
       });
     },
-    registerMoreSettingMenuCommand() {
-      _GM_unregisterMenuCommand(this.more_setting_command_id);
-      this.more_setting_command_id = _GM_registerMenuCommand("更多设置", () => {
+    registMoreSettingCommand() {
+      _GM_unregisterMenuCommand(this.more_sett_menu_id);
+      this.more_sett_menu_id = _GM_registerMenuCommand("更多设置", () => {
         Swal.fire({
           width: 350,
           title: "更多设置",
@@ -865,23 +853,129 @@
           cancelButtonText: "关闭",
           showConfirmButton: false,
           customClass: { container: "monkey-web-fullscreen" },
-          html: `<div class="_menuitem_"><label>关闭自动网页全屏<input type="checkbox"/></label></div>
-      		<div class="_menuitem_"><label>关闭视频倍速调节<input type="checkbox"/></label></div>
-      		<div class="_menuitem_"><label>空格 ◀▶ 键控制<input type="checkbox"/></label></div>`,
+          html: `<div class="_menuitem"><label>空格 ◀▶ 键控制<input name="keyboard" type="checkbox"/></label></div>
+          <div class="_menuitem"><label>禁用自动网页全屏<input name="auto" type="checkbox"/></label></div>
+      		<div class="_menuitem"><label>禁用视频倍速调节<input name="rate" type="checkbox"/></label></div>
+          <div class="_menuitem"><label>禁用记忆播放进度<input name="time" type="checkbox"/></label></div>`,
           didOpen() {
-            const menuitem = [CLOSE_AUTO_WEB_FULL_SCREEN, CLOSE_PLAY_RATE, OVERRIDE_KEYBOARD];
-            Tools.querys("._menuitem_ input").forEach((ele, i) => {
-              ele.checked = menuitem[i].get(location.host);
-              if (i === 0 && !webSite.inMatches()) Tools.closest(ele, "._menuitem_")?.classList.add("hide");
-              ele.addEventListener("click", () => {
-                if (i === 1 && ele.checked) Tools.postMessage(window, { defaultPlaybackRate: true });
-                menuitem[i].set(ele.checked);
+            const item = [OVERRIDE_KEYBOARD, DISABLE_AUTO, CLOSE_PLAY_RATE, DISABLE_MEMORY_TIME$1];
+            Tools.querys("._menuitem input").forEach((ele, i) => {
+              ele.checked = item[i].get();
+              if (ele.name === "auto" && !WebSite.inMatches()) Tools.closest(ele, "._menuitem")?.classList.add("hide");
+              ele.addEventListener("click", function() {
+                if (this.name === "rate") Tools.postMessage(window, { defaultPlaybackRate: this.checked });
+                setTimeout(() => item[i].set(this.checked), 100);
                 Tools.notyf("修改成功！");
               });
             });
           }
         });
       });
+    }
+  };
+  const { EMPTY, ONE_SEC, SYMBOL, DEF_PLAY_RATE, MAX_PLAY_RATE } = Constants;
+  const { PLAY_RATE_STEP, CACHED_PLAY_RATE, VIDEO_SKIP_INTERVAL, PLAY_TIME, DISABLE_MEMORY_TIME } = Storage;
+  const strategy = {
+    [SYMBOL.DIVIDE]: (playRate) => playRate / 2,
+    [SYMBOL.MULTIPLY]: (playRate) => playRate * 2,
+    [SYMBOL.ADD]: (playRate) => playRate + PLAY_RATE_STEP.get(),
+    [SYMBOL.SUBTRACT]: (playRate) => playRate - PLAY_RATE_STEP.get()
+  };
+  const VideoControlHandler = {
+    checkUsable() {
+      if (!this.video) return false;
+      if (this.isVideoEnded()) return false;
+      if (WebSite.isLivePage()) return false;
+      if (this.isDisablePlaybackRate()) return false;
+      if (!Tools.validDuration(this.video)) return false;
+      return true;
+    },
+    isVideoEnded() {
+      return Math.floor(this.video.currentTime) === Math.floor(this.video.duration);
+    },
+    toFixed(playRate) {
+      playRate = Number.parseFloat(playRate);
+      return playRate.toFixed(2).replace(/\.?0+$/, "");
+    },
+    setPlaybackRate(playRate, show = true) {
+      if (!this.checkUsable()) return;
+      this.video.playbackRate = this.toFixed(playRate);
+      if (show) this.customToast("正在以", `${this.video.playbackRate}x`, "倍速播放");
+      CACHED_PLAY_RATE.set(this.video.playbackRate);
+    },
+    adjustPlaybackRate(_symbol) {
+      if (!this.checkUsable()) return;
+      let playRate = this.video.playbackRate;
+      playRate = strategy[_symbol](playRate);
+      playRate = Math.max(PLAY_RATE_STEP.get(), playRate);
+      playRate = Math.min(MAX_PLAY_RATE, playRate);
+      this.setPlaybackRate(playRate);
+    },
+    defaultPlaybackRate() {
+      if (this.isDisablePlaybackRate()) return;
+      this.setPlaybackRate(DEF_PLAY_RATE, false);
+      this.showToast("已恢复正常倍速播放");
+    },
+    useCachePlaybackRate(video) {
+      if (this.isDisablePlaybackRate()) return;
+      const playRate = CACHED_PLAY_RATE.get();
+      if (video.playbackRate === playRate) return;
+      this.setPlaybackRate(playRate, !video.hasToast);
+      video.hasToast = true;
+    },
+    tryplay: (video) => video.paused ? WebSite.isDouyu() ? Tools.triggerClick(video) : video.play() : null,
+    adjustVideoTime(second = VIDEO_SKIP_INTERVAL.get(), _symbol) {
+      if (!this.video || !Tools.validDuration(this.video)) return;
+      if (_symbol && ![SYMBOL.ADD, SYMBOL.SUBTRACT].includes(_symbol)) return;
+      if (Object.is(typeof second, typeof EMPTY) && !_symbol) {
+        _symbol = second;
+        second = VIDEO_SKIP_INTERVAL.get();
+      }
+      if (SYMBOL.SUBTRACT !== _symbol && this.video.isEnded) return;
+      second = Object.is(SYMBOL.SUBTRACT, _symbol) ? -second : second;
+      const currentTime = Math.min(this.video.currentTime + second, this.video.duration);
+      this.setCurrentTime(currentTime);
+    },
+    cachePlayTime(video) {
+      if (!this.topInfo || this.isLive() || this.isMultipleVideo()) return;
+      if (DISABLE_MEMORY_TIME.get() || this.isVideoEnded()) return this.delCachePlayTime();
+      if (video.currentTime > 1) PLAY_TIME.set(this.topInfo.hash, video.currentTime - 1, 7);
+    },
+    delCachePlayTime() {
+      PLAY_TIME.del(this.topInfo.hash);
+    },
+    useCachePlayTime(video) {
+      if (this.hasUsedPlayTime || !this.topInfo || this.isLive()) return;
+      const time = PLAY_TIME.get(this.topInfo.hash);
+      if (time <= video.currentTime) return this.hasUsedPlayTime = true;
+      this.setCurrentTime(time);
+      this.hasUsedPlayTime = true;
+      this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", ONE_SEC * 3, false);
+    },
+    setCurrentTime(currentTime) {
+      if (currentTime) this.video.currentTime = Math.max(0, currentTime);
+    },
+    customToast(startText, colorText, endText, duration, isRemoveOther) {
+      const span = document.createElement("span");
+      span.appendChild(document.createTextNode(startText));
+      const child = span.cloneNode(true);
+      child.textContent = colorText;
+      child.setAttribute("style", "margin:0 3px!important;color:#ff6101!important;");
+      span.appendChild(child);
+      span.appendChild(document.createTextNode(endText));
+      this.showToast(span, duration, isRemoveOther);
+    },
+    formatTime(seconds) {
+      if (isNaN(seconds)) return "00:00";
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor(seconds % 3600 / 60);
+      const s = Math.floor(seconds % 60);
+      return [...h ? [h] : [], m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
+    },
+    isMultipleVideo() {
+      const currVideoSrc = this.video.currentSrc;
+      const videos = Tools.querys("video").filter((video) => video.currentSrc !== currVideoSrc && !isNaN(video.duration));
+      return videos.length > 1;
     }
   };
   const WebSiteLoginHandler = {
@@ -904,40 +998,40 @@
       });
     },
     handleTencentLogin() {
-      if (!webSite.isTencent()) return;
+      if (!WebSite.isTencent()) return;
       const selector = ".main-login-wnd-module_close-button__mt9WU";
       this.loginObserver("#login_win", selector, selector);
     },
     handleIqyLogin() {
-      if (!webSite.isIqiyi()) return;
+      if (!WebSite.isIqiyi()) return;
       const selector = ".simple-buttons_close_btn__6N7HD";
       this.loginObserver("#qy_pca_login_root", selector, selector);
       Tools.createObserver(".cd-time", () => {
         const selector2 = ":is([id*='mask-layer'], #modal-vip-cashier-scope)";
-        Tools.querys(selector2).forEach((el) => el.remove());
+        Tools.querys(selector2).forEach((el) => el?.remove());
         Tools.query(".simple-buttons_close_btn__6N7HD")?.click();
         const adTime = Tools.query(".public-time");
         if (adTime.style.display === "none") return;
         if (this.video.currentTime !== this.video.duration) return;
-        Tools.querys("*:not(.public-vip)", adTime).forEach((el) => el.click());
+        Tools.querys("*:not(.public-vip)", adTime).forEach((el) => el?.click());
       });
     },
     handleBiliLogin() {
-      if (!webSite.isBili()) return;
+      if (!WebSite.isBili()) return;
       if (document.cookie.includes("DedeUserID")) return _unsafeWindow.player?.requestQuality(80);
       setTimeout(() => {
         _unsafeWindow.__BiliUser__.isLogin = true;
         _unsafeWindow.__BiliUser__.cache.data.isLogin = true;
         _unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
-      }, constants.ONE_SEC * 3);
+      }, Constants.ONE_SEC * 3);
     }
   };
   const WebFullScreenHandler = {
     webFullScreen(video) {
       const width = video?.offsetWidth;
       if (!width) return false;
-      if (this.isClosedAuto() || width >= window.innerWidth) return true;
-      if (!webSite.isBiliLive()) return Tools.triggerClick(this.element);
+      if (this.isDisableAuto() || width >= window.innerWidth) return true;
+      if (!WebSite.isBiliLive()) return Tools.triggerClick(this.element);
       return this.biliLiveWebFullScreen();
     },
     biliLiveWebFullScreen() {
@@ -949,6 +1043,10 @@
       return Tools.triggerClick(control[1]);
     },
     exitWebFullScreen() {
+      if (!WebSite.isBili() && !WebSite.isAcFun()) return;
+      const hasPod = Tools.query(".video-pod");
+      const isLast = Tools.query('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
+      if (hasPod && !isLast) return;
       if (window.innerWidth === this.video.offsetWidth) this.getElement()?.click();
       const cancelButton = Tools.query(".bpx-player-ending-related-item-cancel");
       if (cancelButton) setTimeout(() => cancelButton.click(), 100);
@@ -965,14 +1063,14 @@
       Tools.triggerMousemove(video);
       return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
     },
-    experimentWebFullScreen(video) {
-      if (webSite.inMatches() || video.isWebFullScreen || !this.topWinInfo || !this.isEnbleThisWebSiteAuto()) return;
-      if (video.offsetWidth === this.topWinInfo.innerWidth) return video.isWebFullScreen = true;
+    experWebFullScreen(video) {
+      if (WebSite.inMatches() || video.isWebFullScreen || !this.topInfo || !this.isEnbleThisWebSiteAuto()) return;
+      if (video.offsetWidth === this.topInfo.innerWidth) return video.isWebFullScreen = true;
       Tools.postMessage(window.top, { key: "P" });
       video.isWebFullScreen = true;
     }
   };
-  const { ALL_EPISODE_CHAIN: ALL_EPISODE_CHAIN$1 } = storage;
+  const { RELATIVE_EPISODE_SELECTOR: RELATIVE_EPISODE_SELECTOR$1 } = Storage;
   const SwitchEpisodeHandler = {
     switchPrevEpisode: function() {
       this.handleEpisodeChange(this.getPrevEpisode);
@@ -988,7 +1086,7 @@
       this.jumpToEpisodeNumber(targetEpisode);
     },
     getCurrentEpisode() {
-      const ele = ALL_EPISODE_CHAIN$1.get(location.host) ? this.getCurrentEpisodeForChain() : this.getCurrentEpisodeLinkElement();
+      const ele = RELATIVE_EPISODE_SELECTOR$1.get(location.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeLinkElement();
       return this.getEpisodeContainer(ele);
     },
     getCurrentEpisodeLinkElement() {
@@ -1082,42 +1180,40 @@
     getCurrentEpisodeFromAllLink() {
       const path = location.pathname;
       const lastPath = path.substring(path.lastIndexOf("/") + 1);
-      if (lastPath === constants.EMPTY) return null;
-      const currNumber = [...Tools.extractNumbers(lastPath)].join("");
-      for (const link of Tools.querys("a")) {
+      if (lastPath === Constants.EMPTY) return null;
+      const currNumber = Tools.extractNumbers(lastPath).join(Constants.EMPTY);
+      Tools.querys('a[href*="javascript"]').forEach((link) => {
         const attrs = link.attributes;
         for (const attr of attrs) {
-          const attrNumbers = [...Tools.extractNumbers(attr.value)].join("");
-          if (attrNumbers === currNumber) return link;
+          const attrNumber = Tools.extractNumbers(attr.value).join(Constants.EMPTY);
+          if (attrNumber === currNumber) return link;
         }
-      }
+      });
     }
   };
-  const { ALL_EPISODE_CHAIN, CURRENT_EPISODE_CHAIN } = storage;
+  const { RELATIVE_EPISODE_SELECTOR, CURRENT_EPISODE_SELECTOR } = Storage;
   const PickerEpisodeHandler = {
     setupPickerEpisodeListener() {
-      if (webSite.inMatches()) return;
+      if (WebSite.inMatches()) return;
       document.body.addEventListener(
         "click",
         (event) => {
           if (!event.ctrlKey || !event.altKey || !event.isTrusted) return;
           if (!Tools.isTopWin()) return Tools.notyf("此页面不能抓取 (•ิ_•ิ)?", true);
           Tools.preventDefault(event);
-          const hasPickerAllEpisode = ALL_EPISODE_CHAIN.get(location.host);
-          const hasPickerCurrEpisode = CURRENT_EPISODE_CHAIN.get(location.host);
-          if (hasPickerCurrEpisode && hasPickerAllEpisode) {
-            return Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
-          }
+          const hasCurrentSelector = CURRENT_EPISODE_SELECTOR.get(location.host);
+          const hasRelativeSelector = RELATIVE_EPISODE_SELECTOR.get(location.host);
+          if (hasCurrentSelector && hasRelativeSelector) return Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
           const target = event.target;
           const number = this.getEpisodeNumber(target);
           if (!number) return Tools.notyf("点击位置无数字 (•ิ_•ิ)?", true);
-          !hasPickerCurrEpisode ? this.setCurrentEpisodeChain(target) : this.setAllEpisodeChain(target);
+          !hasCurrentSelector ? this.pickerCurrentEpisodeChain(target) : this.pickerRelativeEpisodeChain(target);
         },
         true
       );
     },
-    setCurrentEpisodeChain(element) {
-      if (CURRENT_EPISODE_CHAIN.get(location.host)) return;
+    pickerCurrentEpisodeChain(element) {
+      if (CURRENT_EPISODE_SELECTOR.get(location.host)) return;
       this.pickerEpisodeDialog(element, {
         validBtnCallback(value) {
           try {
@@ -1129,13 +1225,13 @@
           }
         },
         confirmCallback(value) {
-          CURRENT_EPISODE_CHAIN.set(location.host, value);
+          CURRENT_EPISODE_SELECTOR.set(location.host, value);
           Tools.notyf("继续拾取元素 ＼(＞０＜)／");
         }
       });
     },
-    setAllEpisodeChain(element) {
-      if (ALL_EPISODE_CHAIN.get(location.host)) return;
+    pickerRelativeEpisodeChain(element) {
+      if (RELATIVE_EPISODE_SELECTOR.get(location.host)) return;
       this.pickerEpisodeDialog(element, {
         validBtnCallback(value) {
           try {
@@ -1151,28 +1247,28 @@
           }
         },
         confirmCallback(value) {
-          ALL_EPISODE_CHAIN.set(location.host, value);
+          RELATIVE_EPISODE_SELECTOR.set(location.host, value);
           Tools.notyf("操作完成 []~(￣▽￣)~* 干杯");
         }
       });
     },
-    getCurrentEpisodeForChain() {
-      const currChain = CURRENT_EPISODE_CHAIN.get(location.host);
-      if (!currChain) return;
-      const currEpisode = Tools.query(currChain);
+    getCurrentEpisodeBySelector() {
+      const currEpisodeSelector = CURRENT_EPISODE_SELECTOR.get(location.host);
+      if (!currEpisodeSelector) return;
+      const currEpisode = Tools.query(currEpisodeSelector);
       const currNumber = this.getEpisodeNumber(currEpisode);
-      const chain = ALL_EPISODE_CHAIN.get(location.host);
-      const container = this.getEpisodeContainer(Tools.query(chain));
+      const selector = RELATIVE_EPISODE_SELECTOR.get(location.host);
+      const container = this.getEpisodeContainer(Tools.query(selector));
       const episodes = this.getAllEpisodeElement(container);
       return episodes.includes(currEpisode) ? currEpisode : episodes.find((ele) => this.getEpisodeNumber(ele) === currNumber);
     },
     pickerEpisodeDialog(element, { validBtnCallback, confirmCallback }) {
       Swal.fire({
         html: `<h4>验证能正确获取到集数，再确定保存</h4>
-      <textarea id="picker-chain" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
-      <p>编辑选择器确保能正确获取到集数</p>`,
+      <textarea id="monkey-picker" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
+      <p>编辑元素选择器，确保能正确获取到集数</p>`,
         customClass: { container: "monkey-web-fullscreen" },
-        title: "抓取剧集元素选择器",
+        title: "拾取剧集元素选择器",
         confirmButtonText: "保存",
         denyButtonText: "验证",
         showCloseButton: true,
@@ -1180,25 +1276,18 @@
         reverseButtons: true,
         focusDeny: true,
         preDeny: () => {
-          const value = Tools.query("#picker-chain").value.trim();
+          const value = Tools.query("#monkey-picker").value.trim();
           if (!value) return Tools.notyf("元素选择器不能为空！", true);
           validBtnCallback.call(this, value);
           return false;
         },
         preConfirm: () => {
-          const value = Tools.query("#picker-chain").value.trim();
+          const value = Tools.query("#monkey-picker").value.trim();
           if (value) return value;
-          Tools.notyf("元素选择器不能为空！", true);
-          return false;
+          return Tools.notyf("元素选择器不能为空！", true);
         },
-        didOpen: () => {
-          const textarea = Tools.query("#picker-chain");
-          textarea.value = Tools.getParentChain(element);
-        }
-      }).then((result) => {
-        if (!result.isConfirmed) return;
-        confirmCallback.call(this, result.value);
-      });
+        didOpen: () => Tools.query("#monkey-picker").value = Tools.getParentChain(element)
+      }).then((result) => result.isConfirmed ? confirmCallback.call(this, result.value) : null);
     }
   };
   const ScriptsEnhanceHandler = {
@@ -1258,80 +1347,16 @@
       return Tools.findSiblingInParent(element, ['[class*="bar"]', '[class*="Control"]', '[class*="control"]']);
     }
   };
-  const { PLAY_RATE_STEP, CACHED_PLAY_RATE } = storage;
-  const { SYMBOL, DEF_PLAY_RATE, MAX_PLAY_RATE } = constants;
-  const strategy = {
-    [SYMBOL.MULTIPLY]: (playRate) => playRate * 2,
-    [SYMBOL.DIVIDE]: (playRate) => playRate / 2,
-    [SYMBOL.ADD]: (playRate) => playRate + PLAY_RATE_STEP.get(),
-    [SYMBOL.SUBTRACT]: (playRate) => playRate - PLAY_RATE_STEP.get()
-  };
-  const VideoPlaybackRateHandler = {
-    checkUsable() {
-      if (!this.video) return false;
-      if (webSite.isLivePage()) return false;
-      if (this.isClosedPlayRate()) return false;
-      if (!Tools.validDuration(this.video)) return false;
-      return true;
-    },
-    toFixed(playRate) {
-      playRate = Number.parseFloat(playRate);
-      return playRate.toFixed(2).replace(/\.?0+$/, "");
-    },
-    setPlaybackRate(playRate, show = true) {
-      if (!this.checkUsable()) return;
-      this.video.playbackRate = this.toFixed(playRate);
-      if (show) this.playbackRateToast();
-      this.cachePlaybackRate();
-    },
-    adjustPlaybackRate(_symbol) {
-      if (!this.checkUsable()) return;
-      let playRate = this.video.playbackRate;
-      playRate = strategy[_symbol](playRate);
-      playRate = Math.max(PLAY_RATE_STEP.get(), playRate);
-      playRate = Math.min(MAX_PLAY_RATE, playRate);
-      this.setPlaybackRate(playRate);
-    },
-    defaultPlaybackRate() {
-      if (!this.video) return;
-      this.video.playbackRate = DEF_PLAY_RATE;
-      if (this.isClosedPlayRate()) return;
-      this.cachePlaybackRate();
-      this.showToast("已恢复正常倍速播放");
-    },
-    currVideoUseCachePlayRate(video) {
-      if (this.isClosedPlayRate()) return;
-      if (!webSite.isIqiyi()) video.isToastShown = false;
-      const playRate = this.getCachePlaybackRate();
-      if (video.playbackRate === playRate) return;
-      this.setPlaybackRate(playRate, !video.isToastShown);
-      video.isToastShown = true;
-    },
-    cachePlaybackRate() {
-      CACHED_PLAY_RATE.set(this.video.playbackRate);
-    },
-    getCachePlaybackRate: () => Number.parseFloat(CACHED_PLAY_RATE.get() || DEF_PLAY_RATE),
-    playbackRateToast() {
-      const span = document.createElement("span");
-      span.appendChild(document.createTextNode("正在以"));
-      const child = span.cloneNode(true);
-      child.textContent = `${this.video.playbackRate}x`;
-      child.setAttribute("style", "margin:0 3px!important;color:#ff6101!important;");
-      span.appendChild(child);
-      span.appendChild(document.createTextNode("倍速播放"));
-      this.showToast(span);
-    }
-  };
   cssLoader("sweetalert2");
   const logicHandlers = [
     { handler: KeydownHandler },
     { handler: MenuCommandHandler },
+    { handler: VideoControlHandler },
     { handler: WebSiteLoginHandler },
     { handler: WebFullScreenHandler },
     { handler: SwitchEpisodeHandler },
     { handler: PickerEpisodeHandler },
-    { handler: ScriptsEnhanceHandler },
-    { handler: VideoPlaybackRateHandler }
+    { handler: ScriptsEnhanceHandler }
   ];
   logicHandlers.forEach(({ handler }) => {
     for (const key of Object.keys(handler)) {
@@ -1340,6 +1365,6 @@
     }
   });
   App.init();
-  _unsafeWindow.MONKEY_WEB_FULLSCREEN = App;
+  _unsafeWindow.MONKEY_WEB_FULLSCREEN = { App, Tools };
 
 })(notyf, sweetalert2);
