@@ -1,4 +1,5 @@
-.showToast {
+[part="monkey-show-toast"],
+::part(monkey-show-toast) {
   color: #fff !important;
   font-size: 13.5px !important;
   padding: 5px 15px !important;
@@ -57,7 +58,7 @@
     background-color: #dc3741 !important;
   }
 
-  #picker-chain {
+  #monkey-picker {
     width: 25em;
     height: auto;
     font-size: 14px;
@@ -67,10 +68,10 @@
   }
 
   .hide {
-    display: none;
+    display: none !important;
   }
 
-  ._menuitem_ {
+  ._menuitem {
     font-size: 20px;
     cursor: pointer;
     text-align: left;
@@ -86,6 +87,8 @@
     input {
       width: 20px !important;
       height: 20px !important;
+      appearance: auto !important;
+      -webkit-appearance: auto !important;
     }
   }
 }
@@ -102,3 +105,35 @@
     -webkit-box-orient: vertical;
   }
 }
+
+.player-overlay,
+.memory-play-wrap,
+.atom-notice-click,
+#player #loading-box,
+.xgplayer [id*="tips"],
+.dplayer-notice strong,
+.air-player-loading-box,
+.art-layer-autoPlayback,
+.art-layer-auto-playback {
+  display: none !important;
+}
+
+/* 现代浏览器（支持 :has()）使用原生选择器 */
+@supports (selector(:has(div))) {
+  #loading:not(:has([class*="player"])) {
+    display: none !important;
+  }
+}
+
+/* 旧版浏览器使用替代选择器 需配合JS */
+@supports not (selector(:has(div))) {
+  #loading.not-player {
+    display: none !important;
+  }
+}
+
+// .xgplayerr [id*="tips"]  https://www.libvio.fun、https://www.nmdvd.cc、https://www.vv3nwjk.com/
+// .memory-play-wrap        https://www.xgdy.xyz、https://vidhub.tv、https://www.mervod.com
+// #player #loading-box     https://vidhub.tv
+// art-layer-autoPlayback   https://www.renren.pro
+// .dplayer-notice strong   https://www.ffys.fun

@@ -101,7 +101,7 @@ export default {
   },
   findSiblingInParent(element, selector, maxLevel = 3) {
     let currLevel = 0;
-    let currParent = element.parentElement;
+    let currParent = element?.parentElement;
     while (currParent && currLevel < maxLevel) {
       const sibs = currParent.children;
       for (let sib of sibs) {
@@ -144,5 +144,13 @@ export default {
       }
     }
     return tagInfo;
+  },
+  simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = (hash << 5) + hash + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return hash >>> 0;
   },
 };

@@ -15,7 +15,7 @@ export default {
   isTencent: () => QQ_VID_REG.test(location.href),
   isIqiyi: () => IQIYI_VID_REG.test(location.href),
   isAcFun: () => ACFUN_VID_REG.test(location.href),
-  isLivePage: () => location.href.includes("live"),
   isBiliLive: () => location.host === "live.bilibili.com",
+  isLivePage: () => !location.host.endsWith(".live") && /\blive\b/.test(location.href),
   inMatches: () => matches.some((matche) => matche.test(location.href.replace(location.search, EMPTY))),
 };

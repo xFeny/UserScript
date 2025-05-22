@@ -1,12 +1,11 @@
-import douyu from "./DouyuHandler";
 import Tools from "../common/Tools";
 import webSite from "../common/WebSite";
 import storage from "../common/Storage";
 import constants from "../common/Constants";
 import eventCode from "../common/EventCode";
 import selectorConfig from "../common/SelectorConfig";
-const { VIDEO_TIME_STEP, VIDEO_FASTFORWARD_DURATION } = storage;
-const { EMPTY, SYMBOL, MSG_SOURCE } = constants;
+const { ZERO_KEY_SKIP_INTERVAL } = storage;
+const { SYMBOL, MSG_SOURCE } = constants;
 
 /**
  * 快捷键逻辑处理
@@ -16,7 +15,7 @@ export default {
     // Tools.log(event);
     const overrideKey = [eventCode.Space, eventCode.ArrowLeft, eventCode.ArrowRight]; // 空格 ◀▶ 键
     const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(event.code);
-    const isNumberKey = Tools.isNumber(event.key) && !this.isClosedPlayRate();
+    const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
     if (!isNumberKey && !isOverrideKey) return;
     Tools.preventDefault(event);
   },
@@ -29,16 +28,17 @@ export default {
       if (!data?.source || !data.source.includes(MSG_SOURCE)) return;
       if (data?.videoInfo) return this.setParentVideoInfo(data.videoInfo);
       if (data?.defaultPlaybackRate) this.defaultPlaybackRate();
-      if (data?.topWinInfo) this.topWinInfo = data.topWinInfo;
+      if (data?.topInfo) this.topInfo = data.topInfo;
       this.processEvent(data);
     });
   },
   keydownHandler(event) {
     // Tools.log("键盘事件：", event);
     if (this.normalWebsite()) return;
+    const { code, shiftKey } = event;
     let key = event.key.toUpperCase();
-    const { code, target, shiftKey } = event;
-    if (["INPUT", "TEXTAREA", "DEMAND-SEARCH-BOX"].includes(target.tagName)) return;
+    const target = event.composedPath().shift();
+    if (["INPUT", "TEXTAREA"].includes(target.tagName) || target?.isContentEditable) return;
     if (!Object.keys(eventCode).includes(code) && !Tools.isNumber(key)) return;
     this.preventDefault(event);
     if (eventCode.Space === code) key = eventCode.Space.toUpperCase();
@@ -73,14 +73,14 @@ export default {
       N: () => (webSite.inMatches() ? this.triggerIconElement("next") : this.switchNextEpisode()),
       ARROWLEFT: () => (this.isOverrideKeyboard() ? this.adjustVideoTime(SYMBOL.SUBTRACT) : null),
       ARROWRIGHT: () => (this.isOverrideKeyboard() ? this.adjustVideoTime() : null),
-      0: () => this.adjustVideoTime(VIDEO_FASTFORWARD_DURATION.get()),
+      0: () => this.adjustVideoTime(ZERO_KEY_SKIP_INTERVAL.get()),
       P: () => {
         if (!webSite.inMatches()) return this.enhance();
         webSite.isBiliLive() ? this.biliLiveWebFullScreen() : this.triggerIconElement("webfull");
       },
       SPACE: () => {
         if (!this.video || !this.isOverrideKeyboard()) return;
-        if (webSite.isDouyu()) return this.video.paused ? douyu.play() : douyu.pause();
+        if (webSite.isDouyu()) return Tools.triggerClick(this.video);
         this.video.paused ? this.video.play() : this.video.pause();
       },
       F: () => this.triggerIconElement("full", 0),
@@ -91,16 +91,5 @@ export default {
     if (!webSite.inMatches()) return;
     if (webSite.isBiliLive()) return this.getBiliLiveIcons()?.[index]?.click();
     Tools.query(selectorConfig[location.host]?.[name])?.click();
-  },
-  adjustVideoTime(second = VIDEO_TIME_STEP.get(), _symbol) {
-    if (!this.video || !Tools.validDuration(this.video)) return;
-    if (_symbol && ![SYMBOL.ADD, SYMBOL.SUBTRACT].includes(_symbol)) return;
-    if (Object.is(typeof second, typeof EMPTY) && !_symbol) {
-      _symbol = second;
-      second = VIDEO_TIME_STEP.get();
-    }
-    second = Object.is(SYMBOL.SUBTRACT, _symbol) ? -second : second;
-    const currentTime = this.video.currentTime + second;
-    this.video.currentTime = Math.max(0, currentTime);
   },
 };

@@ -1,7 +1,7 @@
 import Tools from "../common/Tools";
 import Storage from "../common/Storage";
 import Constants from "../common/Constants";
-const { ALL_EPISODE_CHAIN } = Storage;
+const { RELATIVE_EPISODE_SELECTOR } = Storage;
 
 /**
  * 通用性切换视频下集
@@ -23,8 +23,8 @@ export default {
     this.jumpToEpisodeNumber(targetEpisode);
   },
   getCurrentEpisode() {
-    const ele = ALL_EPISODE_CHAIN.get(location.host)
-      ? this.getCurrentEpisodeForChain()
+    const ele = RELATIVE_EPISODE_SELECTOR.get(location.host)
+      ? this.getCurrentEpisodeBySelector()
       : this.getCurrentEpisodeLinkElement();
     // console.log("当前集数所在的<a>标签：", ele);
     return this.getEpisodeContainer(ele);
@@ -141,13 +141,13 @@ export default {
     const path = location.pathname;
     const lastPath = path.substring(path.lastIndexOf("/") + 1);
     if (lastPath === Constants.EMPTY) return null;
-    const currNumber = [...Tools.extractNumbers(lastPath)].join("");
-    for (const link of Tools.querys("a")) {
+    const currNumber = Tools.extractNumbers(lastPath).join(Constants.EMPTY);
+    Tools.querys('a[href*="javascript"]').forEach((link) => {
       const attrs = link.attributes;
       for (const attr of attrs) {
-        const attrNumbers = [...Tools.extractNumbers(attr.value)].join("");
-        if (attrNumbers === currNumber) return link;
+        const attrNumber = Tools.extractNumbers(attr.value).join(Constants.EMPTY);
+        if (attrNumber === currNumber) return link;
       }
-    }
+    });
   },
 };

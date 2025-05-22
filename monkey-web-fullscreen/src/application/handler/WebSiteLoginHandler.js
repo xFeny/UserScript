@@ -1,6 +1,6 @@
-import Constants from "../common/Constants";
 import Tools from "../common/Tools";
 import webSite from "../common/WebSite";
+import Constants from "../common/Constants";
 /**
  * 未登录状态下，自动关闭网站的登录弹窗
  */
@@ -37,12 +37,12 @@ export default {
     // 自动点击跳过广告
     Tools.createObserver(".cd-time", () => {
       const selector = ":is([id*='mask-layer'], #modal-vip-cashier-scope)";
-      Tools.querys(selector).forEach((el) => el.remove());
+      Tools.querys(selector).forEach((el) => el?.remove());
       Tools.query(".simple-buttons_close_btn__6N7HD")?.click();
       const adTime = Tools.query(".public-time");
       if (adTime.style.display === "none") return;
       if (this.video.currentTime !== this.video.duration) return;
-      Tools.querys("*:not(.public-vip)", adTime).forEach((el) => el.click());
+      Tools.querys("*:not(.public-vip)", adTime).forEach((el) => el?.click());
     });
   },
   handleBiliLogin() {

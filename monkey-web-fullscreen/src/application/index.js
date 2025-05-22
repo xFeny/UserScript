@@ -3,7 +3,6 @@ import webSite from "./common/WebSite";
 import constants from "./common/Constants";
 import selectorConfig from "./common/SelectorConfig";
 import VideoListenerHandler from "./handler/VideoListenerHandler";
-import douyu from "./handler/DouyuHandler";
 const { EMPTY, ONE_SEC, SHOW_TOAST_TIME, SHOW_TOAST_POSITION } = constants;
 
 export default {
@@ -51,16 +50,26 @@ export default {
   },
   setupMutationObserver() {
     const observer = Tools.createObserver(document.body, () => {
+      this.triggerVideoStart();
       const video = this.getVideo();
       this.element = this.getElement();
       if (video?.play && !!video.offsetWidth) this.setupVideoListener();
-      if (!webSite.inMatches() && this.topWinInfo) return observer.disconnect();
+      if (!webSite.inMatches() && this.topInfo) return observer.disconnect();
       if (!video?.play || !this.element || !this.webFullScreen(video)) return;
       observer.disconnect();
       this.biliLiveExtras();
       this.webSiteLoginObserver();
     });
     setTimeout(() => observer.disconnect(), ONE_SEC * 10);
+  },
+  triggerVideoStart() {
+    // https://www.freeok.la、https://www.jiaozi.me
+    const element = Tools.query(
+      ".ec-no, .conplaying, #start, [class*='poster'], .choice-true, .close-btn, .closeclick"
+    );
+    if (!element || this.isTriggerVideoStart) return;
+    setTimeout(() => element?.click() & element?.remove(), 100);
+    this.isTriggerVideoStart = true;
   },
   video: null,
   videoBoundListeners: [],
@@ -99,7 +108,8 @@ export default {
     }
   },
   setVideoInfo(video) {
-    const videoInfo = { ...Tools.getElementCenterPoint(video), isLive: video.duration === Infinity };
+    const isLive = Object.is(video.duration, Infinity);
+    const videoInfo = { ...Tools.getElementCenterPoint(video), isLive };
     this.setParentVideoInfo(videoInfo);
   },
   setParentVideoInfo(videoInfo) {
@@ -108,24 +118,25 @@ export default {
     if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo });
     this.setupPickerEpisodeListener();
     this.setupScriptMenuCommand();
-    this.sendTopWinInfo();
+    this.sendTopInfo();
   },
   changeVideoInfo(video) {
     if (!this.videoInfo) return;
-    const isLive = video.duration === Infinity;
+    const isLive = Object.is(video.duration, Infinity);
     if (this.videoInfo.isLive === isLive) return;
     this.videoInfo.isLive = isLive;
     this.setParentVideoInfo(this.videoInfo);
   },
-  sendTopWinInfo() {
+  sendTopInfo() {
     // 向iframe传递顶级窗口信息
-    const topWinInfo = (this.topWinInfo = { innerWidth, host: location.host });
-    Tools.postMsgToFrames({ topWinInfo });
+    const { host, href } = location;
+    const topInfo = (this.topInfo = { innerWidth, host, href, hash: Tools.simpleHash(href) });
+    Tools.postMsgToFrames({ topInfo });
   },
   setupMouseMoveListener() {
-    if (this.isSetupMouseMoveListener) return;
+    if (this.isMoveListener) return;
     const delay = ONE_SEC * 2;
-    this.isSetupMouseMoveListener = true;
+    this.isMoveListener = true;
     let timer = setTimeout(() => this.showOrHideCursor(), delay);
     document.addEventListener("mousemove", (event) => {
       if (!event.isTrusted) return;
@@ -133,31 +144,30 @@ export default {
       const target = event.target;
       this.showOrHideCursor(false);
       timer = setTimeout(() => this.showOrHideCursor(), delay);
-      if (this.video === target || !(target instanceof HTMLVideoElement)) return;
+      if (this.video === target || !(target instanceof HTMLVideoElement) || target.offsetWidth > innerWidth) return;
       this.addVideoEvtListener(target);
     });
   },
   showOrHideCursor(isHide = true) {
     if (!this.videoInfo) return;
     const videoWrap = this.getVideoLocation();
-    const elements = Array.from([...videoWrap.children, videoWrap, videoWrap.parentElement]);
+    const elements = Array.from([...(videoWrap?.children || []), videoWrap, videoWrap?.parentElement]);
     elements.forEach((ele) => {
       if (isHide) ele?.dispatchEvent(new MouseEvent("mouseleave"));
-      isHide ? (ele.style.cursor = "none") : (ele.style.cursor = EMPTY);
+      isHide ? ele?.style.setProperty("cursor", "none") : ele?.style.setProperty("cursor", EMPTY);
     });
   },
-  showToast(content, duration = SHOW_TOAST_TIME) {
+  showToast(content, duration = SHOW_TOAST_TIME, isRemoveOther = true) {
     const el = document.createElement("div");
-    if (content instanceof HTMLElement) el.appendChild(content);
-    if (Object.is(typeof content, typeof EMPTY)) el.textContent = content;
-    el.setAttribute("class", "showToast");
+    el.setAttribute("part", "monkey-show-toast");
     el.setAttribute("style", SHOW_TOAST_POSITION);
-    const videoParent = this.video?.parentElement;
+    if (isRemoveOther) Tools.query('[part="monkey-show-toast"]')?.remove();
+    content instanceof HTMLElement ? el.appendChild(content) : (el.innerHTML = content);
+
     const videoContainer = this.getVideoContainer();
-    const target = this.video === videoContainer ? videoParent : videoContainer;
-    if (webSite.isDouyu()) douyu.addStyle(target);
-    Tools.query(".showToast", target)?.remove();
+    const target = Object.is(this.video, videoContainer) ? this.video?.parentElement : videoContainer;
     target?.appendChild(el);
+
     setTimeout(() => {
       el.style.opacity = 0;
       setTimeout(() => el.remove(), ONE_SEC / 3);
