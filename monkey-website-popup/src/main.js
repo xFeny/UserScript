@@ -56,7 +56,8 @@ const App = {
 
     // 遮罩元素
     const mask = this.getMaskElement(element);
-    if (!mask || mask instanceof HTMLIFrameElement || mask instanceof HTMLVideoElement) return;
+    const hasClass = mask?.className.toLowerCase().includes("webfullscreen");
+    if (!mask || hasClass || mask.matches("video, iframe")) return;
     if (!mask?.hasChildNodes()) return mask?.remove();
 
     // 居中元素在遮罩元素的内部

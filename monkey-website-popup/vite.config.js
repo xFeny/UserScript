@@ -42,11 +42,10 @@ const match = [
   "*://www.jzacg.com/*",
   "*://www.mcydh.com/*",
   "*://www.agedm.org/*",
-  "*://www.hhkan*.com/",
   "*://*.*fantuan*.*/*",
   "*://www.xxjio.com/*",
   "*://www.damiys.cc/*",
-  "*://www.hhkan*.com/",
+  "*://www.hhkan*.com/*",
   "*://www.czzy77.com/*",
   "*://www.aiwaiju.cc/*",
   "*://www.agefans.la/*",
@@ -57,6 +56,7 @@ const match = [
   "*://www.fsdm02.com/*",
   "*://www.mgnacg.com/*",
   "*://www.acfuns.net/*",
+  "*://www.acgpty.com/*",
   "*://dick.xfani.com/*",
   "*://www.clicli.pro/*",
   "*://www.voflix.fun/*",
@@ -81,7 +81,7 @@ const match = [
   "*://anich.emmmm.eu.org/*",
   "*://www.klyingshi*.com/*",
   "*://xn--44qz85a01qpc.com/*",
-  "*://anime.girigirilove.com/*",
+  "*://anime.girigirilove.*/*",
 ];
 
 // https://vitejs.dev/config/
