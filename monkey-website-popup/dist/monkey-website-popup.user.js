@@ -46,11 +46,10 @@
 // @match        *://www.jzacg.com/*
 // @match        *://www.mcydh.com/*
 // @match        *://www.agedm.org/*
-// @match        *://www.hhkan*.com/
 // @match        *://*.*fantuan*.*/*
 // @match        *://www.xxjio.com/*
 // @match        *://www.damiys.cc/*
-// @match        *://www.hhkan*.com/
+// @match        *://www.hhkan*.com/*
 // @match        *://www.czzy77.com/*
 // @match        *://www.aiwaiju.cc/*
 // @match        *://www.agefans.la/*
@@ -61,6 +60,7 @@
 // @match        *://www.fsdm02.com/*
 // @match        *://www.mgnacg.com/*
 // @match        *://www.acfuns.net/*
+// @match        *://www.acgpty.com/*
 // @match        *://dick.xfani.com/*
 // @match        *://www.clicli.pro/*
 // @match        *://www.voflix.fun/*
@@ -85,7 +85,7 @@
 // @match        *://anich.emmmm.eu.org/*
 // @match        *://www.klyingshi*.com/*
 // @match        *://xn--44qz85a01qpc.com/*
-// @match        *://anime.girigirilove.com/*
+// @match        *://anime.girigirilove.*/*
 // @require      https://unpkg.com/js-cookie@3.0.5/dist/js.cookie.min.js
 // @grant        GM_addStyle
 // @run-at       document-body
@@ -125,7 +125,8 @@
         element?.remove();
       }
       const mask = this.getMaskElement(element);
-      if (!mask || mask instanceof HTMLIFrameElement || mask instanceof HTMLVideoElement) return;
+      const hasClass = mask?.className.toLowerCase().includes("webfullscreen");
+      if (!mask || hasClass || mask.matches("video, iframe")) return;
       if (!mask?.hasChildNodes()) return mask?.remove();
       const centerEles = [];
       for (const ele of mask.children) {
