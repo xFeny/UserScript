@@ -479,7 +479,7 @@
       const delay = ONE_SEC$1 * 2;
       let timer = setTimeout(() => this.showOrHideCursor(), delay);
       document.addEventListener("mousemove", ({ target, isTrusted }) => {
-        if (!isTrusted || this.normalSite()) return;
+        if (!isTrusted) return;
         clearTimeout(timer);
         this.showOrHideCursor(false);
         timer = setTimeout(() => this.showOrHideCursor(), delay);
