@@ -2,18 +2,20 @@ import webSite from "../common/WebSite";
 import storage from "../common/Storage";
 import Tools from "../common/Tools";
 import Swal from "sweetalert2";
+import Constants from "../common/Constants";
 
 const {
   DISABLE_AUTO,
   PLAY_RATE_STEP,
   CLOSE_PLAY_RATE,
+  USE_ALTERNATIVE,
   OVERRIDE_KEYBOARD,
   VIDEO_SKIP_INTERVAL,
   DISABLE_MEMORY_TIME,
-  ENABLE_THIS_SITE_AUTO,
   ZERO_KEY_SKIP_INTERVAL,
-  CURRENT_EPISODE_SELECTOR,
-  RELATIVE_EPISODE_SELECTOR,
+  ENABLE_THIS_SITE_AUTO: EN_THIS,
+  CURRENT_EPISODE_SELECTOR: EP_SELECTOR,
+  RELATIVE_EPISODE_SELECTOR: RE_SELECTOR,
 } = storage;
 
 /**
@@ -21,110 +23,76 @@ const {
  */
 export default {
   isDisableAuto: () => DISABLE_AUTO.get(),
-  isDisablePlaybackRate: () => CLOSE_PLAY_RATE.get(),
+  isUseAlternative: () => USE_ALTERNATIVE.get(),
   isOverrideKeyboard: () => OVERRIDE_KEYBOARD.get(),
-  isEnbleThisWebSiteAuto() {
-    const host = Tools.isTopWin() ? location.host : this.topInfo.host;
-    return ENABLE_THIS_SITE_AUTO.get(host);
-  },
+  isDisablePlaybackRate: () => CLOSE_PLAY_RATE.get(),
+  isEnbleThisWebSiteAuto: () => EN_THIS.get(Tools.isTopWin() ? location.host : topInfo.host),
   setupScriptMenuCommand() {
-    if (!Tools.isTopWin() || this.hasMenu) return;
+    if (!Tools.isTopWin() || Tools.isTooFrequent("menu")) return;
     this.setupMenuChangeListener();
     this.registMenuCommand();
-    this.hasMenu = true;
-  },
-  registMenuCommand() {
-    this.registPlayRateCommand();
-    this.registSkipTimeCommand();
-    this.registZeroKeySkipCommand();
-    this.registWebSiteAutoCommand();
-    this.registDeletePickerCommand();
-    this.registMoreSettingCommand();
   },
   setupMenuChangeListener() {
-    if (this.hasCommandListener) return;
-    [
-      CLOSE_PLAY_RATE.name,
-      OVERRIDE_KEYBOARD.name,
-      ENABLE_THIS_SITE_AUTO.name + location.host,
-      CURRENT_EPISODE_SELECTOR.name + location.host,
-    ].forEach((key) => GM_addValueChangeListener(key, () => this.registMenuCommand()));
-    this.hasCommandListener = true; // 防止多次注册
+    const host = location.host;
+    [CLOSE_PLAY_RATE.name, OVERRIDE_KEYBOARD.name, EN_THIS.name + host, EP_SELECTOR.name + host].forEach((key) =>
+      GM_addValueChangeListener(key, () => this.registMenuCommand())
+    );
   },
-  registPlayRateCommand() {
-    const title = "设置倍速步进";
-    GM_unregisterMenuCommand(this.play_rate_menu_id);
-    if (this.isLive() || this.isDisablePlaybackRate()) return;
-    this.play_rate_menu_id = GM_registerMenuCommand(title, () => {
-      const input = prompt(title, PLAY_RATE_STEP.get());
-      if (!isNaN(input) && Number.parseFloat(input)) PLAY_RATE_STEP.set(input);
-    });
-  },
-  registSkipTimeCommand() {
-    GM_unregisterMenuCommand(this.skip_time_menu_id);
-    if (this.isLive() || !this.isOverrideKeyboard()) return;
-    const title = "设置快进/退秒数";
-    this.skip_time_menu_id = GM_registerMenuCommand(title, () => {
-      const input = prompt(title, VIDEO_SKIP_INTERVAL.get());
-      if (!isNaN(input) && Number.parseInt(input)) VIDEO_SKIP_INTERVAL.set(input);
-    });
-  },
-  registZeroKeySkipCommand() {
-    GM_unregisterMenuCommand(this.zero_key_menu_id);
-    if (this.isLive()) return;
-    const title = "设置零键快进秒数";
-    this.zero_key_menu_id = GM_registerMenuCommand(title, () => {
-      const input = prompt(title, ZERO_KEY_SKIP_INTERVAL.get());
-      if (!isNaN(input) && Number.parseInt(input)) ZERO_KEY_SKIP_INTERVAL.set(input);
-    });
-  },
-  registWebSiteAutoCommand() {
-    if (webSite.inMatches()) return;
+  registMenuCommand() {
+    const host = location.host;
     const isEnble = this.isEnbleThisWebSiteAuto();
-    const title = isEnble ? "此站禁用自动网页全屏" : "此站启用自动网页全屏";
-    GM_unregisterMenuCommand(this.enble_this_site_auto_menu_id);
-    this.enble_this_site_auto_menu_id = GM_registerMenuCommand(title, () => {
-      if (this.isMultipleVideo()) return Tools.notyf("多视频不能启用自动", true);
-      ENABLE_THIS_SITE_AUTO.set(location.host, !isEnble);
-    });
-  },
-  registDeletePickerCommand() {
-    GM_unregisterMenuCommand(this.del_piker_menu_id);
-    if (webSite.inMatches() || !CURRENT_EPISODE_SELECTOR.get(location.host)) return;
-    this.del_piker_menu_id = GM_registerMenuCommand("删除此站的剧集选择器", () => {
-      CURRENT_EPISODE_SELECTOR.del(location.host);
-      RELATIVE_EPISODE_SELECTOR.del(location.host);
-    });
-  },
-  registMoreSettingCommand() {
-    GM_unregisterMenuCommand(this.more_sett_menu_id);
-    this.more_sett_menu_id = GM_registerMenuCommand("更多设置", () => {
-      Swal.fire({
-        width: 350,
-        title: "更多设置",
-        backdrop: false,
-        showCancelButton: true,
-        cancelButtonText: "关闭",
-        showConfirmButton: false,
-        customClass: { container: "monkey-web-fullscreen" },
-        html: `<div class="_menuitem"><label>空格 ◀▶ 键控制<input name="keyboard" type="checkbox"/></label></div>
-          <div class="_menuitem"><label>禁用自动网页全屏<input name="auto" type="checkbox"/></label></div>
-      		<div class="_menuitem"><label>禁用视频倍速调节<input name="rate" type="checkbox"/></label></div>
-          <div class="_menuitem"><label>禁用记忆播放进度<input name="time" type="checkbox"/></label></div>`,
-        didOpen() {
-          const item = [OVERRIDE_KEYBOARD, DISABLE_AUTO, CLOSE_PLAY_RATE, DISABLE_MEMORY_TIME];
-          Tools.querys("._menuitem input").forEach((ele, i) => {
-            ele.checked = item[i].get();
-            if (ele.name === "auto" && !webSite.inMatches()) Tools.closest(ele, "._menuitem")?.classList.add("hide");
-            // checkbox点击监听
-            ele.addEventListener("click", function () {
-              if (this.name === "rate") Tools.postMessage(window, { defaultPlaybackRate: this.checked });
-              setTimeout(() => item[i].set(this.checked), 100);
-              Tools.notyf("修改成功！");
-            });
-          });
-        },
+    const siteFun = () => EN_THIS.set(host, !isEnble);
+    const delPicker = () => EP_SELECTOR.del(host) & RE_SELECTOR.del(host);
+    [
+      { title: "设置零键秒数", cache: ZERO_KEY_SKIP_INTERVAL, isDisable: this.isLive() },
+      { title: "设置倍速步长", cache: PLAY_RATE_STEP, isDisable: this.isLive() || this.isDisablePlaybackRate() },
+      { title: "设置快进/退秒数", cache: VIDEO_SKIP_INTERVAL, isDisable: this.isLive() || !this.isOverrideKeyboard() },
+      { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: EN_THIS, isDisable: webSite.inMatches(), fn: siteFun },
+      { title: "删除此站的剧集选择器", cache: EP_SELECTOR, isDisable: !EP_SELECTOR.get(host), fn: delPicker },
+      { title: "更多设置", cache: OVERRIDE_KEYBOARD, isDisable: false, fn: () => this.moreSettPopup() },
+    ].forEach(({ title, cache, isDisable, fn }) => {
+      const id = `${cache.name}_MENU_ID`;
+      GM_unregisterMenuCommand(this[id]);
+      if (isDisable) return;
+
+      this[id] = GM_registerMenuCommand(title, () => {
+        if (fn) return fn.call(this);
+        // 设置倍速步长、设置快进/退秒数、设置零键秒数
+        const input = prompt(title, cache.get());
+        if (!isNaN(input) && cache.parser(input)) cache.set(input);
       });
+    });
+  },
+  moreSettPopup() {
+    const configs = [
+      { name: "key", label: "空格 ◀▶ 键 控制", cache: OVERRIDE_KEYBOARD },
+      { name: "auto", label: "禁用自动网页全屏", cache: DISABLE_AUTO, hide: !webSite.inMatches() },
+      { name: "rate", label: "禁用视频倍速调节", cache: CLOSE_PLAY_RATE, hide: this.isLive() },
+      { name: "time", label: "禁用播放进度记录", cache: DISABLE_MEMORY_TIME, hide: this.isLive() },
+      { name: "self", label: "使用自带网页全屏增强", cache: USE_ALTERNATIVE, hide: webSite.inMatches() },
+    ];
+    const html = configs.map(
+      ({ name, label, hide }) => `<label class="_menu_ ${hide && "hide"}">${label}<input name="${name}" type="checkbox"/></label>`
+    );
+    Swal.fire({
+      width: 350,
+      backdrop: false,
+      title: "更多设置",
+      showCancelButton: true,
+      cancelButtonText: "关闭",
+      showConfirmButton: false,
+      html: html.join(Constants.EMPTY),
+      customClass: { container: "monkey-web-fullscreen" },
+      didOpen() {
+        Tools.querys("._menu_ input").forEach((ele, i) => {
+          ele.checked = configs[i].cache.get();
+          // checkbox点击监听
+          ele.addEventListener("click", function () {
+            this.name === "rate" && Tools.postMessage(window, { defaultPlaybackRate: this.checked });
+            setTimeout(() => configs[i].cache.set(this.checked), 100), Tools.notyf("修改成功！");
+          });
+        });
+      },
     });
   },
 };

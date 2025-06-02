@@ -3,19 +3,23 @@ import webSite from "../common/WebSite";
 import storage from "../common/Storage";
 import constants from "../common/Constants";
 
-const { EMPTY, ONE_SEC, SYMBOL, DEF_PLAY_RATE, MAX_PLAY_RATE } = constants;
+const { ONE_SEC, DEF_PLAY_RATE, MAX_PLAY_RATE } = constants;
 const { PLAY_RATE_STEP, CACHED_PLAY_RATE, VIDEO_SKIP_INTERVAL, PLAY_TIME, DISABLE_MEMORY_TIME } = storage;
 
-const strategy = {
-  [SYMBOL.DIVIDE]: (playRate) => playRate / 2,
-  [SYMBOL.MULTIPLY]: (playRate) => playRate * 2,
-  [SYMBOL.ADD]: (playRate) => playRate + PLAY_RATE_STEP.get(),
-  [SYMBOL.SUBTRACT]: (playRate) => playRate - PLAY_RATE_STEP.get(),
-};
 /**
  * 视频控制相关逻辑处理
  */
 export default {
+  isVideoEnded() {
+    return Math.floor(this.video.currentTime) === Math.floor(this.video.duration);
+  },
+  initVideoProperties(video) {
+    video.volume = 1;
+    video.hasToast = false;
+    video.isWebFullScreen = false;
+  },
+  playOrPause: (video) => (webSite.isDouyu() ? Tools.triggerClick(video) : video.paused ? video.play() : video.pause()),
+  tryplay: (video) => video?.paused && (webSite.isDouyu() ? Tools.triggerClick(video) : video?.play()),
   checkUsable() {
     //是否可以设置倍速
     if (!this.video) return false;
@@ -25,26 +29,16 @@ export default {
     if (!Tools.validDuration(this.video)) return false;
     return true;
   },
-  isVideoEnded() {
-    return Math.floor(this.video.currentTime) === Math.floor(this.video.duration);
-  },
-  toFixed(playRate) {
-    playRate = Number.parseFloat(playRate);
-    return playRate.toFixed(2).replace(/\.?0+$/, "");
-  },
   setPlaybackRate(playRate, show = true) {
     if (!this.checkUsable()) return;
-    this.video.playbackRate = this.toFixed(playRate);
+    this.video.playbackRate = (+playRate).toFixed(2).replace(/\.?0+$/, "");
     if (show) this.customToast("正在以", `${this.video.playbackRate}x`, "倍速播放");
     CACHED_PLAY_RATE.set(this.video.playbackRate);
   },
-  adjustPlaybackRate(_symbol) {
+  adjustPlaybackRate(step = PLAY_RATE_STEP.get()) {
     if (!this.checkUsable()) return;
-    let playRate = this.video.playbackRate;
-    playRate = strategy[_symbol](playRate);
-    playRate = Math.max(PLAY_RATE_STEP.get(), playRate);
-    playRate = Math.min(MAX_PLAY_RATE, playRate);
-    this.setPlaybackRate(playRate);
+    const playRate = Math.max(PLAY_RATE_STEP.get(), this.video.playbackRate + step);
+    this.setPlaybackRate(Math.min(MAX_PLAY_RATE, playRate));
   },
   defaultPlaybackRate() {
     if (this.isDisablePlaybackRate()) return;
@@ -59,39 +53,39 @@ export default {
     this.setPlaybackRate(playRate, !video.hasToast);
     video.hasToast = true;
   },
-  tryplay: (video) => (video.paused ? (webSite.isDouyu() ? Tools.triggerClick(video) : video.play()) : null),
-  adjustVideoTime(second = VIDEO_SKIP_INTERVAL.get(), _symbol) {
-    if (!this.video || !Tools.validDuration(this.video)) return;
-    if (_symbol && ![SYMBOL.ADD, SYMBOL.SUBTRACT].includes(_symbol)) return;
-    if (Object.is(typeof second, typeof EMPTY) && !_symbol) {
-      _symbol = second;
-      second = VIDEO_SKIP_INTERVAL.get();
-    }
-    if (SYMBOL.SUBTRACT !== _symbol && this.video.isEnded) return;
-    second = Object.is(SYMBOL.SUBTRACT, _symbol) ? -second : second;
+  adjustVideoTime(second = VIDEO_SKIP_INTERVAL.get()) {
+    if (!this.video || !Tools.validDuration(this.video) || (second > 0 && this.video.isEnded)) return;
     const currentTime = Math.min(this.video.currentTime + second, this.video.duration);
     this.setCurrentTime(currentTime);
   },
   cachePlayTime(video) {
-    if (!this.topInfo || this.isLive() || this.isMultipleVideo()) return;
-    if (DISABLE_MEMORY_TIME.get() || this.isVideoEnded()) return this.delCachePlayTime();
-    if (video.currentTime > 1) PLAY_TIME.set(this.topInfo.hash, video.currentTime - 1, 7);
-  },
-  delCachePlayTime() {
-    PLAY_TIME.del(this.topInfo.hash);
+    if (!this.topInfo || this.isLive()) return;
+    if (DISABLE_MEMORY_TIME.get() || this.isVideoEnded() || this.isMultVideo()) return this.delCachePlayTime();
+    if (video.currentTime > VIDEO_SKIP_INTERVAL.get()) PLAY_TIME.set(topInfo.hash, video.currentTime - 1, 7);
   },
   useCachePlayTime(video) {
     if (this.hasUsedPlayTime || !this.topInfo || this.isLive()) return;
-    const time = PLAY_TIME.get(this.topInfo.hash);
+    const time = PLAY_TIME.get(topInfo.hash);
     if (time <= video.currentTime) return (this.hasUsedPlayTime = true);
-    this.setCurrentTime(time);
-    this.hasUsedPlayTime = true;
     this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", ONE_SEC * 3, false);
+    this.hasUsedPlayTime = true;
+    this.setCurrentTime(time);
   },
+  delCachePlayTime: () => PLAY_TIME.del(topInfo.hash),
   setCurrentTime(currentTime) {
     if (currentTime) this.video.currentTime = Math.max(0, currentTime);
   },
-  customToast(startText, colorText, endText, duration, isRemoveOther) {
+  rotation: 0,
+  videoRotateOrMirror(mirror = false) {
+    if (!this.video) return;
+    mirror ? (this.isMirrored = !this.isMirrored) : (this.rotation = (this.rotation + 90) % 360);
+    const { videoWidth, videoHeight } = this.video;
+    const isVertical = [90, 270].includes(this.rotation);
+    const scale = isVertical ? videoHeight / videoWidth : 1;
+    this.video.style = `--scale: ${scale}; --rotation: ${this.rotation}deg; --mirror: ${this.isMirrored ? -1 : 1};`;
+    // 测试视频：https://www.bilibili.com/video/BV1DT5AzLEMb、https://www.bilibili.com/video/BV13Y9FYfEVu
+  },
+  customToast(startText, colorText, endText, duration, isCoexist) {
     const span = document.createElement("span");
     span.appendChild(document.createTextNode(startText));
     const child = span.cloneNode(true);
@@ -99,7 +93,7 @@ export default {
     child.setAttribute("style", "margin:0 3px!important;color:#ff6101!important;");
     span.appendChild(child);
     span.appendChild(document.createTextNode(endText));
-    this.showToast(span, duration, isRemoveOther);
+    this.showToast(span, duration, isCoexist);
   },
   formatTime(seconds) {
     if (isNaN(seconds)) return "00:00";
@@ -108,8 +102,8 @@ export default {
     const s = Math.floor(seconds % 60);
     return [...(h ? [h] : []), m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
   },
-  isMultipleVideo() {
-    const currVideoSrc = this.video.currentSrc;
+  isMultVideo() {
+    const currVideoSrc = this.videoInfo.src;
     const videos = Tools.querys("video").filter((video) => video.currentSrc !== currVideoSrc && !isNaN(video.duration));
     return videos.length > 1;
   },

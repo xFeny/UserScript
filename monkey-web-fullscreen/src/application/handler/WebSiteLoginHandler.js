@@ -5,46 +5,13 @@ import Constants from "../common/Constants";
  * 未登录状态下，自动关闭网站的登录弹窗
  */
 export default {
-  webSiteLoginObserver() {
+  handleLoginPopups() {
     this.handleIqyLogin();
     this.handleBiliLogin();
     this.handleTencentLogin();
   },
-  loginObserver(target, matches, clickTarget) {
-    return Tools.createObserver(target, (mutations, observer) => {
-      mutations.forEach((mutation) => {
-        if (mutation.addedNodes.length === 0) return;
-        mutation.addedNodes.forEach((node) => {
-          if (node.nodeType !== Node.ELEMENT_NODE) return;
-          if (!node.matches(matches)) return;
-          Tools.query(clickTarget)?.click();
-          observer.disconnect();
-        });
-      });
-    });
-  },
-  handleTencentLogin() {
-    if (!webSite.isTencent()) return;
-    // 自动关闭腾讯视频登录弹窗
-    const selector = ".main-login-wnd-module_close-button__mt9WU";
-    this.loginObserver("#login_win", selector, selector);
-  },
-  handleIqyLogin() {
-    if (!webSite.isIqiyi()) return;
-    // 自动关闭爱奇艺视频登录弹窗
-    const selector = ".simple-buttons_close_btn__6N7HD";
-    this.loginObserver("#qy_pca_login_root", selector, selector);
-    // 自动点击跳过广告
-    Tools.createObserver(".cd-time", () => {
-      const selector = ":is([id*='mask-layer'], #modal-vip-cashier-scope)";
-      Tools.querys(selector).forEach((el) => el?.remove());
-      Tools.query(".simple-buttons_close_btn__6N7HD")?.click();
-      const adTime = Tools.query(".public-time");
-      if (adTime.style.display === "none") return;
-      if (this.video.currentTime !== this.video.duration) return;
-      Tools.querys("*:not(.public-vip)", adTime).forEach((el) => el?.click());
-    });
-  },
+  handleTencentLogin: () => webSite.isTencent() && Tools.query("#login_win")?.remove(),
+  handleIqyLogin: () => webSite.isIqiyi() && Tools.query("#qy_pca_login_root")?.remove(),
   handleBiliLogin() {
     if (!webSite.isBili()) return;
     if (document.cookie.includes("DedeUserID")) return unsafeWindow.player?.requestQuality(80); // 清晰度设置为 1080P

@@ -92,6 +92,7 @@ class TimedStorageItem extends StorageItem {
  *
  * DISABLE_MEMORY_TIME  禁用记忆播放进度
  * ENABLE_THIS_SITE_AUTO  此站启用自动网页全屏
+ * USE_ALTERNATIVE  不使用外部`网页全屏`脚本，使用自带网页全屏样式
  * RELATIVE_EPISODE_SELECTOR  切换下集—所有集数中的某一集 CSS选择器
  * CURRENT_EPISODE_SELECTOR  切换下集—当前集 CSS选择器
  * PLAY_TIME  播放进度
@@ -106,6 +107,7 @@ export default {
   ZERO_KEY_SKIP_INTERVAL: new StorageItem("ZERO_KEY_SKIP_INTERVAL", 30, false, (value) => parseInt(value, 10)),
   ENABLE_THIS_SITE_AUTO: new TimedStorageItem("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
   DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
+  USE_ALTERNATIVE: new StorageItem("USE_ALTERNATIVE", false, false, (value) => Boolean(value)),
   RELATIVE_EPISODE_SELECTOR: new TimedStorageItem("RELATIVE_EPISODE_SELECTOR_", null),
   CURRENT_EPISODE_SELECTOR: new TimedStorageItem("CURRENT_EPISODE_SELECTOR_", null),
   PLAY_TIME: new TimedStorageItem("PLAY_TIME_", 0, true, parseFloat),

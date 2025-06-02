@@ -1,6 +1,6 @@
 import { Notyf } from "notyf";
 import constants from "./Constants";
-import { querySelector, querySelectorAll } from "./shadow-dom-utils";
+import { querySelector, querySelectorAll } from "shadow-dom-utils";
 
 const { ONE_SEC, MSG_SOURCE } = constants;
 
@@ -34,10 +34,10 @@ export default {
     this.getFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
   },
   lastTimeMap: new Map(),
-  isTooFrequent(key = "default", delay = ONE_SEC) {
+  isTooFrequent(key = "default") {
     const now = Date.now();
     const lastTime = this.lastTimeMap.get(key) ?? 0;
-    const isFrequent = now - lastTime < delay;
+    const isFrequent = now - lastTime < ONE_SEC;
     this.lastTimeMap.set(key, now);
     return isFrequent;
   },
@@ -59,7 +59,7 @@ export default {
   },
   triggerHover(element) {
     if (!element) return;
-    // this.log("悬停元素：", element);
+    this.log("悬停元素：", element);
     const { centerX, centerY } = this.getElementCenterPoint(element);
     const dict = { clientX: centerX, clientY: centerY, bubbles: true };
     element?.dispatchEvent(new MouseEvent("mouseover", dict));
@@ -76,24 +76,35 @@ export default {
     return observer;
   },
   closest(element, selector, maxLevel = 3) {
-    for (let level = 0; element && level < maxLevel; level++, element = element.parentElement) {
+    let currLevel = 0;
+    while (element && currLevel < maxLevel) {
       if (element.matches(selector)) return element;
+      element = element.parentElement;
+      currLevel++;
     }
     return null;
   },
   findSiblingInParent(element, selector, maxLevel = 3) {
-    for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
-      for (const child of parent.children) {
-        if (child !== element && child.matches(selector)) return child;
+    let currLevel = 0;
+    let currParent = element?.parentElement;
+    while (currParent && currLevel < maxLevel) {
+      const sibs = currParent.children;
+      for (let sib of sibs) {
+        if (sib !== element && sib.matches(selector)) return sib;
       }
+      currParent = currParent.parentElement;
+      currLevel++;
     }
     return null;
   },
   getParentChain(element) {
-    const parents = [];
-    for (let current = element; current && current !== document.body; current = current.parentElement) {
-      parents.unshift(this.getTagInfo(current));
+    let parents = [];
+    let current = element;
+    while (current && current.tagName !== "BODY") {
+      const tagInfo = this.getTagInfo(current);
+      parents.unshift(tagInfo);
       if (current.id && this.noNumber(current.id)) break;
+      current = current.parentElement;
     }
     return parents.join(" > ");
   },
@@ -108,14 +119,12 @@ export default {
     const classes = classList.filter((cls) => this.noNumber(cls));
     return classes.length ? `${tagInfo}.${classes.join(".")}` : tagInfo;
   },
-  getParents(element, withSelf = false, maxLevel = Infinity) {
-    const parents = withSelf && element ? [element] : [];
-    for (
-      let current = element?.parentElement, level = 0;
-      current && current !== document.body && level < maxLevel;
-      current = current.parentElement, level++
-    ) {
+  getParents(element, withSelf = false) {
+    const parents = withSelf ? [element] : [];
+    let current = element.parentElement;
+    while (current && current !== document.body) {
       parents.unshift(current);
+      current = current.parentElement;
     }
     return parents;
   },

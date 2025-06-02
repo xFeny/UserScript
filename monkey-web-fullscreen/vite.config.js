@@ -49,7 +49,7 @@ export default defineConfig({
         match,
         include,
         author: "Feny",
-        version: "2.8.0",
+        version: "2.9.0",
         license: "GPL-3.0-only",
         name: "视频网站自动网页全屏｜倍速播放",
         namespace: "http://tampermonkey.net/",
@@ -68,8 +68,8 @@ export default defineConfig({
             .concat(util.dataUrl(";window.sweetalert2=Swal;")),
         },
         externalResource: {
-          "notyf/notyf.min.css": cdn.unpkg(),
           "sweetalert2/dist/sweetalert2.min.css": cdn.unpkg("sweetalert2"),
+          "notyf/notyf.min.css": cdn.unpkg(),
         },
       },
     }),

@@ -6,63 +6,46 @@
 import Tools from "../common/Tools";
 export default {
   enhance() {
-    if (!this.videoInfo) return; // 页面没有视频元素
-    const ele = this.getVideoLocation();
-    Tools.triggerHoverEvent(ele);
-    Tools.triggerEscapeEvent();
-    this.backupTrigger();
+    if (this.normalSite()) return;
+    const ele = this.getVideoHostContainer();
+    (ele.oldWidth = ele?.offsetWidth ?? 0), (ele.ctrl = ele.ctrl ?? ele?.controls);
+    if (!this.isUseAlternative()) Tools.triggerHover(ele), Tools.triggerEscape();
+    setTimeout(() => this.alternative(ele), 100); // https://36kr.com
   },
-  backupTrigger() {
-    if (!this.video || this.videoInfo.frameSrc) return;
-    let oldWidth = this.video.oldWidth;
-    let newWidth = this.video.offsetWidth;
-    if (!Object.is(oldWidth, newWidth)) return;
-    Tools.query("#playerControlBtn")?.click(); // `Esc`键切换失败，点击 `网页全屏`
-    if (!Object.is(newWidth, this.video.offsetWidth)) return;
-    Tools.query("#playerControlBtn")?.click(); // 再次尝试
+  alternative(ele) {
+    if (!Tools.isTopWin() || ele.oldWidth !== ele.offsetWidth) return;
+    Tools.getParents(ele, true)?.forEach((el) => el?.classList?.toggle("_webFullScreen_"));
+    if (ele?.matches("video")) ele.controls = ele.classList.contains("_webFullScreen_") ? true : ele.ctrl;
+    this.cleanStubbornElements(ele);
   },
-  getVideoLocation() {
-    if (this.video) return this.getVideoContainer();
+  cleanStubbornElements(element) {
+    if (element.classList.contains("_webFullScreen_")) return;
+    Tools.querys("._webFullScreen_").forEach((el) => el.classList.remove("_webFullScreen_"));
+    Tools.scrollTop(Tools.getElementRect(element)?.top - 100);
+  },
+  getVideoHostContainer() {
+    if (this.video) return this.getVideoWrapper();
+
     // video所在的iframe
-    const iframe = this.getVideoIframe();
-    if (iframe) return iframe;
+    const videoIframe = this.getVideoIframe();
+    if (videoIframe) return videoIframe;
+
+    const iframes = Tools.getFrames();
+    if (iframes.length === 1) return iframes.shift();
+
     // 根据video的中心点，判断是否在iframe的矩形范围内
     const { centerX, centerY } = this.videoInfo;
-    const iframes = Tools.getFrames();
-    for (const element of iframes) {
-      if (!Tools.isVisible(element)) continue;
-      if (Tools.isPointInElementRect(centerX, centerY, element)) return element;
-    }
+    return iframes.find((ele) => Tools.isVisible(ele) && Tools.isPointInElement(centerX, centerY, ele));
   },
-  getVideoContainer() {
-    const video = this.video;
-    video.oldWidth = video.offsetWidth;
-    const parentEle = video?.parentElement;
-    const control = this.getVideoControls(video);
-    const player = this.getVideoPlayer(parentEle);
-    // Tools.log("播放器控制栏：", control, "控制栏父元素：", control?.parentElement);
-    const videoContainer = player || control?.parentElement;
-    if (!videoContainer) return video;
-    if (this.videoInfo.frameSrc) return videoContainer; // 播放器在iframe中
-
-    const videoWidth = video.offsetWidth;
-    const wrapWidth = videoContainer.offsetWidth;
-    // Tools.log("\t播放器容器宽度：" + wrapWidth + "\t播放器宽度：" + videoWidth);
-    return wrapWidth !== videoWidth ? video : videoContainer;
+  getVideoWrapper() {
+    const control = this.findVideoControlBar(this.video);
+    return control?.parentElement ?? this.findVideoContainer(this.video?.parentElement) ?? this.video;
   },
-  getVideoPlayer(target) {
-    const selector = [
-      ".video-js",
-      '[class*="wrap"]',
-      '[class*="video"]',
-      '[class*="Player"]',
-      '[class*="player"]',
-      '[aria-label="视频播放器"]',
-      '[aria-label="Video Player"]',
-    ];
-    return Tools.closest(target, `:is(${selector})`);
+  findVideoContainer(target) {
+    return Tools.closest(target, ':is([class*="wrap"], [class*="video"], [class*="Player"], [class*="player"])');
   },
-  getVideoControls(element) {
-    return Tools.findSiblingInParent(element, ['[class*="bar"]', '[class*="Control"]', '[class*="control"]']);
+  findVideoControlBar(element) {
+    const ctrl = ':is([class*="Control"], [class*="control"], [id*="control"], [class*="ctrl"], [class*="bar"])';
+    return Tools.findSiblingInParent(element, ctrl);
   },
 };

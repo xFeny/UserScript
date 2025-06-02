@@ -7,8 +7,45 @@
   position: absolute !important;
   z-index: 2147483647 !important;
   font-weight: normal !important;
-  transition: opacity 300ms ease-in;
+  transition: opacity 0.3s ease-in;
   background: rgba(0, 0, 0, 0.75) !important;
+}
+
+._webFullScreen_ {
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  width: 100vw !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 100vh !important;
+  position: fixed !important;
+  transform: none !important;
+  max-width: none !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+  z-index: 2147483646 !important;
+  background-color: #000 !important;
+
+  video {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform-origin: center;
+  transition: transform 0.3s;
+  transform: rotate(var(--rotation, 0deg)) scale(var(--scale, 1)) scaleX(var(--mirror, 1));
+}
+
+.hideCursor {
+  cursor: none !important;
 }
 
 #bilibili-player {
@@ -19,6 +56,7 @@
     display: none !important;
   }
 }
+
 /* B站直播样式 START */
 .live-room-app {
   #sidebar-vm,
@@ -28,7 +66,9 @@
   }
 }
 
-.login-tip {
+.login-tip,
+body.lite-room .bili-mini-mask,
+body.risk-captcha-adapt .bili-mini-mask {
   display: none !important;
 }
 /* B站直播样式 END */
@@ -59,8 +99,8 @@
   }
 
   #monkey-picker {
-    width: 25em;
     height: auto;
+    max-width: 25em;
     font-size: 14px;
     margin-bottom: 0;
     min-height: 10em;
@@ -71,20 +111,21 @@
     display: none !important;
   }
 
-  ._menuitem {
-    font-size: 20px;
+  ._menu_ {
+    display: flex;
     cursor: pointer;
-    text-align: left;
-    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: normal;
+    align-items: center !important;
+    margin-bottom: 15px !important;
+    justify-content: space-between !important;
 
-    label {
-      display: flex;
-      cursor: pointer;
-      align-items: center;
-      justify-content: space-between;
+    &:last-of-type {
+      margin-bottom: 0 !important;
     }
 
     input {
+      cursor: pointer;
       width: 20px !important;
       height: 20px !important;
       appearance: auto !important;
@@ -106,28 +147,27 @@
   }
 }
 
+#buffer,
+#install,
+#a1 #tips,
 .player-overlay,
 .memory-play-wrap,
 .atom-notice-click,
+#loading.not-player,
 #player #loading-box,
 .xgplayer [id*="tips"],
 .dplayer-notice strong,
 .air-player-loading-box,
 .art-layer-autoPlayback,
-.art-layer-auto-playback {
+.art-layer-auto-playback,
+.invoke-app-floating-tips,
+.invoke-app-san-container {
   display: none !important;
 }
 
 /* 现代浏览器（支持 :has()）使用原生选择器 */
 @supports (selector(:has(div))) {
   #loading:not(:has([class*="player"])) {
-    display: none !important;
-  }
-}
-
-/* 旧版浏览器使用替代选择器 需配合JS */
-@supports not (selector(:has(div))) {
-  #loading.not-player {
     display: none !important;
   }
 }

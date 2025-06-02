@@ -1,111 +1,90 @@
 import Tools from "../common/Tools";
 import Storage from "../common/Storage";
 import Constants from "../common/Constants";
-const { RELATIVE_EPISODE_SELECTOR } = Storage;
+const { RELATIVE_EPISODE_SELECTOR: RE_SELECTOR } = Storage;
 
 /**
  * 通用性切换视频下集
  */
 export default {
-  switchPrevEpisode: function () {
-    this.handleEpisodeChange(this.getPrevEpisode);
-  },
-  switchNextEpisode: function () {
-    this.handleEpisodeChange(this.getNextEpisode);
-  },
-  handleEpisodeChange(getTargetEpisode) {
-    if (!Tools.isTopWin()) return;
-    let currEpisode = this.getCurrentEpisode();
-    if (!currEpisode) currEpisode = this.getCurrentEpisodeFromAllLink();
+  switchEpisode(isPrev = false) {
+    const currEpisode = this.getCurrentEpisode() ?? this.getCurrentEpisodeFromAllLink();
     // Tools.log("当前集元素：", currEpisode);
-    const targetEpisode = getTargetEpisode.call(this, currEpisode);
-    // Tools.log("目标集元素：", targetEpisode);
-    this.jumpToEpisodeNumber(targetEpisode);
+    const targetEpisode = this.getTargetEpisodeContainer(currEpisode, isPrev);
+    // Tools.log("跳转集元素：", targetEpisode);
+    this.jumpToTargetEpisode(targetEpisode);
   },
   getCurrentEpisode() {
-    const ele = RELATIVE_EPISODE_SELECTOR.get(location.host)
-      ? this.getCurrentEpisodeBySelector()
-      : this.getCurrentEpisodeLinkElement();
-    // console.log("当前集数所在的<a>标签：", ele);
-    return this.getEpisodeContainer(ele);
+    return RE_SELECTOR.get(location.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeLinkElement();
   },
   getCurrentEpisodeLinkElement() {
-    const href = location.href;
-    const path = location.pathname;
-    const lastPath = path.substring(path.lastIndexOf("/") + 1);
-    const links = Tools.querys(`:is(a[href*="${path}"], a[href*="${lastPath}"])`);
+    const { pathname, search } = location;
+    const last = pathname.split("/").pop();
+    const links = Tools.querys(`:is(a[href*="${pathname + search}"], a[href*="${last}"], a[href*="${search}"])`);
     // Tools.log("匹配到所有的链接：", links);
-    if (links.length == 1) return links.shift();
+    return links.length <= 1 ? links.shift() : this.findCurrentEpisodeElement(links, pathname + search);
+  },
+  findCurrentEpisodeElement(eles, pageUrl) {
     // 过滤：历史记录、标题、线路(tab-item、play-channel)
     const filter = [
       "h1",
       "header",
       "[id*='history']",
+      "[id*='guankan']",
       "[class*='lishi']",
       "[class*='record']",
       "[class*='history']",
       "[class*='tab-item']",
       "[class*='play-channel']",
     ];
-    return links.find((link) => {
-      const linkUrl = new URL(link.href);
-      if (Tools.closest(link, `:is(${filter})`, 5)) return false;
-      if (!Object.is(href, link.href) && !Object.is(path, linkUrl.pathname)) return false; // URL不匹配
-      return !!this.getEpisodeNumber(link);
-    });
+    eles = eles
+      .filter((el) => {
+        const { pathname, search } = new URL(el.href);
+        return !Tools.closest(el, `:is(${filter})`, 5) && pageUrl.includes(pathname + search);
+      })
+      .map(this.getEpisodeContainer)
+      .reverse();
+    // Tools.log("过滤后连接：", links);
+    return eles.length <= 1 ? eles.shift() : eles.find((el) => el.classList.contains("active") || !!this.getEpisodeNumber(el));
   },
-  getEpisodeNumber(element) {
-    return Tools.extractNumbers(element?.innerText).shift();
-  },
-  getPrevEpisode(element) {
-    return this.getEpisodeNumberContainer(element, true);
-  },
-  getNextEpisode(element) {
-    return this.getEpisodeNumberContainer(element);
-  },
-  getEpisodeNumberContainer(element, isPrev = false) {
+  getEpisodeNumber: (ele) => Tools.getNumbers(ele?.innerText?.replace(/-/g, ""))?.shift(),
+  getTargetEpisodeContainer(element, isPrev = false) {
     if (!element) return;
     const currNumber = this.getEpisodeNumber(element);
     const episodes = this.getAllEpisodeElement(element);
-    if (episodes.length <= 1) return null;
-    const numbers = episodes.map(this.getEpisodeNumber);
+    // Tools.log("所有剧集元素", episodes);
+
     const index = episodes.indexOf(element);
-    const prev = episodes[index - 1];
-    const next = episodes[index + 1];
+    const numbers = episodes.map(this.getEpisodeNumber);
     const { leftSmall, rightLarge } = this.compareLeftRight(numbers, currNumber, index);
-    if (leftSmall || rightLarge) return isPrev ? prev : next; // 剧集是正序：[1, 2, 3, 4, 5]
-    return isPrev ? next : prev; // 剧集是倒序：[5, 4, 3, 2, 1]
+
+    // 数字左小右大为正序，反之为倒序
+    // 当 leftSmall || rightLarge 的结果与 isPrev 的布尔值相同时，返回 prev，当两者不同时，返回 next。
+    return (leftSmall || rightLarge) === isPrev ? episodes[index - 1] : episodes[index + 1];
   },
-  compareLeftRight(numbers, compareNumber, index) {
-    const leftSmall = numbers.findIndex((val, i) => i < index && val < compareNumber) > -1;
-    const rightLarge = numbers.findIndex((val, i) => i > index && val > compareNumber) > -1;
-    return { leftSmall, rightLarge };
-  },
+  compareLeftRight: (numbers, compareNumber = 0, index) => ({
+    leftSmall: numbers.some((val, i) => i < index && val < compareNumber),
+    rightLarge: numbers.some((val, i) => i > index && val > compareNumber),
+  }),
   getAllEpisodeElement(element) {
+    if (!element) return [];
     const eleName = element.tagName;
     const eleClass = Array.from(element.classList);
     const sibling = Tools.findSiblingInParent(element, eleName);
-    const children = Array.from(sibling?.parentElement.children);
+    const children = Array.from(sibling?.parentElement?.children ?? []);
     return children.filter((ele) => {
       const currClass = Array.from(ele.classList);
-      const haveSomeClass = eleClass.some((value) => currClass.includes(value));
-      if (!!currClass.length && !haveSomeClass) return false;
-      return ele.tagName === eleName;
+      const hasSameClass = eleClass.some((value) => currClass.includes(value));
+      return currClass.length ? hasSameClass : ele.tagName === eleName;
     });
   },
-  jumpToEpisodeNumber(element) {
-    if (!element) return;
-    if (element instanceof HTMLAnchorElement) return element.click();
-    const stack = [element];
+  jumpToTargetEpisode(element) {
+    const stack = [element].filter(Boolean);
     while (stack.length > 0) {
       const current = stack.pop();
-      if (!(current instanceof HTMLElement) || !this.getEpisodeNumber(current)) continue;
-      if (current instanceof HTMLAnchorElement || current instanceof HTMLButtonElement) return current.click();
+      if (current.matches("a, button")) return current.click();
+      stack.push(...Array.from(current.children).reverse());
       current.click();
-      const children = Array.from(current.children).reverse();
-      for (const child of children) {
-        stack.push(child);
-      }
     }
   },
   getEpisodeContainer(element) {
@@ -126,28 +105,20 @@ export default {
     // 		<ul><li><a>第02集</a></li></ul>
     // 	</div>
     // </ul>
-    while (element) {
-      const tagName = element.tagName;
-      const parentEle = element.parentElement;
-      const haveSib = Tools.haveSiblings(element);
-      const hasEqualsTag = Tools.querys(tagName, parentEle).find((el) => el !== element);
-      if (haveSib && hasEqualsTag) return element;
-      element = parentEle;
+    while (element && element.parentElement) {
+      const siblings = Array.from(element.parentElement.children);
+      if (siblings.length > 1 && siblings.some((sib) => sib !== element && sib.tagName === element.tagName)) return element;
+      element = element.parentElement;
     }
-    return element;
+    return null;
   },
   getCurrentEpisodeFromAllLink() {
     // https://www.dmb0u.art/index/home.html
-    const path = location.pathname;
-    const lastPath = path.substring(path.lastIndexOf("/") + 1);
-    if (lastPath === Constants.EMPTY) return null;
-    const currNumber = Tools.extractNumbers(lastPath).join(Constants.EMPTY);
-    Tools.querys('a[href*="javascript"]').forEach((link) => {
-      const attrs = link.attributes;
-      for (const attr of attrs) {
-        const attrNumber = Tools.extractNumbers(attr.value).join(Constants.EMPTY);
-        if (attrNumber === currNumber) return link;
-      }
-    });
+    const getNumber = (str) => Tools.getNumbers(str).join(Constants.EMPTY);
+    const lastPath = location.pathname.split("/").pop();
+    const number = getNumber(lastPath);
+    return number
+      ? Tools.querys("a[onclick]")?.find((el) => Array.from(el.attributes).find((attr) => getNumber(attr.value) === number))
+      : null;
   },
 };
