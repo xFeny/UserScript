@@ -28,7 +28,6 @@ const App = {
   },
   query: (selector, context) => (context || document).querySelector(selector),
   querys: (selector, context) => (context || document).querySelectorAll(selector),
-  isPili: () => location.host.includes("pili"),
   isFanTuan: () => location.host.includes("ft"),
   isEzSite: () => location.host.includes("ezdmw"),
   isBimi: () => location.host.includes("bimiacg"),
@@ -97,12 +96,6 @@ const App = {
           const routes = siteConfigs.ezSite.getRoutes(this);
           const currentRoute = siteConfigs.ezSite.getCurrentRoute(this);
           siteConfigs.ezSite.switchRoute(routes, currentRoute);
-        }
-        // P站切换逻辑
-        if (this.isPili()) {
-          const routes = siteConfigs.pili.getRoutes(this);
-          const currentEpisode = siteConfigs.pili.getCurrentEpisode();
-          siteConfigs.pili.switchRoute(routes, currentEpisode, this);
         }
         // 饭团动漫切换逻辑
         if (this.isFanTuan()) {

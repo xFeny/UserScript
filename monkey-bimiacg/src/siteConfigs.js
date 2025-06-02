@@ -11,19 +11,6 @@ export default {
       routes.find((route) => route !== currentRoute)?.click();
     },
   },
-  // P站配置
-  pili: {
-    getRoutes: (self) => queryElements(self, ".c-player-episode ul"),
-    getCurrentEpisode: () => document.querySelector(`a[class*="current"][href="${location.pathname}"]`),
-    switchRoute: (routes, currentEpisode, self) => {
-      const currentRouteIndex = routes.findIndex((route) => route === currentEpisode.parentElement);
-      let nextRouteIndex = currentRouteIndex + 1;
-      if (nextRouteIndex >= routes.length) nextRouteIndex = 0;
-      const currentEpisodeIndex = self.index(currentEpisode);
-      const episodes = self.querys("a", routes[nextRouteIndex]);
-      episodes[currentEpisodeIndex]?.click();
-    },
-  },
   // 饭团动漫配置
   fanTuan: {
     getCurrentRoute: (self) => self.query(".anime-episode.active"),
