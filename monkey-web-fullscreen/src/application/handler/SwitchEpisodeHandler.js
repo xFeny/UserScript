@@ -8,7 +8,7 @@ const { RELATIVE_EPISODE_SELECTOR: RE_SELECTOR } = Storage;
  */
 export default {
   switchEpisode(isPrev = false) {
-    const targetEpisode = this.getTargetEpisodeByText(isPrev) ?? this.getTargetEpisode(this.getCurrentEpisode(), isPrev);
+    const targetEpisode = this.getTargetEpisode(this.getCurrentEpisode(), isPrev) ?? this.getTargetEpisodeByText(isPrev);
     // Tools.log("跳转集元素：", targetEpisode);
     this.jumpToTargetEpisode(targetEpisode);
   },
