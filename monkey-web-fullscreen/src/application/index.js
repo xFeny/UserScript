@@ -1,11 +1,10 @@
+import Site from "./common/Site";
 import Tools from "./common/Tools";
-import webSite from "./common/WebSite";
-import constants from "./common/Constants";
-import selectorConfig from "./common/SelectorConfig";
+import Constants from "./common/Constants";
+import SiteIcons from "./common/SiteIcons";
 import VideoEventHandler from "./handler/VideoEventHandler";
-const { EMPTY, ONE_SEC, SHOW_TOAST_TIME, SHOW_TOAST_POSITION } = constants;
 
-export default {
+export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
   init() {
     this.setupVisibleListener();
     this.setupKeydownListener();
@@ -13,18 +12,11 @@ export default {
     this.setupUrlChangeListener();
     this.setupMouseMoveListener();
   },
-  normalSite: () => !window?.videoInfo,
-  isLive: () => webSite.isLivePage() || window?.videoInfo?.isLive,
+  normalSite: () => !window?.videoInfo && !window?.topInfo,
+  isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
   isBackgroudVideo: (video) => video?.muted && video?.hasAttribute("loop"),
-  getVideo: () => Tools.query("video:not([loop]):not([src=''])") || Tools.query("video:not([loop])"),
-  getWebFullElement: () => Tools.query(selectorConfig[location.host]?.webfull),
-  getVideoIframe() {
-    // video所在的iframe标签
-    if (!this.videoInfo?.frameSrc) return null;
-    const url = new URL(this.videoInfo.frameSrc);
-    const src = decodeURI(url.pathname + url.search);
-    return Tools.query(`iframe[src*="${src}"]`);
-  },
+  getVideo: () => Tools.querys("video:not([loop])").find((el) => Tools.isVisible(el)),
+  getWebFullElement: () => Tools.query(SiteIcons[location.host]?.[SiteIcons.name.webFull]),
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
       if (this.normalSite()) return;
@@ -51,11 +43,11 @@ export default {
       const video = this.getVideo();
       this.webFullElement = this.getWebFullElement();
       if (video?.play && !!video.offsetWidth) this.setupVideoListener();
-      if (!webSite.inMatches() && this.topInfo) return observer.disconnect();
-      if (!this.videoInfo || !this.webFullElement || !this.webFullScreen(video)) return;
-      observer.disconnect(), this.biliLiveExtras(), this.handleLoginPopups();
+      if (!Site.isMatch() && this.topInfo) return observer.disconnect();
+      if (!this.videoInfo || !this.webFullElement || !this.specificWebFullscreen(video)) return;
+      observer.disconnect(), this.handleLoginPopups();
     });
-    setTimeout(() => observer.disconnect(), ONE_SEC * 10);
+    setTimeout(() => observer.disconnect(), Constants.ONE_SEC * 10);
   },
   triggerVideoStart() {
     // https://www.jumomo.cc、https://www.jiaozi.me、https://www.kmvod.cc
@@ -85,7 +77,7 @@ export default {
   },
   healthCurrentVideo() {
     if (this.healthID || Tools.isTooFrequent("healt")) return;
-    this.healthID = setInterval(() => this.getPlayingVideo(), ONE_SEC);
+    this.healthID = setInterval(() => this.getPlayingVideo(), Constants.ONE_SEC);
   },
   getPlayingVideo() {
     const videos = Tools.querys("video");
@@ -96,13 +88,12 @@ export default {
   },
   setVideoInfo(video) {
     const isLive = Object.is(video.duration, Infinity);
-    const videoInfo = { ...Tools.getElementCenterPoint(video), src: video.currentSrc, isLive };
+    const videoInfo = { ...Tools.getCenterPoint(video), src: video.currentSrc, isLive };
     this.setParentVideoInfo(videoInfo);
   },
   setParentVideoInfo(videoInfo) {
     window.videoInfo = this.videoInfo = videoInfo;
-    if (!Tools.isTopWin()) videoInfo.frameSrc = location.href;
-    if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo });
+    if (!Tools.isTopWin()) return (videoInfo.frameSrc = location.href), Tools.postMessage(window.parent, { videoInfo });
     this.setupPickerEpisodeListener();
     this.setupScriptMenuCommand();
     this.sendTopInfo();
@@ -111,10 +102,10 @@ export default {
     // 向iframe传递顶级窗口信息
     const { host, href } = location;
     window.topInfo = this.topInfo = { innerWidth, host, href, hash: Tools.simpleHash(href) };
-    Tools.postMsgToFrames({ topInfo });
+    Tools.sendToIFrames({ topInfo });
   },
   setupMouseMoveListener() {
-    const delay = ONE_SEC * 2;
+    const delay = Constants.ONE_SEC * 2;
     let timer = setTimeout(() => this.showOrHideCursor(), delay);
     document.addEventListener("mousemove", ({ target, isTrusted }) => {
       if (!isTrusted) return;
@@ -128,23 +119,10 @@ export default {
   showOrHideCursor(isHide = true) {
     if (this.normalSite()) return;
     const videoWrap = this.getVideoHostContainer();
-    const elements = Array.from([this?.video, ...Tools.getParents(videoWrap, true, 3)]);
-    elements.forEach((ele) => {
-      if (isHide) ele?.dispatchEvent(new MouseEvent("mouseleave"));
-      isHide ? ele?.classList.add("hideCursor") : ele?.classList.remove("hideCursor");
-    });
-  },
-  showToast(content, duration = SHOW_TOAST_TIME, isRemove = true) {
-    const el = document.createElement("div");
-    el.setAttribute("part", "monkey-show-toast");
-    el.setAttribute("style", SHOW_TOAST_POSITION);
-    if (isRemove) Tools.query('[part="monkey-show-toast"]')?.remove();
-    content instanceof Element ? el.appendChild(content) : (el.innerHTML = content);
-
-    const videoWrap = this.getVideoWrapper();
-    const target = videoWrap?.matches("video") ? videoWrap?.parentElement : videoWrap;
-    target?.appendChild(el);
-
-    setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), ONE_SEC / 3)), duration);
+    isHide
+      ? Array.from([this?.video, ...Tools.getParents(videoWrap, true, 3)]).forEach((ele) => {
+          ele?.classList.add("hideCursor"), ele?.dispatchEvent(new MouseEvent("mouseleave"));
+        })
+      : Tools.querys(".hideCursor").forEach((el) => el.classList.remove("hideCursor"));
   },
 };

@@ -17,6 +17,10 @@
     return Array.from((context ?? document).querySelectorAll(selector));
   }
 
+  function hasAnyClass(element, ...classes) {
+    return classes.flat().some((cls) => element.classList.contains(cls));
+  }
+
   /** 提取字符串中的数字 */
   function extractNumbers(str) {
     const numbers = str.match(/\d+/g);
@@ -31,12 +35,12 @@
   /** 向上查找元素 */
   function closest(element, selector, maxLevel = 3) {
     for (let level = 0; element && level < maxLevel; level++, element = element.parentElement) {
-      if (element.matches(selector)) return console.log(element), element;
+      if (element.matches(selector)) return element;
     }
     return null;
   }
 
-  function getEpisodeContainer(element) {
+  function getEpisodeWrapper(element) {
     //  当前集相对所有集所在的标签
     while (element && element.parentElement) {
       const siblings = Array.from(element.parentElement.children);
@@ -47,9 +51,7 @@
   }
 
   function getCurrentEpisode() {
-    const ele = getCurrentEpisodeLinkElement();
-    console.log("当前集的<a>标签：", ele);
-    return getEpisodeContainer(ele);
+    return getCurrentEpisodeLinkElement();
   }
 
   function getCurrentEpisodeLinkElement() {
@@ -57,34 +59,33 @@
     const last = pathname.split("/").pop();
     const links = querys(`:is(a[href*="${pathname + search}"], a[href*="${last}"], a[href*="${search}"])`);
     console.log("匹配到所有的链接：", links);
-    return links.length == 1 ? links.shift() : findCurrentEpisodeElement(links, pathname + search);
+    return links.length <= 1 ? getEpisodeWrapper(links[0]) : findCurrentEpisodeElement(links, pathname + search);
   }
 
-  function findCurrentEpisodeElement(links, pageUrl) {
-    // 过滤：历史记录、标题、线路(tab-item、play-channel)
+  function findCurrentEpisodeElement(eles, pageUrl) {
+    // 过滤： 标题、线路、排行、热门、猜你喜欢、推荐、历史记录
+    // https://www.yingshikong1.com、https://www.dyttlg1.com
     const filter = [
-      "h1",
-      "header",
-      "[id*='history']",
-      "[id*='guankan']",
-      "[class*='lishi']",
-      "[class*='record']",
-      "[class*='history']",
-      "[class*='tab-item']",
-      "[class*='play-channel']",
+      "h1, header, footer",
+      "[class*='tab-item'], [class*='play-channel']",
+      "[class*='rank'], [class*='hotlist'], [class*='vodlist']",
+      "[id*='guankan'], [id*='history'], [class*='history'], [class*='record'], [class*='lishi']",
     ];
-    links = links.filter((link) => {
-      const { pathname, search } = new URL(link.href);
-      return !closest(link, `:is(${filter})`, 5) && pageUrl.includes(pathname + search);
-    });
-    console.log("过滤后连接：", links);
-    return links.length == 1 ? links.shift() : links.find((link) => !!getEpisodeNumber(link));
+    eles = eles
+      .filter((el) => {
+        const { pathname, search } = new URL(el.href);
+        return !closest(el, `:is(${filter})`, 5) && pageUrl.includes(pathname + search);
+      })
+      .map(getEpisodeWrapper)
+      .reverse();
+    console.log("过滤后连接：", eles);
+    return eles.length <= 1 ? eles.shift() : eles.find((el) => hasAnyClass(el, "cur", "active") || !!getEpisodeNumber(el));
   }
 
-  function getTargetEpisodeContainer(element, isPrev = false) {
+  function getTargetEpisode(element, isPrev = false) {
     if (!element) return;
     const currNumber = getEpisodeNumber(element);
-    const episodes = getAllEpisodeElement(element);
+    const episodes = getAllEpisodes(element);
     const numbers = episodes.map(getEpisodeNumber);
     const index = episodes.indexOf(element);
     const { leftSmall, rightLarge } = compareLeftRight(numbers, currNumber, index);
@@ -100,7 +101,7 @@
     };
   }
 
-  function getAllEpisodeElement(element) {
+  function getAllEpisodes(element) {
     if (!element) return;
     const eleName = element.tagName;
     const eleClass = Array.from(element.classList);
@@ -123,7 +124,7 @@
   }
 
   console.log("当前集元素：", (currEpisode = getCurrentEpisode()));
-  console.log("所有剧集元素：", getAllEpisodeElement(currEpisode));
-  console.log("上集的元素：", getTargetEpisodeContainer(currEpisode, true));
-  console.log("下集的元素：", getTargetEpisodeContainer(currEpisode));
+  console.log("所有剧集元素：", getAllEpisodes(currEpisode));
+  console.log("上集的元素：", getTargetEpisode(currEpisode, true));
+  console.log("下集的元素：", getTargetEpisode(currEpisode));
 })();

@@ -1,4 +1,3 @@
-// showToast 位置样式
 const positions = Object.freeze({
   bottomLeft: "bottom: 17%; left: 10px;",
   bottomRight: "bottom: 17%; right: 10px;",
@@ -16,8 +15,4 @@ export default Object.freeze({
   SHOW_TOAST_TIME: ONE_SECOND * 5,
   SHOW_TOAST_POSITION: positions.bottomLeft,
   MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN",
-  BILI_VID_REG: /bilibili.com\/video/,
-  IQIYI_VID_REG: /iqiyi.com\/v_*/,
-  ACFUN_VID_REG: /acfun.cn\/v/,
-  QQ_VID_REG: /v.qq.com\/x/,
 });

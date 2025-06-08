@@ -1,37 +1,36 @@
+import Site from "../common/Site";
 import Tools from "../common/Tools";
-import webSite from "../common/WebSite";
-import storage from "../common/Storage";
-import constants from "../common/Constants";
+import Storage from "../common/Storage";
+import Constants from "../common/Constants";
 
-const { ONE_SEC, DEF_PLAY_RATE, MAX_PLAY_RATE } = constants;
-const { PLAY_RATE_STEP, CACHED_PLAY_RATE, VIDEO_SKIP_INTERVAL, PLAY_TIME, DISABLE_MEMORY_TIME } = storage;
+const { EMPTY, ONE_SEC, DEF_PLAY_RATE, MAX_PLAY_RATE, SHOW_TOAST_TIME, SHOW_TOAST_POSITION } = Constants;
+const { PLAY_RATE_STEP, CACHED_PLAY_RATE, VIDEO_SKIP_INTERVAL, PLAY_TIME, DISABLE_MEMORY_TIME } = Storage;
 
 /**
  * 视频控制相关逻辑处理
  */
 export default {
-  isVideoEnded() {
+  isEnded() {
     return Math.floor(this.video.currentTime) === Math.floor(this.video.duration);
   },
   initVideoProperties(video) {
     video.volume = 1;
     video.hasToast = false;
-    video.isWebFullScreen = false;
+    video.hasWebFullScreen = false;
   },
-  playOrPause: (video) => (webSite.isDouyu() ? Tools.triggerClick(video) : video.paused ? video.play() : video.pause()),
-  tryplay: (video) => video?.paused && (webSite.isDouyu() ? Tools.triggerClick(video) : video?.play()),
+  playOrPause: (video) => (Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause()),
+  tryplay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),
   checkUsable() {
-    //是否可以设置倍速
     if (!this.video) return false;
-    if (this.isVideoEnded()) return false;
-    if (webSite.isLivePage()) return false;
+    if (this.isEnded()) return false;
+    if (Site.isLivePage()) return false;
     if (this.isDisablePlaybackRate()) return false;
     if (!Tools.validDuration(this.video)) return false;
     return true;
   },
   setPlaybackRate(playRate, show = true) {
     if (!this.checkUsable()) return;
-    this.video.playbackRate = (+playRate).toFixed(2).replace(/\.?0+$/, "");
+    this.video.playbackRate = (+playRate).toFixed(2).replace(/\.?0+$/, EMPTY);
     if (show) this.customToast("正在以", `${this.video.playbackRate}x`, "倍速播放");
     CACHED_PLAY_RATE.set(this.video.playbackRate);
   },
@@ -60,7 +59,7 @@ export default {
   },
   cachePlayTime(video) {
     if (!this.topInfo || this.isLive()) return;
-    if (DISABLE_MEMORY_TIME.get() || this.isVideoEnded() || this.isMultVideo()) return this.delCachePlayTime();
+    if (DISABLE_MEMORY_TIME.get() || this.isEnded() || this.isMultVideo()) return this.delPlayTime();
     if (video.currentTime > VIDEO_SKIP_INTERVAL.get()) PLAY_TIME.set(topInfo.hash, video.currentTime - 1, 7);
   },
   useCachePlayTime(video) {
@@ -71,21 +70,27 @@ export default {
     this.hasUsedPlayTime = true;
     this.setCurrentTime(time);
   },
-  delCachePlayTime: () => PLAY_TIME.del(topInfo.hash),
+  delPlayTime: () => PLAY_TIME.del(topInfo.hash),
   setCurrentTime(currentTime) {
     if (currentTime) this.video.currentTime = Math.max(0, currentTime);
   },
   rotation: 0,
   videoRotateOrMirror(mirror = false) {
     if (!this.video) return;
-    mirror ? (this.isMirrored = !this.isMirrored) : (this.rotation = (this.rotation + 90) % 360);
+
+    const style = this.video.style;
+    this.video.classList.add("monkey-transform"), Tools.setPart(this.video, "monkey-transform");
+    if (mirror) return (this.isMirrored = !this.isMirrored), style.setProperty("--mirror", this.isMirrored ? -1 : 1);
+
+    this.rotation = (this.rotation + 90) % 360;
     const { videoWidth, videoHeight } = this.video;
     const isVertical = [90, 270].includes(this.rotation);
     const scale = isVertical ? videoHeight / videoWidth : 1;
-    this.video.style = `--scale: ${scale}; --rotation: ${this.rotation}deg; --mirror: ${this.isMirrored ? -1 : 1};`;
+    style.setProperty("--scale", scale), style.setProperty("--rotate", `${this.rotation}deg`);
+
     // 测试视频：https://www.bilibili.com/video/BV1DT5AzLEMb、https://www.bilibili.com/video/BV13Y9FYfEVu
   },
-  customToast(startText, colorText, endText, duration, isCoexist) {
+  customToast(startText, colorText, endText, duration, isRemove) {
     const span = document.createElement("span");
     span.appendChild(document.createTextNode(startText));
     const child = span.cloneNode(true);
@@ -93,7 +98,20 @@ export default {
     child.setAttribute("style", "margin:0 3px!important;color:#ff6101!important;");
     span.appendChild(child);
     span.appendChild(document.createTextNode(endText));
-    this.showToast(span, duration, isCoexist);
+    this.showToast(span, duration, isRemove);
+  },
+  showToast(content, duration = SHOW_TOAST_TIME, isRemove = true) {
+    const el = document.createElement("div");
+    el.setAttribute("part", "monkey-toast");
+    el.setAttribute("style", SHOW_TOAST_POSITION);
+    if (isRemove) Tools.query('[part="monkey-toast"]')?.remove();
+    content instanceof Element ? el.appendChild(content) : (el.innerHTML = content);
+
+    const videoWrap = this.getVideoWrapper();
+    const target = videoWrap?.matches("video") ? videoWrap?.parentElement : videoWrap;
+    target?.appendChild(el);
+
+    setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), ONE_SEC / 3)), duration);
   },
   formatTime(seconds) {
     if (isNaN(seconds)) return "00:00";

@@ -1,6 +1,6 @@
 import Storage from "../common/Storage";
-import WebSite from "../common/WebSite";
 import Tools from "../common/Tools";
+import Site from "../common/Site";
 import Swal from "sweetalert2";
 
 const { RELATIVE_EPISODE_SELECTOR: RE_SELECTOR, CURRENT_EPISODE_SELECTOR: EP_SELECTOR } = Storage;
@@ -16,7 +16,7 @@ const { RELATIVE_EPISODE_SELECTOR: RE_SELECTOR, CURRENT_EPISODE_SELECTOR: EP_SEL
  */
 export default {
   setupPickerEpisodeListener() {
-    if (WebSite.inMatches()) return;
+    if (Site.isMatch()) return;
     document.body.addEventListener(
       "click",
       (event, { target, ctrlKey, altKey, isTrusted } = event) => {
@@ -38,7 +38,7 @@ export default {
   },
   pickerCurrentEpisodeChain(element) {
     if (EP_SELECTOR.get(location.host)) return;
-    this.pickerEpisodeDialog(element, {
+    this.pickerEpisodePopup(element, {
       validBtnCallback(value) {
         try {
           const number = this.getEpisodeNumber(Tools.query(value));
@@ -56,11 +56,11 @@ export default {
   },
   pickerRelativeEpisodeChain(element) {
     if (RE_SELECTOR.get(location.host)) return;
-    this.pickerEpisodeDialog(element, {
+    this.pickerEpisodePopup(element, {
       validBtnCallback(value) {
         try {
-          const container = this.getEpisodeContainer(Tools.query(value));
-          const numbers = this.getAllEpisodeElement(container)?.map(this.getEpisodeNumber);
+          const container = this.getEpisodeWrapper(Tools.query(value));
+          const numbers = this.getAllEpisodes(container)?.map(this.getEpisodeNumber);
           !!numbers.length ? Tools.notyf(`所有集数：${numbers.join(" ")}`) : Tools.notyf("获取集数失败 〒▽〒", true);
         } catch (e) {
           Tools.notyf("获取集数失败 〒▽〒", true);
@@ -75,11 +75,11 @@ export default {
   },
   getCurrentEpisodeBySelector() {
     const num = this.getEpisodeNumber(Tools.query(EP_SELECTOR.get(location.host)));
-    const current = this.getEpisodeContainer(Tools.query(EP_SELECTOR.get(location.host)));
-    const episodes = this.getAllEpisodeElement(this.getEpisodeContainer(Tools.query(RE_SELECTOR.get(location.host))));
+    const current = this.getEpisodeWrapper(Tools.query(EP_SELECTOR.get(location.host)));
+    const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(RE_SELECTOR.get(location.host))));
     return episodes.includes(current) ? current : episodes.find((el) => this.getEpisodeNumber(el) === num);
   },
-  pickerEpisodeDialog(element, { validBtnCallback, confirmCallback }) {
+  pickerEpisodePopup(element, { validBtnCallback, confirmCallback }) {
     Swal.fire({
       html: `<h4>验证能正确获取到集数，再确定保存</h4>
       <textarea id="monkey-picker" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>

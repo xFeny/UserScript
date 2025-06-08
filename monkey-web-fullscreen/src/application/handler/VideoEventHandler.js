@@ -6,6 +6,7 @@ import Tools from "../common/Tools";
  */
 export default {
   loadedmetadata() {
+    App.universalWebFullscreen(this);
     Tools.querys('[id*="loading"]')
       .filter((ele) => !Tools.query('[class*="player"]', ele))
       .forEach((ele) => ele.classList.add("not-player"));
@@ -17,8 +18,8 @@ export default {
   },
   timeupdate() {
     if (isNaN(this.duration)) return;
+    App.universalWebFullscreen(this);
     App.useCachePlaybackRate(this);
-    App.experWebFullScreen(this);
     App.useCachePlayTime(this);
     App.cachePlayTime(this);
   },
@@ -27,7 +28,7 @@ export default {
   },
   play() {
     this.isEnded = false;
-    App.webFullScreen(this);
+    App.specificWebFullscreen(this);
   },
   pause() {
     // https://www.mcydh.com、https://dick.xfani.com
@@ -38,7 +39,7 @@ export default {
   ended() {
     this.isEnded = true;
     this.hasToast = false;
-    App.delCachePlayTime();
     App.exitWebFullScreen();
+    App.delPlayTime();
   },
 };

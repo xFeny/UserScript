@@ -1,18 +1,18 @@
 import { Notyf } from "notyf";
-import constants from "./Constants";
+import Constants from "./Constants";
 import { querySelector, querySelectorAll } from "./shadow-dom-utils";
 
-const { ONE_SEC, MSG_SOURCE } = constants;
+const { ONE_SEC, MSG_SOURCE } = Constants;
 
 /**
  * 公共方法
  */
-export default {
+export default unsafeWindow.Tools = {
   noNumber: (str) => !/\d/.test(str),
   isTopWin: () => window.top === window,
   isNumber: (str) => /^[0-9]$/.test(str),
+  scrollTop: (top) => window.scrollTo({ top }),
   alert: (...data) => window.alert(data.join(" ")),
-  scrollTop: (top) => unsafeWindow.top.scrollTo({ top }),
   query: (selector, context) => querySelector(selector, context),
   querys: (selector, context) => querySelectorAll(selector, context),
   validDuration: (video) => !isNaN(video.duration) && video.duration !== Infinity,
@@ -21,17 +21,17 @@ export default {
   isVisible: (ele) => !!(ele?.offsetWidth || ele?.offsetHeight || ele?.getClientRects().length),
   log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
   preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
-  getFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
+  getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
+  hasClass: (element, ...classes) => classes.flat().some((cls) => element.classList.contains(cls)),
   getNumbers: (str) => (typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : []),
-  haveSiblings: (element) => element?.parentElement?.children.length > 1,
   getElementRect: (element) => element?.getBoundingClientRect(),
   notyf(msg, isError = false) {
     const notyf = new Notyf({ duration: ONE_SEC * 3, position: { x: "center", y: "top" } });
     isError ? notyf.error(msg) : notyf.success(msg);
     return false;
   },
-  postMsgToFrames(data) {
-    this.getFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
+  sendToIFrames(data) {
+    this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
   },
   lastTimeMap: new Map(),
   isTooFrequent(key = "default", delay = ONE_SEC) {
@@ -41,38 +41,27 @@ export default {
     this.lastTimeMap.set(key, now);
     return isFrequent;
   },
-  getElementCenterPoint(element) {
+  getCenterPoint(element) {
     const { top, left, width, height } = this.getElementRect(element);
     return { centerX: left + width / 2, centerY: top + height / 2 }; // 元素中心点
   },
-  isPointInElement(pointX, pointY, element) {
+  pointInElement(pointX, pointY, element) {
     const { top, left, right, bottom } = this.getElementRect(element);
     return pointX >= left && pointX <= right && pointY >= top && pointY <= bottom;
   },
-  triggerMousemove(ele) {
-    const { centerY } = this.getElementCenterPoint(ele);
-    for (let x = 0; x < ele.offsetWidth; x += 10) this.dispatchMousemove(ele, x, centerY);
+  triggerMousemove(element) {
+    if (!element) return;
+    const { centerY } = this.getCenterPoint(element);
+    for (let x = 0; x < element.offsetWidth; x += 10) this.dispatchMousemove(element, x, centerY);
   },
   dispatchMousemove(element, clientX, clientY) {
     const dict = { clientX, clientY, bubbles: true };
     element.dispatchEvent(new MouseEvent("mousemove", dict));
   },
-  triggerHover(element) {
-    if (!element) return;
-    // this.log("悬停元素：", element);
-    const { centerX, centerY } = this.getElementCenterPoint(element);
-    const dict = { clientX: centerX, clientY: centerY, bubbles: true };
-    element?.dispatchEvent(new MouseEvent("mouseover", dict));
-  },
-  triggerEscape() {
-    const dict = { key: "Escape", keyCode: 27, bubbles: true };
-    document.body?.dispatchEvent(new KeyboardEvent("keydown", dict)); // 触发键盘`esc`按键
-  },
   createObserver(target, callback) {
-    target = target instanceof Element ? target : this.query(target);
-    const options = { attributes: true, childList: true, subtree: true };
     const observer = new MutationObserver(callback);
-    observer.observe(target, options);
+    target = target instanceof Element ? target : this.query(target);
+    observer.observe(target, { attributes: true, childList: true, subtree: true });
     return observer;
   },
   closest(element, selector, maxLevel = 3) {
@@ -110,12 +99,9 @@ export default {
   },
   getParents(element, withSelf = false, maxLevel = Infinity) {
     const parents = withSelf && element ? [element] : [];
-    for (
-      let current = element?.parentElement, level = 0;
-      current && current !== document.body && level < maxLevel;
-      current = current.parentElement, level++
-    ) {
-      parents.unshift(current);
+    for (let current = element, level = 0; current && level < maxLevel; level++) {
+      current = current.parentNode instanceof ShadowRoot ? current?.getRootNode()?.host : current?.parentElement;
+      current && parents.unshift(current);
     }
     return parents;
   },
@@ -126,5 +112,33 @@ export default {
       hash |= 0;
     }
     return hash >>> 0;
+  },
+  /**
+   * 通过 XPath 查找元素，支持文本内容或属性值匹配
+   * @param {'text'|'attr'} mode - 匹配模式：'text' 匹配文本内容，'attr' 匹配任意属性
+   * @param {...string|string[]} texts - 要匹配的文本（可嵌套数组）
+   * @returns {Element[]} 匹配的元素数组
+   */
+  findByText(mode, ...texts) {
+    const flatTexts = texts.flat();
+    const expr = Object.is(mode, "text")
+      ? `.//*[${flatTexts.map((t) => `contains(text(), '${t.replace(/'/g, "\\'")}')`).join(" or ")}]`
+      : `.//*[${flatTexts.map((t) => `@*[contains(., '${t.replace(/'/g, "\\'")}')]`).join(" or ")}]`;
+    const nodes = document.evaluate(expr, document.body, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+    return Array.from({ length: nodes.snapshotLength }, (_, i) => nodes.snapshotItem(i)).filter((el) => !el.matches("script"));
+  },
+  setPart(node, value) {
+    if (!node?.getRootNode()?.host) return;
+    const currentParts = node.getAttribute("part")?.split(" ") || [];
+    node.setAttribute("part", [...new Set([...currentParts, value])].join(" "));
+  },
+  removePart(node, value) {
+    if (!node?.getRootNode()?.host) return;
+    const parts = (node.getAttribute("part") || "").trim().split(/\s+/).filter(Boolean);
+    const newValue = parts.filter((v) => v !== value).join(" ");
+    newValue ? node.setAttribute("part", newValue) : node.removeAttribute("part");
+  },
+  togglePart(node, value) {
+    node.getAttribute("part")?.includes(value) ? this.removePart(node, value) : this.setPart(node, value);
   },
 };

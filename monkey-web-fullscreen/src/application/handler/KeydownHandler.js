@@ -1,10 +1,10 @@
+import Site from "../common/Site";
 import Tools from "../common/Tools";
-import webSite from "../common/WebSite";
-import storage from "../common/Storage";
+import Storage from "../common/Storage";
 import keyboard from "../common/Keyboard";
-import constants from "../common/Constants";
-import selectorConfig from "../common/SelectorConfig";
-const { PLAY_RATE_STEP, VIDEO_SKIP_INTERVAL, ZERO_KEY_SKIP_INTERVAL } = storage;
+import Constants from "../common/Constants";
+import SiteIcons from "../common/SiteIcons";
+const { PLAY_RATE_STEP, VIDEO_SKIP_INTERVAL, ZERO_KEY_SKIP_INTERVAL } = Storage;
 
 /**
  * 快捷键逻辑处理
@@ -23,7 +23,7 @@ export default {
     window.addEventListener("keydown", (event) => this.keydownHandler.call(this, event), true);
     window.addEventListener("message", ({ data }) => {
       // Tools.log(location.href, "接收到消息：", data);
-      if (!data?.source?.includes(constants.MSG_SOURCE)) return;
+      if (!data?.source?.includes(Constants.MSG_SOURCE)) return;
       if (data?.videoInfo) return this.setParentVideoInfo(data.videoInfo);
       if (data?.topInfo) window.topInfo = this.topInfo = data.topInfo;
       if (data?.defaultPlaybackRate) this.defaultPlaybackRate();
@@ -43,32 +43,35 @@ export default {
   },
   processEvent(data) {
     // video可能在iframe中，向iframe传递事件
-    if (!this.video) Tools.postMsgToFrames(data);
+    if (!this.video) Tools.sendToIFrames(data);
     if (data?.key) this.execHotKeyActions(data.key.toUpperCase());
   },
   execHotKeyActions(key) {
     // Tools.log("按下的键：", { key });
     const mapping = {
-      Z: () => this.defaultPlaybackRate(),
-      P: () => (webSite.inMatches() ? this.triggerIconElement("webfull", 1) : this.enhance()),
-      N: () => (webSite.inMatches() ? this.triggerIconElement("next") : this.switchEpisode()),
+      P: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance()),
+      N: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
       ARROWLEFT: () => this.isOverrideKeyboard() && this.adjustVideoTime(-VIDEO_SKIP_INTERVAL.get()),
       ARROWRIGHT: () => this.isOverrideKeyboard() && this.adjustVideoTime(VIDEO_SKIP_INTERVAL.get()),
       SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.video),
       0: () => this.adjustVideoTime(ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
-      D: () => this.triggerIconElement("danmaku", 3),
-      F: () => this.triggerIconElement("full", 0),
+      D: () => this.triggerIconElement(SiteIcons.name.danmaku),
+      F: () => this.triggerIconElement(SiteIcons.name.full),
       KEYR: () => this.videoRotateOrMirror(true),
       R: () => this.videoRotateOrMirror(),
+      Z: () => this.defaultPlaybackRate(),
     };
     [keyboard.A, keyboard.ADD].forEach((key) => (mapping[key] = () => this.adjustPlaybackRate(PLAY_RATE_STEP.get())));
     [keyboard.S, keyboard.SUB].forEach((key) => (mapping[key] = () => this.adjustPlaybackRate(-PLAY_RATE_STEP.get())));
 
     mapping[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
   },
-  triggerIconElement(name, index) {
-    webSite.isBiliLive()
-      ? this.getBiliLiveIcons()?.[index]?.click()
-      : Tools.query(selectorConfig[location.host]?.[name])?.click();
+  triggerIconElement(name) {
+    const index = Object.values(SiteIcons.name).indexOf(name);
+    Site.isBiliLive()
+      ? SiteIcons.name.webFull === name
+        ? this.liveWebFullScreen()
+        : this.getBiliLiveIcons()?.[index]?.click()
+      : Tools.query(SiteIcons[location.host]?.[name])?.click();
   },
 };
