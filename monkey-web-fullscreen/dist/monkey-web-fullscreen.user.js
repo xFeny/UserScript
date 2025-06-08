@@ -901,7 +901,7 @@
   const { RELATIVE_EPISODE_SELECTOR: RE_SELECTOR$1 } = Storage;
   const SwitchEpisode = {
     switchEpisode(isPrev = false) {
-      const targetEpisode = this.getTargetEpisodeByText(isPrev) ?? this.getTargetEpisode(this.getCurrentEpisode(), isPrev);
+      const targetEpisode = this.getTargetEpisode(this.getCurrentEpisode(), isPrev) ?? this.getTargetEpisodeByText(isPrev);
       this.jumpToTargetEpisode(targetEpisode);
     },
     getCurrentEpisode() {
