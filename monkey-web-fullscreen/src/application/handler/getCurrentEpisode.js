@@ -105,7 +105,7 @@
     if (!element) return;
     const eleName = element.tagName;
     const eleClass = Array.from(element.classList);
-    const sibling = findSiblingInParent(element, eleName);
+    const sibling = findSibling(element, eleName);
     const children = Array.from(sibling?.parentElement.children);
     return children.filter((ele) => {
       const currClass = Array.from(ele.classList);
@@ -114,7 +114,7 @@
     });
   }
 
-  function findSiblingInParent(element, selector, maxLevel = 3) {
+  function findSibling(element, selector, maxLevel = 3) {
     for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
       for (const child of parent.children) {
         if (child !== element && child.matches(selector)) return child;

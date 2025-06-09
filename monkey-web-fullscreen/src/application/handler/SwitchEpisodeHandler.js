@@ -59,7 +59,7 @@ export default {
     if (!element) return [];
     const eleName = element.tagName;
     const eleClass = Array.from(element.classList);
-    const sibling = Tools.findSiblingInParent(element, eleName);
+    const sibling = Tools.findSibling(element, eleName);
     const children = Array.from(sibling?.parentElement?.children ?? []);
     return children.filter((ele) => {
       const currClass = Array.from(ele.classList);

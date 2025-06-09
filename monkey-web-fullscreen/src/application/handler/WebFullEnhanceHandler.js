@@ -54,6 +54,6 @@ export default {
       '[class*="bar"]:not([class*="barrage"]), [class*="footer"], [class*="bottom"]',
       ".iqp-player-innerlayer",
     ];
-    return Tools.findSiblingInParent(ele, `:is(${ctrl})`);
+    return Tools.findSibling(ele, `:is(${ctrl})`) ?? Tools.findParentWithChild(ele, ctrl[0]);
   },
 };

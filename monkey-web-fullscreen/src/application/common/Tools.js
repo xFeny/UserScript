@@ -72,7 +72,13 @@ export default unsafeWindow.Tools = {
     }
     return null;
   },
-  findSiblingInParent(element, selector, maxLevel = 3) {
+  findParentWithChild(element, selector, maxLevel = 3) {
+    for (let level = 0; element && level < maxLevel; level++, element = element.parentElement) {
+      if (this.query(selector, element)) return element;
+    }
+    return null;
+  },
+  findSibling(element, selector, maxLevel = 3) {
     for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
       for (const child of parent.children) {
         if (child !== element && child.matches(selector)) return child;
