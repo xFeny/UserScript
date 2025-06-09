@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      2.9.1c
+// @version      2.9.2
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持任意视频倍速播放；支持播放进度记录；支持任意视频网站下集切换。
 // @license      GPL-3.0-only
