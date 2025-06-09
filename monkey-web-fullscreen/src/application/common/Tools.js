@@ -13,18 +13,20 @@ export default unsafeWindow.Tools = {
   isNumber: (str) => /^[0-9]$/.test(str),
   scrollTop: (top) => window.scrollTo({ top }),
   alert: (...data) => window.alert(data.join(" ")),
+  getElementRect: (el) => el?.getBoundingClientRect(),
   query: (selector, context) => querySelector(selector, context),
   querys: (selector, context) => querySelectorAll(selector, context),
   validDuration: (video) => !isNaN(video.duration) && video.duration !== Infinity,
   triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
   postMessage: (win = null, data) => win?.postMessage({ source: MSG_SOURCE, ...data }, "*"),
-  isVisible: (ele) => !!(ele?.offsetWidth || ele?.offsetHeight || ele?.getClientRects().length),
-  log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
-  preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
-  getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
-  hasClass: (element, ...classes) => classes.flat().some((cls) => element.classList.contains(cls)),
+  isVisible: (el) => !!(el?.offsetWidth || el?.offsetHeight || el?.getClientRects().length),
   getNumbers: (str) => (typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : []),
-  getElementRect: (element) => element?.getBoundingClientRect(),
+  log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
+  getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
+  preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
+  hasClass: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
+  delCls: (el, ...classes) => el?.classList.remove(...classes),
+  addCls: (el, ...classes) => el?.classList.add(...classes),
   notyf(msg, isError = false) {
     const notyf = new Notyf({ duration: ONE_SEC * 3, position: { x: "center", y: "top" } });
     isError ? notyf.error(msg) : notyf.success(msg);
@@ -129,16 +131,15 @@ export default unsafeWindow.Tools = {
   },
   setPart(node, value) {
     if (!node?.getRootNode()?.host) return;
-    const currentParts = node.getAttribute("part")?.split(" ") || [];
-    node.setAttribute("part", [...new Set([...currentParts, value])].join(" "));
+    const parts = node?.getAttribute("part")?.split(/\s+/) ?? [];
+    node?.setAttribute("part", [...new Set([...parts, value])].join(" ").trim());
   },
-  removePart(node, value) {
+  delPart(node, value) {
     if (!node?.getRootNode()?.host) return;
-    const parts = (node.getAttribute("part") || "").trim().split(/\s+/).filter(Boolean);
-    const newValue = parts.filter((v) => v !== value).join(" ");
-    newValue ? node.setAttribute("part", newValue) : node.removeAttribute("part");
+    const parts = (node?.getAttribute("part")?.split(/\s+/) ?? []).filter((v) => v !== value);
+    node?.setAttribute("part", parts.join(" ").trim());
   },
   togglePart(node, value) {
-    node.getAttribute("part")?.includes(value) ? this.removePart(node, value) : this.setPart(node, value);
+    node?.getAttribute("part")?.includes(value) ? this.delPart(node, value) : this.setPart(node, value);
   },
 };

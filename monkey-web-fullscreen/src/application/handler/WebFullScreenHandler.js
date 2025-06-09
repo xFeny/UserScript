@@ -28,7 +28,7 @@ export default {
       unsafeWindow.top?.livePlayer?.volume(100); // 声音100%
       unsafeWindow.top?.livePlayer?.switchQuality("10000"); // 原画画质
       localStorage.setItem("FULLSCREEN-GIFT-PANEL-SHOW", 0); // 关闭全屏礼物栏
-      document.body.classList.add("hide-asida-area", "hide-aside-area"); // 关闭侧边聊天栏
+      Tools.addCls(document.body, "hide-asida-area", "hide-aside-area"); // 关闭侧边聊天栏
     }
 
     return Tools.triggerClick(icons?.[1]);

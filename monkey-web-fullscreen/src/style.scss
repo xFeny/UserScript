@@ -11,18 +11,12 @@
   background: rgba(0, 0, 0, 0.75) !important;
 }
 
-@mixin Transform() {
-  transform: rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scaleX(var(--mirror, 1)) !important;
-}
-
-.monkey-transform,
-::part(monkey-transform) {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+._transform_,
+::part(_transform_) {
+  object-fit: contain !important;
   transform-origin: center !important;
   transition: transform 0.35s !important;
-  @include Transform();
+  transform: rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scaleX(var(--mirror, 1)) !important;
 }
 
 ._webFullScreen_,
@@ -53,10 +47,10 @@
   width: 100vw !important;
   height: 100vh !important;
   object-fit: contain !important;
-  @include Transform();
 }
 
-.hideCursor {
+.hideCursor,
+::part(hideCursor) {
   cursor: none !important;
 }
 

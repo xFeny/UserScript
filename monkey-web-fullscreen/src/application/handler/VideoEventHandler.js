@@ -8,8 +8,8 @@ export default {
   loadedmetadata() {
     App.universalWebFullscreen(this);
     Tools.querys('[id*="loading"]')
-      .filter((ele) => !Tools.query('[class*="player"]', ele))
-      .forEach((ele) => ele.classList.add("not-player"));
+      .filter((el) => !Tools.query('[class*="player"]', el))
+      .forEach((el) => Tools.addCls(el, "not-player"));
   },
   loadeddata() {
     App.initVideoProperties(this);

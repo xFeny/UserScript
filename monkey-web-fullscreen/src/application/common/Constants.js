@@ -12,6 +12,7 @@ export default Object.freeze({
   DEF_PLAY_RATE: 1,
   MAX_PLAY_RATE: 16,
   ONE_SEC: ONE_SECOND,
+  webFull: "_webFullScreen_",
   SHOW_TOAST_TIME: ONE_SECOND * 5,
   SHOW_TOAST_POSITION: positions.bottomLeft,
   MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN",

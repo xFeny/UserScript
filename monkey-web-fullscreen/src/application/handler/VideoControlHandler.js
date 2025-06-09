@@ -79,7 +79,7 @@ export default {
     if (!this.video) return;
 
     const style = this.video.style;
-    this.video.classList.add("monkey-transform"), Tools.setPart(this.video, "monkey-transform");
+    Tools.addCls(this.video, "_transform_"), Tools.setPart(this.video, "_transform_");
     if (mirror) return (this.isMirrored = !this.isMirrored), style.setProperty("--mirror", this.isMirrored ? -1 : 1);
 
     this.rotation = (this.rotation + 90) % 360;

@@ -120,9 +120,9 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
     if (this.normalSite()) return;
     const videoWrap = this.getVideoHostContainer();
     isHide
-      ? Array.from([this?.video, ...Tools.getParents(videoWrap, true, 3)]).forEach((ele) => {
-          ele?.classList.add("hideCursor"), ele?.dispatchEvent(new MouseEvent("mouseleave"));
+      ? [this?.video, ...Tools.getParents(videoWrap, true, 3)].forEach((el) => {
+          Tools.addCls(el, "hideCursor"), Tools.setPart(el, "hideCursor"), el?.dispatchEvent(new MouseEvent("mouseleave"));
         })
-      : Tools.querys(".hideCursor").forEach((el) => el.classList.remove("hideCursor"));
+      : Tools.querys(".hideCursor").forEach((el) => (Tools.delCls(el, "hideCursor"), Tools.delPart(el, "hideCursor")));
   },
 };

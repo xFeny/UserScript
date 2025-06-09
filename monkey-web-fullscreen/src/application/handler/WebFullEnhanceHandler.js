@@ -1,5 +1,6 @@
+import Constants from "../common/Constants";
 import Tools from "../common/Tools";
-
+const { webFull } = Constants;
 /**
  * 通用网页全屏
  */
@@ -11,22 +12,18 @@ export default {
     if (!wrap) return;
 
     wrap.ctrl = wrap.ctrl ?? wrap?.controls;
-    Tools.getParents(wrap, true)?.forEach((el) => {
-      el.classList.toggle("_webFullScreen_"), Tools.togglePart(el, "_webFullScreen_");
-    });
+    Tools.getParents(wrap, true)?.forEach((el) => (el.classList.toggle(webFull), Tools.togglePart(el, webFull)));
 
     if (this.video) Tools.togglePart(this.video, "_video_");
-    if (wrap.matches("video")) wrap.controls = Tools.hasClass(wrap, "_webFullScreen_") ? true : wrap.ctrl;
+    if (wrap.matches("video")) wrap.controls = Tools.hasClass(wrap, webFull) ? true : wrap.ctrl;
 
     this.cleanStubbornElements(wrap);
   },
   cleanStubbornElements(ele) {
-    if (Tools.hasClass(ele, "_webFullScreen_")) return;
+    if (Tools.hasClass(ele, webFull)) return;
 
     Tools.scrollTop(Tools.getElementRect(ele)?.top - 100);
-    Tools.querys("[part='_webFullScreen_'], ._webFullScreen_").forEach((el) => {
-      el.classList.remove("_webFullScreen_"), Tools.removePart(el, "_webFullScreen_");
-    });
+    Tools.querys(`.${webFull}`).forEach((el) => (Tools.delCls(el, webFull), Tools.delPart(el, webFull)));
   },
   getVideoHostContainer() {
     if (this.video) return this.getVideoWrapper();
