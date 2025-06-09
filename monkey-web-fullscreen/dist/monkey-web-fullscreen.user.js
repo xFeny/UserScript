@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      2.9.1
+// @version      2.9.1c
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持任意视频倍速播放；支持播放进度记录；支持任意视频网站下集切换。
 // @license      GPL-3.0-only
@@ -52,7 +52,7 @@
 // @note         *://*/*
 // ==/UserScript==
 
-(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const o=document.createElement("style");o.textContent=t,document.head.append(o)})(' @charset "UTF-8";[part=monkey-toast],::part(monkey-toast){color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in;background:#000000bf!important}.monkey-transform,::part(monkey-transform){width:100%;height:100%;object-fit:contain;transform-origin:center!important;transition:transform .35s!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scaleX(var(--mirror, 1))!important}._webFullScreen_,::part(_webFullScreen_){top:0!important;left:0!important;margin:0!important;padding:0!important;border:none!important;width:100vw!important;min-width:0!important;min-height:0!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important}._webFullScreen_ video,::part(_video_){top:0!important;left:0!important;width:100vw!important;height:100vh!important;object-fit:contain!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scaleX(var(--mirror, 1))!important}.hideCursor{cursor:none!important}#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,.live-room-app #sidebar-vm,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.login-tip,.login-guide,body.lite-room .bili-mini-mask,body.risk-captcha-adapt .bili-mini-mask{display:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen h4{color:red;margin:0 auto}.monkey-web-fullscreen p{color:#999;font-size:12px}.monkey-web-fullscreen #monkey-picker{height:auto;max-width:25em;font-size:14px;margin-bottom:0;min-height:10em;resize:vertical}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen ._menu_{color:#666;display:flex;cursor:pointer;font-size:20px;font-weight:400;float:none!important;align-items:center!important;margin-bottom:15px!important;justify-content:space-between!important}.monkey-web-fullscreen ._menu_:hover{color:#333}.monkey-web-fullscreen ._menu_:last-of-type{margin-bottom:0!important}.monkey-web-fullscreen ._menu_ input{outline:none;cursor:pointer;opacity:1!important;width:20px!important;height:20px!important;position:static!important;appearance:auto!important;-webkit-appearance:auto!important}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical}#buffer,#install,#a1 #tips,#player #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading.not-player,#player #loading-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}} ');
+(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const o=document.createElement("style");o.textContent=t,document.head.append(o)})(' @charset "UTF-8";[part=monkey-toast],::part(monkey-toast){color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in;background:#000000bf!important}._transform_,::part(_transform_){object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scaleX(var(--mirror, 1))!important}._webFullScreen_,::part(_webFullScreen_){top:0!important;left:0!important;margin:0!important;padding:0!important;border:none!important;width:100vw!important;min-width:0!important;min-height:0!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important}._webFullScreen_ video,::part(_video_){top:0!important;left:0!important;width:100vw!important;height:100vh!important;object-fit:contain!important}.hideCursor,::part(hideCursor){cursor:none!important}#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,.live-room-app #sidebar-vm,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.login-tip,.login-guide,body.lite-room .bili-mini-mask,body.risk-captcha-adapt .bili-mini-mask{display:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen h4{color:red;margin:0 auto}.monkey-web-fullscreen p{color:#999;font-size:12px}.monkey-web-fullscreen #monkey-picker{height:auto;max-width:25em;font-size:14px;margin-bottom:0;min-height:10em;resize:vertical}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen ._menu_{color:#666;display:flex;cursor:pointer;font-size:20px;font-weight:400;float:none!important;align-items:center!important;margin-bottom:15px!important;justify-content:space-between!important}.monkey-web-fullscreen ._menu_:hover{color:#333}.monkey-web-fullscreen ._menu_:last-of-type{margin-bottom:0!important}.monkey-web-fullscreen ._menu_ input{outline:none;cursor:pointer;opacity:1!important;width:20px!important;height:20px!important;position:static!important;appearance:auto!important;-webkit-appearance:auto!important}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical}#buffer,#install,#a1 #tips,#player #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading.not-player,#player #loading-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}} ');
 
 (function (notyf, Swal) {
   'use strict';
@@ -68,6 +68,7 @@
     DEF_PLAY_RATE: 1,
     MAX_PLAY_RATE: 16,
     ONE_SEC: ONE_SECOND,
+    webFull: "_webFullScreen_",
     SHOW_TOAST_TIME: ONE_SECOND * 5,
     SHOW_TOAST_POSITION: positions.bottomLeft,
     MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN"
@@ -208,18 +209,20 @@
     isNumber: (str) => /^[0-9]$/.test(str),
     scrollTop: (top2) => window.scrollTo({ top: top2 }),
     alert: (...data) => window.alert(data.join(" ")),
+    getElementRect: (el) => el?.getBoundingClientRect(),
     query: (selector, context) => querySelector(selector, context),
     querys: (selector, context) => querySelectorAll(selector, context),
     validDuration: (video) => !isNaN(video.duration) && video.duration !== Infinity,
     triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
     postMessage: (win = null, data) => win?.postMessage({ source: MSG_SOURCE, ...data }, "*"),
-    isVisible: (ele) => !!(ele?.offsetWidth || ele?.offsetHeight || ele?.getClientRects().length),
-    log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
-    preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
-    getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
-    hasClass: (element, ...classes) => classes.flat().some((cls) => element.classList.contains(cls)),
+    isVisible: (el) => !!(el?.offsetWidth || el?.offsetHeight || el?.getClientRects().length),
     getNumbers: (str) => typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : [],
-    getElementRect: (element) => element?.getBoundingClientRect(),
+    log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
+    getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
+    preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
+    hasClass: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
+    delCls: (el, ...classes) => el?.classList.remove(...classes),
+    addCls: (el, ...classes) => el?.classList.add(...classes),
     notyf(msg, isError = false) {
       const notyf$1 = new notyf.Notyf({ duration: ONE_SEC$1 * 3, position: { x: "center", y: "top" } });
       isError ? notyf$1.error(msg) : notyf$1.success(msg);
@@ -320,17 +323,16 @@
     },
     setPart(node, value) {
       if (!node?.getRootNode()?.host) return;
-      const currentParts = node.getAttribute("part")?.split(" ") || [];
-      node.setAttribute("part", [.../* @__PURE__ */ new Set([...currentParts, value])].join(" "));
+      const parts = node?.getAttribute("part")?.split(/\s+/) ?? [];
+      node?.setAttribute("part", [.../* @__PURE__ */ new Set([...parts, value])].join(" ").trim());
     },
-    removePart(node, value) {
+    delPart(node, value) {
       if (!node?.getRootNode()?.host) return;
-      const parts = (node.getAttribute("part") || "").trim().split(/\s+/).filter(Boolean);
-      const newValue = parts.filter((v) => v !== value).join(" ");
-      newValue ? node.setAttribute("part", newValue) : node.removeAttribute("part");
+      const parts = (node?.getAttribute("part")?.split(/\s+/) ?? []).filter((v) => v !== value);
+      node?.setAttribute("part", parts.join(" ").trim());
     },
     togglePart(node, value) {
-      node.getAttribute("part")?.includes(value) ? this.removePart(node, value) : this.setPart(node, value);
+      node?.getAttribute("part")?.includes(value) ? this.delPart(node, value) : this.setPart(node, value);
     }
   };
   const SiteIcons = {
@@ -351,7 +353,7 @@
   const VideoEventHandler = {
     loadedmetadata() {
       App.universalWebFullscreen(this);
-      Tools.querys('[id*="loading"]').filter((ele) => !Tools.query('[class*="player"]', ele)).forEach((ele) => ele.classList.add("not-player"));
+      Tools.querys('[id*="loading"]').filter((el) => !Tools.query('[class*="player"]', el)).forEach((el) => Tools.addCls(el, "not-player"));
     },
     loadeddata() {
       App.initVideoProperties(this);
@@ -496,9 +498,9 @@
     showOrHideCursor(isHide = true) {
       if (this.normalSite()) return;
       const videoWrap = this.getVideoHostContainer();
-      isHide ? Array.from([this?.video, ...Tools.getParents(videoWrap, true, 3)]).forEach((ele) => {
-        ele?.classList.add("hideCursor"), ele?.dispatchEvent(new MouseEvent("mouseleave"));
-      }) : Tools.querys(".hideCursor").forEach((el) => el.classList.remove("hideCursor"));
+      isHide ? [this?.video, ...Tools.getParents(videoWrap, true, 3)].forEach((el) => {
+        Tools.addCls(el, "hideCursor"), Tools.setPart(el, "hideCursor"), el?.dispatchEvent(new MouseEvent("mouseleave"));
+      }) : Tools.querys(".hideCursor").forEach((el) => (Tools.delCls(el, "hideCursor"), Tools.delPart(el, "hideCursor")));
     }
   };
   class StorageItem {
@@ -820,7 +822,7 @@
     videoRotateOrMirror(mirror = false) {
       if (!this.video) return;
       const style = this.video.style;
-      this.video.classList.add("monkey-transform"), Tools.setPart(this.video, "monkey-transform");
+      Tools.addCls(this.video, "_transform_"), Tools.setPart(this.video, "_transform_");
       if (mirror) return this.isMirrored = !this.isMirrored, style.setProperty("--mirror", this.isMirrored ? -1 : 1);
       this.rotation = (this.rotation + 90) % 360;
       const { videoWidth, videoHeight } = this.video;
@@ -883,7 +885,7 @@
         _unsafeWindow.top?.livePlayer?.volume(100);
         _unsafeWindow.top?.livePlayer?.switchQuality("10000");
         localStorage.setItem("FULLSCREEN-GIFT-PANEL-SHOW", 0);
-        document.body.classList.add("hide-asida-area", "hide-aside-area");
+        Tools.addCls(document.body, "hide-asida-area", "hide-aside-area");
       }
       return Tools.triggerClick(icons?.[1]);
     },
@@ -1059,25 +1061,22 @@
       }).then((result) => result.isConfirmed && confirmCallback.call(this, result.value));
     }
   };
+  const { webFull } = Constants;
   const WebFullEnhance = {
     webFullEnhance() {
       if (this.normalSite() || Tools.isTooFrequent("enhance", 300)) return;
       const wrap = this.getVideoHostContainer();
       if (!wrap) return;
       wrap.ctrl = wrap.ctrl ?? wrap?.controls;
-      Tools.getParents(wrap, true)?.forEach((el) => {
-        el.classList.toggle("_webFullScreen_"), Tools.togglePart(el, "_webFullScreen_");
-      });
+      Tools.getParents(wrap, true)?.forEach((el) => (el.classList.toggle(webFull), Tools.togglePart(el, webFull)));
       if (this.video) Tools.togglePart(this.video, "_video_");
-      if (wrap.matches("video")) wrap.controls = Tools.hasClass(wrap, "_webFullScreen_") ? true : wrap.ctrl;
+      if (wrap.matches("video")) wrap.controls = Tools.hasClass(wrap, webFull) ? true : wrap.ctrl;
       this.cleanStubbornElements(wrap);
     },
     cleanStubbornElements(ele) {
-      if (Tools.hasClass(ele, "_webFullScreen_")) return;
+      if (Tools.hasClass(ele, webFull)) return;
       Tools.scrollTop(Tools.getElementRect(ele)?.top - 100);
-      Tools.querys("[part='_webFullScreen_'], ._webFullScreen_").forEach((el) => {
-        el.classList.remove("_webFullScreen_"), Tools.removePart(el, "_webFullScreen_");
-      });
+      Tools.querys(`.${webFull}`).forEach((el) => (Tools.delCls(el, webFull), Tools.delPart(el, webFull)));
     },
     getVideoHostContainer() {
       if (this.video) return this.getVideoWrapper();
