@@ -1,6 +1,6 @@
 import Site from "./common/Site";
 import Tools from "./common/Tools";
-import Constants from "./common/Constants";
+import Consts from "./common/Consts";
 import SiteIcons from "./common/SiteIcons";
 import VideoEventHandler from "./handler/VideoEventHandler";
 
@@ -47,7 +47,7 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
       if (!this.videoInfo || !this.webFullElement || !this.specificWebFullscreen(video)) return;
       observer.disconnect(), this.handleLoginPopups();
     });
-    setTimeout(() => observer.disconnect(), Constants.ONE_SEC * 10);
+    setTimeout(() => observer.disconnect(), Consts.ONE_SEC * 10);
   },
   triggerVideoStart() {
     // https://www.jumomo.cc、https://www.jiaozi.me、https://www.kmvod.cc
@@ -77,12 +77,12 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
   },
   healthCurrentVideo() {
     if (this.healthID || Tools.isTooFrequent("healt")) return;
-    this.healthID = setInterval(() => this.getPlayingVideo(), Constants.ONE_SEC);
+    this.healthID = setInterval(() => this.getPlayingVideo(), Consts.ONE_SEC);
   },
   getPlayingVideo() {
     const videos = Tools.querys("video");
     for (const video of videos) {
-      if (this.video === video || video.paused || !Tools.validDuration(video) || this.isBackgroudVideo(video)) continue;
+      if (this.video === video || video.paused || isNaN(video.duration) || this.isBackgroudVideo(video)) continue;
       return this.addVideoEvtListener(video); // 正在播放的video
     }
   },
@@ -105,24 +105,29 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
     Tools.sendToIFrames({ topInfo });
   },
   setupMouseMoveListener() {
-    const delay = Constants.ONE_SEC * 2;
-    let timer = setTimeout(() => this.showOrHideCursor(), delay);
-    document.addEventListener("mousemove", ({ target, isTrusted }) => {
+    let timer = null;
+    const handleMouseEvent = ({ target, isTrusted }, addListener = false) => {
       if (!isTrusted) return;
+
       clearTimeout(timer);
-      this.showOrHideCursor(false);
-      timer = setTimeout(() => this.showOrHideCursor(), delay);
-      if (this.video === target || !target.matches("video") || this.isBackgroudVideo(target)) return;
+      this.toggleCursor();
+      timer = setTimeout(() => this.toggleCursor(true), Consts.ONE_SEC * 3);
+
+      if (!addListener || this.video === target || !target.matches("video") || this.isBackgroudVideo(target)) return;
       this.addVideoEvtListener(target);
-    });
+    };
+
+    document.addEventListener("mousemove", (e) => handleMouseEvent(e, true));
+    document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
   },
-  showOrHideCursor(isHide = true) {
-    if (this.normalSite()) return;
+  toggleCursor(hide = false) {
+    if (this.normalSite() || Tools.isTooFrequent("mouse", 300)) return;
     const videoWrap = this.getVideoHostContainer();
-    isHide
-      ? [this?.video, ...Tools.getParents(videoWrap, true, 3)].forEach((el) => {
-          Tools.addCls(el, "hideCursor"), Tools.setPart(el, "hideCursor"), el?.dispatchEvent(new MouseEvent("mouseleave"));
-        })
-      : Tools.querys(".hideCursor").forEach((el) => (Tools.delCls(el, "hideCursor"), Tools.delPart(el, "hideCursor")));
+    const cls = "__hc";
+
+    if (!hide) return Tools.querys(`.${cls}`).forEach((el) => (Tools.delCls(el, cls), Tools.delPart(el, cls)));
+    [this?.video, ...Tools.getParents(videoWrap, true, 3)].forEach((el) => {
+      el?.blur(), Tools.addCls(el, cls), Tools.setPart(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
+    });
   },
 };

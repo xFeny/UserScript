@@ -1,8 +1,8 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
+import Consts from "../common/Consts";
 import Storage from "../common/Storage";
 import keyboard from "../common/Keyboard";
-import Constants from "../common/Constants";
 import SiteIcons from "../common/SiteIcons";
 const { PLAY_RATE_STEP, VIDEO_SKIP_INTERVAL, ZERO_KEY_SKIP_INTERVAL } = Storage;
 
@@ -23,7 +23,7 @@ export default {
     window.addEventListener("keydown", (event) => this.keydownHandler.call(this, event), true);
     window.addEventListener("message", ({ data }) => {
       // Tools.log(location.href, "接收到消息：", data);
-      if (!data?.source?.includes(Constants.MSG_SOURCE)) return;
+      if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
       if (data?.videoInfo) return this.setParentVideoInfo(data.videoInfo);
       if (data?.topInfo) window.topInfo = this.topInfo = data.topInfo;
       if (data?.defaultPlaybackRate) this.defaultPlaybackRate();
@@ -68,10 +68,7 @@ export default {
   },
   triggerIconElement(name) {
     const index = Object.values(SiteIcons.name).indexOf(name);
-    Site.isBiliLive()
-      ? SiteIcons.name.webFull === name
-        ? this.liveWebFullScreen()
-        : this.getBiliLiveIcons()?.[index]?.click()
-      : Tools.query(SiteIcons[location.host]?.[name])?.click();
+    if (!Site.isBiliLive()) return Tools.query(SiteIcons[location.host]?.[name])?.click();
+    SiteIcons.name.webFull === name ? this.liveWebFullScreen() : this.getBiliLiveIcons()?.[index]?.click();
   },
 };

@@ -7,9 +7,7 @@ import Tools from "../common/Tools";
 export default {
   loadedmetadata() {
     App.universalWebFullscreen(this);
-    Tools.querys('[id*="loading"]')
-      .filter((el) => !Tools.query('[class*="player"]', el))
-      .forEach((el) => Tools.addCls(el, "not-player"));
+    Tools.querys('[id*="loading"]').forEach((el) => !Tools.query('[class*="player"]', el) && Tools.addCls(el, "_noplayer"));
   },
   loadeddata() {
     App.initVideoProperties(this);
@@ -34,7 +32,7 @@ export default {
     // https://www.mcydh.com、https://dick.xfani.com
     // 某些动漫网站会提示是否跳转上次播放进度，然后暂停播放等待确认跳转
     Tools.query(".ec-no")?.click();
-    Tools.query('[id*="loading"].not-player')?.remove();
+    Tools.query('[id*="loading"]._noplayer')?.remove();
   },
   ended() {
     this.isEnded = true;

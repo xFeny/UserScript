@@ -1,6 +1,6 @@
 import Tools from "../common/Tools";
+import Consts from "../common/Consts";
 import Storage from "../common/Storage";
-import Constants from "../common/Constants";
 const { RELATIVE_EPISODE_SELECTOR: RE_SELECTOR } = Storage;
 
 /**
@@ -39,9 +39,9 @@ export default {
       .map(this.getEpisodeWrapper)
       .reverse();
     // Tools.log("过滤后连接：", eles);
-    return eles.length <= 1 ? eles[0] : eles.find((el) => Tools.hasClass(el, "cur", "active") || !!this.getEpisodeNumber(el));
+    return eles.length <= 1 ? eles[0] : eles.find((el) => Tools.hasCls(el, "cur", "active") || !!this.getEpisodeNumber(el));
   },
-  getEpisodeNumber: (ele) => Tools.getNumbers(ele?.innerText?.replace(/-/g, Constants.EMPTY))?.shift(),
+  getEpisodeNumber: (ele) => Tools.getNumbers(ele?.innerText?.replace(/-/g, Consts.EMPTY))?.shift(),
   getTargetEpisode(element, isPrev = false) {
     if (!element) return;
     const currNumber = this.getEpisodeNumber(element);
@@ -73,7 +73,7 @@ export default {
       const current = stack.pop();
       if (current.matches("a, button")) return current.click();
       stack.push(...Array.from(current.children).reverse());
-      current.click();
+      Tools.triggerClick(current);
     }
   },
   getEpisodeWrapper(element) {

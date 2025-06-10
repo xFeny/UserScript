@@ -1,4 +1,4 @@
-import Constants from "./Constants";
+import Consts from "./Consts";
 
 // 获取脚本@match匹配规则
 const matches = GM_info.script.matches
@@ -16,5 +16,5 @@ export default {
   isBili: () => /bilibili.com\/video/.test(location.href),
   isBiliLive: () => location.host === "live.bilibili.com",
   isLivePage: () => !location.host.endsWith("live") && /\blive\b/.test(location.href),
-  isMatch: () => matches.some((match) => match.test(location.href.replace(location.search, Constants.EMPTY))),
+  isMatch: () => matches.some((match) => match.test(location.href.replace(location.search, Consts.EMPTY))),
 };

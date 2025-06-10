@@ -1,6 +1,6 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
-import Constants from "../common/Constants";
+import Consts from "../common/Consts";
 /**
  * 未登录状态下，自动关闭网站的登录弹窗
  */
@@ -18,6 +18,6 @@ export default {
       unsafeWindow.__BiliUser__.isLogin = true;
       unsafeWindow.__BiliUser__.cache.data.isLogin = true;
       unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
-    }, Constants.ONE_SEC * 3);
+    }, Consts.ONE_SEC * 3);
   },
 };

@@ -46,7 +46,7 @@ class StorageItem {
 /**
  * 带过期时间的存储项类，用于需要动态键的存储操作
  */
-class TimedStorageItem extends StorageItem {
+class TimedStorage extends StorageItem {
   constructor(name, defaultValue, useLocalStorage, valueParser) {
     super(name, defaultValue, useLocalStorage, valueParser);
     this.clearExpired();
@@ -105,9 +105,9 @@ export default {
   DISABLE_AUTO: new StorageItem("CLOSE_AUTO_WEB_FULL_SCREEN", false, false, (value) => Boolean(value)),
   VIDEO_SKIP_INTERVAL: new StorageItem("VIDEO_SKIP_INTERVAL", 5, false, (value) => parseInt(value, 10)),
   ZERO_KEY_SKIP_INTERVAL: new StorageItem("ZERO_KEY_SKIP_INTERVAL", 30, false, (value) => parseInt(value, 10)),
-  ENABLE_THIS_SITE_AUTO: new TimedStorageItem("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
+  ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
   DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
-  RELATIVE_EPISODE_SELECTOR: new TimedStorageItem("RELATIVE_EPISODE_SELECTOR_", null),
-  CURRENT_EPISODE_SELECTOR: new TimedStorageItem("CURRENT_EPISODE_SELECTOR_", null),
-  PLAY_TIME: new TimedStorageItem("PLAY_TIME_", 0, true, parseFloat),
+  RELATIVE_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
+  CURRENT_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
+  PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat),
 };

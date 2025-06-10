@@ -82,7 +82,7 @@ export default {
   pickerEpisodePopup(element, { validBtnCallback, confirmCallback }) {
     Swal.fire({
       html: `<h4>验证能正确获取到集数，再确定保存</h4>
-      <textarea id="monkey-picker" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
+      <textarea id="__picker" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
       <p>编辑元素选择器，确保能正确获取到集数</p>`,
       customClass: { container: "monkey-web-fullscreen" },
       title: "拾取剧集元素选择器",
@@ -93,11 +93,11 @@ export default {
       reverseButtons: true,
       focusDeny: true,
       preDeny: () => {
-        const value = Tools.query("#monkey-picker").value.trim();
+        const value = Tools.query("#__picker").value.trim();
         return value ? validBtnCallback.call(this, value) ?? false : Tools.notyf("元素选择器不能为空！", true);
       },
-      preConfirm: () => Tools.query("#monkey-picker").value.trim() || Tools.notyf("元素选择器不能为空！", true),
-      didOpen: () => (Tools.query("#monkey-picker").value = Tools.getParentChain(element)),
+      preConfirm: () => Tools.query("#__picker").value.trim() || Tools.notyf("元素选择器不能为空！", true),
+      didOpen: () => (Tools.query("#__picker").value = Tools.getParentChain(element)),
     }).then((result) => result.isConfirmed && confirmCallback.call(this, result.value));
   },
 };

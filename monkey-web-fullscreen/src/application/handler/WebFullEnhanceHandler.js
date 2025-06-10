@@ -1,6 +1,6 @@
-import Constants from "../common/Constants";
+import Consts from "../common/Consts";
 import Tools from "../common/Tools";
-const { webFull } = Constants;
+const { webFull } = Consts;
 /**
  * 通用网页全屏
  */
@@ -14,13 +14,13 @@ export default {
     wrap.ctrl = wrap.ctrl ?? wrap?.controls;
     Tools.getParents(wrap, true)?.forEach((el) => (el.classList.toggle(webFull), Tools.togglePart(el, webFull)));
 
-    if (this.video) Tools.togglePart(this.video, "_video_");
-    if (wrap.matches("video")) wrap.controls = Tools.hasClass(wrap, webFull) ? true : wrap.ctrl;
+    if (this.video) Tools.togglePart(this.video, "__video");
+    if (wrap.matches("video")) wrap.controls = Tools.hasCls(wrap, webFull) ? true : wrap.ctrl;
 
     this.cleanStubbornElements(wrap);
   },
   cleanStubbornElements(ele) {
-    if (Tools.hasClass(ele, webFull)) return;
+    if (Tools.hasCls(ele, webFull)) return;
 
     Tools.scrollTop(Tools.getElementRect(ele)?.top - 100);
     Tools.querys(`.${webFull}`).forEach((el) => (Tools.delCls(el, webFull), Tools.delPart(el, webFull)));
@@ -36,8 +36,7 @@ export default {
     return ifrs.length <= 1 ? ifrs[0] : ifrs.find((el) => Tools.isVisible(el) && Tools.pointInElement(centerX, centerY, el));
   },
   getVideoWrapper() {
-    const control = this.findVideoControlBar(this.video);
-    return control?.parentElement ?? this.findVideoContainer(this.video?.parentElement) ?? this.video;
+    return this.findVideoControlBar(this.video) ?? this.findVideoContainer(this.video?.parentElement) ?? this.video;
   },
   getVideoIFrame() {
     if (!this?.videoInfo?.frameSrc) return null;
@@ -49,11 +48,7 @@ export default {
     return Tools.closest(ele, ':is([class*="player" i], [class*="wrap"], [class*="video"], [player])');
   },
   findVideoControlBar(ele) {
-    const ctrl = [
-      '[class*="control" i]:not(.Drag-Control), [id*="control"], [class*="contrl"], [class*="ctrl"], [id*="ctrl"]',
-      '[class*="bar"]:not([class*="barrage"]), [class*="footer"], [class*="bottom"]',
-      ".iqp-player-innerlayer",
-    ];
-    return Tools.findSibling(ele, `:is(${ctrl})`) ?? Tools.findParentWithChild(ele, ctrl[0]);
+    const ctrl = '[class*="contr" i]:not(.Drag-Control), [id*="control"], [class*="ctrl"], [id*="ctrl"], [class*="progress" i]';
+    return Tools.findParentWithChild(ele, ctrl, 5);
   },
 };

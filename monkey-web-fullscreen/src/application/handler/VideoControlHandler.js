@@ -1,9 +1,9 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
+import Consts from "../common/Consts";
 import Storage from "../common/Storage";
-import Constants from "../common/Constants";
 
-const { EMPTY, ONE_SEC, DEF_PLAY_RATE, MAX_PLAY_RATE, SHOW_TOAST_TIME, SHOW_TOAST_POSITION } = Constants;
+const { EMPTY, ONE_SEC, DEF_PLAY_RATE, MAX_PLAY_RATE, SHOW_TOAST_TIME, SHOW_TOAST_POSITION } = Consts;
 const { PLAY_RATE_STEP, CACHED_PLAY_RATE, VIDEO_SKIP_INTERVAL, PLAY_TIME, DISABLE_MEMORY_TIME } = Storage;
 
 /**
@@ -58,7 +58,7 @@ export default {
     this.setCurrentTime(currentTime);
   },
   cachePlayTime(video) {
-    if (!this.topInfo || this.isLive()) return;
+    if (!this.topInfo || this.isLive() || !Tools.validDuration(this.video)) return;
     if (DISABLE_MEMORY_TIME.get() || this.isEnded() || this.isMultVideo()) return this.delPlayTime();
     if (video.currentTime > VIDEO_SKIP_INTERVAL.get()) PLAY_TIME.set(topInfo.hash, video.currentTime - 1, 7);
   },
@@ -78,8 +78,9 @@ export default {
   videoRotateOrMirror(mirror = false) {
     if (!this.video) return;
 
+    const cls = "__tsr";
     const style = this.video.style;
-    Tools.addCls(this.video, "_transform_"), Tools.setPart(this.video, "_transform_");
+    Tools.addCls(this.video, cls), Tools.setPart(this.video, cls);
     if (mirror) return (this.isMirrored = !this.isMirrored), style.setProperty("--mirror", this.isMirrored ? -1 : 1);
 
     this.rotation = (this.rotation + 90) % 360;

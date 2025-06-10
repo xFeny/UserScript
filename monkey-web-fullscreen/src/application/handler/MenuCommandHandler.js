@@ -1,5 +1,5 @@
-import Constants from "../common/Constants";
 import Storage from "../common/Storage";
+import Consts from "../common/Consts";
 import Tools from "../common/Tools";
 import Site from "../common/Site";
 import Swal from "sweetalert2";
@@ -69,7 +69,7 @@ export default {
       { name: "time", text: "禁用播放进度记录", cache: DISABLE_MEMORY_TIME, hide: this.isLive() },
     ];
     const html = configs.map(
-      ({ name, text, hide }) => `<label class="_menu_ ${hide && "hide"}">${text}<input name="${name}" type="checkbox"/></label>`
+      ({ name, text, hide }) => `<label class="__menu ${hide && "hide"}">${text}<input name="${name}" type="checkbox"/></label>`
     );
     Swal.fire({
       width: 350,
@@ -78,10 +78,10 @@ export default {
       showCancelButton: true,
       cancelButtonText: "关闭",
       showConfirmButton: false,
-      html: html.join(Constants.EMPTY),
+      html: html.join(Consts.EMPTY),
       customClass: { container: "monkey-web-fullscreen" },
-      didOpen() {
-        Tools.querys("._menu_ input").forEach((ele, i) => {
+      didOpen(popup) {
+        Tools.querys(".__menu input", popup).forEach((ele, i) => {
           ele.checked = configs[i].cache.get();
           // checkbox点击监听
           ele.addEventListener("click", function () {

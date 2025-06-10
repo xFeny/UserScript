@@ -1,8 +1,6 @@
 import { Notyf } from "notyf";
-import Constants from "./Constants";
+import Consts from "./Consts";
 import { querySelector, querySelectorAll } from "./shadow-dom-utils";
-
-const { ONE_SEC, MSG_SOURCE } = Constants;
 
 /**
  * 公共方法
@@ -18,17 +16,17 @@ export default unsafeWindow.Tools = {
   querys: (selector, context) => querySelectorAll(selector, context),
   validDuration: (video) => !isNaN(video.duration) && video.duration !== Infinity,
   triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
-  postMessage: (win = null, data) => win?.postMessage({ source: MSG_SOURCE, ...data }, "*"),
+  postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
   isVisible: (el) => !!(el?.offsetWidth || el?.offsetHeight || el?.getClientRects().length),
   getNumbers: (str) => (typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : []),
   log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
   getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
   preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
-  hasClass: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
+  hasCls: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
   delCls: (el, ...classes) => el?.classList.remove(...classes),
   addCls: (el, ...classes) => el?.classList.add(...classes),
   notyf(msg, isError = false) {
-    const notyf = new Notyf({ duration: ONE_SEC * 3, position: { x: "center", y: "top" } });
+    const notyf = new Notyf({ duration: Consts.ONE_SEC * 3, position: { x: "center", y: "top" } });
     isError ? notyf.error(msg) : notyf.success(msg);
     return false;
   },
@@ -36,7 +34,7 @@ export default unsafeWindow.Tools = {
     this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
   },
   lastTimeMap: new Map(),
-  isTooFrequent(key = "default", delay = ONE_SEC) {
+  isTooFrequent(key = "default", delay = Consts.ONE_SEC) {
     const now = Date.now();
     const lastTime = this.lastTimeMap.get(key) ?? 0;
     const isFrequent = now - lastTime < delay;
@@ -73,8 +71,8 @@ export default unsafeWindow.Tools = {
     return null;
   },
   findParentWithChild(element, selector, maxLevel = 3) {
-    for (let level = 0; element && level < maxLevel; level++, element = element.parentElement) {
-      if (this.query(selector, element)) return element;
+    for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
+      if (this.query(selector, parent)) return parent;
     }
     return null;
   },
