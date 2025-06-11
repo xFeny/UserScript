@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      2.9.3
+// @version      2.9.4
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持任意视频倍速播放；支持播放进度记录；支持任意视频网站下集切换。
 // @license      GPL-3.0-only
@@ -782,11 +782,24 @@
       if (!Tools.validDuration(this.video)) return false;
       return true;
     },
+    lockPlaybackRate(video) {
+      try {
+        const orig = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, "playbackRate");
+        Object.defineProperty(video, "playbackRate", {
+          set: (value) => value === video?.__playbackRate && orig.set.call(video, value),
+          get: () => orig.get.call(video),
+          configurable: true
+        });
+      } catch (e) {
+      }
+    },
     setPlaybackRate(playRate, show = true) {
       if (!this.checkUsable()) return;
-      this.video.playbackRate = (+playRate).toFixed(2).replace(/\.?0+$/, EMPTY);
-      if (show) this.customToast("正在以", `${this.video.playbackRate}x`, "倍速播放");
-      CACHED_PLAY_RATE.set(this.video.playbackRate);
+      this.lockPlaybackRate(this.video);
+      playRate = (+playRate).toFixed(2).replace(/\.?0+$/, EMPTY);
+      this.video.playbackRate = this.video.__playbackRate = playRate;
+      if (show) this.customToast("正在以", `${playRate}x`, "倍速播放");
+      CACHED_PLAY_RATE.set(playRate);
     },
     adjustPlaybackRate(step = PLAY_RATE_STEP.get()) {
       if (!this.checkUsable()) return;
