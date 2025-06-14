@@ -14,8 +14,8 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
   },
   normalSite: () => !window?.videoInfo && !window?.topInfo,
   isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
+  getVideo: () => Tools.querys("video:not([loop])").find(Tools.isVisible),
   isBackgroudVideo: (video) => video?.muted && video?.hasAttribute("loop"),
-  getVideo: () => Tools.querys("video:not([loop])").find((el) => Tools.isVisible(el)),
   getWebFullElement: () => Tools.query(SiteIcons[location.host]?.[SiteIcons.name.webFull]),
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {

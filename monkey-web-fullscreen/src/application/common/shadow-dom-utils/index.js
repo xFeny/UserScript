@@ -59,6 +59,7 @@ function* getShadowRoots(node, deep) {
     if (isElement(node) && node.shadowRoot) {
         yield node.shadowRoot;
     }
+    if(!doc.createTreeWalker) return;
     const toWalk = [node];
     let currentNode = undefined;
     while ((currentNode = toWalk.pop())) {

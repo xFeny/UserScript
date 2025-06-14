@@ -60,7 +60,7 @@ export default {
     if (this.isDisablePlaybackRate()) return;
     const playRate = CACHED_PLAY_RATE.get();
     // Tools.log(`当前播放倍速为：${video.playbackRate}，记忆倍速为：${playRate}`);
-    if (video.playbackRate === playRate) return;
+    if (DEF_PLAY_RATE === playRate || video.playbackRate === playRate) return;
     this.setPlaybackRate(playRate, !video.hasToast);
     video.hasToast = true;
   },
