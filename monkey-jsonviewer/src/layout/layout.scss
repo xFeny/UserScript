@@ -255,7 +255,6 @@ textarea:focus {
     font-family: monospace;
 
     > div {
-      height: 100%;
       display: none;
 
       &.active {
@@ -264,7 +263,7 @@ textarea:focus {
     }
 
     #formatBox {
-      padding: 5px 8px;
+      padding: 5px 0 8px 8px;
     }
 
     #rawTextBox {

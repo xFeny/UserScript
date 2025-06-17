@@ -12,12 +12,9 @@ export default {
     return this;
   },
   eventPath() {
-    Utils.addEvent("click mouseenter", ".json-key", (event) => {
-      const target = event.target;
+    Utils.addEvent("click mouseenter", ".json-key", ({ type, ctrlKey, target }) => {
       const path = Utils.closest(target, "[path]").getAttribute("path");
-      if (Object.is(event.type, "click") && event.ctrlKey) {
-        return GM_setClipboard(path) & layer.msg("复制成功", { time: 1500 });
-      }
+      if (ctrlKey && type === "click") return GM_setClipboard(path) & layer.msg("复制成功", { time: 1500 });
       const content = `<i>ctrl＋click 复制</i><br/><b>路径：</b>${path}`;
       tippy(target, { duration: 800, theme: "layer", allowHTML: true, maxWidth: "none", content }).show();
     });

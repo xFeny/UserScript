@@ -78,12 +78,9 @@ const format = {
   },
 };
 
-window.addEventListener("message", function (event) {
-  const { data } = event;
-  if (!data) return;
-  if (data.reload) return format.setStyle();
-  const { type, value } = data;
-  if (Object.is(type, "style")) format.changeStyle(value);
+window.addEventListener("message", function ({ data }) {
+  if (data?.reload) return format.setStyle();
+  if (Object.is(data?.type, "style")) format.changeStyle(data?.value);
 });
 
 format.init();

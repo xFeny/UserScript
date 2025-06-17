@@ -38,9 +38,9 @@ class JsonToTable extends JsonFormat {
 
   bindEvent() {
     super.bindEvent();
-    Utils.addEvent("mousedown", "table tr", function (e) {
-      const { tagName, className } = e.target;
-      if (e.ctrlKey || tagName === "A" || (tagName === "SPAN" && className !== "json-key")) return;
+    Utils.addEvent("mousedown", "table tr", function ({ ctrlKey, target }) {
+      const { tagName, className } = target;
+      if (ctrlKey || tagName === "A" || (tagName === "SPAN" && className !== "json-key")) return;
       const filter = Utils.queryAll(".selected").filter((el) => el !== this);
       Utils.removeClass(filter, "selected");
       Utils.toggleClass(this, "selected");

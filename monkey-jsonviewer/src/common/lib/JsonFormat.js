@@ -144,8 +144,7 @@ class JsonFormat {
   }
 
   bindEvent() {
-    this.addEvent("click", ".json-copy", (e) => {
-      const target = e.target;
+    this.addEvent("click", ".json-copy", ({ target }) => {
       const className = "success";
       if (!target.json || Utils.hasClass(target, className)) return;
       Utils.setClipboard(Utils.stringify(target.json, null, 2));
@@ -153,13 +152,12 @@ class JsonFormat {
       Utils.addClass(target, className);
     });
 
-    this.addEvent("click", ".json-arrow", (e) => {
-      const node = Utils.closest(e.target, ".collapsible");
-      const expanded = Utils.hasClass(node, "expanded");
-      expanded ? this.collapse(node) : this.expand(node);
+    this.addEvent("click", ".json-arrow", ({ target }) => {
+      const node = Utils.closest(target, ".collapsible");
+      Utils.hasClass(node, "expanded") ? this.collapse(node) : this.expand(node);
     });
 
-    this.addEvent("click", ".json-desc", (e) => this.expand(Utils.closest(e.target, ".collapsible")));
+    this.addEvent("click", ".json-desc", ({ target }) => this.expand(Utils.closest(target, ".collapsible")));
   }
 
   expandAll() {

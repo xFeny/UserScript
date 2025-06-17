@@ -53,22 +53,14 @@ export default {
     return this;
   },
   event() {
-    Utils.addEvent("click mouseover", "jmnode", (event) => {
-      const target = event.target;
+    Utils.addEvent("click mouseover", "jmnode", ({ type, ctrlKey, target }) => {
       const nodeid = Utils.attr(target, "nodeid");
       const node = unsafeWindow.GLOBAL_JSMIND.get_node(nodeid);
       const chain = this.getChain(node);
       if (!chain) return;
-      if (event.type === "click") {
-        if (event.ctrlKey) {
-          GM_setClipboard(chain);
-          layer.msg("复制成功", { time: 1500 });
-          return;
-        }
-
-        const keys = node.data.keys;
-        if (!keys || keys.length === 0) return;
-        this.popup(chain, keys);
+      if (type === "click") {
+        if (ctrlKey) return GM_setClipboard(chain), layer.msg("复制成功", { time: 1500 });
+        if (node?.data?.keys?.length > 0) this.popup(chain, node?.data?.keys);
       } else {
         const content = `<i>ctrl＋click 复制</i><br/><b>路径：</b>${chain}`;
         tippy(target, { content, duration: 800, theme: "layer", allowHTML: true, maxWidth: "none" }).show();

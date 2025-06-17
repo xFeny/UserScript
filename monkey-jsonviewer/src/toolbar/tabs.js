@@ -79,8 +79,7 @@ const tabs = {
     rawTextPre.textContent = str;
   },
   init() {
-    Utils.addEvent("click", ".btn", (e) => {
-      const target = e.target;
+    Utils.addEvent("click", ".btn", ({ target }) => {
       const id = target.id;
       if (Utils.hasClass(target, "tabs-item")) {
         const clas = "active";
@@ -96,8 +95,7 @@ const tabs = {
   },
 };
 
-window.addEventListener("message", function (event) {
-  const { data } = event;
+window.addEventListener("message", function ({ data }) {
   if (!data?.reload) return;
   mindBox.innerHTML = "";
   jsonMind.isFirst = true;

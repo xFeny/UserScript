@@ -14,7 +14,7 @@ export default defineConfig({
       userscript: {
         name: "JSON Viewer",
         author: "Feny",
-        version: "1.1.0",
+        version: "1.1.0c",
         match: ["*://*/*"],
         license: "GPL-3.0-only",
         homepage: "https://github.com/xFeny/UserScript/tree/main/monkey-jsonviewer",

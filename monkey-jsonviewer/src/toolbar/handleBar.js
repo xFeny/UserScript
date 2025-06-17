@@ -36,8 +36,7 @@ export default {
   },
   checked() {
     const selector = ".rightbox li";
-    Utils.addEvent("click", selector, (event) => {
-      const target = event.target;
+    Utils.addEvent("click", selector, ({ target }) => {
       if (Utils.hasClass(target, active)) return;
       const type = target.dataset.type;
       const value = target.dataset.value;
