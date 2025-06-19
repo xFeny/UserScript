@@ -3,9 +3,6 @@ import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
 
-const { EMPTY, ONE_SEC, DEF_PLAY_RATE, MAX_PLAY_RATE, SHOW_TOAST_TIME, SHOW_TOAST_POSITION } = Consts;
-const { PLAY_RATE_STEP, CACHED_PLAY_RATE, VIDEO_SKIP_INTERVAL, PLAY_TIME, DISABLE_MEMORY_TIME } = Storage;
-
 /**
  * 视频控制相关逻辑处理
  */
@@ -41,48 +38,48 @@ export default {
   setPlaybackRate(playRate, show = true) {
     if (!this.checkUsable()) return;
     this.lockPlaybackRate(this.video);
-    playRate = (+playRate).toFixed(2).replace(/\.?0+$/, EMPTY);
+    playRate = (+playRate).toFixed(2).replace(/\.?0+$/, Consts.EMPTY);
     this.video.playbackRate = this.video.__playbackRate = playRate;
     if (show) this.customToast("正在以", `${playRate}x`, "倍速播放");
-    CACHED_PLAY_RATE.set(playRate);
+    Storage.CACHED_PLAY_RATE.set(playRate);
   },
-  adjustPlaybackRate(step = PLAY_RATE_STEP.get()) {
+  adjustPlaybackRate(step = Storage.PLAY_RATE_STEP.get()) {
     if (!this.checkUsable()) return;
-    const playRate = Math.max(PLAY_RATE_STEP.get(), this.video.playbackRate + step);
-    this.setPlaybackRate(Math.min(MAX_PLAY_RATE, playRate));
+    const playRate = Math.max(Storage.PLAY_RATE_STEP.get(), this.video.playbackRate + step);
+    this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
   },
   defaultPlaybackRate() {
     if (this.isDisablePlaybackRate()) return;
-    this.setPlaybackRate(DEF_PLAY_RATE, false);
+    this.setPlaybackRate(Consts.DEF_PLAY_RATE, false);
     this.showToast("已恢复正常倍速播放");
   },
   useCachePlaybackRate(video) {
     if (this.isDisablePlaybackRate()) return;
-    const playRate = CACHED_PLAY_RATE.get();
+    const playRate = Storage.CACHED_PLAY_RATE.get();
     // Tools.log(`当前播放倍速为：${video.playbackRate}，记忆倍速为：${playRate}`);
-    if (DEF_PLAY_RATE === playRate || video.playbackRate === playRate) return;
+    if (Consts.DEF_PLAY_RATE === playRate || video.playbackRate === playRate) return;
     this.setPlaybackRate(playRate, !video.hasToast);
     video.hasToast = true;
   },
-  adjustVideoTime(second = VIDEO_SKIP_INTERVAL.get()) {
+  adjustVideoTime(second = Storage.SKIP_INTERVAL.get()) {
     if (!this.video || !Tools.validDuration(this.video) || (second > 0 && this.video.isEnded)) return;
     const currentTime = Math.min(this.video.currentTime + second, this.video.duration);
     this.setCurrentTime(currentTime);
   },
   cachePlayTime(video) {
     if (!this.topInfo || this.isLive() || !Tools.validDuration(this.video)) return;
-    if (DISABLE_MEMORY_TIME.get() || this.isEnded() || this.isMultVideo()) return this.delPlayTime();
-    if (video.currentTime > VIDEO_SKIP_INTERVAL.get()) PLAY_TIME.set(topInfo.hash, video.currentTime - 1, 7);
+    if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded() || this.isMultVideo()) return this.delPlayTime();
+    if (video.currentTime > Storage.SKIP_INTERVAL.get()) Storage.PLAY_TIME.set(topInfo.hash, video.currentTime - 1, 7);
   },
   useCachePlayTime(video) {
     if (this.hasUsedPlayTime || !this.topInfo || this.isLive()) return;
-    const time = PLAY_TIME.get(topInfo.hash);
+    const time = Storage.PLAY_TIME.get(topInfo.hash);
     if (time <= video.currentTime) return (this.hasUsedPlayTime = true);
-    this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", ONE_SEC * 3, false);
+    this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3, false);
     this.hasUsedPlayTime = true;
     this.setCurrentTime(time);
   },
-  delPlayTime: () => PLAY_TIME.del(topInfo.hash),
+  delPlayTime: () => Storage.PLAY_TIME.del(topInfo.hash),
   setCurrentTime(currentTime) {
     if (currentTime) this.video.currentTime = Math.max(0, currentTime);
   },
@@ -113,10 +110,9 @@ export default {
     span.appendChild(document.createTextNode(endText));
     this.showToast(span, duration, isRemove);
   },
-  showToast(content, duration = SHOW_TOAST_TIME, isRemove = true) {
+  showToast(content, duration = Consts.ONE_SEC * 5, isRemove = true) {
     const el = document.createElement("div");
     el.setAttribute("part", "monkey-toast");
-    el.setAttribute("style", SHOW_TOAST_POSITION);
     if (isRemove) Tools.query('[part="monkey-toast"]')?.remove();
     content instanceof Element ? el.appendChild(content) : (el.innerHTML = content);
 
@@ -124,7 +120,7 @@ export default {
     const target = videoWrap?.matches("video") ? videoWrap?.parentElement : videoWrap;
     target?.appendChild(el);
 
-    setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), ONE_SEC / 3)), duration);
+    setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
   },
   formatTime(seconds) {
     if (isNaN(seconds)) return "00:00";

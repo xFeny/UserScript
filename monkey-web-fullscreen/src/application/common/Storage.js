@@ -87,27 +87,27 @@ class TimedStorage extends StorageItem {
  * CLOSE_PLAY_RATE  禁用倍速播放功能
  * OVERRIDE_KEYBOARD  启用空格 ◀▶ 键控制
  * DISABLE_AUTO  禁用自动网页全屏
- * VIDEO_SKIP_INTERVAL  设置快进/退的时长
+ * SKIP_INTERVAL  设置快进/退的时长
  * ZERO_KEY_SKIP_INTERVAL  设置零键的快进时长
  *
  * DISABLE_MEMORY_TIME  禁用记忆播放进度
  * ENABLE_THIS_SITE_AUTO  此站启用自动网页全屏
  * USE_ALTERNATIVE  不使用外部`网页全屏`脚本，使用自带网页全屏样式
- * RELATIVE_EPISODE_SELECTOR  切换下集—所有集数中的某一集 CSS选择器
- * CURRENT_EPISODE_SELECTOR  切换下集—当前集 CSS选择器
+ * REL_EPISODE_SELECTOR  切换下集—所有集数中的某一集 CSS选择器
+ * CURR_EPISODE_SELECTOR  切换下集—当前集 CSS选择器
  * PLAY_TIME  播放进度
  */
 export default {
   PLAY_RATE_STEP: new StorageItem("PLAY_RATE_STEP", 0.25, false, parseFloat),
   CACHED_PLAY_RATE: new StorageItem("FENY_SCRIPTS_V_PLAYBACK_RATE", 1, true, parseFloat),
   CLOSE_PLAY_RATE: new StorageItem("CLOSE_PLAY_RATE", false, false, (value) => Boolean(value)),
+  SKIP_INTERVAL: new StorageItem("VIDEO_SKIP_INTERVAL", 5, false, (value) => parseInt(value, 10)),
   OVERRIDE_KEYBOARD: new StorageItem("OVERRIDE_KEYBOARD", false, false, (value) => Boolean(value)),
   DISABLE_AUTO: new StorageItem("CLOSE_AUTO_WEB_FULL_SCREEN", false, false, (value) => Boolean(value)),
-  VIDEO_SKIP_INTERVAL: new StorageItem("VIDEO_SKIP_INTERVAL", 5, false, (value) => parseInt(value, 10)),
   ZERO_KEY_SKIP_INTERVAL: new StorageItem("ZERO_KEY_SKIP_INTERVAL", 30, false, (value) => parseInt(value, 10)),
   ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
   DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
-  RELATIVE_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
-  CURRENT_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
+  CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
+  REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
   PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat),
 };

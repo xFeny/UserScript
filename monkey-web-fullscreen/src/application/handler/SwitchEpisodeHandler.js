@@ -1,7 +1,6 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
-const { RELATIVE_EPISODE_SELECTOR: RE_SELECTOR } = Storage;
 
 /**
  * 通用性切换视频下集
@@ -13,7 +12,7 @@ export default {
     this.jumpToTargetEpisode(targetEpisode);
   },
   getCurrentEpisode() {
-    return RE_SELECTOR.get(location.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
+    return Storage.REL_EPISODE_SELECTOR.get(location.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
   },
   getCurrentEpisodeByLink() {
     const { pathname, search } = location;

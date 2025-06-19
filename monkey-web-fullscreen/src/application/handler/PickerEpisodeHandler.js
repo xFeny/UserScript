@@ -3,8 +3,6 @@ import Tools from "../common/Tools";
 import Site from "../common/Site";
 import Swal from "sweetalert2";
 
-const { RELATIVE_EPISODE_SELECTOR: RE_SELECTOR, CURRENT_EPISODE_SELECTOR: EP_SELECTOR } = Storage;
-
 /**
  * 手动采集剧集元素选择器
  * https://gqc7.top/
@@ -24,8 +22,8 @@ export default {
         if (!Tools.isTopWin()) return Tools.notyf("此页面不能抓取 (•ิ_•ิ)?", true);
         Tools.preventDefault(event);
 
-        const hasCurrentSelector = EP_SELECTOR.get(location.host);
-        const hasRelativeSelector = RE_SELECTOR.get(location.host);
+        const hasCurrentSelector = Storage.CURR_EPISODE_SELECTOR.get(location.host);
+        const hasRelativeSelector = Storage.REL_EPISODE_SELECTOR.get(location.host);
         if (hasCurrentSelector && hasRelativeSelector) return Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
 
         const number = this.getEpisodeNumber(target);
@@ -37,7 +35,7 @@ export default {
     );
   },
   pickerCurrentEpisodeChain(element) {
-    if (EP_SELECTOR.get(location.host)) return;
+    if (Storage.CURR_EPISODE_SELECTOR.get(location.host)) return;
     this.pickerEpisodePopup(element, {
       validBtnCallback(value) {
         try {
@@ -49,13 +47,13 @@ export default {
         }
       },
       confirmCallback(value) {
-        EP_SELECTOR.set(location.host, value);
+        Storage.CURR_EPISODE_SELECTOR.set(location.host, value);
         Tools.notyf("继续拾取元素 ＼(＞０＜)／");
       },
     });
   },
   pickerRelativeEpisodeChain(element) {
-    if (RE_SELECTOR.get(location.host)) return;
+    if (Storage.REL_EPISODE_SELECTOR.get(location.host)) return;
     this.pickerEpisodePopup(element, {
       validBtnCallback(value) {
         try {
@@ -68,15 +66,15 @@ export default {
         }
       },
       confirmCallback(value) {
-        RE_SELECTOR.set(location.host, value);
+        Storage.REL_EPISODE_SELECTOR.set(location.host, value);
         Tools.notyf("操作完成 []~(￣▽￣)~* 干杯");
       },
     });
   },
   getCurrentEpisodeBySelector() {
-    const num = this.getEpisodeNumber(Tools.query(EP_SELECTOR.get(location.host)));
-    const current = this.getEpisodeWrapper(Tools.query(EP_SELECTOR.get(location.host)));
-    const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(RE_SELECTOR.get(location.host))));
+    const num = this.getEpisodeNumber(Tools.query(Storage.CURR_EPISODE_SELECTOR.get(location.host)));
+    const current = this.getEpisodeWrapper(Tools.query(Storage.CURR_EPISODE_SELECTOR.get(location.host)));
+    const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(Storage.REL_EPISODE_SELECTOR.get(location.host))));
     return episodes.includes(current) ? current : episodes.find((el) => this.getEpisodeNumber(el) === num);
   },
   pickerEpisodePopup(element, { validBtnCallback, confirmCallback }) {

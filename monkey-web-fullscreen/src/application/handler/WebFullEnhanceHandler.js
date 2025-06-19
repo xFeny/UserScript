@@ -1,6 +1,6 @@
 import Consts from "../common/Consts";
 import Tools from "../common/Tools";
-const { webFull } = Consts;
+
 /**
  * 通用网页全屏
  */
@@ -12,18 +12,18 @@ export default {
     if (!wrap) return;
 
     wrap.ctrl = wrap.ctrl ?? wrap?.controls;
-    Tools.getParents(wrap, true)?.forEach((el) => (el.classList.toggle(webFull), Tools.togglePart(el, webFull)));
+    Tools.getParents(wrap, true)?.forEach((el) => (el.classList.toggle(Consts.webFull), Tools.togglePart(el, Consts.webFull)));
 
     if (this.video) Tools.togglePart(this.video, "__video");
-    if (wrap.matches("video")) wrap.controls = Tools.hasCls(wrap, webFull) ? true : wrap.ctrl;
+    if (wrap.matches("video")) wrap.controls = Tools.hasCls(wrap, Consts.webFull) ? true : wrap.ctrl;
 
     this.cleanStubbornElements(wrap);
   },
   cleanStubbornElements(ele) {
-    if (Tools.hasCls(ele, webFull)) return;
+    if (Tools.hasCls(ele, Consts.webFull)) return;
 
     Tools.scrollTop(Tools.getElementRect(ele)?.top - 100);
-    Tools.querys(`.${webFull}`).forEach((el) => (Tools.delCls(el, webFull), Tools.delPart(el, webFull)));
+    Tools.querys(`.${Consts.webFull}`).forEach((el) => (Tools.delCls(el, Consts.webFull), Tools.delPart(el, Consts.webFull)));
   },
   getVideoHostContainer() {
     if (this.video) return this.getVideoWrapper();

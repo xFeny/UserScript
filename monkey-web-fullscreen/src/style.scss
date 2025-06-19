@@ -1,13 +1,15 @@
 [part="monkey-toast"],
 ::part(monkey-toast) {
+  left: 10px !important;
+  bottom: 17% !important;
   color: #fff !important;
-  font-size: 13.5px !important;
-  padding: 5px 15px !important;
+  font-size: 13px !important;
+  padding: 6px 15px !important;
   border-radius: 5px !important;
   position: absolute !important;
   z-index: 2147483647 !important;
   font-weight: normal !important;
-  transition: opacity 0.3s ease-in;
+  transition: opacity 0.3s ease-in !important;
   background: rgba(0, 0, 0, 0.75) !important;
 }
 

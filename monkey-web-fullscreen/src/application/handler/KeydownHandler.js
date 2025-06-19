@@ -4,7 +4,6 @@ import Consts from "../common/Consts";
 import Storage from "../common/Storage";
 import keyboard from "../common/Keyboard";
 import SiteIcons from "../common/SiteIcons";
-const { PLAY_RATE_STEP, VIDEO_SKIP_INTERVAL, ZERO_KEY_SKIP_INTERVAL } = Storage;
 
 /**
  * 快捷键逻辑处理
@@ -49,20 +48,20 @@ export default {
   execHotKeyActions(key) {
     // Tools.log("按下的键：", { key });
     const mapping = {
-      P: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance()),
       N: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
-      ARROWLEFT: () => this.isOverrideKeyboard() && this.adjustVideoTime(-VIDEO_SKIP_INTERVAL.get()),
-      ARROWRIGHT: () => this.isOverrideKeyboard() && this.adjustVideoTime(VIDEO_SKIP_INTERVAL.get()),
+      P: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance()),
+      ARROWLEFT: () => this.isOverrideKeyboard() && this.adjustVideoTime(-Storage.SKIP_INTERVAL.get()),
+      ARROWRIGHT: () => this.isOverrideKeyboard() && this.adjustVideoTime(Storage.SKIP_INTERVAL.get()),
+      0: () => this.adjustVideoTime(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
       SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.video),
-      0: () => this.adjustVideoTime(ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
       D: () => this.triggerIconElement(SiteIcons.name.danmaku),
       F: () => this.triggerIconElement(SiteIcons.name.full),
       KEYR: () => this.videoRotateOrMirror(true),
       R: () => this.videoRotateOrMirror(),
       Z: () => this.defaultPlaybackRate(),
     };
-    [keyboard.A, keyboard.ADD].forEach((key) => (mapping[key] = () => this.adjustPlaybackRate(PLAY_RATE_STEP.get())));
-    [keyboard.S, keyboard.SUB].forEach((key) => (mapping[key] = () => this.adjustPlaybackRate(-PLAY_RATE_STEP.get())));
+    [keyboard.A, keyboard.ADD].forEach((key) => (mapping[key] = () => this.adjustPlaybackRate(Storage.PLAY_RATE_STEP.get())));
+    [keyboard.S, keyboard.SUB].forEach((key) => (mapping[key] = () => this.adjustPlaybackRate(-Storage.PLAY_RATE_STEP.get())));
 
     mapping[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
   },
