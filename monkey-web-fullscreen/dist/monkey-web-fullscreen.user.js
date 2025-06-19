@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      2.9.4
+// @version      2.9.5
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持任意视频倍速播放；支持播放进度记录；支持任意视频网站下集切换。
 // @license      GPL-3.0-only
@@ -52,25 +52,17 @@
 // @note         *://*/*
 // ==/UserScript==
 
-(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const o=document.createElement("style");o.textContent=t,document.head.append(o)})(' @charset "UTF-8";[part=monkey-toast],::part(monkey-toast){color:#fff!important;font-size:13.5px!important;padding:5px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in;background:#000000bf!important}.__webFullScreen,::part(__webFullScreen){top:0!important;left:0!important;margin:0!important;padding:0!important;border:none!important;width:100vw!important;min-width:0!important;min-height:0!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important}.__webFullScreen video,::part(__video){top:0!important;left:0!important;width:100vw!important;height:100vh!important;object-fit:contain!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scaleX(var(--mirror, 1))!important}.__tsr,::part(__tsr){object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scaleX(var(--mirror, 1))!important}.__hc,::part(__hc){cursor:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen h4{color:red;margin:0 auto}.monkey-web-fullscreen p{color:#999;font-size:12px}.monkey-web-fullscreen #__picker{height:auto;max-width:25em;font-size:14px;margin-bottom:0;min-height:10em;resize:vertical}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .__menu{color:#666;display:flex;cursor:pointer;font-size:20px;font-weight:400;float:none!important;align-items:center!important;margin-bottom:15px!important;justify-content:space-between!important}.monkey-web-fullscreen .__menu:hover{color:#333}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important}.monkey-web-fullscreen .__menu input{outline:none;cursor:pointer;opacity:1!important;width:20px!important;height:20px!important;position:static!important;appearance:auto!important;-webkit-appearance:auto!important}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,#buffer,#install,#a1 #tips,#player #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,#player #loading-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}} ');
+(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const o=document.createElement("style");o.textContent=t,document.head.append(o)})(' @charset "UTF-8";[part=monkey-toast],::part(monkey-toast){left:10px!important;bottom:17%!important;color:#fff!important;font-size:13px!important;padding:6px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.__webFullScreen,::part(__webFullScreen){top:0!important;left:0!important;margin:0!important;padding:0!important;border:none!important;width:100vw!important;min-width:0!important;min-height:0!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important}.__webFullScreen video,::part(__video){top:0!important;left:0!important;width:100vw!important;height:100vh!important;object-fit:contain!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scaleX(var(--mirror, 1))!important}.__tsr,::part(__tsr){object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scaleX(var(--mirror, 1))!important}.__hc,::part(__hc){cursor:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen h4{color:red;margin:0 auto}.monkey-web-fullscreen p{color:#999;font-size:12px}.monkey-web-fullscreen #__picker{height:auto;max-width:25em;font-size:14px;margin-bottom:0;min-height:10em;resize:vertical}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .__menu{color:#666;display:flex;cursor:pointer;font-size:20px;font-weight:400;float:none!important;align-items:center!important;margin-bottom:15px!important;justify-content:space-between!important}.monkey-web-fullscreen .__menu:hover{color:#333}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important}.monkey-web-fullscreen .__menu input{outline:none;cursor:pointer;opacity:1!important;width:20px!important;height:20px!important;position:static!important;appearance:auto!important;-webkit-appearance:auto!important}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,#buffer,#install,#a1 #tips,#player #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,#player #loading-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}} ');
 
 (function (notyf, Swal) {
   'use strict';
 
-  const positions = Object.freeze({
-    bottomLeft: "bottom: 17%; left: 10px;",
-    bottomRight: "bottom: 17%; right: 10px;",
-    center: "top: 50%; left: 50%; transform: translate(-50%, -50%);"
-  });
-  const ONE_SECOND = 1e3;
   const Consts = Object.freeze({
     EMPTY: "",
+    ONE_SEC: 1e3,
     DEF_PLAY_RATE: 1,
     MAX_PLAY_RATE: 16,
-    ONE_SEC: ONE_SECOND,
     webFull: "__webFullScreen",
-    SHOW_TOAST_TIME: ONE_SECOND * 5,
-    SHOW_TOAST_POSITION: positions.bottomLeft,
     MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN"
   });
   var _GM_addValueChangeListener = /* @__PURE__ */ (() => typeof GM_addValueChangeListener != "undefined" ? GM_addValueChangeListener : void 0)();
@@ -576,14 +568,14 @@
     PLAY_RATE_STEP: new StorageItem("PLAY_RATE_STEP", 0.25, false, parseFloat),
     CACHED_PLAY_RATE: new StorageItem("FENY_SCRIPTS_V_PLAYBACK_RATE", 1, true, parseFloat),
     CLOSE_PLAY_RATE: new StorageItem("CLOSE_PLAY_RATE", false, false, (value) => Boolean(value)),
+    SKIP_INTERVAL: new StorageItem("VIDEO_SKIP_INTERVAL", 5, false, (value) => parseInt(value, 10)),
     OVERRIDE_KEYBOARD: new StorageItem("OVERRIDE_KEYBOARD", false, false, (value) => Boolean(value)),
     DISABLE_AUTO: new StorageItem("CLOSE_AUTO_WEB_FULL_SCREEN", false, false, (value) => Boolean(value)),
-    VIDEO_SKIP_INTERVAL: new StorageItem("VIDEO_SKIP_INTERVAL", 5, false, (value) => parseInt(value, 10)),
     ZERO_KEY_SKIP_INTERVAL: new StorageItem("ZERO_KEY_SKIP_INTERVAL", 30, false, (value) => parseInt(value, 10)),
     ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
     DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
-    RELATIVE_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
-    CURRENT_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
+    CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
+    REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
     PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat)
   };
   const Keyboard = Object.freeze({
@@ -606,7 +598,6 @@
     NumpadSubtract: "NumpadSubtract",
     NumpadAdd: "NumpadAdd"
   });
-  const { PLAY_RATE_STEP: PLAY_RATE_STEP$2, VIDEO_SKIP_INTERVAL: VIDEO_SKIP_INTERVAL$2, ZERO_KEY_SKIP_INTERVAL: ZERO_KEY_SKIP_INTERVAL$1 } = Storage;
   const Keydown = {
     preventDefault(event) {
       const overrideKey = [Keyboard.Space, Keyboard.ArrowLeft, Keyboard.ArrowRight];
@@ -642,20 +633,20 @@
     },
     execHotKeyActions(key) {
       const mapping = {
-        P: () => Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance(),
         N: () => Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode(),
-        ARROWLEFT: () => this.isOverrideKeyboard() && this.adjustVideoTime(-VIDEO_SKIP_INTERVAL$2.get()),
-        ARROWRIGHT: () => this.isOverrideKeyboard() && this.adjustVideoTime(VIDEO_SKIP_INTERVAL$2.get()),
+        P: () => Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance(),
+        ARROWLEFT: () => this.isOverrideKeyboard() && this.adjustVideoTime(-Storage.SKIP_INTERVAL.get()),
+        ARROWRIGHT: () => this.isOverrideKeyboard() && this.adjustVideoTime(Storage.SKIP_INTERVAL.get()),
+        0: () => this.adjustVideoTime(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
         SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.video),
-        0: () => this.adjustVideoTime(ZERO_KEY_SKIP_INTERVAL$1.get()) ?? true,
         D: () => this.triggerIconElement(SiteIcons.name.danmaku),
         F: () => this.triggerIconElement(SiteIcons.name.full),
         KEYR: () => this.videoRotateOrMirror(true),
         R: () => this.videoRotateOrMirror(),
         Z: () => this.defaultPlaybackRate()
       };
-      [Keyboard.A, Keyboard.ADD].forEach((key2) => mapping[key2] = () => this.adjustPlaybackRate(PLAY_RATE_STEP$2.get()));
-      [Keyboard.S, Keyboard.SUB].forEach((key2) => mapping[key2] = () => this.adjustPlaybackRate(-PLAY_RATE_STEP$2.get()));
+      [Keyboard.A, Keyboard.ADD].forEach((key2) => mapping[key2] = () => this.adjustPlaybackRate(Storage.PLAY_RATE_STEP.get()));
+      [Keyboard.S, Keyboard.SUB].forEach((key2) => mapping[key2] = () => this.adjustPlaybackRate(-Storage.PLAY_RATE_STEP.get()));
       mapping[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
     },
     triggerIconElement(name) {
@@ -680,23 +671,12 @@
       }, Consts.ONE_SEC * 3);
     }
   };
-  const {
-    DISABLE_AUTO,
-    PLAY_RATE_STEP: PLAY_RATE_STEP$1,
-    CLOSE_PLAY_RATE,
-    OVERRIDE_KEYBOARD,
-    VIDEO_SKIP_INTERVAL: VIDEO_SKIP_INTERVAL$1,
-    DISABLE_MEMORY_TIME: DISABLE_MEMORY_TIME$1,
-    ZERO_KEY_SKIP_INTERVAL,
-    ENABLE_THIS_SITE_AUTO: EN_THIS,
-    CURRENT_EPISODE_SELECTOR: EP_SELECTOR$1,
-    RELATIVE_EPISODE_SELECTOR: RE_SELECTOR$2
-  } = Storage;
+  const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELECTOR } = Storage;
   const MenuCommand = {
-    isDisableAuto: () => DISABLE_AUTO.get(),
-    isOverrideKeyboard: () => OVERRIDE_KEYBOARD.get(),
-    isDisablePlaybackRate: () => CLOSE_PLAY_RATE.get(),
-    isEnbleThisWebSiteAuto: () => EN_THIS.get(Tools.isTopWin() ? location.host : topInfo.host),
+    isDisableAuto: () => Storage.DISABLE_AUTO.get(),
+    isOverrideKeyboard: () => Storage.OVERRIDE_KEYBOARD.get(),
+    isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
+    isEnbleThisWebSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : topInfo.host),
     setupScriptMenuCommand() {
       if (!Tools.isTopWin() || Tools.isTooFrequent("menu")) return;
       this.setupMenuChangeListener();
@@ -704,22 +684,22 @@
     },
     setupMenuChangeListener() {
       const host = location.host;
-      [CLOSE_PLAY_RATE.name, OVERRIDE_KEYBOARD.name, EN_THIS.name + host, EP_SELECTOR$1.name + host].forEach(
+      [Storage.CLOSE_PLAY_RATE.name, Storage.OVERRIDE_KEYBOARD.name, ENABLE_THIS.name + host, EPISODE_SELECTOR.name + host].forEach(
         (key) => _GM_addValueChangeListener(key, () => this.registMenuCommand())
       );
     },
     registMenuCommand() {
       const host = location.host;
       const isEnble = this.isEnbleThisWebSiteAuto();
-      const siteFun = () => EN_THIS.set(host, !isEnble);
-      const delPicker = () => EP_SELECTOR$1.del(host) & RE_SELECTOR$2.del(host);
+      const siteFun = () => ENABLE_THIS.set(host, !isEnble);
+      const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
       [
-        { title: "设置零键秒数", cache: ZERO_KEY_SKIP_INTERVAL, isDisable: this.isLive() },
-        { title: "设置倍速步长", cache: PLAY_RATE_STEP$1, isDisable: this.isLive() || this.isDisablePlaybackRate() },
-        { title: "设置快进/退秒数", cache: VIDEO_SKIP_INTERVAL$1, isDisable: this.isLive() || !this.isOverrideKeyboard() },
-        { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: EN_THIS, isDisable: Site.isMatch(), fn: siteFun },
-        { title: "删除此站的剧集选择器", cache: EP_SELECTOR$1, isDisable: !EP_SELECTOR$1.get(host), fn: delPicker },
-        { title: "更多设置", cache: OVERRIDE_KEYBOARD, isDisable: false, fn: () => this.moreSettPopup() }
+        { title: "设置零键秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL, isDisable: this.isLive() },
+        { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isDisable: this.isLive() || this.isDisablePlaybackRate() },
+        { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isDisable: this.isLive() || !this.isOverrideKeyboard() },
+        { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isDisable: Site.isMatch(), fn: siteFun },
+        { title: "删除此站的剧集选择器", cache: EPISODE_SELECTOR, isDisable: !EPISODE_SELECTOR.get(host), fn: delPicker },
+        { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isDisable: false, fn: () => this.moreSettPopup() }
       ].forEach(({ title, cache, isDisable, fn }) => {
         const id = `${cache.name}_MENU_ID`;
         _GM_unregisterMenuCommand(this[id]);
@@ -733,10 +713,10 @@
     },
     moreSettPopup() {
       const configs = [
-        { name: "key", text: "空格 ◀▶ 键 控制", cache: OVERRIDE_KEYBOARD },
-        { name: "auto", text: "禁用自动网页全屏", cache: DISABLE_AUTO, hide: !Site.isMatch() },
-        { name: "rate", text: "禁用视频倍速调节", cache: CLOSE_PLAY_RATE, hide: this.isLive() },
-        { name: "time", text: "禁用播放进度记录", cache: DISABLE_MEMORY_TIME$1, hide: this.isLive() }
+        { name: "key", text: "空格 ◀▶ 键 控制", cache: Storage.OVERRIDE_KEYBOARD },
+        { name: "auto", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, hide: !Site.isMatch() },
+        { name: "rate", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, hide: this.isLive() },
+        { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, hide: this.isLive() }
       ];
       const html = configs.map(
         ({ name, text, hide }) => `<label class="__menu ${hide && "hide"}">${text}<input name="${name}" type="checkbox"/></label>`
@@ -762,8 +742,6 @@
       });
     }
   };
-  const { EMPTY, ONE_SEC, DEF_PLAY_RATE, MAX_PLAY_RATE, SHOW_TOAST_TIME, SHOW_TOAST_POSITION } = Consts;
-  const { PLAY_RATE_STEP, CACHED_PLAY_RATE, VIDEO_SKIP_INTERVAL, PLAY_TIME, DISABLE_MEMORY_TIME } = Storage;
   const VideoControl = {
     isEnded() {
       return Math.floor(this.video.currentTime) === Math.floor(this.video.duration);
@@ -797,47 +775,47 @@
     setPlaybackRate(playRate, show = true) {
       if (!this.checkUsable()) return;
       this.lockPlaybackRate(this.video);
-      playRate = (+playRate).toFixed(2).replace(/\.?0+$/, EMPTY);
+      playRate = (+playRate).toFixed(2).replace(/\.?0+$/, Consts.EMPTY);
       this.video.playbackRate = this.video.__playbackRate = playRate;
       if (show) this.customToast("正在以", `${playRate}x`, "倍速播放");
-      CACHED_PLAY_RATE.set(playRate);
+      Storage.CACHED_PLAY_RATE.set(playRate);
     },
-    adjustPlaybackRate(step = PLAY_RATE_STEP.get()) {
+    adjustPlaybackRate(step = Storage.PLAY_RATE_STEP.get()) {
       if (!this.checkUsable()) return;
-      const playRate = Math.max(PLAY_RATE_STEP.get(), this.video.playbackRate + step);
-      this.setPlaybackRate(Math.min(MAX_PLAY_RATE, playRate));
+      const playRate = Math.max(Storage.PLAY_RATE_STEP.get(), this.video.playbackRate + step);
+      this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
     },
     defaultPlaybackRate() {
       if (this.isDisablePlaybackRate()) return;
-      this.setPlaybackRate(DEF_PLAY_RATE, false);
+      this.setPlaybackRate(Consts.DEF_PLAY_RATE, false);
       this.showToast("已恢复正常倍速播放");
     },
     useCachePlaybackRate(video) {
       if (this.isDisablePlaybackRate()) return;
-      const playRate = CACHED_PLAY_RATE.get();
-      if (DEF_PLAY_RATE === playRate || video.playbackRate === playRate) return;
+      const playRate = Storage.CACHED_PLAY_RATE.get();
+      if (Consts.DEF_PLAY_RATE === playRate || video.playbackRate === playRate) return;
       this.setPlaybackRate(playRate, !video.hasToast);
       video.hasToast = true;
     },
-    adjustVideoTime(second = VIDEO_SKIP_INTERVAL.get()) {
+    adjustVideoTime(second = Storage.SKIP_INTERVAL.get()) {
       if (!this.video || !Tools.validDuration(this.video) || second > 0 && this.video.isEnded) return;
       const currentTime = Math.min(this.video.currentTime + second, this.video.duration);
       this.setCurrentTime(currentTime);
     },
     cachePlayTime(video) {
       if (!this.topInfo || this.isLive() || !Tools.validDuration(this.video)) return;
-      if (DISABLE_MEMORY_TIME.get() || this.isEnded() || this.isMultVideo()) return this.delPlayTime();
-      if (video.currentTime > VIDEO_SKIP_INTERVAL.get()) PLAY_TIME.set(topInfo.hash, video.currentTime - 1, 7);
+      if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded() || this.isMultVideo()) return this.delPlayTime();
+      if (video.currentTime > Storage.SKIP_INTERVAL.get()) Storage.PLAY_TIME.set(topInfo.hash, video.currentTime - 1, 7);
     },
     useCachePlayTime(video) {
       if (this.hasUsedPlayTime || !this.topInfo || this.isLive()) return;
-      const time = PLAY_TIME.get(topInfo.hash);
+      const time = Storage.PLAY_TIME.get(topInfo.hash);
       if (time <= video.currentTime) return this.hasUsedPlayTime = true;
-      this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", ONE_SEC * 3, false);
+      this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3, false);
       this.hasUsedPlayTime = true;
       this.setCurrentTime(time);
     },
-    delPlayTime: () => PLAY_TIME.del(topInfo.hash),
+    delPlayTime: () => Storage.PLAY_TIME.del(topInfo.hash),
     setCurrentTime(currentTime) {
       if (currentTime) this.video.currentTime = Math.max(0, currentTime);
     },
@@ -864,16 +842,15 @@
       span.appendChild(document.createTextNode(endText));
       this.showToast(span, duration, isRemove);
     },
-    showToast(content, duration = SHOW_TOAST_TIME, isRemove = true) {
+    showToast(content, duration = Consts.ONE_SEC * 5, isRemove = true) {
       const el = document.createElement("div");
       el.setAttribute("part", "monkey-toast");
-      el.setAttribute("style", SHOW_TOAST_POSITION);
       if (isRemove) Tools.query('[part="monkey-toast"]')?.remove();
       content instanceof Element ? el.appendChild(content) : el.innerHTML = content;
       const videoWrap = this.getVideoWrapper();
       const target = videoWrap?.matches("video") ? videoWrap?.parentElement : videoWrap;
       target?.appendChild(el);
-      setTimeout(() => (el.style.opacity = 0, setTimeout(() => el.remove(), ONE_SEC / 3)), duration);
+      setTimeout(() => (el.style.opacity = 0, setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
     },
     formatTime(seconds) {
       if (isNaN(seconds)) return "00:00";
@@ -924,14 +901,13 @@
       return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
     }
   };
-  const { RELATIVE_EPISODE_SELECTOR: RE_SELECTOR$1 } = Storage;
   const SwitchEpisode = {
     switchEpisode(isPrev = false) {
       const targetEpisode = this.getTargetEpisode(this.getCurrentEpisode(), isPrev) ?? this.getTargetEpisodeByText(isPrev);
       this.jumpToTargetEpisode(targetEpisode);
     },
     getCurrentEpisode() {
-      return RE_SELECTOR$1.get(location.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
+      return Storage.REL_EPISODE_SELECTOR.get(location.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
     },
     getCurrentEpisodeByLink() {
       const { pathname, search } = location;
@@ -1000,7 +976,6 @@
       rightLarge: numbers.some((val, i) => i > index && val > compareNumber)
     })
   };
-  const { RELATIVE_EPISODE_SELECTOR: RE_SELECTOR, CURRENT_EPISODE_SELECTOR: EP_SELECTOR } = Storage;
   const PickerEpisode = {
     setupPickerEpisodeListener() {
       if (Site.isMatch()) return;
@@ -1010,8 +985,8 @@
           if (!ctrlKey || !altKey || !isTrusted || this.isLive()) return;
           if (!Tools.isTopWin()) return Tools.notyf("此页面不能抓取 (•ิ_•ิ)?", true);
           Tools.preventDefault(event);
-          const hasCurrentSelector = EP_SELECTOR.get(location.host);
-          const hasRelativeSelector = RE_SELECTOR.get(location.host);
+          const hasCurrentSelector = Storage.CURR_EPISODE_SELECTOR.get(location.host);
+          const hasRelativeSelector = Storage.REL_EPISODE_SELECTOR.get(location.host);
           if (hasCurrentSelector && hasRelativeSelector) return Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
           const number = this.getEpisodeNumber(target);
           if (!number) return Tools.notyf("点击位置无数字 (•ิ_•ิ)?", true);
@@ -1021,7 +996,7 @@
       );
     },
     pickerCurrentEpisodeChain(element) {
-      if (EP_SELECTOR.get(location.host)) return;
+      if (Storage.CURR_EPISODE_SELECTOR.get(location.host)) return;
       this.pickerEpisodePopup(element, {
         validBtnCallback(value) {
           try {
@@ -1033,13 +1008,13 @@
           }
         },
         confirmCallback(value) {
-          EP_SELECTOR.set(location.host, value);
+          Storage.CURR_EPISODE_SELECTOR.set(location.host, value);
           Tools.notyf("继续拾取元素 ＼(＞０＜)／");
         }
       });
     },
     pickerRelativeEpisodeChain(element) {
-      if (RE_SELECTOR.get(location.host)) return;
+      if (Storage.REL_EPISODE_SELECTOR.get(location.host)) return;
       this.pickerEpisodePopup(element, {
         validBtnCallback(value) {
           try {
@@ -1052,15 +1027,15 @@
           }
         },
         confirmCallback(value) {
-          RE_SELECTOR.set(location.host, value);
+          Storage.REL_EPISODE_SELECTOR.set(location.host, value);
           Tools.notyf("操作完成 []~(￣▽￣)~* 干杯");
         }
       });
     },
     getCurrentEpisodeBySelector() {
-      const num = this.getEpisodeNumber(Tools.query(EP_SELECTOR.get(location.host)));
-      const current = this.getEpisodeWrapper(Tools.query(EP_SELECTOR.get(location.host)));
-      const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(RE_SELECTOR.get(location.host))));
+      const num = this.getEpisodeNumber(Tools.query(Storage.CURR_EPISODE_SELECTOR.get(location.host)));
+      const current = this.getEpisodeWrapper(Tools.query(Storage.CURR_EPISODE_SELECTOR.get(location.host)));
+      const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(Storage.REL_EPISODE_SELECTOR.get(location.host))));
       return episodes.includes(current) ? current : episodes.find((el) => this.getEpisodeNumber(el) === num);
     },
     pickerEpisodePopup(element, { validBtnCallback, confirmCallback }) {
@@ -1085,22 +1060,21 @@
       }).then((result) => result.isConfirmed && confirmCallback.call(this, result.value));
     }
   };
-  const { webFull } = Consts;
   const WebFullEnhance = {
     webFullEnhance() {
       if (this.normalSite() || Tools.isTooFrequent("enhance", 300)) return;
       const wrap = this.getVideoHostContainer();
       if (!wrap) return;
       wrap.ctrl = wrap.ctrl ?? wrap?.controls;
-      Tools.getParents(wrap, true)?.forEach((el) => (el.classList.toggle(webFull), Tools.togglePart(el, webFull)));
+      Tools.getParents(wrap, true)?.forEach((el) => (el.classList.toggle(Consts.webFull), Tools.togglePart(el, Consts.webFull)));
       if (this.video) Tools.togglePart(this.video, "__video");
-      if (wrap.matches("video")) wrap.controls = Tools.hasCls(wrap, webFull) ? true : wrap.ctrl;
+      if (wrap.matches("video")) wrap.controls = Tools.hasCls(wrap, Consts.webFull) ? true : wrap.ctrl;
       this.cleanStubbornElements(wrap);
     },
     cleanStubbornElements(ele) {
-      if (Tools.hasCls(ele, webFull)) return;
+      if (Tools.hasCls(ele, Consts.webFull)) return;
       Tools.scrollTop(Tools.getElementRect(ele)?.top - 100);
-      Tools.querys(`.${webFull}`).forEach((el) => (Tools.delCls(el, webFull), Tools.delPart(el, webFull)));
+      Tools.querys(`.${Consts.webFull}`).forEach((el) => (Tools.delCls(el, Consts.webFull), Tools.delPart(el, Consts.webFull)));
     },
     getVideoHostContainer() {
       if (this.video) return this.getVideoWrapper();
