@@ -49,7 +49,7 @@ export default defineConfig({
         match,
         include,
         author: "Feny",
-        version: "2.9.5",
+        version: "3.0.0",
         license: "GPL-3.0-only",
         name: "视频网站自动网页全屏｜倍速播放",
         namespace: "http://tampermonkey.net/",

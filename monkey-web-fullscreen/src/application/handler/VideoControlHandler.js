@@ -86,19 +86,62 @@ export default {
   rotation: 0,
   videoRotateOrMirror(mirror = false) {
     if (!this.video) return;
-
-    const cls = "__tsr";
-    const style = this.video.style;
-    Tools.addCls(this.video, cls), Tools.setPart(this.video, cls);
-    if (mirror) return (this.isMirrored = !this.isMirrored), style.setProperty("--mirror", this.isMirrored ? -1 : 1);
+    if (mirror) return (this.isMirrored = !this.isMirrored), this.setVideoTsr("--mirror", this.isMirrored ? -1 : 1);
 
     this.rotation = (this.rotation + 90) % 360;
     const { videoWidth, videoHeight } = this.video;
     const isVertical = [90, 270].includes(this.rotation);
     const scale = isVertical ? videoHeight / videoWidth : 1;
-    style.setProperty("--scale", scale), style.setProperty("--rotate", `${this.rotation}deg`);
+    this.setVideoTsr("--scale", scale).setVideoTsr("--rotate", `${this.rotation}deg`);
 
     // 测试视频：https://www.bilibili.com/video/BV1DT5AzLEMb、https://www.bilibili.com/video/BV13Y9FYfEVu
+  },
+  currentZoom: Consts.DEF_ZOOM,
+  zoomVideo(isDown) {
+    if (!this.video || this.isDisableZoom()) return;
+    const zoom = this.currentZoom + (isDown ? -Consts.ZOOM_STEP : Consts.ZOOM_STEP);
+    if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
+
+    this.currentZoom = zoom;
+    this.setVideoTsr("--zomm", zoom / 100);
+    this.showToast(`缩放: ${zoom}%`, Consts.ONE_SEC * 2);
+  },
+  moveX: 0,
+  moveY: 0,
+  moveVideo(direction) {
+    if (!this.video || this.isDisableZoom()) return;
+    const { x = 0, y = 0 } = {
+      ALT_ARROWUP: { y: -Consts.MOVE_STEP },
+      ALT_ARROWDOWN: { y: Consts.MOVE_STEP },
+      ALT_ARROWLEFT: { x: -Consts.MOVE_STEP },
+      ALT_ARROWRIGHT: { x: Consts.MOVE_STEP },
+    }[direction];
+
+    (this.moveX += x), (this.moveY += y);
+    this.setVideoTsr("--moveX", `${this.moveX}px`).setVideoTsr("--moveY", `${this.moveY}px`);
+  },
+  videoScreenshot() {
+    if (!this.video || this.isDisableScreenshot()) return;
+    this.video.setAttribute("crossorigin", "anonymous");
+    const canvas = document.createElement("canvas");
+    canvas.height = this.video.videoHeight;
+    canvas.width = this.video.videoWidth;
+    const ctx = canvas.getContext("2d");
+
+    try {
+      ctx.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+      GM_download(canvas.toDataURL("image/png"), `视频截图_${Date.now()}.png`);
+    } catch (e) {
+      canvas.style.setProperty("max-width", "98vw");
+      const popup = window.open(Consts.EMPTY, "_blank", "width=1000,height=570,top=130,left=270");
+      popup.document.title = "鼠标右键选择「图片另存为」";
+      popup.document.body.appendChild(canvas);
+    }
+  },
+  freezeVideoFrame(isPrev) {
+    if (!this.video) return;
+    !this.video.paused && this.video.pause();
+    this.video.currentTime += (isPrev ? -1 : 1) / 30;
   },
   customToast(startText, colorText, endText, duration, isRemove) {
     const span = document.createElement("span");
@@ -133,5 +176,11 @@ export default {
     const currVideoSrc = this.videoInfo.src;
     const videos = Tools.querys("video").filter((video) => video.currentSrc !== currVideoSrc && !isNaN(video.duration));
     return videos.length > 1;
+  },
+  setVideoTsr(name, value) {
+    const cls = "__tsr";
+    this.video?.style?.setProperty(name, value);
+    if (!Tools.hasCls(cls)) Tools.addCls(this.video, cls), Tools.setPart(this.video, cls);
+    return this;
   },
 };

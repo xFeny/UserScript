@@ -21,9 +21,6 @@ export default {
     App.useCachePlayTime(this);
     App.cachePlayTime(this);
   },
-  canplay() {
-    App.tryplay(this);
-  },
   play() {
     this.isEnded = false;
     App.specificWebFullscreen(this);

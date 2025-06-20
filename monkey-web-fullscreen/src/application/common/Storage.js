@@ -96,6 +96,8 @@ class TimedStorage extends StorageItem {
  * REL_EPISODE_SELECTOR  切换下集—所有集数中的某一集 CSS选择器
  * CURR_EPISODE_SELECTOR  切换下集—当前集 CSS选择器
  * PLAY_TIME  播放进度
+ * DISABLE_SCREENSHOT  禁用截图
+ * DISABLE_ZOOM  禁用缩放和移动
  */
 export default {
   PLAY_RATE_STEP: new StorageItem("PLAY_RATE_STEP", 0.25, false, parseFloat),
@@ -107,6 +109,8 @@ export default {
   ZERO_KEY_SKIP_INTERVAL: new StorageItem("ZERO_KEY_SKIP_INTERVAL", 30, false, (value) => parseInt(value, 10)),
   ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
   DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
+  DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
+  DISABLE_ZOOM: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
   CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
   REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
   PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat),

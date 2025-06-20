@@ -38,7 +38,8 @@
 }
 
 @mixin __tsr() {
-  transform: rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scaleX(var(--mirror, 1)) !important;
+  transform: rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scale(var(--zomm, 1)) scaleX(var(--mirror, 1))
+    translate(var(--moveX, 0), var(--moveY, 0)) !important;
 }
 
 .__webFullScreen video,
@@ -144,6 +145,28 @@
       appearance: auto !important;
       -webkit-appearance: auto !important;
     }
+  }
+
+  table {
+    width: 100%;
+    border-radius: 3px;
+    border-collapse: collapse;
+  }
+
+  th {
+    font-weight: 600;
+  }
+
+  th,
+  td {
+    line-height: 28px;
+    vertical-align: middle;
+    border: 1px solid #e5e6eb;
+  }
+
+  th,
+  tr:nth-child(odd) {
+    background-color: #f8f8f8;
   }
 }
 

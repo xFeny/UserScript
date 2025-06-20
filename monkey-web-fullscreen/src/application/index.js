@@ -100,8 +100,9 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
   },
   sendTopInfo() {
     // 向iframe传递顶级窗口信息
+    const title = document.title;
     const { host, href } = location;
-    window.topInfo = this.topInfo = { innerWidth, host, href, hash: Tools.simpleHash(href) };
+    window.topInfo = this.topInfo = { title, innerWidth, host, href, hash: Tools.simpleHash(href) };
     Tools.sendToIFrames({ topInfo });
   },
   setupMouseMoveListener() {
