@@ -9,7 +9,6 @@ export default Object.freeze({
   SUB: "-",
   KeyA: "KeyA",
   KeyD: "KeyD",
-  KeyF: "KeyF",
   KeyK: "KeyK",
   KeyL: "KeyL",
   KeyN: "KeyN",

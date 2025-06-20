@@ -87,7 +87,6 @@ export default {
   },
   shortcutKeysPopup() {
     const shortcutKeys = [
-      { key: "F", desc: "切换全屏" },
       { key: "P", desc: "切换网页全屏" },
       { key: "N", desc: "切换下一集视频" },
       { key: "D", desc: "弹幕显示 / 隐藏" },

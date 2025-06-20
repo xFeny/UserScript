@@ -66,7 +66,6 @@ export default {
       0: () => this.adjustVideoTime(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
       SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.video),
       D: () => this.triggerIconElement(SiteIcons.name.danmaku),
-      F: () => this.triggerIconElement(SiteIcons.name.full),
       KEYR: () => this.videoRotateOrMirror(true),
       R: () => this.videoRotateOrMirror(),
       Z: () => this.defaultPlaybackRate(),
