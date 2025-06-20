@@ -93,6 +93,12 @@
     background-color: #757575 !important;
   }
 
+  button:where(.swal2-close) {
+    color: #666;
+    font-size: 1.6em;
+    font-weight: bolder;
+  }
+
   h4 {
     color: red;
     margin: 0 auto;
