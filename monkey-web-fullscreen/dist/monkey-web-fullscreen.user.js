@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      2.9.5
+// @version      3.0.0
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持任意视频倍速播放；支持播放进度记录；支持任意视频网站下集切换。
 // @license      GPL-3.0-only
@@ -40,6 +40,7 @@
 // @grant        GM_addStyle
 // @grant        GM_addValueChangeListener
 // @grant        GM_deleteValue
+// @grant        GM_download
 // @grant        GM_getResourceText
 // @grant        GM_getValue
 // @grant        GM_info
@@ -52,13 +53,18 @@
 // @note         *://*/*
 // ==/UserScript==
 
-(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const o=document.createElement("style");o.textContent=t,document.head.append(o)})(' @charset "UTF-8";[part=monkey-toast],::part(monkey-toast){left:10px!important;bottom:17%!important;color:#fff!important;font-size:13px!important;padding:6px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.__webFullScreen,::part(__webFullScreen){top:0!important;left:0!important;margin:0!important;padding:0!important;border:none!important;width:100vw!important;min-width:0!important;min-height:0!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important}.__webFullScreen video,::part(__video){top:0!important;left:0!important;width:100vw!important;height:100vh!important;object-fit:contain!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scaleX(var(--mirror, 1))!important}.__tsr,::part(__tsr){object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scaleX(var(--mirror, 1))!important}.__hc,::part(__hc){cursor:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen h4{color:red;margin:0 auto}.monkey-web-fullscreen p{color:#999;font-size:12px}.monkey-web-fullscreen #__picker{height:auto;max-width:25em;font-size:14px;margin-bottom:0;min-height:10em;resize:vertical}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .__menu{color:#666;display:flex;cursor:pointer;font-size:20px;font-weight:400;float:none!important;align-items:center!important;margin-bottom:15px!important;justify-content:space-between!important}.monkey-web-fullscreen .__menu:hover{color:#333}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important}.monkey-web-fullscreen .__menu input{outline:none;cursor:pointer;opacity:1!important;width:20px!important;height:20px!important;position:static!important;appearance:auto!important;-webkit-appearance:auto!important}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,#buffer,#install,#a1 #tips,#player #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,#player #loading-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}} ');
+(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const e=document.createElement("style");e.textContent=t,document.head.append(e)})(' @charset "UTF-8";[part=monkey-toast],::part(monkey-toast){left:10px!important;bottom:17%!important;color:#fff!important;font-size:13px!important;padding:6px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.__webFullScreen,::part(__webFullScreen){top:0!important;left:0!important;margin:0!important;padding:0!important;border:none!important;width:100vw!important;min-width:0!important;min-height:0!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important}.__webFullScreen video,::part(__video){top:0!important;left:0!important;width:100vw!important;height:100vh!important;object-fit:contain!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scale(var(--zomm, 1)) scaleX(var(--mirror, 1)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr,::part(__tsr){object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scale(var(--zomm, 1)) scaleX(var(--mirror, 1)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc,::part(__hc){cursor:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen h4{color:red;margin:0 auto}.monkey-web-fullscreen p{color:#999;font-size:12px}.monkey-web-fullscreen #__picker{height:auto;max-width:25em;font-size:14px;margin-bottom:0;min-height:10em;resize:vertical}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .__menu{color:#666;display:flex;cursor:pointer;font-size:20px;font-weight:400;float:none!important;align-items:center!important;margin-bottom:15px!important;justify-content:space-between!important}.monkey-web-fullscreen .__menu:hover{color:#333}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important}.monkey-web-fullscreen .__menu input{outline:none;cursor:pointer;opacity:1!important;width:20px!important;height:20px!important;position:static!important;appearance:auto!important;-webkit-appearance:auto!important}.monkey-web-fullscreen table{width:100%;border-radius:3px;border-collapse:collapse}.monkey-web-fullscreen th{font-weight:600}.monkey-web-fullscreen th,.monkey-web-fullscreen td{line-height:28px;vertical-align:middle;border:1px solid #e5e6eb}.monkey-web-fullscreen th,.monkey-web-fullscreen tr:nth-child(odd){background-color:#f8f8f8}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,#buffer,#install,#a1 #tips,#player #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,#player #loading-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}} ');
 
 (function (notyf, Swal) {
   'use strict';
 
   const Consts = Object.freeze({
     EMPTY: "",
+    MIN_ZOOM: 50,
+    MOVE_STEP: 10,
+    ZOOM_STEP: 10,
+    DEF_ZOOM: 100,
+    MAX_ZOOM: 500,
     ONE_SEC: 1e3,
     DEF_PLAY_RATE: 1,
     MAX_PLAY_RATE: 16,
@@ -67,6 +73,7 @@
   });
   var _GM_addValueChangeListener = /* @__PURE__ */ (() => typeof GM_addValueChangeListener != "undefined" ? GM_addValueChangeListener : void 0)();
   var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
+  var _GM_download = /* @__PURE__ */ (() => typeof GM_download != "undefined" ? GM_download : void 0)();
   var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
   var _GM_info = /* @__PURE__ */ (() => typeof GM_info != "undefined" ? GM_info : void 0)();
   var _GM_listValues = /* @__PURE__ */ (() => typeof GM_listValues != "undefined" ? GM_listValues : void 0)();
@@ -365,9 +372,6 @@
       App.useCachePlayTime(this);
       App.cachePlayTime(this);
     },
-    canplay() {
-      App.tryplay(this);
-    },
     play() {
       this.isEnded = false;
       App.specificWebFullscreen(this);
@@ -477,8 +481,9 @@
       this.sendTopInfo();
     },
     sendTopInfo() {
+      const title = document.title;
       const { host, href } = location;
-      window.topInfo = this.topInfo = { innerWidth, host, href, hash: Tools.simpleHash(href) };
+      window.topInfo = this.topInfo = { title, innerWidth, host, href, hash: Tools.simpleHash(href) };
       Tools.sendToIFrames({ topInfo });
     },
     setupMouseMoveListener() {
@@ -574,37 +579,47 @@
     ZERO_KEY_SKIP_INTERVAL: new StorageItem("ZERO_KEY_SKIP_INTERVAL", 30, false, (value) => parseInt(value, 10)),
     ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
     DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
+    DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
+    DISABLE_ZOOM: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
     CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
     REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
     PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat)
   };
   const Keyboard = Object.freeze({
     A: "A",
-    S: "S",
     P: "P",
+    S: "S",
     ADD: "+",
     SUB: "-",
     KeyA: "KeyA",
-    KeyS: "KeyS",
-    KeyZ: "KeyZ",
     KeyD: "KeyD",
     KeyF: "KeyF",
+    KeyK: "KeyK",
+    KeyL: "KeyL",
     KeyN: "KeyN",
     KeyP: "KeyP",
     KeyR: "KeyR",
+    KeyS: "KeyS",
+    KeyZ: "KeyZ",
     Space: "Space",
-    ArrowLeft: "ArrowLeft",
-    ArrowRight: "ArrowRight",
-    NumpadSubtract: "NumpadSubtract",
+    Up: "ArrowUp",
+    Down: "ArrowDown",
+    Left: "ArrowLeft",
+    Right: "ArrowRight",
+    Subtract: "NumpadSubtract",
     NumpadAdd: "NumpadAdd"
   });
   const Keydown = {
     preventDefault(event) {
-      const overrideKey = [Keyboard.Space, Keyboard.ArrowLeft, Keyboard.ArrowRight];
+      const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
       const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(event.code);
       const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
-      if (!isNumberKey && !isOverrideKey) return;
+      if (!isNumberKey && !isOverrideKey && !this.isZoomKey(event)) return;
       Tools.preventDefault(event);
+    },
+    isZoomKey(event) {
+      const zommKey = [Keyboard.NumpadAdd, Keyboard.Subtract, Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right];
+      return event.altKey && zommKey.includes(event.code) && !this.isDisableZoom();
     },
     setupKeydownListener() {
       window.addEventListener("keyup", (event) => this.preventDefault(event), true);
@@ -617,12 +632,14 @@
         this.processEvent(data);
       });
     },
-    keydownHandler(event, { key, code, ctrlKey, shiftKey } = event) {
+    keydownHandler(event, { key, code, altKey, ctrlKey, shiftKey } = event) {
       const target = event.composedPath()[0];
       const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
       if (this.normalSite() || isInput || target?.isContentEditable) return;
-      if (!Object.keys(Keyboard).includes(code) && !Tools.isNumber(key)) return;
+      if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
       this.preventDefault(event);
+      if (this.isZoomKey(event)) key = "ALT_" + code;
+      if (ctrlKey && altKey && Keyboard.KeyA === code) key = code;
       if (Keyboard.Space === code || shiftKey && Keyboard.KeyR === code) key = code;
       if ([Keyboard.KeyP, Keyboard.KeyN].includes(code)) return Tools.postMessage(window.top, { key });
       this.processEvent({ key });
@@ -632,7 +649,11 @@
       if (data?.key) this.execHotKeyActions(data.key.toUpperCase());
     },
     execHotKeyActions(key) {
-      const mapping = {
+      const dict = {
+        L: () => this.freezeVideoFrame(),
+        K: () => this.freezeVideoFrame(true),
+        ALT_NUMPADADD: () => this.zoomVideo(),
+        ALT_NUMPADSUBTRACT: () => this.zoomVideo(true),
         N: () => Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode(),
         P: () => Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance(),
         ARROWLEFT: () => this.isOverrideKeyboard() && this.adjustVideoTime(-Storage.SKIP_INTERVAL.get()),
@@ -643,11 +664,13 @@
         F: () => this.triggerIconElement(SiteIcons.name.full),
         KEYR: () => this.videoRotateOrMirror(true),
         R: () => this.videoRotateOrMirror(),
-        Z: () => this.defaultPlaybackRate()
+        Z: () => this.defaultPlaybackRate(),
+        KEYA: () => this.videoScreenshot()
       };
-      [Keyboard.A, Keyboard.ADD].forEach((key2) => mapping[key2] = () => this.adjustPlaybackRate(Storage.PLAY_RATE_STEP.get()));
-      [Keyboard.S, Keyboard.SUB].forEach((key2) => mapping[key2] = () => this.adjustPlaybackRate(-Storage.PLAY_RATE_STEP.get()));
-      mapping[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
+      [Keyboard.A, Keyboard.ADD].forEach((k) => dict[k] = () => this.adjustPlaybackRate(Storage.PLAY_RATE_STEP.get()));
+      [Keyboard.S, Keyboard.SUB].forEach((k) => dict[k] = () => this.adjustPlaybackRate(-Storage.PLAY_RATE_STEP.get()));
+      ["ALT_ARROWUP", "ALT_ARROWDOWN", "ALT_ARROWLEFT", "ALT_ARROWRIGHT"].forEach((k) => dict[k] = () => this.moveVideo(k));
+      dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
     },
     triggerIconElement(name) {
       const index = Object.values(SiteIcons.name).indexOf(name);
@@ -673,9 +696,11 @@
   };
   const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELECTOR } = Storage;
   const MenuCommand = {
+    isDisableZoom: () => Storage.DISABLE_ZOOM.get(),
     isDisableAuto: () => Storage.DISABLE_AUTO.get(),
     isOverrideKeyboard: () => Storage.OVERRIDE_KEYBOARD.get(),
     isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
+    isDisableScreenshot: () => Storage.DISABLE_SCREENSHOT.get(),
     isEnbleThisWebSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : topInfo.host),
     setupScriptMenuCommand() {
       if (!Tools.isTopWin() || Tools.isTooFrequent("menu")) return;
@@ -699,6 +724,7 @@
         { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isDisable: this.isLive() || !this.isOverrideKeyboard() },
         { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isDisable: Site.isMatch(), fn: siteFun },
         { title: "删除此站的剧集选择器", cache: EPISODE_SELECTOR, isDisable: !EPISODE_SELECTOR.get(host), fn: delPicker },
+        { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isDisable: false, fn: () => this.shortcutKeysPopup() },
         { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isDisable: false, fn: () => this.moreSettPopup() }
       ].forEach(({ title, cache, isDisable, fn }) => {
         const id = `${cache.name}_MENU_ID`;
@@ -713,17 +739,18 @@
     },
     moreSettPopup() {
       const configs = [
-        { name: "key", text: "空格 ◀▶ 键 控制", cache: Storage.OVERRIDE_KEYBOARD },
+        { name: "cut", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT },
+        { name: "key", text: "空格◀️▶️键 控制", cache: Storage.OVERRIDE_KEYBOARD },
         { name: "auto", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, hide: !Site.isMatch() },
         { name: "rate", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, hide: this.isLive() },
-        { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, hide: this.isLive() }
+        { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, hide: this.isLive() },
+        { name: "zoom", text: "禁用视频缩放与移动", cache: Storage.DISABLE_ZOOM }
       ];
       const html = configs.map(
         ({ name, text, hide }) => `<label class="__menu ${hide && "hide"}">${text}<input name="${name}" type="checkbox"/></label>`
       );
       Swal.fire({
         width: 350,
-        backdrop: false,
         title: "更多设置",
         showCancelButton: true,
         cancelButtonText: "关闭",
@@ -739,6 +766,36 @@
             });
           });
         }
+      });
+    },
+    shortcutKeysPopup() {
+      const shortcutKeys = [
+        { key: "F", desc: "切换全屏" },
+        { key: "P", desc: "切换网页全屏" },
+        { key: "N", desc: "切换下一集视频" },
+        { key: "D", desc: "弹幕显示 / 隐藏" },
+        { key: "Z", desc: "恢复 1.0x 正常倍速" },
+        { key: "R", desc: "90° 循环旋转视频角度" },
+        { key: "Shift R", desc: "视频水平镜像翻转" },
+        { key: "L / K", desc: "下一帧 / 上一帧" },
+        { key: "Ctrl Alt A", desc: "视频画面截图（默认禁用）" },
+        { key: "数字 0️", desc: "快进 30 秒" },
+        { key: "1️ 至 9️", desc: "直接设置 1️ 至 9️ 倍速" },
+        { key: "A / S 或 ➕ / ➖", desc: "倍速 ±0.25" },
+        { key: "空格", desc: "播放 / 暂停（默认禁用）" },
+        { key: "◀️▶️", desc: "快退 / 快进 5 秒（默认禁用）" },
+        { key: "Alt ➕ / ➖", desc: "视频缩放（默认禁用）" },
+        { key: "Alt ◀️🔼🔽▶️", desc: "视频上下左右方向移动（默认禁用）" }
+      ];
+      const rows = shortcutKeys.map(({ key, desc }) => `<tr><td>${key}</td><td>${desc}</td></tr>`).join(Consts.EMPTY);
+      Swal.fire({
+        width: 600,
+        title: "快捷键说明",
+        showCancelButton: true,
+        cancelButtonText: "关闭",
+        showConfirmButton: false,
+        customClass: { container: "monkey-web-fullscreen" },
+        html: `<table><tr><th>快捷键</th><th>说明</th></tr>${rows}</table>`
       });
     }
   };
@@ -822,15 +879,56 @@
     rotation: 0,
     videoRotateOrMirror(mirror = false) {
       if (!this.video) return;
-      const cls = "__tsr";
-      const style = this.video.style;
-      Tools.addCls(this.video, cls), Tools.setPart(this.video, cls);
-      if (mirror) return this.isMirrored = !this.isMirrored, style.setProperty("--mirror", this.isMirrored ? -1 : 1);
+      if (mirror) return this.isMirrored = !this.isMirrored, this.setVideoTsr("--mirror", this.isMirrored ? -1 : 1);
       this.rotation = (this.rotation + 90) % 360;
       const { videoWidth, videoHeight } = this.video;
       const isVertical = [90, 270].includes(this.rotation);
       const scale = isVertical ? videoHeight / videoWidth : 1;
-      style.setProperty("--scale", scale), style.setProperty("--rotate", `${this.rotation}deg`);
+      this.setVideoTsr("--scale", scale).setVideoTsr("--rotate", `${this.rotation}deg`);
+    },
+    currentZoom: Consts.DEF_ZOOM,
+    zoomVideo(isDown) {
+      if (!this.video || this.isDisableZoom()) return;
+      const zoom = this.currentZoom + (isDown ? -Consts.ZOOM_STEP : Consts.ZOOM_STEP);
+      if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
+      this.currentZoom = zoom;
+      this.setVideoTsr("--zomm", zoom / 100);
+      this.showToast(`缩放: ${zoom}%`, Consts.ONE_SEC * 2);
+    },
+    moveX: 0,
+    moveY: 0,
+    moveVideo(direction) {
+      if (!this.video || this.isDisableZoom()) return;
+      const { x = 0, y = 0 } = {
+        ALT_ARROWUP: { y: -Consts.MOVE_STEP },
+        ALT_ARROWDOWN: { y: Consts.MOVE_STEP },
+        ALT_ARROWLEFT: { x: -Consts.MOVE_STEP },
+        ALT_ARROWRIGHT: { x: Consts.MOVE_STEP }
+      }[direction];
+      this.moveX += x, this.moveY += y;
+      this.setVideoTsr("--moveX", `${this.moveX}px`).setVideoTsr("--moveY", `${this.moveY}px`);
+    },
+    videoScreenshot() {
+      if (!this.video || this.isDisableScreenshot()) return;
+      this.video.setAttribute("crossorigin", "anonymous");
+      const canvas = document.createElement("canvas");
+      canvas.height = this.video.videoHeight;
+      canvas.width = this.video.videoWidth;
+      const ctx = canvas.getContext("2d");
+      try {
+        ctx.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+        _GM_download(canvas.toDataURL("image/png"), `视频截图_${Date.now()}.png`);
+      } catch (e) {
+        canvas.style.setProperty("max-width", "98vw");
+        const popup = window.open(Consts.EMPTY, "_blank", "width=1000,height=570,top=130,left=270");
+        popup.document.title = "鼠标右键选择「图片另存为」";
+        popup.document.body.appendChild(canvas);
+      }
+    },
+    freezeVideoFrame(isPrev) {
+      if (!this.video) return;
+      !this.video.paused && this.video.pause();
+      this.video.currentTime += (isPrev ? -1 : 1) / 30;
     },
     customToast(startText, colorText, endText, duration, isRemove) {
       const span = document.createElement("span");
@@ -863,6 +961,12 @@
       const currVideoSrc = this.videoInfo.src;
       const videos = Tools.querys("video").filter((video) => video.currentSrc !== currVideoSrc && !isNaN(video.duration));
       return videos.length > 1;
+    },
+    setVideoTsr(name, value) {
+      const cls = "__tsr";
+      this.video?.style?.setProperty(name, value);
+      if (!Tools.hasCls(cls)) Tools.addCls(this.video, cls), Tools.setPart(this.video, cls);
+      return this;
     }
   };
   const WebFullScreen = {
