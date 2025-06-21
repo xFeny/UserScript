@@ -26,7 +26,6 @@ export default {
     // https://www.2rk.cc、https://www.yingshikong1.com、https://www.dyttlg1.com
     const filter = [
       "h1, header, footer",
-      "[class*='tab-item'], [class*='play-channel']",
       "[class*='rank'], [class*='hotlist'], [class*='vodlist']",
       "[id*='guankan'], [id*='history'], [class*='history'], [class*='record'], [class*='lishi']",
     ];
@@ -36,21 +35,21 @@ export default {
         return !Tools.closest(el, `:is(${filter})`, 5) && pageUrl.includes(pathname + search);
       })
       .map(this.getEpisodeWrapper)
-      .reverse();
+      .filter((el) => this.getAllEpisodes(el).map(this.getEpisodeNumber).filter(Boolean).length > 1);
     // Tools.log("过滤后连接：", eles);
+
     return eles.length <= 1 ? eles[0] : eles.find((el) => Tools.hasCls(el, "cur", "active") || !!this.getEpisodeNumber(el));
   },
   getEpisodeNumber: (ele) => Tools.getNumbers(ele?.innerText?.replace(/-/g, Consts.EMPTY))?.shift(),
   getTargetEpisode(element, isPrev = false) {
     if (!element) return;
-    const currNumber = this.getEpisodeNumber(element);
     const episodes = this.getAllEpisodes(element);
-    // Tools.log("所有剧集元素", episodes);
+    const numbers = episodes.map(this.getEpisodeNumber).filter(Boolean);
+    if (numbers.length < 2) return;
 
     const index = episodes.indexOf(element);
-    const numbers = episodes.map(this.getEpisodeNumber);
+    const currNumber = this.getEpisodeNumber(element);
     const { leftSmall, rightLarge } = this.compareLeftRight(numbers, currNumber, index);
-
     // 当 leftSmall || rightLarge 的结果与 isPrev 的布尔值相同时，返回 prev，当两者不同时，返回 next。
     return (leftSmall || rightLarge) === isPrev ? episodes[index - 1] : episodes[index + 1];
   },
@@ -70,9 +69,9 @@ export default {
     const stack = [element].filter(Boolean);
     while (stack.length > 0) {
       const current = stack.pop();
-      if (current.matches("a, button")) return current.click();
+      if (current.matches("a, button")) return current?.click();
       stack.push(...Array.from(current.children).reverse());
-      Tools.triggerClick(current);
+      current?.click && current.click();
     }
   },
   getEpisodeWrapper(element) {
@@ -94,10 +93,12 @@ export default {
     return null;
   },
   getTargetEpisodeByText(isPrev = false) {
-    // 示例网址：https://www.dmb0u.art、https://www.lincartoon.com、
+    // 示例网址：https://www.dmb0u.art、https://www.lincartoon.com
     // https://ddys.pro、https://www.5dm.link、https://www.tucao.my、https://www.flixflop.com
+
+    const ignore = (el) => !el?.innerText?.includes("自动");
     const texts = isPrev ? ["上集", "上一集", "上话", "上一话", "上一个"] : ["下集", "下一集", "下话", "下一话", "下一个"];
-    return Tools.findByText("attr", texts).shift() ?? Tools.findByText("text", texts).shift();
+    return Tools.findByText("attr", texts).filter(ignore).shift() ?? Tools.findByText("text", texts).filter(ignore).shift();
   },
   compareLeftRight: (numbers, compareNumber = 0, index) => ({
     leftSmall: numbers.some((val, i) => i < index && val < compareNumber),

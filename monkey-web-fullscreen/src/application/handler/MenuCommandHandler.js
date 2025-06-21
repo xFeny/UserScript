@@ -10,7 +10,7 @@ const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELEC
  * 脚本菜单命令
  */
 export default {
-  isDisableZoom: () => Storage.DISABLE_ZOOM.get(),
+  isDisableZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
   isDisableAuto: () => Storage.DISABLE_AUTO.get(),
   isOverrideKeyboard: () => Storage.OVERRIDE_KEYBOARD.get(),
   isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
@@ -37,7 +37,7 @@ export default {
       { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isDisable: this.isLive() || this.isDisablePlaybackRate() },
       { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isDisable: this.isLive() || !this.isOverrideKeyboard() },
       { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isDisable: Site.isMatch(), fn: siteFun },
-      { title: "删除此站的剧集选择器", cache: EPISODE_SELECTOR, isDisable: !EPISODE_SELECTOR.get(host), fn: delPicker },
+      { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isDisable: !EPISODE_SELECTOR.get(host), fn: delPicker },
       { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isDisable: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isDisable: false, fn: () => this.moreSettPopup() },
     ].forEach(({ title, cache, isDisable, fn }) => {
@@ -56,11 +56,11 @@ export default {
   moreSettPopup() {
     const configs = [
       { name: "cut", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT },
-      { name: "key", text: "空格◀️▶️键 控制", cache: Storage.OVERRIDE_KEYBOARD },
+      { name: "zoom", text: "禁用缩放与移动", cache: Storage.DISABLE_ZOOM_MOVE },
       { name: "auto", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, hide: !Site.isMatch() },
       { name: "rate", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, hide: this.isLive() },
       { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, hide: this.isLive() },
-      { name: "zoom", text: "禁用视频缩放与移动", cache: Storage.DISABLE_ZOOM },
+      { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
     ];
     const html = configs.map(
       ({ name, text, hide }) => `<label class="__menu ${hide && "hide"}">${text}<input name="${name}" type="checkbox"/></label>`

@@ -84,20 +84,19 @@ class TimedStorage extends StorageItem {
  * 缓存的 key-value
  * PLAY_RATE_STEP  倍速步进
  * CACHED_PLAY_RATE  用户设置的播放倍速
- * CLOSE_PLAY_RATE  禁用倍速播放功能
- * OVERRIDE_KEYBOARD  启用空格 ◀▶ 键控制
- * DISABLE_AUTO  禁用自动网页全屏
- * SKIP_INTERVAL  设置快进/退的时长
- * ZERO_KEY_SKIP_INTERVAL  设置零键的快进时长
+ * CLOSE_PLAY_RATE  禁用视频倍速调节
+ * SKIP_INTERVAL  设置快进/退秒数
+ * OVERRIDE_KEYBOARD  启用 空格 ◀▶ 键控制
+ * DISABLE_AUTO  禁用`@match`网址自动网页全屏
+ * ZERO_KEY_SKIP_INTERVAL  设置零键快进时长
  *
- * DISABLE_MEMORY_TIME  禁用记忆播放进度
- * ENABLE_THIS_SITE_AUTO  此站启用自动网页全屏
- * USE_ALTERNATIVE  不使用外部`网页全屏`脚本，使用自带网页全屏样式
- * REL_EPISODE_SELECTOR  切换下集—所有集数中的某一集 CSS选择器
- * CURR_EPISODE_SELECTOR  切换下集—当前集 CSS选择器
- * PLAY_TIME  播放进度
- * DISABLE_SCREENSHOT  禁用截图
- * DISABLE_ZOOM  禁用缩放和移动
+ * ENABLE_THIS_SITE_AUTO  此站启/禁用自动网页全屏
+ * DISABLE_MEMORY_TIME  禁用播放进度记录
+ * DISABLE_ZOOM_MOVE  禁用缩放和移动
+ * DISABLE_SCREENSHOT  禁用视频截图
+ * REL_EPISODE_SELECTOR  通用切换下集—集数列表中的任意一集 拾取的CSS选择器
+ * CURR_EPISODE_SELECTOR  通用切换下集—当前播放集数 拾取的CSS选择器
+ * PLAY_TIME  记录的播放进度
  */
 export default {
   PLAY_RATE_STEP: new StorageItem("PLAY_RATE_STEP", 0.25, false, parseFloat),
@@ -109,8 +108,8 @@ export default {
   ZERO_KEY_SKIP_INTERVAL: new StorageItem("ZERO_KEY_SKIP_INTERVAL", 30, false, (value) => parseInt(value, 10)),
   ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
   DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
+  DISABLE_ZOOM_MOVE: new StorageItem("DISABLE_ZOOM_MOVE", true, false, (value) => Boolean(value)),
   DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
-  DISABLE_ZOOM: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
   CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
   REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
   PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat),

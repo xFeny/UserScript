@@ -24,8 +24,6 @@
   padding: 0 !important;
   border: none !important;
   width: 100vw !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
   height: 100vh !important;
   position: fixed !important;
   transform: none !important;
@@ -81,6 +79,12 @@
     font-size: 14px !important;
   }
 
+  button:where(.swal2-styled) {
+    &:focus {
+      box-shadow: 0 0 0 1px rgba(100, 150, 200, 0.5) !important;
+    }
+  }
+
   .swal2-confirm {
     background-color: #7066e0 !important;
   }
@@ -94,29 +98,36 @@
   }
 
   button:where(.swal2-close) {
-    color: #666;
-    font-size: 1.6em;
-    font-weight: bolder;
+    color: #666 !important;
+    font-size: 1.7em !important;
+    font-weight: bolder !important;
   }
 
   h4 {
-    color: red;
-    margin: 0 auto;
+    color: red !important;
+    margin: 0 auto !important;
+    font-size: 18px !important;
+    font-weight: normal !important;
   }
 
   p {
-    color: #999;
-    font-size: 12px;
+    color: #999 !important;
+    margin-top: 0 !important;
+    font-size: 12px !important;
   }
 
   #__picker {
-    width: 100%;
-    height: auto;
-    max-width: 25em;
-    font-size: 14px;
-    margin-bottom: 0;
-    min-height: 10em;
-    resize: vertical;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 25em !important;
+    font-size: 14px !important;
+    margin-bottom: 0 !important;
+    min-height: 10em !important;
+    resize: vertical !important;
+
+    &:focus {
+      box-shadow: 0 0 0 1px rgba(100, 150, 200, 0.5) !important;
+    }
   }
 
   .hide {
@@ -155,25 +166,24 @@
   }
 
   table {
-    width: 100%;
-    border-radius: 3px;
-    border-collapse: collapse;
+    width: 100% !important;
+    border-collapse: collapse !important;
   }
 
   th {
-    font-weight: 600;
+    font-weight: 600 !important;
   }
 
   th,
   td {
-    line-height: 28px;
-    vertical-align: middle;
-    border: 1px solid #e5e6eb;
+    font-size: 14px !important;
+    line-height: 28px !important;
+    vertical-align: middle !important;
+    border: 1px solid #e5e6eb !important;
   }
 
-  th,
   tr:nth-child(odd) {
-    background-color: #f8f8f8;
+    background-color: #f8f8f8 !important;
   }
 }
 

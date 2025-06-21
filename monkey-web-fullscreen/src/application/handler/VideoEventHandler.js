@@ -10,9 +10,9 @@ export default {
     Tools.querys('[id*="loading"]').forEach((el) => !Tools.query('[class*="player"]', el) && Tools.addCls(el, "_noplayer"));
   },
   loadeddata() {
+    App.tryplay(this);
     App.initVideoProperties(this);
     Tools.query(".conplaying")?.click(); // https://skr.skrcc.cc:666
-    App.tryplay(this);
   },
   timeupdate() {
     if (isNaN(this.duration)) return;

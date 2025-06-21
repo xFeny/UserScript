@@ -67,9 +67,8 @@
     // https://www.yingshikong1.com、https://www.dyttlg1.com
     const filter = [
       "h1, header, footer",
-      "[class*='tab-item'], [class*='play-channel']",
       "[class*='rank'], [class*='hotlist'], [class*='vodlist']",
-      "[id*='guankan'], [id*='history'], [class*='history'], [class*='record'], [class*='lishi']",
+      "[id*='guankan'], [id*='history' i], [class*='history' i], [class*='record'], [class*='lishi']",
     ];
     eles = eles
       .filter((el) => {
@@ -77,17 +76,20 @@
         return !closest(el, `:is(${filter})`, 5) && pageUrl.includes(pathname + search);
       })
       .map(getEpisodeWrapper)
-      .reverse();
+      .filter((el) => getAllEpisodes(el)?.map(getEpisodeNumber).filter(Boolean).length > 1);
+
     console.log("过滤后连接：", eles);
     return eles.length <= 1 ? eles.shift() : eles.find((el) => hasAnyClass(el, "cur", "active") || !!getEpisodeNumber(el));
   }
 
   function getTargetEpisode(element, isPrev = false) {
     if (!element) return;
-    const currNumber = getEpisodeNumber(element);
     const episodes = getAllEpisodes(element);
-    const numbers = episodes.map(getEpisodeNumber);
+    const numbers = episodes.map(getEpisodeNumber).filter(Boolean);
+    if (numbers.length === 0) return;
+
     const index = episodes.indexOf(element);
+    const currNumber = getEpisodeNumber(element);
     const { leftSmall, rightLarge } = compareLeftRight(numbers, currNumber, index);
     console.log("左小", leftSmall, "右大", rightLarge);
     // 当 leftSmall || rightLarge 的结果与 isPrev 的布尔值相同时，返回 prev，当两者不同时，返回 next。

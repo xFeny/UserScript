@@ -42,14 +42,22 @@ export default {
     return Tools.query(`iframe[src*="${src}"]`);
   },
   getVideoWrapper() {
-    return this.findVideoControlBar() ?? this.findVideoContainer() ?? this.video;
+    return this.findVideoControlBar() ?? this.findVideoContainer();
   },
   findVideoControlBar() {
-    const ctrl = '[class*="contr" i]:not(.Drag-Control), [id*="control"], [class*="ctrl"], [id*="ctrl"]';
-    return Tools.findParentWithChild(this.video, ctrl);
+    const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
+    const ctrl = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"]`;
+    const controlBar = Tools.findParentWithChild(this.video, ctrl);
+    const { centerX, centerY } = Tools.getCenterPoint(controlBar);
+    return Tools.pointInElement(centerX, centerY, this.video) ? controlBar : null;
   },
-  findVideoContainer() {
-    const parent = this.video?.parentElement;
-    return Tools.closest(parent, ':is([class*="player" i], [class*="wrap"], [class*="video"], [player])');
+  findVideoContainer(maxLevel = 3) {
+    let container = this.video;
+    const videoRect = Tools.getElementRect(this.video);
+    for (let parent = this.video?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
+      const { width, height } = Tools.getElementRect(parent);
+      if (width === videoRect.width && height === videoRect.height) container = parent;
+    }
+    return container;
   },
 };

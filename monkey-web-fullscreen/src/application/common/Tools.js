@@ -42,10 +42,12 @@ export default unsafeWindow.Tools = {
     return isFrequent;
   },
   getCenterPoint(element) {
+    if (!element) return { centerX: 0, centerY: 0 };
     const { top, left, width, height } = this.getElementRect(element);
     return { centerX: left + width / 2, centerY: top + height / 2 }; // 元素中心点
   },
   pointInElement(pointX, pointY, element) {
+    if (!element) return false;
     const { top, left, right, bottom } = this.getElementRect(element);
     return pointX >= left && pointX <= right && pointY >= top && pointY <= bottom;
   },
