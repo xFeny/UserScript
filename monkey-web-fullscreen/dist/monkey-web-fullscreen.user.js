@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.0.0
+// @version      3.0.1
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持任意视频倍速播放；支持播放进度记录；支持任意视频网站下集切换。
 // @license      GPL-3.0-only
@@ -53,7 +53,7 @@
 // @note         *://*/*
 // ==/UserScript==
 
-(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const e=document.createElement("style");e.textContent=t,document.head.append(e)})(' @charset "UTF-8";[part=monkey-toast],::part(monkey-toast){left:10px!important;bottom:17%!important;color:#fff!important;font-size:13px!important;padding:6px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.__webFullScreen,::part(__webFullScreen){top:0!important;left:0!important;margin:0!important;padding:0!important;border:none!important;width:100vw!important;min-width:0!important;min-height:0!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important}.__webFullScreen video,::part(__video){top:0!important;left:0!important;width:100vw!important;height:100vh!important;object-fit:contain!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scale(var(--zomm, 1)) scaleX(var(--mirror, 1)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr,::part(__tsr){object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scale(var(--zomm, 1)) scaleX(var(--mirror, 1)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc,::part(__hc){cursor:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666;font-size:1.6em;font-weight:bolder}.monkey-web-fullscreen h4{color:red;margin:0 auto}.monkey-web-fullscreen p{color:#999;font-size:12px}.monkey-web-fullscreen #__picker{width:100%;height:auto;max-width:25em;font-size:14px;margin-bottom:0;min-height:10em;resize:vertical}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .__menu{color:#666;display:flex;cursor:pointer;font-size:20px;font-weight:400;float:none!important;align-items:center!important;margin-bottom:15px!important;justify-content:space-between!important}.monkey-web-fullscreen .__menu:hover{color:#333}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important}.monkey-web-fullscreen .__menu input{outline:none;cursor:pointer;opacity:1!important;width:20px!important;height:20px!important;position:static!important;appearance:auto!important;-webkit-appearance:auto!important}.monkey-web-fullscreen table{width:100%;border-radius:3px;border-collapse:collapse}.monkey-web-fullscreen th{font-weight:600}.monkey-web-fullscreen th,.monkey-web-fullscreen td{line-height:28px;vertical-align:middle;border:1px solid #e5e6eb}.monkey-web-fullscreen th,.monkey-web-fullscreen tr:nth-child(odd){background-color:#f8f8f8}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,#buffer,#install,#a1 #tips,#player #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,#player #loading-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}} ');
+(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const o=document.createElement("style");o.textContent=t,document.head.append(o)})(' @charset "UTF-8";[part=monkey-toast],::part(monkey-toast){left:10px!important;bottom:17%!important;color:#fff!important;font-size:13px!important;padding:6px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.__webFullScreen,::part(__webFullScreen){top:0!important;left:0!important;margin:0!important;padding:0!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important}.__webFullScreen video,::part(__video){top:0!important;left:0!important;width:100vw!important;height:100vh!important;object-fit:contain!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scale(var(--zomm, 1)) scaleX(var(--mirror, 1)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr,::part(__tsr){object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scale(var(--zomm, 1)) scaleX(var(--mirror, 1)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc,::part(__hc){cursor:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .__menu{color:#666;display:flex;cursor:pointer;font-size:20px;font-weight:400;float:none!important;align-items:center!important;margin-bottom:15px!important;justify-content:space-between!important}.monkey-web-fullscreen .__menu:hover{color:#333}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important}.monkey-web-fullscreen .__menu input{outline:none;cursor:pointer;opacity:1!important;width:20px!important;height:20px!important;position:static!important;appearance:auto!important;-webkit-appearance:auto!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen th{font-weight:600!important}.monkey-web-fullscreen th,.monkey-web-fullscreen td{font-size:14px!important;line-height:28px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,#buffer,#install,#a1 #tips,#player #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,#player #loading-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}} ');
 
 (function (notyf, Swal) {
   'use strict';
@@ -239,10 +239,12 @@
       return isFrequent;
     },
     getCenterPoint(element) {
+      if (!element) return { centerX: 0, centerY: 0 };
       const { top: top2, left, width, height } = this.getElementRect(element);
       return { centerX: left + width / 2, centerY: top2 + height / 2 };
     },
     pointInElement(pointX, pointY, element) {
+      if (!element) return false;
       const { top: top2, left, right, bottom } = this.getElementRect(element);
       return pointX >= left && pointX <= right && pointY >= top2 && pointY <= bottom;
     },
@@ -361,9 +363,9 @@
       Tools.querys('[id*="loading"]').forEach((el) => !Tools.query('[class*="player"]', el) && Tools.addCls(el, "_noplayer"));
     },
     loadeddata() {
+      App.tryplay(this);
       App.initVideoProperties(this);
       Tools.query(".conplaying")?.click();
-      App.tryplay(this);
     },
     timeupdate() {
       if (isNaN(this.duration)) return;
@@ -579,8 +581,8 @@
     ZERO_KEY_SKIP_INTERVAL: new StorageItem("ZERO_KEY_SKIP_INTERVAL", 30, false, (value) => parseInt(value, 10)),
     ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
     DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
+    DISABLE_ZOOM_MOVE: new StorageItem("DISABLE_ZOOM_MOVE", true, false, (value) => Boolean(value)),
     DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
-    DISABLE_ZOOM: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
     CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
     REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
     PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat)
@@ -694,7 +696,7 @@
   };
   const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELECTOR } = Storage;
   const MenuCommand = {
-    isDisableZoom: () => Storage.DISABLE_ZOOM.get(),
+    isDisableZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
     isDisableAuto: () => Storage.DISABLE_AUTO.get(),
     isOverrideKeyboard: () => Storage.OVERRIDE_KEYBOARD.get(),
     isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
@@ -721,7 +723,7 @@
         { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isDisable: this.isLive() || this.isDisablePlaybackRate() },
         { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isDisable: this.isLive() || !this.isOverrideKeyboard() },
         { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isDisable: Site.isMatch(), fn: siteFun },
-        { title: "删除此站的剧集选择器", cache: EPISODE_SELECTOR, isDisable: !EPISODE_SELECTOR.get(host), fn: delPicker },
+        { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isDisable: !EPISODE_SELECTOR.get(host), fn: delPicker },
         { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isDisable: false, fn: () => this.shortcutKeysPopup() },
         { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isDisable: false, fn: () => this.moreSettPopup() }
       ].forEach(({ title, cache, isDisable, fn }) => {
@@ -738,11 +740,11 @@
     moreSettPopup() {
       const configs = [
         { name: "cut", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT },
-        { name: "key", text: "空格◀️▶️键 控制", cache: Storage.OVERRIDE_KEYBOARD },
+        { name: "zoom", text: "禁用缩放与移动", cache: Storage.DISABLE_ZOOM_MOVE },
         { name: "auto", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, hide: !Site.isMatch() },
         { name: "rate", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, hide: this.isLive() },
         { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, hide: this.isLive() },
-        { name: "zoom", text: "禁用视频缩放与移动", cache: Storage.DISABLE_ZOOM }
+        { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD }
       ];
       const html = configs.map(
         ({ name, text, hide }) => `<label class="__menu ${hide && "hide"}">${text}<input name="${name}" type="checkbox"/></label>`
@@ -1019,23 +1021,23 @@
     findCurrentEpisode(eles, pageUrl) {
       const filter = [
         "h1, header, footer",
-        "[class*='tab-item'], [class*='play-channel']",
         "[class*='rank'], [class*='hotlist'], [class*='vodlist']",
         "[id*='guankan'], [id*='history'], [class*='history'], [class*='record'], [class*='lishi']"
       ];
       eles = eles.filter((el) => {
         const { pathname, search } = new URL(el.href);
         return !Tools.closest(el, `:is(${filter})`, 5) && pageUrl.includes(pathname + search);
-      }).map(this.getEpisodeWrapper).reverse();
+      }).map(this.getEpisodeWrapper).filter((el) => this.getAllEpisodes(el).map(this.getEpisodeNumber).filter(Boolean).length > 1);
       return eles.length <= 1 ? eles[0] : eles.find((el) => Tools.hasCls(el, "cur", "active") || !!this.getEpisodeNumber(el));
     },
     getEpisodeNumber: (ele) => Tools.getNumbers(ele?.innerText?.replace(/-/g, Consts.EMPTY))?.shift(),
     getTargetEpisode(element, isPrev = false) {
       if (!element) return;
-      const currNumber = this.getEpisodeNumber(element);
       const episodes = this.getAllEpisodes(element);
+      const numbers = episodes.map(this.getEpisodeNumber).filter(Boolean);
+      if (numbers.length < 2) return;
       const index = episodes.indexOf(element);
-      const numbers = episodes.map(this.getEpisodeNumber);
+      const currNumber = this.getEpisodeNumber(element);
       const { leftSmall, rightLarge } = this.compareLeftRight(numbers, currNumber, index);
       return (leftSmall || rightLarge) === isPrev ? episodes[index - 1] : episodes[index + 1];
     },
@@ -1055,9 +1057,9 @@
       const stack = [element].filter(Boolean);
       while (stack.length > 0) {
         const current = stack.pop();
-        if (current.matches("a, button")) return current.click();
+        if (current.matches("a, button")) return current?.click();
         stack.push(...Array.from(current.children).reverse());
-        Tools.triggerClick(current);
+        current?.click && current.click();
       }
     },
     getEpisodeWrapper(element) {
@@ -1069,8 +1071,9 @@
       return null;
     },
     getTargetEpisodeByText(isPrev = false) {
+      const ignore = (el) => !el?.innerText?.includes("自动");
       const texts = isPrev ? ["上集", "上一集", "上话", "上一话", "上一个"] : ["下集", "下一集", "下话", "下一话", "下一个"];
-      return Tools.findByText("attr", texts).shift() ?? Tools.findByText("text", texts).shift();
+      return Tools.findByText("attr", texts).filter(ignore).shift() ?? Tools.findByText("text", texts).filter(ignore).shift();
     },
     compareLeftRight: (numbers, compareNumber = 0, index) => ({
       leftSmall: numbers.some((val, i) => i < index && val < compareNumber),
@@ -1141,7 +1144,7 @@
     },
     pickerEpisodePopup(element, { validBtnCallback, confirmCallback }) {
       Swal.fire({
-        html: `<h4>验证能正确获取到集数，再确定保存</h4>
+        html: `<h4>验证能正确取到集数，再确定保存</h4>
       <textarea id="__picker" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
       <p>编辑元素选择器，确保能正确获取到集数</p>`,
         customClass: { container: "monkey-web-fullscreen" },
@@ -1192,15 +1195,23 @@
       return Tools.query(`iframe[src*="${src}"]`);
     },
     getVideoWrapper() {
-      return this.findVideoControlBar() ?? this.findVideoContainer() ?? this.video;
+      return this.findVideoControlBar() ?? this.findVideoContainer();
     },
     findVideoControlBar() {
-      const ctrl = '[class*="contr" i]:not(.Drag-Control), [id*="control"], [class*="ctrl"], [id*="ctrl"]';
-      return Tools.findParentWithChild(this.video, ctrl);
+      const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
+      const ctrl = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"]`;
+      const controlBar = Tools.findParentWithChild(this.video, ctrl);
+      const { centerX, centerY } = Tools.getCenterPoint(controlBar);
+      return Tools.pointInElement(centerX, centerY, this.video) ? controlBar : null;
     },
-    findVideoContainer() {
-      const parent = this.video?.parentElement;
-      return Tools.closest(parent, ':is([class*="player" i], [class*="wrap"], [class*="video"], [player])');
+    findVideoContainer(maxLevel = 3) {
+      let container = this.video;
+      const videoRect = Tools.getElementRect(this.video);
+      for (let parent = this.video?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
+        const { width, height } = Tools.getElementRect(parent);
+        if (width === videoRect.width && height === videoRect.height) container = parent;
+      }
+      return container;
     }
   };
   const cssLoader = (e) => {
