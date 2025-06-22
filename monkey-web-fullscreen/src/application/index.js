@@ -3,6 +3,7 @@ import Tools from "./common/Tools";
 import Consts from "./common/Consts";
 import SiteIcons from "./common/SiteIcons";
 import VideoEventHandler from "./handler/VideoEventHandler";
+import Storage from "./common/Storage";
 
 export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
   init() {
@@ -15,7 +16,7 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
   normalSite: () => !window?.videoInfo && !window?.topInfo,
   isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
   getVideo: () => Tools.querys("video:not([loop])").find(Tools.isVisible),
-  isBackgroudVideo: (video) => video?.muted && video?.hasAttribute("loop"),
+  isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
   getWebFullElement: () => Tools.query(SiteIcons[location.host]?.[SiteIcons.name.webFull]),
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
@@ -42,33 +43,30 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
       this.triggerVideoStart();
       const video = this.getVideo();
       this.webFullElement = this.getWebFullElement();
-      if (video?.play && !!video.offsetWidth) this.setupVideoListener();
       if (!Site.isMatch() && this.topInfo) return observer.disconnect();
+      if (video?.play && !!video.offsetWidth) this.addVideoListener(video);
       if (!this.videoInfo || !this.webFullElement || !this.specificWebFullscreen(video)) return;
       observer.disconnect(), this.handleLoginPopups();
     });
     setTimeout(() => observer.disconnect(), Consts.ONE_SEC * 10);
   },
   triggerVideoStart() {
-    // https://www.jumomo.cc、https://www.jiaozi.me、https://www.kmvod.cc
-    const element = Tools.query(".ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
+    // https://www.zhihu.com 、https://www.jumomo.cc 、https://www.jiaozi.me 、https://www.kmvod.cc
+    const element = Tools.query("._qrp4qg, .ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
     if (!element || Tools.isTooFrequent("start")) return;
     setTimeout(() => element?.click() & element?.remove(), 150);
   },
-  setupVideoListener() {
-    const video = this.getVideo();
-    this.addVideoEvtListener(video);
-    this.healthCurrentVideo();
-  },
-  addVideoEvtListener(video) {
+  addVideoListener(video) {
     this.video = video;
     this.setVideoInfo(video);
+    this.healthCurrentVideo();
     this.removeVideoEvtListener();
     this.videoBoundListeners = [];
-    for (const [type, handler] of Object.entries(VideoEventHandler)) {
-      this.video?.addEventListener(type, handler);
-      this.videoBoundListeners.push([this.video, type, handler]);
-    }
+
+    Object.entries(VideoEventHandler).forEach(([type, handler]) => {
+      this.videoBoundListeners.push([video, type, handler]);
+      video?.addEventListener(type, handler);
+    });
   },
   removeVideoEvtListener() {
     this.videoBoundListeners?.forEach(([target, type, handler]) => {
@@ -82,8 +80,8 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
   getPlayingVideo() {
     const videos = Tools.querys("video");
     for (const video of videos) {
-      if (this.video === video || video.paused || isNaN(video.duration) || this.isBackgroudVideo(video)) continue;
-      return this.addVideoEvtListener(video); // 正在播放的video
+      if (this.video === video || video.paused || isNaN(video.duration) || this.isBackgroundVideo(video)) continue;
+      return this.addVideoListener(video);
     }
   },
   setVideoInfo(video) {
@@ -114,8 +112,8 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
       this.toggleCursor();
       timer = setTimeout(() => this.toggleCursor(true), Consts.ONE_SEC * 3);
 
-      if (!addListener || this.video === target || !target.matches("video") || this.isBackgroudVideo(target)) return;
-      this.addVideoEvtListener(target);
+      if (!addListener || this.video === target || !target.matches("video") || this.isBackgroundVideo(target)) return;
+      this.addVideoListener(target);
     };
 
     document.addEventListener("mousemove", (e) => handleMouseEvent(e, true));

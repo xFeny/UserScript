@@ -145,7 +145,4 @@ export default unsafeWindow.Tools = {
     const parts = (node?.getAttribute("part")?.split(/\s+/) ?? []).filter((v) => v !== value);
     node?.setAttribute("part", parts.join(" ").trim());
   },
-  togglePart(node, value) {
-    node?.getAttribute("part")?.includes(value) ? this.delPart(node, value) : this.setPart(node, value);
-  },
 };

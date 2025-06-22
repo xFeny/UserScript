@@ -10,12 +10,12 @@ import Keyboard from "../common/Keyboard";
  * 快捷键逻辑处理
  */
 export default {
-  preventDefault(event) {
+  preventDefault(event, { code } = event) {
     const overrideKey = [keyboard.Space, keyboard.Left, keyboard.Right]; // 空格 ◀▶ 键
-    const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(event.code);
+    const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
     const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
 
-    if (!isNumberKey && !isOverrideKey && !this.isZoomKey(event)) return;
+    if (!isNumberKey && !isOverrideKey && !this.isZoomKey(event) && code !== Keyboard.KeyP) return;
     Tools.preventDefault(event);
   },
   isZoomKey(event) {
@@ -43,8 +43,10 @@ export default {
     this.preventDefault(event);
     if (this.isZoomKey(event)) key = "ALT_" + code;
     if (ctrlKey && altKey && keyboard.KeyA === code) key = code; // Ctrl Alt A  键截图
-    if (keyboard.Space === code || (shiftKey && keyboard.KeyR === code)) key = code; // ◀️▶️ 和 Shift R 键
-    if ([keyboard.KeyP, keyboard.KeyN].includes(code)) return Tools.postMessage(window.top, { key });
+    if (keyboard.Space === code || (shiftKey && [keyboard.KeyP, keyboard.KeyR].includes(code))) key = code;
+    if (!altKey && !ctrlKey && !shiftKey && [keyboard.KeyP, keyboard.KeyN].includes(code)) {
+      return Tools.postMessage(window.top, { key });
+    }
     this.processEvent({ key });
   },
   processEvent(data) {
@@ -55,6 +57,7 @@ export default {
   execHotKeyActions(key) {
     // Tools.log("按下的键：", { key });
     const dict = {
+      KEYP: () => this.togglePIP(),
       L: () => this.freezeVideoFrame(),
       K: () => this.freezeVideoFrame(true),
       ALT_NUMPADADD: () => this.zoomVideo(),

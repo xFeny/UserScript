@@ -7,23 +7,31 @@ import Tools from "../common/Tools";
 export default {
   webFullEnhance() {
     if (this.normalSite() || Tools.isTooFrequent("enhance", 300)) return;
+    // 退出网页全屏
+    if (this.webFullWrap) return this.exitWebFull();
 
     const wrap = this.getVideoHostContainer();
     if (!wrap) return;
 
+    // 进入网页全屏
+    this.webFullWrap = wrap;
     wrap.ctrl = wrap.ctrl ?? wrap?.controls;
-    Tools.getParents(wrap, true)?.forEach((el) => (el.classList.toggle(Consts.webFull), Tools.togglePart(el, Consts.webFull)));
+    wrap.top = wrap.top ?? wrap.getBoundingClientRect()?.top ?? 0;
+    wrap.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    Tools.getParents(wrap, true)?.forEach((el) => (el.classList.add(Consts.webFull), Tools.setPart(el, Consts.webFull)));
 
-    if (this.video) Tools.togglePart(this.video, "__video");
-    if (wrap.matches("video")) wrap.controls = Tools.hasCls(wrap, Consts.webFull) ? true : wrap.ctrl;
-
-    this.cleanStubbornElements(wrap);
+    // video特殊处理
+    if (this.video) Tools.setPart(this.video, Consts.videoPart);
+    if (wrap.matches("video") && Tools.hasCls(wrap, Consts.webFull)) wrap.controls = true;
   },
-  cleanStubbornElements(ele) {
-    if (Tools.hasCls(ele, Consts.webFull)) return;
+  exitWebFull() {
+    const wrap = this.webFullWrap;
+    if (this.video) Tools.delPart(this.video, Consts.videoPart);
+    if (this.webFullWrap?.matches("video")) wrap.controls = wrap.ctrl;
 
-    Tools.scrollTop(Tools.getElementRect(ele)?.top - 100);
     Tools.querys(`.${Consts.webFull}`).forEach((el) => (Tools.delCls(el, Consts.webFull), Tools.delPart(el, Consts.webFull)));
+    Tools.scrollTop((Tools.getElementRect(wrap)?.top < 0 ? wrap?.top + wrap.scrollY : wrap?.top) - 120);
+    this.webFullWrap = null;
   },
   getVideoHostContainer() {
     if (this.video) return this.getVideoWrapper();
@@ -51,7 +59,7 @@ export default {
     const { centerX, centerY } = Tools.getCenterPoint(controlBar);
     return Tools.pointInElement(centerX, centerY, this.video) ? controlBar : null;
   },
-  findVideoContainer(maxLevel = 3) {
+  findVideoContainer(maxLevel = 5) {
     let container = this.video;
     const videoRect = Tools.getElementRect(this.video);
     for (let parent = this.video?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {

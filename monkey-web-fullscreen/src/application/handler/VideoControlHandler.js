@@ -83,6 +83,10 @@ export default {
   setCurrentTime(currentTime) {
     if (currentTime) this.video.currentTime = Math.max(0, currentTime);
   },
+  togglePIP() {
+    if (!this.video) return;
+    document.pictureInPictureElement ? document.exitPictureInPicture() : this.video?.requestPictureInPicture();
+  },
   rotation: 0,
   videoRotateOrMirror(mirror = false) {
     if (!this.video) return;
@@ -141,7 +145,7 @@ export default {
   freezeVideoFrame(isPrev) {
     if (!this.video) return;
     !this.video.paused && this.video.pause();
-    this.video.currentTime += (isPrev ? -1 : 1) / 30;
+    this.video.currentTime += (isPrev ? -1 : 1) / 24;
   },
   customToast(startText, colorText, endText, duration, isRemove) {
     const span = document.createElement("span");

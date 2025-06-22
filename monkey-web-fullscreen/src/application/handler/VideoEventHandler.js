@@ -26,10 +26,11 @@ export default {
     App.specificWebFullscreen(this);
   },
   pause() {
-    // https://www.mcydh.com、https://dick.xfani.com
-    // 某些动漫网站会提示是否跳转上次播放进度，然后暂停播放等待确认跳转
+    App.getPlayingVideo();
     Tools.query(".ec-no")?.click();
     Tools.query('[id*="loading"]._noplayer')?.remove();
+    // https://www.mcydh.com、https://dick.xfani.com
+    // 某些动漫网站会提示是否跳转上次播放进度，然后暂停播放等待确认跳转
   },
   ended() {
     this.isEnded = true;
