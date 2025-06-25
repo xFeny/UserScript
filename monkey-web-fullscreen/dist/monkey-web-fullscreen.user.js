@@ -345,8 +345,8 @@
       setTimeout(() => element?.click() & element?.remove(), 150);
     },
     setCurrentVideo(video) {
-      if (isNaN(video.duration) || video.duration < 10 || video.offsetWidth < 200) return;
-      if (this.isBackgroundVideo(video) || this.player === video) return;
+      if (this.isBackgroundVideo(video)) return;
+      if (video.offsetWidth < 200 || this.player === video) return;
       this.player = video;
       this.setVideoInfo(video);
       window?.EnhancerVideo?.enhanced(video);
