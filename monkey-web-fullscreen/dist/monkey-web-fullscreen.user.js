@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.1.0
+// @version      3.1.1
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持任意视频倍速播放；支持播放进度记录；支持任意视频网站下集切换。
 // @license      GPL-3.0-only
@@ -858,6 +858,7 @@
       video.hasWebFull = true;
     },
     specificWebFullscreen(video) {
+      if (this.player !== video) return false;
       if (!video?.offsetWidth || !this.webFullElement) return false;
       if (this.isDisableAuto() || video?.offsetWidth >= innerWidth) return true;
       return Site.isBiliLive() ? this.liveWebFullScreen() : Tools.triggerClick(this.webFullElement);
@@ -878,8 +879,10 @@
     exitWebFullScreen() {
       if (!Site.isBili() && !Site.isAcFun()) return;
       if (this.player.offsetWidth === innerWidth) this.webFullElement?.click();
-      const isLast = Tools.query('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
-      if (!Tools.query(".video-pod") || isLast) return Tools.query(".bpx-player-ending-related-item-cancel")?.click();
+      setTimeout(() => {
+        const isLast = Tools.query('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
+        if (!Tools.query(".video-pod") || isLast) Tools.query(".bpx-player-ending-related-item-cancel")?.click();
+      });
     },
     getBiliLiveIcons() {
       Tools.triggerMousemove(this.getVideo());
