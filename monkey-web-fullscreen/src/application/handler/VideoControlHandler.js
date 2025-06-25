@@ -8,44 +8,31 @@ import Storage from "../common/Storage";
  */
 export default {
   isEnded() {
-    return Math.floor(this.video.currentTime) === Math.floor(this.video.duration);
+    return Math.floor(this.player.currentTime) === Math.floor(this.player.duration);
   },
   initVideoProperties(video) {
     video.volume = 1;
     video.hasToast = false;
-    video.hasWebFullScreen = false;
+    video.hasWebFull = false;
   },
   playOrPause: (video) => (Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause()),
   tryplay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),
   checkUsable() {
-    if (!this.video) return false;
-    if (this.isEnded()) return false;
-    if (Site.isLivePage()) return false;
-    if (this.isDisablePlaybackRate()) return false;
-    if (!Tools.validDuration(this.video)) return false;
+    if (!this.player || this.isDisablePlaybackRate()) return false;
+    if (this.isBackgroundVideo(this.player) || this.isEnded()) return false;
+    if (this.isLive() || this.player.duration > this.player?.__duration) return false;
+    if (!Tools.validDuration(this.player)) return false;
     return true;
-  },
-  lockPlaybackRate(video) {
-    try {
-      const orig = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, "playbackRate");
-      Object.defineProperty(video, "playbackRate", {
-        set: (value) => value === video?.__playbackRate && orig.set.call(video, value),
-        get: () => orig.get.call(video),
-        configurable: true,
-      });
-    } catch (e) {}
   },
   setPlaybackRate(playRate, show = true) {
     if (!this.checkUsable()) return;
-    this.lockPlaybackRate(this.video);
     playRate = (+playRate).toFixed(2).replace(/\.?0+$/, Consts.EMPTY);
-    this.video.playbackRate = this.video.__playbackRate = playRate;
+    window?.EnhancerVideo?.setPlaybackRate(this.player, playRate);
     if (show) this.customToast("正在以", `${playRate}x`, "倍速播放");
     Storage.CACHED_PLAY_RATE.set(playRate);
   },
   adjustPlaybackRate(step = Storage.PLAY_RATE_STEP.get()) {
-    if (!this.checkUsable()) return;
-    const playRate = Math.max(Storage.PLAY_RATE_STEP.get(), this.video.playbackRate + step);
+    const playRate = Math.max(Storage.PLAY_RATE_STEP.get(), this.player.playbackRate + step);
     this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
   },
   defaultPlaybackRate() {
@@ -62,38 +49,42 @@ export default {
     video.hasToast = true;
   },
   adjustVideoTime(second = Storage.SKIP_INTERVAL.get()) {
-    if (!this.video || !Tools.validDuration(this.video) || (second > 0 && this.video.isEnded)) return;
-    const currentTime = Math.min(this.video.currentTime + second, this.video.duration);
+    if (!this.player || !Tools.validDuration(this.player) || (second > 0 && this.player.isEnded)) return;
+    const currentTime = Math.min(this.player.currentTime + second, this.player.duration);
     this.setCurrentTime(currentTime);
   },
   cachePlayTime(video) {
-    if (!this.topInfo || this.isLive() || !Tools.validDuration(this.video)) return;
+    if (!this.topInfo || this.isLive() || !Tools.validDuration(this.player)) return;
+    // 动态变动总时长的、时长小于两分钟的不记录播放进度
+    if (this.player.duration > this.player?.__duration || this.player.duration < 120) return;
+    // 禁用记录、播放结束、多video标签时，删除播放进度记录
     if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded() || this.isMultVideo()) return this.delPlayTime();
-    if (video.currentTime > Storage.SKIP_INTERVAL.get()) Storage.PLAY_TIME.set(topInfo.hash, video.currentTime - 1, 7);
+    // 记录的时间相对于播放的少一秒，使恢复时有衔接感
+    if (video.currentTime > Storage.SKIP_INTERVAL.get()) Storage.PLAY_TIME.set(this.topInfo.hash, video.currentTime - 1, 7);
   },
   useCachePlayTime(video) {
     if (this.hasUsedPlayTime || !this.topInfo || this.isLive()) return;
-    const time = Storage.PLAY_TIME.get(topInfo.hash);
+    const time = Storage.PLAY_TIME.get(this.topInfo.hash);
     if (time <= video.currentTime) return (this.hasUsedPlayTime = true);
     this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3, false);
     this.hasUsedPlayTime = true;
     this.setCurrentTime(time);
   },
-  delPlayTime: () => Storage.PLAY_TIME.del(topInfo.hash),
+  delPlayTime: () => Storage.PLAY_TIME.del(window?.topInfo?.hash),
   setCurrentTime(currentTime) {
-    if (currentTime) this.video.currentTime = Math.max(0, currentTime);
+    if (currentTime) this.player.currentTime = Math.max(0, currentTime);
   },
   togglePIP() {
-    if (!this.video) return;
-    document.pictureInPictureElement ? document.exitPictureInPicture() : this.video?.requestPictureInPicture();
+    if (!this.player) return;
+    document.pictureInPictureElement ? document.exitPictureInPicture() : this.player?.requestPictureInPicture();
   },
   rotation: 0,
   videoRotateOrMirror(mirror = false) {
-    if (!this.video) return;
+    if (!this.player) return;
     if (mirror) return (this.isMirrored = !this.isMirrored), this.setVideoTsr("--mirror", this.isMirrored ? -1 : 1);
 
     this.rotation = (this.rotation + 90) % 360;
-    const { videoWidth, videoHeight } = this.video;
+    const { videoWidth, videoHeight } = this.player;
     const isVertical = [90, 270].includes(this.rotation);
     const scale = isVertical ? videoHeight / videoWidth : 1;
     this.setVideoTsr("--scale", scale).setVideoTsr("--rotate", `${this.rotation}deg`);
@@ -102,38 +93,42 @@ export default {
   },
   currentZoom: Consts.DEF_ZOOM,
   zoomVideo(isDown) {
-    if (!this.video || this.isDisableZoom()) return;
+    if (!this.player || this.isDisableZoom()) return;
     const zoom = this.currentZoom + (isDown ? -Consts.ZOOM_STEP : Consts.ZOOM_STEP);
     if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
 
     this.currentZoom = zoom;
     this.setVideoTsr("--zomm", zoom / 100);
-    this.showToast(`缩放: ${zoom}%`, Consts.ONE_SEC * 2);
+    this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC * 2);
   },
   moveX: 0,
   moveY: 0,
   moveVideo(direction) {
-    if (!this.video || this.isDisableZoom()) return;
-    const { x = 0, y = 0 } = {
-      ALT_ARROWUP: { y: -Consts.MOVE_STEP },
-      ALT_ARROWDOWN: { y: Consts.MOVE_STEP },
-      ALT_ARROWLEFT: { x: -Consts.MOVE_STEP },
-      ALT_ARROWRIGHT: { x: Consts.MOVE_STEP },
+    if (!this.player || this.isDisableZoom()) return;
+
+    const moveX = this.moveX;
+    const { x, y, desc } = {
+      ALT_ARROWUP: { y: -Consts.MOVE_STEP, desc: "向上移动" },
+      ALT_ARROWDOWN: { y: Consts.MOVE_STEP, desc: "向下移动" },
+      ALT_ARROWLEFT: { x: -Consts.MOVE_STEP, desc: "向左移动" },
+      ALT_ARROWRIGHT: { x: Consts.MOVE_STEP, desc: "向右移动" },
     }[direction];
 
-    (this.moveX += x), (this.moveY += y);
+    this.moveX += x ?? 0;
+    this.moveY += y ?? 0;
     this.setVideoTsr("--moveX", `${this.moveX}px`).setVideoTsr("--moveY", `${this.moveY}px`);
+    this.showToast(`${desc}：${moveX === this.moveX ? this.moveY : this.moveX}px`, Consts.ONE_SEC * 2);
   },
   videoScreenshot() {
-    if (!this.video || this.isDisableScreenshot()) return;
-    this.video.setAttribute("crossorigin", "anonymous");
+    if (!this.player || this.isDisableScreenshot()) return;
+    this.player.setAttribute("crossorigin", "anonymous");
     const canvas = document.createElement("canvas");
-    canvas.height = this.video.videoHeight;
-    canvas.width = this.video.videoWidth;
+    canvas.height = this.player.videoHeight;
+    canvas.width = this.player.videoWidth;
     const ctx = canvas.getContext("2d");
 
     try {
-      ctx.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(this.player, 0, 0, canvas.width, canvas.height);
       GM_download(canvas.toDataURL("image/png"), `视频截图_${Date.now()}.png`);
     } catch (e) {
       canvas.style.setProperty("max-width", "98vw");
@@ -143,9 +138,9 @@ export default {
     }
   },
   freezeVideoFrame(isPrev) {
-    if (!this.video) return;
-    !this.video.paused && this.video.pause();
-    this.video.currentTime += (isPrev ? -1 : 1) / 24;
+    if (!this.player) return;
+    !this.player.paused && this.player.pause();
+    this.player.currentTime += (isPrev ? -1 : 1) / 24;
   },
   customToast(startText, colorText, endText, duration, isRemove) {
     const span = document.createElement("span");
@@ -177,14 +172,14 @@ export default {
     return [...(h ? [h] : []), m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
   },
   isMultVideo() {
-    const currVideoSrc = this.videoInfo.src;
-    const videos = Tools.querys("video").filter((video) => video.currentSrc !== currVideoSrc && !isNaN(video.duration));
+    const playerSrc = this.videoInfo?.src;
+    const videos = Tools.querys("video").filter((video) => video.currentSrc !== playerSrc && !isNaN(video.duration));
     return videos.length > 1;
   },
   setVideoTsr(name, value) {
     const cls = "__tsr";
-    this.video?.style?.setProperty(name, value);
-    if (!Tools.hasCls(cls)) Tools.addCls(this.video, cls), Tools.setPart(this.video, cls);
+    this.player?.style?.setProperty(name, value);
+    if (!Tools.hasCls(cls)) Tools.addCls(this.player, cls), Tools.setPart(this.player, cls);
     return this;
   },
 };

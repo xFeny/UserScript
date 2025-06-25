@@ -51,7 +51,7 @@ export default {
   },
   processEvent(data) {
     // video可能在iframe中，向iframe传递事件
-    if (!this.video) Tools.sendToIFrames(data);
+    if (!this.player) Tools.sendToIFrames(data);
     if (data?.key) this.execHotKeyActions(data.key.toUpperCase());
   },
   execHotKeyActions(key) {
@@ -67,7 +67,7 @@ export default {
       ARROWLEFT: () => this.isOverrideKeyboard() && this.adjustVideoTime(-Storage.SKIP_INTERVAL.get()),
       ARROWRIGHT: () => this.isOverrideKeyboard() && this.adjustVideoTime(Storage.SKIP_INTERVAL.get()),
       0: () => this.adjustVideoTime(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
-      SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.video),
+      SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.player),
       D: () => this.triggerIconElement(SiteIcons.name.danmaku),
       KEYR: () => this.videoRotateOrMirror(true),
       R: () => this.videoRotateOrMirror(),

@@ -6,7 +6,7 @@ import Tools from "../common/Tools";
  */
 export default {
   webFullEnhance() {
-    if (this.normalSite() || Tools.isTooFrequent("enhance", 300)) return;
+    if (this.normalSite() || Tools.isTooFrequent("enhance")) return;
     // 退出网页全屏
     if (this.webFullWrap) return this.exitWebFull();
 
@@ -21,12 +21,12 @@ export default {
     Tools.getParents(wrap, true)?.forEach((el) => (el.classList.add(Consts.webFull), Tools.setPart(el, Consts.webFull)));
 
     // video特殊处理
-    if (this.video) Tools.setPart(this.video, Consts.videoPart);
+    if (this.player) Tools.setPart(this.player, Consts.videoPart);
     if (wrap.matches("video") && Tools.hasCls(wrap, Consts.webFull)) wrap.controls = true;
   },
   exitWebFull() {
     const wrap = this.webFullWrap;
-    if (this.video) Tools.delPart(this.video, Consts.videoPart);
+    if (this.player) Tools.delPart(this.player, Consts.videoPart);
     if (this.webFullWrap?.matches("video")) wrap.controls = wrap.ctrl;
 
     Tools.querys(`.${Consts.webFull}`).forEach((el) => (Tools.delCls(el, Consts.webFull), Tools.delPart(el, Consts.webFull)));
@@ -34,7 +34,7 @@ export default {
     this.webFullWrap = null;
   },
   getVideoHostContainer() {
-    if (this.video) return this.getVideoWrapper();
+    if (this.player) return this.getVideoWrapper();
 
     const videoIFrame = this.getVideoIFrame();
     if (videoIFrame) return videoIFrame;
@@ -55,14 +55,15 @@ export default {
   findVideoControlBar() {
     const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
     const ctrl = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"]`;
-    const controlBar = Tools.findParentWithChild(this.video, ctrl);
+    const controlBar = Tools.findParentWithChild(this.player, ctrl);
     const { centerX, centerY } = Tools.getCenterPoint(controlBar);
-    return Tools.pointInElement(centerX, centerY, this.video) ? controlBar : null;
+    return Tools.pointInElement(centerX, centerY, this.player) ? controlBar : null;
   },
   findVideoContainer(maxLevel = 5) {
-    let container = this.video;
-    const videoRect = Tools.getElementRect(this.video);
-    for (let parent = this.video?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
+    const video = this.player;
+    let container = this.player;
+    const videoRect = Tools.getElementRect(video);
+    for (let parent = video?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
       const { width, height } = Tools.getElementRect(parent);
       if (width === videoRect.width && height === videoRect.height) container = parent;
     }

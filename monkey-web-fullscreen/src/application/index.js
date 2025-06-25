@@ -2,10 +2,8 @@ import Site from "./common/Site";
 import Tools from "./common/Tools";
 import Consts from "./common/Consts";
 import SiteIcons from "./common/SiteIcons";
-import VideoEventHandler from "./handler/VideoEventHandler";
-import Storage from "./common/Storage";
 
-export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
+export default window.App = {
   init() {
     this.setupVisibleListener();
     this.setupKeydownListener();
@@ -21,7 +19,7 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
       if (this.normalSite()) return;
-      const video = this.isLive() ? this.getVideo() : this.video;
+      const video = this.isLive() ? this.getVideo() : this.player;
       if (!video || video?.isEnded || !Tools.isVisible(video)) return;
       document.hidden ? video?.pause() : video?.play();
     });
@@ -30,7 +28,7 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
     const _wr = (method) => {
       const original = history[method];
       history[method] = function () {
-        original.apply(history, arguments);
+        original.apply(this, arguments);
         window.dispatchEvent(new Event(method));
       };
     };
@@ -40,49 +38,28 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
   setupMutationObserver() {
     if (Tools.isTooFrequent()) return;
     const observer = Tools.createObserver(document.body, () => {
-      this.triggerVideoStart();
+      this.removeLoginPopups();
+      this.triggerStartElement();
       const video = this.getVideo();
       this.webFullElement = this.getWebFullElement();
-      if (!Site.isMatch() && this.topInfo) return observer.disconnect();
-      if (video?.play && !!video.offsetWidth) this.addVideoListener(video);
-      if (!this.videoInfo || !this.webFullElement || !this.specificWebFullscreen(video)) return;
-      observer.disconnect(), this.handleLoginPopups();
+      if (video?.play && !!video?.offsetWidth) this.setCurrentVideo(video);
+      if (this.topInfo && (!Site.isMatch() || this.specificWebFullscreen(video))) observer.disconnect();
     });
     setTimeout(() => observer.disconnect(), Consts.ONE_SEC * 10);
   },
-  triggerVideoStart() {
+  triggerStartElement() {
     // https://www.zhihu.com 、https://www.jumomo.cc 、https://www.jiaozi.me 、https://www.kmvod.cc
     const element = Tools.query("._qrp4qg, .ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
     if (!element || Tools.isTooFrequent("start")) return;
     setTimeout(() => element?.click() & element?.remove(), 150);
   },
-  addVideoListener(video) {
-    this.video = video;
-    this.setVideoInfo(video);
-    this.healthCurrentVideo();
-    this.removeVideoEvtListener();
-    this.videoBoundListeners = [];
+  setCurrentVideo(video) {
+    if (isNaN(video.duration) || video.duration < 10 || video.offsetWidth < 200) return;
+    if (this.isBackgroundVideo(video) || this.player === video) return;
 
-    Object.entries(VideoEventHandler).forEach(([type, handler]) => {
-      this.videoBoundListeners.push([video, type, handler]);
-      video?.addEventListener(type, handler);
-    });
-  },
-  removeVideoEvtListener() {
-    this.videoBoundListeners?.forEach(([target, type, handler]) => {
-      target?.removeEventListener(type, handler);
-    });
-  },
-  healthCurrentVideo() {
-    if (this.healthID || Tools.isTooFrequent("healt")) return;
-    this.healthID = setInterval(() => this.getPlayingVideo(), Consts.ONE_SEC);
-  },
-  getPlayingVideo() {
-    const videos = Tools.querys("video");
-    for (const video of videos) {
-      if (this.video === video || video.paused || isNaN(video.duration) || this.isBackgroundVideo(video)) continue;
-      return this.addVideoListener(video);
-    }
+    this.player = video;
+    this.setVideoInfo(video);
+    window?.EnhancerVideo?.enhanced(video);
   },
   setVideoInfo(video) {
     const isLive = Object.is(video.duration, Infinity);
@@ -97,7 +74,9 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
     this.sendTopInfo();
   },
   sendTopInfo() {
+    if (this.hasTopInfo) return;
     // 向iframe传递顶级窗口信息
+    this.hasTopInfo = true;
     const title = document.title;
     const { host, href } = location;
     window.topInfo = this.topInfo = { title, innerWidth, host, href, hash: Tools.simpleHash(href) };
@@ -105,22 +84,20 @@ export default unsafeWindow.MONKEY_WEB_FULLSCREEN = {
   },
   setupMouseMoveListener() {
     let timer = null;
-    const handleMouseEvent = ({ target, isTrusted }, addListener = false) => {
+    const handleMouseEvent = ({ target, isTrusted }) => {
       if (!isTrusted) return;
 
       clearTimeout(timer);
       this.toggleCursor();
       timer = setTimeout(() => this.toggleCursor(true), Consts.ONE_SEC * 3);
-
-      if (!addListener || this.video === target || !target.matches("video") || this.isBackgroundVideo(target)) return;
-      this.addVideoListener(target);
+      if (target instanceof HTMLVideoElement) this.setCurrentVideo(target);
     };
 
-    document.addEventListener("mousemove", (e) => handleMouseEvent(e, true));
+    document.addEventListener("mousemove", (e) => handleMouseEvent(e));
     document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
   },
   toggleCursor(hide = false) {
-    if (this.normalSite() || Tools.isTooFrequent("mouse", 300)) return;
+    if (this.normalSite() || Tools.isTooFrequent("cursor")) return;
     const videoWrap = this.getVideoHostContainer();
     const cls = "__hc";
 

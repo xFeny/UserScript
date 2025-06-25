@@ -34,7 +34,7 @@ export default unsafeWindow.Tools = {
     this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
   },
   lastTimeMap: new Map(),
-  isTooFrequent(key = "default", delay = Consts.ONE_SEC) {
+  isTooFrequent(key = "default", delay = Consts.ONE_SEC / 2) {
     const now = Date.now();
     const lastTime = this.lastTimeMap.get(key) ?? 0;
     const isFrequent = now - lastTime < delay;
@@ -63,7 +63,7 @@ export default unsafeWindow.Tools = {
   createObserver(target, callback) {
     const observer = new MutationObserver(callback);
     target = target instanceof Element ? target : this.query(target);
-    observer.observe(target, { attributes: true, childList: true, subtree: true });
+    observer.observe(target, { childList: true, subtree: true });
     return observer;
   },
   closest(element, selector, maxLevel = 3) {
