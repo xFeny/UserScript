@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.0.2
+// @version      3.1.0
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持任意视频倍速播放；支持播放进度记录；支持任意视频网站下集切换。
 // @license      GPL-3.0-only
@@ -100,24 +100,17 @@
     return node instanceof Document;
   }
   function* getShadowRoots(node, deep) {
-    if (!isElement(node) && !isDocument(node)) {
-      return;
-    }
-    const doc = isDocument(node) ? node : node.getRootNode({ composed: true });
+    if (!node || !isElement(node) && !isDocument(node)) return;
     if (isElement(node) && node.shadowRoot) {
       yield node.shadowRoot;
     }
+    const doc = isDocument(node) ? node : node.getRootNode({ composed: true });
     if (!doc.createTreeWalker) return;
     const toWalk = [node];
     let currentNode = void 0;
     while (currentNode = toWalk.pop()) {
       const walker = doc.createTreeWalker(currentNode, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_DOCUMENT_FRAGMENT, {
-        acceptNode(node2) {
-          if (isElement(node2) && node2.shadowRoot) {
-            return NodeFilter.FILTER_ACCEPT;
-          }
-          return NodeFilter.FILTER_SKIP;
-        }
+        acceptNode: (node2) => isElement(node2) && node2.shadowRoot ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
       });
       let walkerNode = walker.nextNode();
       while (walkerNode) {
@@ -132,74 +125,21 @@
     }
     return;
   }
-  function queryCrossBoundary(selector, subject = document) {
+  function querySelector(selector, subject = document) {
     const immediate = subject.querySelector(selector);
-    if (immediate) {
-      return immediate;
-    }
+    if (immediate) return immediate;
     const shadowRoots = [...getShadowRoots(subject)];
     for (const root of shadowRoots) {
-      const child = root.querySelector(selector);
-      if (child) {
-        return child;
-      }
+      const match = root.querySelector(selector);
+      if (match) return match;
     }
     return null;
   }
-  function queryAllCrossBoundary(selector, subject = document) {
+  function querySelectorAll(selector, subject = document) {
     const results = [...subject.querySelectorAll(selector)];
     const shadowRoots = [...getShadowRoots(subject)];
     for (const root of shadowRoots) {
-      const children = root.querySelectorAll(selector);
-      for (const child of children) {
-        results.push(child);
-      }
-    }
-    return results;
-  }
-  function querySelector(selectors, subject = document, _options) {
-    const selectorList = Array.isArray(selectors) ? selectors : [selectors];
-    if (selectorList.length === 0) {
-      return null;
-    }
-    let currentSubjects = [subject];
-    let result = null;
-    for (const selector of selectorList) {
-      const newSubjects = [];
-      for (const currentSubject of currentSubjects) {
-        const child = queryCrossBoundary(selector, currentSubject);
-        if (child) {
-          result = child;
-          newSubjects.push(child);
-        }
-      }
-      if (newSubjects.length === 0) {
-        return null;
-      }
-      currentSubjects = newSubjects;
-    }
-    return result;
-  }
-  function querySelectorAll(selectors, subject = document, _options) {
-    const selectorList = Array.isArray(selectors) ? selectors : [selectors];
-    if (selectorList.length === 0) {
-      return [];
-    }
-    let currentSubjects = [subject];
-    let results = [];
-    for (const selector of selectorList) {
-      const newSubjects = [];
-      for (const currentSubject of currentSubjects) {
-        const children = queryAllCrossBoundary(selector, currentSubject);
-        for (const child of children) {
-          newSubjects.push(child);
-        }
-      }
-      if (newSubjects.length === 0) {
-        return [];
-      }
-      currentSubjects = newSubjects;
-      results = newSubjects;
+      results.push(...root.querySelectorAll(selector));
     }
     return results;
   }
@@ -232,7 +172,7 @@
       this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
     },
     lastTimeMap: /* @__PURE__ */ new Map(),
-    isTooFrequent(key = "default", delay = Consts.ONE_SEC) {
+    isTooFrequent(key = "default", delay = Consts.ONE_SEC / 2) {
       const now = Date.now();
       const lastTime = this.lastTimeMap.get(key) ?? 0;
       const isFrequent = now - lastTime < delay;
@@ -261,7 +201,7 @@
     createObserver(target, callback) {
       const observer = new MutationObserver(callback);
       target = target instanceof Element ? target : this.query(target);
-      observer.observe(target, { attributes: true, childList: true, subtree: true });
+      observer.observe(target, { childList: true, subtree: true });
       return observer;
     },
     closest(element, selector, maxLevel = 3) {
@@ -355,37 +295,102 @@
     "tv.sohu.com": { webFull: ".x-pagefs-btn", danmaku: ".tm-tmbtn", next: ".x-next-btn" },
     name: { full: "full", webFull: "webFull", next: "next", danmaku: "danmaku" }
   };
-  const VideoEventHandler = {
-    loadedmetadata() {
-      App.universalWebFullscreen(this);
-      Tools.querys('[id*="loading"]').forEach((el) => !Tools.query('[class*="player"]', el) && Tools.addCls(el, "_noplayer"));
+  const App$1 = window.App = {
+    init() {
+      this.setupVisibleListener();
+      this.setupKeydownListener();
+      this.setupMutationObserver();
+      this.setupUrlChangeListener();
+      this.setupMouseMoveListener();
     },
-    loadeddata() {
-      App.tryplay(this);
-      App.initVideoProperties(this);
-      Tools.query(".conplaying")?.click();
+    normalSite: () => !window?.videoInfo && !window?.topInfo,
+    isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
+    getVideo: () => Tools.querys("video:not([loop])").find(Tools.isVisible),
+    isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
+    getWebFullElement: () => Tools.query(SiteIcons[location.host]?.[SiteIcons.name.webFull]),
+    setupVisibleListener() {
+      window.addEventListener("visibilitychange", () => {
+        if (this.normalSite()) return;
+        const video = this.isLive() ? this.getVideo() : this.player;
+        if (!video || video?.isEnded || !Tools.isVisible(video)) return;
+        document.hidden ? video?.pause() : video?.play();
+      });
     },
-    timeupdate() {
-      if (isNaN(this.duration)) return;
-      App.universalWebFullscreen(this);
-      App.useCachePlaybackRate(this);
-      App.useCachePlayTime(this);
-      App.cachePlayTime(this);
+    setupUrlChangeListener() {
+      const _wr = (method) => {
+        const original = history[method];
+        history[method] = function() {
+          original.apply(this, arguments);
+          window.dispatchEvent(new Event(method));
+        };
+      };
+      const handler = () => this.setupMutationObserver();
+      ["popstate", "pushState", "replaceState"].forEach((t) => _wr(t) & window.addEventListener(t, handler));
     },
-    play() {
-      this.isEnded = false;
-      App.specificWebFullscreen(this);
+    setupMutationObserver() {
+      if (Tools.isTooFrequent()) return;
+      const observer = Tools.createObserver(document.body, () => {
+        this.removeLoginPopups();
+        this.triggerStartElement();
+        const video = this.getVideo();
+        this.webFullElement = this.getWebFullElement();
+        if (video?.play && !!video?.offsetWidth) this.setCurrentVideo(video);
+        if (this.topInfo && (!Site.isMatch() || this.specificWebFullscreen(video))) observer.disconnect();
+      });
+      setTimeout(() => observer.disconnect(), Consts.ONE_SEC * 10);
     },
-    pause() {
-      App.getPlayingVideo();
-      Tools.query(".ec-no")?.click();
-      Tools.query('[id*="loading"]._noplayer')?.remove();
+    triggerStartElement() {
+      const element = Tools.query("._qrp4qg, .ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
+      if (!element || Tools.isTooFrequent("start")) return;
+      setTimeout(() => element?.click() & element?.remove(), 150);
     },
-    ended() {
-      this.isEnded = true;
-      this.hasToast = false;
-      App.exitWebFullScreen();
-      App.delPlayTime();
+    setCurrentVideo(video) {
+      if (isNaN(video.duration) || video.duration < 10 || video.offsetWidth < 200) return;
+      if (this.isBackgroundVideo(video) || this.player === video) return;
+      this.player = video;
+      this.setVideoInfo(video);
+      window?.EnhancerVideo?.enhanced(video);
+    },
+    setVideoInfo(video) {
+      const isLive = Object.is(video.duration, Infinity);
+      const videoInfo = { ...Tools.getCenterPoint(video), src: video.currentSrc, isLive };
+      this.setParentVideoInfo(videoInfo);
+    },
+    setParentVideoInfo(videoInfo) {
+      window.videoInfo = this.videoInfo = videoInfo;
+      if (!Tools.isTopWin()) return videoInfo.frameSrc = location.href, Tools.postMessage(window.parent, { videoInfo });
+      this.setupPickerEpisodeListener();
+      this.setupScriptMenuCommand();
+      this.sendTopInfo();
+    },
+    sendTopInfo() {
+      if (this.hasTopInfo) return;
+      this.hasTopInfo = true;
+      const title = document.title;
+      const { host, href } = location;
+      window.topInfo = this.topInfo = { title, innerWidth, host, href, hash: Tools.simpleHash(href) };
+      Tools.sendToIFrames({ topInfo });
+    },
+    setupMouseMoveListener() {
+      let timer = null;
+      const handleMouseEvent = ({ target, isTrusted }) => {
+        if (!isTrusted) return;
+        clearTimeout(timer);
+        this.toggleCursor();
+        timer = setTimeout(() => this.toggleCursor(true), Consts.ONE_SEC * 3);
+        if (target instanceof HTMLVideoElement) this.setCurrentVideo(target);
+      };
+      document.addEventListener("mousemove", (e) => handleMouseEvent(e));
+      document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
+    },
+    toggleCursor(hide = false) {
+      if (this.normalSite() || Tools.isTooFrequent("cursor")) return;
+      const videoWrap = this.getVideoHostContainer();
+      const cls = "__hc";
+      if (!hide) return Tools.querys(`.${cls}`).forEach((el) => (Tools.delCls(el, cls), Tools.delPart(el, cls)));
+      [this?.video, ...Tools.getParents(videoWrap, true, 3)].forEach((el) => {
+        el?.blur(), Tools.addCls(el, cls), Tools.setPart(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
+      });
     }
   };
   class StorageItem {
@@ -464,124 +469,6 @@
     REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
     PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat)
   };
-  const App = _unsafeWindow.MONKEY_WEB_FULLSCREEN = {
-    init() {
-      this.setupVisibleListener();
-      this.setupKeydownListener();
-      this.setupMutationObserver();
-      this.setupUrlChangeListener();
-      this.setupMouseMoveListener();
-    },
-    normalSite: () => !window?.videoInfo && !window?.topInfo,
-    isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
-    getVideo: () => Tools.querys("video:not([loop])").find(Tools.isVisible),
-    isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
-    getWebFullElement: () => Tools.query(SiteIcons[location.host]?.[SiteIcons.name.webFull]),
-    setupVisibleListener() {
-      window.addEventListener("visibilitychange", () => {
-        if (this.normalSite()) return;
-        const video = this.isLive() ? this.getVideo() : this.video;
-        if (!video || video?.isEnded || !Tools.isVisible(video)) return;
-        document.hidden ? video?.pause() : video?.play();
-      });
-    },
-    setupUrlChangeListener() {
-      const _wr = (method) => {
-        const original = history[method];
-        history[method] = function() {
-          original.apply(history, arguments);
-          window.dispatchEvent(new Event(method));
-        };
-      };
-      const handler = () => this.setupMutationObserver();
-      ["popstate", "pushState", "replaceState"].forEach((t) => _wr(t) & window.addEventListener(t, handler));
-    },
-    setupMutationObserver() {
-      if (Tools.isTooFrequent()) return;
-      const observer = Tools.createObserver(document.body, () => {
-        this.triggerVideoStart();
-        const video = this.getVideo();
-        this.webFullElement = this.getWebFullElement();
-        if (!Site.isMatch() && this.topInfo) return observer.disconnect();
-        if (video?.play && !!video.offsetWidth) this.addVideoListener(video);
-        if (!this.videoInfo || !this.webFullElement || !this.specificWebFullscreen(video)) return;
-        observer.disconnect(), this.handleLoginPopups();
-      });
-      setTimeout(() => observer.disconnect(), Consts.ONE_SEC * 10);
-    },
-    triggerVideoStart() {
-      const element = Tools.query("._qrp4qg, .ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
-      if (!element || Tools.isTooFrequent("start")) return;
-      setTimeout(() => element?.click() & element?.remove(), 150);
-    },
-    addVideoListener(video) {
-      this.video = video;
-      this.setVideoInfo(video);
-      this.healthCurrentVideo();
-      this.removeVideoEvtListener();
-      this.videoBoundListeners = [];
-      Object.entries(VideoEventHandler).forEach(([type, handler]) => {
-        this.videoBoundListeners.push([video, type, handler]);
-        video?.addEventListener(type, handler);
-      });
-    },
-    removeVideoEvtListener() {
-      this.videoBoundListeners?.forEach(([target, type, handler]) => {
-        target?.removeEventListener(type, handler);
-      });
-    },
-    healthCurrentVideo() {
-      if (this.healthID || Tools.isTooFrequent("healt")) return;
-      this.healthID = setInterval(() => this.getPlayingVideo(), Consts.ONE_SEC);
-    },
-    getPlayingVideo() {
-      const videos = Tools.querys("video");
-      for (const video of videos) {
-        if (this.video === video || video.paused || isNaN(video.duration) || this.isBackgroundVideo(video)) continue;
-        return this.addVideoListener(video);
-      }
-    },
-    setVideoInfo(video) {
-      const isLive = Object.is(video.duration, Infinity);
-      const videoInfo = { ...Tools.getCenterPoint(video), src: video.currentSrc, isLive };
-      this.setParentVideoInfo(videoInfo);
-    },
-    setParentVideoInfo(videoInfo) {
-      window.videoInfo = this.videoInfo = videoInfo;
-      if (!Tools.isTopWin()) return videoInfo.frameSrc = location.href, Tools.postMessage(window.parent, { videoInfo });
-      this.setupPickerEpisodeListener();
-      this.setupScriptMenuCommand();
-      this.sendTopInfo();
-    },
-    sendTopInfo() {
-      const title = document.title;
-      const { host, href } = location;
-      window.topInfo = this.topInfo = { title, innerWidth, host, href, hash: Tools.simpleHash(href) };
-      Tools.sendToIFrames({ topInfo });
-    },
-    setupMouseMoveListener() {
-      let timer = null;
-      const handleMouseEvent = ({ target, isTrusted }, addListener = false) => {
-        if (!isTrusted) return;
-        clearTimeout(timer);
-        this.toggleCursor();
-        timer = setTimeout(() => this.toggleCursor(true), Consts.ONE_SEC * 3);
-        if (!addListener || this.video === target || !target.matches("video") || this.isBackgroundVideo(target)) return;
-        this.addVideoListener(target);
-      };
-      document.addEventListener("mousemove", (e) => handleMouseEvent(e, true));
-      document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
-    },
-    toggleCursor(hide = false) {
-      if (this.normalSite() || Tools.isTooFrequent("mouse", 300)) return;
-      const videoWrap = this.getVideoHostContainer();
-      const cls = "__hc";
-      if (!hide) return Tools.querys(`.${cls}`).forEach((el) => (Tools.delCls(el, cls), Tools.delPart(el, cls)));
-      [this?.video, ...Tools.getParents(videoWrap, true, 3)].forEach((el) => {
-        el?.blur(), Tools.addCls(el, cls), Tools.setPart(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
-      });
-    }
-  };
   const Keyboard = Object.freeze({
     A: "A",
     P: "P",
@@ -643,7 +530,7 @@
       this.processEvent({ key });
     },
     processEvent(data) {
-      if (!this.video) Tools.sendToIFrames(data);
+      if (!this.player) Tools.sendToIFrames(data);
       if (data?.key) this.execHotKeyActions(data.key.toUpperCase());
     },
     execHotKeyActions(key) {
@@ -658,7 +545,7 @@
         ARROWLEFT: () => this.isOverrideKeyboard() && this.adjustVideoTime(-Storage.SKIP_INTERVAL.get()),
         ARROWRIGHT: () => this.isOverrideKeyboard() && this.adjustVideoTime(Storage.SKIP_INTERVAL.get()),
         0: () => this.adjustVideoTime(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
-        SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.video),
+        SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.player),
         D: () => this.triggerIconElement(SiteIcons.name.danmaku),
         KEYR: () => this.videoRotateOrMirror(true),
         R: () => this.videoRotateOrMirror(),
@@ -677,15 +564,16 @@
     }
   };
   const WebLogin = {
-    handleLoginPopups() {
-      this.handleQiyiLogin(), this.handleBiliLogin(), this.handleTencentLogin();
+    removeLoginPopups() {
+      this.removeQiyiLogin(), this.removeBiliLogin(), this.removeTencentLogin();
     },
-    handleTencentLogin: () => Site.isTencent() && Tools.query("#login_win")?.remove(),
-    handleQiyiLogin: () => Site.isQiyi() && Tools.query("#qy_pca_login_root")?.remove(),
-    handleBiliLogin() {
-      if (!Site.isBili()) return;
+    removeTencentLogin: () => Site.isTencent() && Tools.query("#login_win")?.remove(),
+    removeQiyiLogin: () => Site.isQiyi() && Tools.query("#qy_pca_login_root")?.remove(),
+    removeBiliLogin() {
+      if (!Site.isBili() || this.BiliTimerID) return;
       if (document.cookie.includes("DedeUserID")) return _unsafeWindow.player?.requestQuality(80);
-      setTimeout(() => {
+      this.BiliTimerID = setInterval(() => {
+        if (_unsafeWindow.__BiliUser__.cache.data.isLogin) clearInterval(this.BiliTimerID);
         _unsafeWindow.__BiliUser__.isLogin = true;
         _unsafeWindow.__BiliUser__.cache.data.isLogin = true;
         _unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
@@ -699,11 +587,12 @@
     isOverrideKeyboard: () => Storage.OVERRIDE_KEYBOARD.get(),
     isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
     isDisableScreenshot: () => Storage.DISABLE_SCREENSHOT.get(),
-    isEnbleThisWebSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : topInfo.host),
+    isEnbleThisWebSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : window?.topInfo?.host),
     setupScriptMenuCommand() {
-      if (!Tools.isTopWin() || Tools.isTooFrequent("menu")) return;
+      if (this.hasMenu || !Tools.isTopWin() || Tools.isTooFrequent("menu")) return;
       this.setupMenuChangeListener();
       this.registMenuCommand();
+      this.hasMenu = true;
     },
     setupMenuChangeListener() {
       const host = location.host;
@@ -799,45 +688,31 @@
   };
   const VideoControl = {
     isEnded() {
-      return Math.floor(this.video.currentTime) === Math.floor(this.video.duration);
+      return Math.floor(this.player.currentTime) === Math.floor(this.player.duration);
     },
     initVideoProperties(video) {
       video.volume = 1;
       video.hasToast = false;
-      video.hasWebFullScreen = false;
+      video.hasWebFull = false;
     },
     playOrPause: (video) => Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause(),
     tryplay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),
     checkUsable() {
-      if (!this.video) return false;
-      if (this.isEnded()) return false;
-      if (Site.isLivePage()) return false;
-      if (this.isDisablePlaybackRate()) return false;
-      if (!Tools.validDuration(this.video)) return false;
+      if (!this.player || this.isDisablePlaybackRate()) return false;
+      if (this.isBackgroundVideo(this.player) || this.isEnded()) return false;
+      if (this.isLive() || this.player.duration > this.player?.__duration) return false;
+      if (!Tools.validDuration(this.player)) return false;
       return true;
-    },
-    lockPlaybackRate(video) {
-      try {
-        const orig = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, "playbackRate");
-        Object.defineProperty(video, "playbackRate", {
-          set: (value) => value === video?.__playbackRate && orig.set.call(video, value),
-          get: () => orig.get.call(video),
-          configurable: true
-        });
-      } catch (e) {
-      }
     },
     setPlaybackRate(playRate, show = true) {
       if (!this.checkUsable()) return;
-      this.lockPlaybackRate(this.video);
       playRate = (+playRate).toFixed(2).replace(/\.?0+$/, Consts.EMPTY);
-      this.video.playbackRate = this.video.__playbackRate = playRate;
+      window?.EnhancerVideo?.setPlaybackRate(this.player, playRate);
       if (show) this.customToast("正在以", `${playRate}x`, "倍速播放");
       Storage.CACHED_PLAY_RATE.set(playRate);
     },
     adjustPlaybackRate(step = Storage.PLAY_RATE_STEP.get()) {
-      if (!this.checkUsable()) return;
-      const playRate = Math.max(Storage.PLAY_RATE_STEP.get(), this.video.playbackRate + step);
+      const playRate = Math.max(Storage.PLAY_RATE_STEP.get(), this.player.playbackRate + step);
       this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
     },
     defaultPlaybackRate() {
@@ -853,72 +728,76 @@
       video.hasToast = true;
     },
     adjustVideoTime(second = Storage.SKIP_INTERVAL.get()) {
-      if (!this.video || !Tools.validDuration(this.video) || second > 0 && this.video.isEnded) return;
-      const currentTime = Math.min(this.video.currentTime + second, this.video.duration);
+      if (!this.player || !Tools.validDuration(this.player) || second > 0 && this.player.isEnded) return;
+      const currentTime = Math.min(this.player.currentTime + second, this.player.duration);
       this.setCurrentTime(currentTime);
     },
     cachePlayTime(video) {
-      if (!this.topInfo || this.isLive() || !Tools.validDuration(this.video)) return;
+      if (!this.topInfo || this.isLive() || !Tools.validDuration(this.player)) return;
+      if (this.player.duration > this.player?.__duration || this.player.duration < 120) return;
       if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded() || this.isMultVideo()) return this.delPlayTime();
-      if (video.currentTime > Storage.SKIP_INTERVAL.get()) Storage.PLAY_TIME.set(topInfo.hash, video.currentTime - 1, 7);
+      if (video.currentTime > Storage.SKIP_INTERVAL.get()) Storage.PLAY_TIME.set(this.topInfo.hash, video.currentTime - 1, 7);
     },
     useCachePlayTime(video) {
       if (this.hasUsedPlayTime || !this.topInfo || this.isLive()) return;
-      const time = Storage.PLAY_TIME.get(topInfo.hash);
+      const time = Storage.PLAY_TIME.get(this.topInfo.hash);
       if (time <= video.currentTime) return this.hasUsedPlayTime = true;
       this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3, false);
       this.hasUsedPlayTime = true;
       this.setCurrentTime(time);
     },
-    delPlayTime: () => Storage.PLAY_TIME.del(topInfo.hash),
+    delPlayTime: () => Storage.PLAY_TIME.del(window?.topInfo?.hash),
     setCurrentTime(currentTime) {
-      if (currentTime) this.video.currentTime = Math.max(0, currentTime);
+      if (currentTime) this.player.currentTime = Math.max(0, currentTime);
     },
     togglePIP() {
-      if (!this.video) return;
-      document.pictureInPictureElement ? document.exitPictureInPicture() : this.video?.requestPictureInPicture();
+      if (!this.player) return;
+      document.pictureInPictureElement ? document.exitPictureInPicture() : this.player?.requestPictureInPicture();
     },
     rotation: 0,
     videoRotateOrMirror(mirror = false) {
-      if (!this.video) return;
+      if (!this.player) return;
       if (mirror) return this.isMirrored = !this.isMirrored, this.setVideoTsr("--mirror", this.isMirrored ? -1 : 1);
       this.rotation = (this.rotation + 90) % 360;
-      const { videoWidth, videoHeight } = this.video;
+      const { videoWidth, videoHeight } = this.player;
       const isVertical = [90, 270].includes(this.rotation);
       const scale = isVertical ? videoHeight / videoWidth : 1;
       this.setVideoTsr("--scale", scale).setVideoTsr("--rotate", `${this.rotation}deg`);
     },
     currentZoom: Consts.DEF_ZOOM,
     zoomVideo(isDown) {
-      if (!this.video || this.isDisableZoom()) return;
+      if (!this.player || this.isDisableZoom()) return;
       const zoom = this.currentZoom + (isDown ? -Consts.ZOOM_STEP : Consts.ZOOM_STEP);
       if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
       this.currentZoom = zoom;
       this.setVideoTsr("--zomm", zoom / 100);
-      this.showToast(`缩放: ${zoom}%`, Consts.ONE_SEC * 2);
+      this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC * 2);
     },
     moveX: 0,
     moveY: 0,
     moveVideo(direction) {
-      if (!this.video || this.isDisableZoom()) return;
-      const { x = 0, y = 0 } = {
-        ALT_ARROWUP: { y: -Consts.MOVE_STEP },
-        ALT_ARROWDOWN: { y: Consts.MOVE_STEP },
-        ALT_ARROWLEFT: { x: -Consts.MOVE_STEP },
-        ALT_ARROWRIGHT: { x: Consts.MOVE_STEP }
+      if (!this.player || this.isDisableZoom()) return;
+      const moveX = this.moveX;
+      const { x, y, desc } = {
+        ALT_ARROWUP: { y: -Consts.MOVE_STEP, desc: "向上移动" },
+        ALT_ARROWDOWN: { y: Consts.MOVE_STEP, desc: "向下移动" },
+        ALT_ARROWLEFT: { x: -Consts.MOVE_STEP, desc: "向左移动" },
+        ALT_ARROWRIGHT: { x: Consts.MOVE_STEP, desc: "向右移动" }
       }[direction];
-      this.moveX += x, this.moveY += y;
+      this.moveX += x ?? 0;
+      this.moveY += y ?? 0;
       this.setVideoTsr("--moveX", `${this.moveX}px`).setVideoTsr("--moveY", `${this.moveY}px`);
+      this.showToast(`${desc}：${moveX === this.moveX ? this.moveY : this.moveX}px`, Consts.ONE_SEC * 2);
     },
     videoScreenshot() {
-      if (!this.video || this.isDisableScreenshot()) return;
-      this.video.setAttribute("crossorigin", "anonymous");
+      if (!this.player || this.isDisableScreenshot()) return;
+      this.player.setAttribute("crossorigin", "anonymous");
       const canvas = document.createElement("canvas");
-      canvas.height = this.video.videoHeight;
-      canvas.width = this.video.videoWidth;
+      canvas.height = this.player.videoHeight;
+      canvas.width = this.player.videoWidth;
       const ctx = canvas.getContext("2d");
       try {
-        ctx.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(this.player, 0, 0, canvas.width, canvas.height);
         _GM_download(canvas.toDataURL("image/png"), `视频截图_${Date.now()}.png`);
       } catch (e) {
         canvas.style.setProperty("max-width", "98vw");
@@ -928,9 +807,9 @@
       }
     },
     freezeVideoFrame(isPrev) {
-      if (!this.video) return;
-      !this.video.paused && this.video.pause();
-      this.video.currentTime += (isPrev ? -1 : 1) / 24;
+      if (!this.player) return;
+      !this.player.paused && this.player.pause();
+      this.player.currentTime += (isPrev ? -1 : 1) / 24;
     },
     customToast(startText, colorText, endText, duration, isRemove) {
       const span = document.createElement("span");
@@ -960,26 +839,26 @@
       return [...h ? [h] : [], m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
     },
     isMultVideo() {
-      const currVideoSrc = this.videoInfo.src;
-      const videos = Tools.querys("video").filter((video) => video.currentSrc !== currVideoSrc && !isNaN(video.duration));
+      const playerSrc = this.videoInfo?.src;
+      const videos = Tools.querys("video").filter((video) => video.currentSrc !== playerSrc && !isNaN(video.duration));
       return videos.length > 1;
     },
     setVideoTsr(name, value) {
       const cls = "__tsr";
-      this.video?.style?.setProperty(name, value);
-      if (!Tools.hasCls(cls)) Tools.addCls(this.video, cls), Tools.setPart(this.video, cls);
+      this.player?.style?.setProperty(name, value);
+      if (!Tools.hasCls(cls)) Tools.addCls(this.player, cls), Tools.setPart(this.player, cls);
       return this;
     }
   };
   const WebFullScreen = {
     universalWebFullscreen(video) {
-      if (!this.topInfo || Site.isMatch() || !this.isEnbleThisWebSiteAuto() || video.hasWebFullScreen) return;
-      if (video.offsetWidth === topInfo.innerWidth) return video.hasWebFullScreen = true;
+      if (!this.topInfo || video.hasWebFull || Site.isMatch() || !this.isEnbleThisWebSiteAuto()) return;
+      if (video.offsetWidth === this.topInfo.innerWidth) return video.hasWebFull = true;
       Tools.postMessage(window.top, { key: Keyboard.P });
-      video.hasWebFullScreen = true;
+      video.hasWebFull = true;
     },
     specificWebFullscreen(video) {
-      if (!video?.offsetWidth) return false;
+      if (!video?.offsetWidth || !this.webFullElement) return false;
       if (this.isDisableAuto() || video?.offsetWidth >= innerWidth) return true;
       return Site.isBiliLive() ? this.liveWebFullScreen() : Tools.triggerClick(this.webFullElement);
     },
@@ -998,7 +877,7 @@
     },
     exitWebFullScreen() {
       if (!Site.isBili() && !Site.isAcFun()) return;
-      if (this.video.offsetWidth === innerWidth) this.webFullElement?.click();
+      if (this.player.offsetWidth === innerWidth) this.webFullElement?.click();
       const isLast = Tools.query('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
       if (!Tools.query(".video-pod") || isLast) return Tools.query(".bpx-player-ending-related-item-cancel")?.click();
     },
@@ -1085,7 +964,8 @@
   };
   const PickerEpisode = {
     setupPickerEpisodeListener() {
-      if (Site.isMatch()) return;
+      if (Site.isMatch() || this.hasPickerListener) return;
+      this.hasPickerListener = true;
       document.body.addEventListener(
         "click",
         (event, { target, ctrlKey, altKey, isTrusted } = event) => {
@@ -1169,7 +1049,7 @@
   };
   const WebFullEnhance = {
     webFullEnhance() {
-      if (this.normalSite() || Tools.isTooFrequent("enhance", 300)) return;
+      if (this.normalSite() || Tools.isTooFrequent("enhance")) return;
       if (this.webFullWrap) return this.exitWebFull();
       const wrap = this.getVideoHostContainer();
       if (!wrap) return;
@@ -1178,19 +1058,19 @@
       wrap.top = wrap.top ?? wrap.getBoundingClientRect()?.top ?? 0;
       wrap.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
       Tools.getParents(wrap, true)?.forEach((el) => (el.classList.add(Consts.webFull), Tools.setPart(el, Consts.webFull)));
-      if (this.video) Tools.setPart(this.video, Consts.videoPart);
+      if (this.player) Tools.setPart(this.player, Consts.videoPart);
       if (wrap.matches("video") && Tools.hasCls(wrap, Consts.webFull)) wrap.controls = true;
     },
     exitWebFull() {
       const wrap = this.webFullWrap;
-      if (this.video) Tools.delPart(this.video, Consts.videoPart);
+      if (this.player) Tools.delPart(this.player, Consts.videoPart);
       if (this.webFullWrap?.matches("video")) wrap.controls = wrap.ctrl;
       Tools.querys(`.${Consts.webFull}`).forEach((el) => (Tools.delCls(el, Consts.webFull), Tools.delPart(el, Consts.webFull)));
       Tools.scrollTop((Tools.getElementRect(wrap)?.top < 0 ? wrap?.top + wrap.scrollY : wrap?.top) - 120);
       this.webFullWrap = null;
     },
     getVideoHostContainer() {
-      if (this.video) return this.getVideoWrapper();
+      if (this.player) return this.getVideoWrapper();
       const videoIFrame = this.getVideoIFrame();
       if (videoIFrame) return videoIFrame;
       const ifrs = Tools.getIFrames();
@@ -1209,20 +1089,128 @@
     findVideoControlBar() {
       const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
       const ctrl = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"]`;
-      const controlBar = Tools.findParentWithChild(this.video, ctrl);
+      const controlBar = Tools.findParentWithChild(this.player, ctrl);
       const { centerX, centerY } = Tools.getCenterPoint(controlBar);
-      return Tools.pointInElement(centerX, centerY, this.video) ? controlBar : null;
+      return Tools.pointInElement(centerX, centerY, this.player) ? controlBar : null;
     },
     findVideoContainer(maxLevel = 5) {
-      let container = this.video;
-      const videoRect = Tools.getElementRect(this.video);
-      for (let parent = this.video?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
+      const video = this.player;
+      let container = this.player;
+      const videoRect = Tools.getElementRect(video);
+      for (let parent = video?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
         const { width, height } = Tools.getElementRect(parent);
         if (width === videoRect.width && height === videoRect.height) container = parent;
       }
       return container;
     }
   };
+  const VideoEvents = {
+    loadedmetadata() {
+      App.universalWebFullscreen(this);
+      Tools.querys('[id*="loading"]').forEach((el) => !Tools.query('[class*="player"]', el) && Tools.addCls(el, "_noplayer"));
+    },
+    loadeddata() {
+      App.initVideoProperties(this);
+      this.__duration = this.duration;
+      Tools.query(".conplaying")?.click();
+    },
+    timeupdate() {
+      if (isNaN(this.duration)) return;
+      App.universalWebFullscreen(this);
+      App.cachePlayTime(this);
+    },
+    canplay() {
+      if (this.hasTryplay || App.isMultVideo()) return;
+      this.hasTryplay = true;
+      App.tryplay(this);
+    },
+    playing() {
+      this.isEnded = false;
+      if (this.duration >= 10) {
+        App.setCurrentVideo(this);
+        App.useCachePlayTime(this);
+        App.useCachePlaybackRate(this);
+      }
+      App.specificWebFullscreen(this);
+    },
+    pause() {
+      Tools.query(".ec-no")?.click();
+      Tools.query('[id*="loading"]._noplayer')?.remove();
+    },
+    ended() {
+      this.isEnded = true;
+      this.hasToast = false;
+      App.exitWebFullScreen();
+      App.delPlayTime();
+    }
+  };
+  class VideoEnhancer {
+    constructor() {
+      this.setupObserver();
+      this.setupExistingVideos();
+      this.hookMediaMethod("play", (video) => this.enhanced(video));
+    }
+    setupExistingVideos() {
+      const videos = Tools.querys("video:not([enhanced])");
+      videos.forEach((video) => this.enhanced(video));
+    }
+    setupObserver() {
+      Tools.createObserver(document.body, (mutationsList) => {
+        for (const mutation of mutationsList) {
+          if (mutation.type !== "childList" || mutation.addedNodes.length === 0) return;
+          this.processAddedNodes(mutation.addedNodes);
+        }
+      });
+    }
+    processAddedNodes(nodes) {
+      for (const node of nodes) {
+        if (node instanceof HTMLVideoElement && !node.hasAttribute("enhanced")) {
+          this.enhanced(node);
+        } else if (node.nodeType === Node.ELEMENT_NODE && node.hasChildNodes()) {
+          const childVideos = Tools.querys("video:not([enhanced])", node);
+          childVideos.forEach((video) => this.enhanced(video));
+        }
+      }
+    }
+    enhanced(video) {
+      if (video.hasAttribute("enhanced")) return;
+      this.setupEventListeners(video);
+      this.floorVideoDuration(video);
+    }
+    setupEventListeners(video) {
+      video.setAttribute("enhanced", true);
+      Object.entries(VideoEvents).forEach(([type, handler]) => {
+        video.removeEventListener(type, handler, true);
+        video.addEventListener(type, handler, true);
+      });
+    }
+    setPlaybackRate(video, playRate) {
+      this.defineProperty(video, "playbackRate", { set: (val, setter, t) => val === t?.__playbackRate && setter(val) });
+      video.playbackRate = video.__playbackRate = playRate;
+    }
+    floorVideoDuration(video) {
+      this.defineProperty(video, "duration", { get: (value) => Math.floor(value) });
+    }
+    defineProperty(video, propertyKey, descriptors) {
+      try {
+        const original = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, propertyKey);
+        Object.defineProperty(video, propertyKey, {
+          get: descriptors.get ? () => descriptors.get(original.get.call(video)) : original.get,
+          set: descriptors.set ? (value) => descriptors.set(value, original.set.bind(video), video) : original.set,
+          configurable: true
+        });
+      } catch (e) {
+        console.error(`Error modifying ${propertyKey} property:`, e);
+      }
+    }
+    hookMediaMethod(method, callback) {
+      const original = HTMLMediaElement.prototype[method];
+      HTMLMediaElement.prototype[method] = function() {
+        callback.call(this, this);
+        return original.apply(this, arguments);
+      };
+    }
+  }
   const cssLoader = (e) => {
     const t = GM_getResourceText(e);
     return GM_addStyle(t), t;
@@ -1231,9 +1219,11 @@
   cssLoader("notyf/notyf.min.css");
   [Keydown, WebLogin, MenuCommand, VideoControl, WebFullScreen, WebFullEnhance, SwitchEpisode, PickerEpisode].forEach((handler) => {
     Object.entries(handler).forEach(([key, value]) => {
-      App[key] = value instanceof Function ? value.bind(App) : value;
+      App$1[key] = value instanceof Function ? value.bind(App$1) : value;
     });
   });
-  App.init();
+  window.EnhancerVideo = new VideoEnhancer();
+  _unsafeWindow.AUTO_WEB_FULLSCREEN = App$1;
+  App$1.init();
 
 })(notyf, sweetalert2);
