@@ -14,6 +14,7 @@ export default {
   },
   specificWebFullscreen(video) {
     // 特定网页全屏，只针对在`@match`中的网站，通过点击图标来网页全屏
+    if (this.player !== video) return false;
     if (!video?.offsetWidth || !this.webFullElement) return false;
     if (this.isDisableAuto() || video?.offsetWidth >= innerWidth) return true;
     return Site.isBiliLive() ? this.liveWebFullScreen() : Tools.triggerClick(this.webFullElement);
@@ -37,8 +38,10 @@ export default {
     if (!Site.isBili() && !Site.isAcFun()) return;
     if (this.player.offsetWidth === innerWidth) this.webFullElement?.click();
     // B站视频合集播放的是合集最后一个或关闭了合集自动连播，点击“取消连播”按钮
-    const isLast = Tools.query('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
-    if (!Tools.query(".video-pod") || isLast) return Tools.query(".bpx-player-ending-related-item-cancel")?.click();
+    setTimeout(() => {
+      const isLast = Tools.query('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
+      if (!Tools.query(".video-pod") || isLast) Tools.query(".bpx-player-ending-related-item-cancel")?.click();
+    });
   },
   getBiliLiveIcons() {
     // 图标从右到左：全屏、网页全屏、弹幕设置、弹幕开关、小窗模式，即下标[0]是全屏图标
