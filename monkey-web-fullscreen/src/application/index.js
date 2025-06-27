@@ -1,7 +1,6 @@
 import Site from "./common/Site";
 import Tools from "./common/Tools";
 import Consts from "./common/Consts";
-import SiteIcons from "./common/SiteIcons";
 
 export default window.App = {
   init() {
@@ -15,7 +14,6 @@ export default window.App = {
   isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
   getVideo: () => Tools.querys("video:not([loop])").find(Tools.isVisible),
   isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
-  getWebFullElement: () => Tools.query(SiteIcons[location.host]?.[SiteIcons.name.webFull]),
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
       if (this.normalSite()) return;
@@ -40,10 +38,8 @@ export default window.App = {
     const observer = Tools.createObserver(document.body, () => {
       this.removeLoginPopups();
       this.triggerStartElement();
-      const video = this.getVideo();
-      this.webFullElement = this.getWebFullElement();
-      if (video?.play && !!video?.offsetWidth) this.setCurrentVideo(video);
-      if (this.topInfo && (!Site.isMatch() || this.specificWebFullscreen(video))) observer.disconnect();
+      this.setCurrentVideo(this.getVideo());
+      if (this.topInfo) observer.disconnect();
     });
     setTimeout(() => observer.disconnect(), Consts.ONE_SEC * 10);
   },
@@ -54,8 +50,8 @@ export default window.App = {
     setTimeout(() => element?.click() & element?.remove(), 150);
   },
   setCurrentVideo(video) {
-    if (this.isBackgroundVideo(video)) return;
-    if (video.offsetWidth < 200 || this.player === video) return;
+    if (!video || this.player === video) return;
+    if (Tools.getElementRect(video).width < 200 || this.isBackgroundVideo(video)) return;
 
     this.player = video;
     this.setVideoInfo(video);
@@ -74,9 +70,7 @@ export default window.App = {
     this.sendTopInfo();
   },
   sendTopInfo() {
-    if (this.hasTopInfo) return;
     // 向iframe传递顶级窗口信息
-    this.hasTopInfo = true;
     const title = document.title;
     const { host, href } = location;
     window.topInfo = this.topInfo = { title, innerWidth, host, href, hash: Tools.simpleHash(href) };

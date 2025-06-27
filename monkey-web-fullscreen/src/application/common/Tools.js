@@ -2,9 +2,6 @@ import { Notyf } from "notyf";
 import Consts from "./Consts";
 import { querySelector, querySelectorAll } from "./shadow-dom-utils";
 
-/**
- * 公共方法
- */
 export default unsafeWindow.Tools = {
   noNumber: (str) => !/\d/.test(str),
   isTopWin: () => window.top === window,
@@ -34,7 +31,7 @@ export default unsafeWindow.Tools = {
     this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
   },
   lastTimeMap: new Map(),
-  isTooFrequent(key = "default", delay = Consts.ONE_SEC / 2) {
+  isTooFrequent(key = "default", delay = 300) {
     const now = Date.now();
     const lastTime = this.lastTimeMap.get(key) ?? 0;
     const isFrequent = now - lastTime < delay;

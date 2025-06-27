@@ -83,6 +83,7 @@ export default {
     dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
   },
   triggerIconElement(name) {
+    if (Tools.isTooFrequent("icon")) return;
     const index = Object.values(SiteIcons.name).indexOf(name);
     if (!Site.isBiliLive()) return Tools.query(SiteIcons[location.host]?.[name])?.click();
     SiteIcons.name.webFull === name ? this.liveWebFullScreen() : this.getBiliLiveIcons()?.[index]?.click();

@@ -5,7 +5,7 @@ import Tools from "../common/Tools";
  */
 export default {
   loadedmetadata() {
-    App.universalWebFullscreen(this);
+    App.autoWebFullScreen(this);
     Tools.querys('[id*="loading"]').forEach((el) => !Tools.query('[class*="player"]', el) && Tools.addCls(el, "_noplayer"));
   },
   loadeddata() {
@@ -15,7 +15,7 @@ export default {
   },
   timeupdate() {
     if (isNaN(this.duration)) return;
-    App.universalWebFullscreen(this);
+    App.autoWebFullScreen(this);
     App.cachePlayTime(this);
   },
   canplay() {
@@ -25,13 +25,10 @@ export default {
   },
   playing() {
     this.isEnded = false;
-    // 超短的视频不操作
-    if (this.duration >= 10) {
-      App.setCurrentVideo(this);
-      App.useCachePlayTime(this);
-      App.useCachePlaybackRate(this);
-    }
-    App.specificWebFullscreen(this);
+    if (this.duration < 10) return; // 超短的视频不操作
+    App.setCurrentVideo(this);
+    App.useCachePlayTime(this);
+    App.useCachePlaybackRate(this);
   },
   pause() {
     // https://www.mcydh.com、https://dick.xfani.com
@@ -42,7 +39,7 @@ export default {
   ended() {
     this.isEnded = true;
     this.hasToast = false;
-    App.exitWebFullScreen();
+    App.autoExitWebFullScreen();
     App.delPlayTime();
   },
 };
