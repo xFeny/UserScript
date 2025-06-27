@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网站自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.1.1
+// @version      3.1.2
 // @author       Feny
 // @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持任意视频倍速播放；支持播放进度记录；支持任意视频网站下集切换。
 // @license      GPL-3.0-only
@@ -172,7 +172,7 @@
       this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
     },
     lastTimeMap: /* @__PURE__ */ new Map(),
-    isTooFrequent(key = "default", delay = Consts.ONE_SEC / 2) {
+    isTooFrequent(key = "default", delay = 300) {
       const now = Date.now();
       const lastTime = this.lastTimeMap.get(key) ?? 0;
       const isFrequent = now - lastTime < delay;
@@ -280,21 +280,6 @@
       node?.setAttribute("part", parts.join(" ").trim());
     }
   };
-  const SiteIcons = {
-    "live.bilibili.com": { webFull: "#businessContainerElement" },
-    "live.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled" },
-    "www.bilibili.com": { webFull: ".bpx-player-ctrl-web", next: ".bpx-player-ctrl-next" },
-    "haokan.baidu.com": { webFull: ".art-control-fullscreenWeb", next: ".art-control-next" },
-    "v.douyu.com": { webFull: ".ControllerBar-PageFull-Icon", danmaku: ".BarrageSwitch-icon" },
-    "v.pptv.com": { webFull: ".w-expand-container > div", danmaku: ".w-barrage", next: ".w-next" },
-    "www.iqiyi.com": { webFull: ".iqp-btn-webscreen", danmaku: "#barrage_switch", next: ".iqp-btn-next" },
-    "v.youku.com": { webFull: "#webfullscreen-icon", danmaku: "#barrage-switch", next: ".kui-next-icon-0" },
-    "www.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled", next: ".btn-next-part div" },
-    "www.mgtv.com": { webFull: ".webfullscreenBtn i", danmaku: "div[class*='danmuSwitch']", next: ".icon-next" },
-    "v.qq.com": { webFull: ".txp_btn_fake", danmaku: ".barrage-switch", next: ".txp_btn_next_u" },
-    "tv.sohu.com": { webFull: ".x-pagefs-btn", danmaku: ".tm-tmbtn", next: ".x-next-btn" },
-    name: { full: "full", webFull: "webFull", next: "next", danmaku: "danmaku" }
-  };
   const App$1 = window.App = {
     init() {
       this.setupVisibleListener();
@@ -307,7 +292,6 @@
     isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
     getVideo: () => Tools.querys("video:not([loop])").find(Tools.isVisible),
     isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
-    getWebFullElement: () => Tools.query(SiteIcons[location.host]?.[SiteIcons.name.webFull]),
     setupVisibleListener() {
       window.addEventListener("visibilitychange", () => {
         if (this.normalSite()) return;
@@ -332,10 +316,8 @@
       const observer = Tools.createObserver(document.body, () => {
         this.removeLoginPopups();
         this.triggerStartElement();
-        const video = this.getVideo();
-        this.webFullElement = this.getWebFullElement();
-        if (video?.play && !!video?.offsetWidth) this.setCurrentVideo(video);
-        if (this.topInfo && (!Site.isMatch() || this.specificWebFullscreen(video))) observer.disconnect();
+        this.setCurrentVideo(this.getVideo());
+        if (this.topInfo) observer.disconnect();
       });
       setTimeout(() => observer.disconnect(), Consts.ONE_SEC * 10);
     },
@@ -345,8 +327,8 @@
       setTimeout(() => element?.click() & element?.remove(), 150);
     },
     setCurrentVideo(video) {
-      if (this.isBackgroundVideo(video)) return;
-      if (video.offsetWidth < 200 || this.player === video) return;
+      if (!video || this.player === video) return;
+      if (Tools.getElementRect(video).width < 200 || this.isBackgroundVideo(video)) return;
       this.player = video;
       this.setVideoInfo(video);
       window?.EnhancerVideo?.enhanced(video);
@@ -364,8 +346,6 @@
       this.sendTopInfo();
     },
     sendTopInfo() {
-      if (this.hasTopInfo) return;
-      this.hasTopInfo = true;
       const title = document.title;
       const { host, href } = location;
       window.topInfo = this.topInfo = { title, innerWidth, host, href, hash: Tools.simpleHash(href) };
@@ -492,6 +472,21 @@
     Subtract: "NumpadSubtract",
     NumpadAdd: "NumpadAdd"
   });
+  const SiteIcons = {
+    "live.bilibili.com": { webFull: "#businessContainerElement" },
+    "live.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled" },
+    "www.bilibili.com": { webFull: ".bpx-player-ctrl-web", next: ".bpx-player-ctrl-next" },
+    "haokan.baidu.com": { webFull: ".art-control-fullscreenWeb", next: ".art-control-next" },
+    "v.douyu.com": { webFull: ".ControllerBar-PageFull-Icon", danmaku: ".BarrageSwitch-icon" },
+    "v.pptv.com": { webFull: ".w-expand-container > div", danmaku: ".w-barrage", next: ".w-next" },
+    "www.iqiyi.com": { webFull: ".iqp-btn-webscreen", danmaku: "#barrage_switch", next: ".iqp-btn-next" },
+    "v.youku.com": { webFull: "#webfullscreen-icon", danmaku: "#barrage-switch", next: ".kui-next-icon-0" },
+    "www.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled", next: ".btn-next-part div" },
+    "www.mgtv.com": { webFull: ".webfullscreenBtn i", danmaku: "div[class*='danmuSwitch']", next: ".icon-next" },
+    "v.qq.com": { webFull: ".txp_btn_fake", danmaku: ".barrage-switch", next: ".txp_btn_next_u" },
+    "tv.sohu.com": { webFull: ".x-pagefs-btn", danmaku: ".tm-tmbtn", next: ".x-next-btn" },
+    name: { full: "full", webFull: "webFull", next: "next", danmaku: "danmaku" }
+  };
   const Keydown = {
     preventDefault(event, { code } = event) {
       const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
@@ -558,6 +553,7 @@
       dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
     },
     triggerIconElement(name) {
+      if (Tools.isTooFrequent("icon")) return;
       const index = Object.values(SiteIcons.name).indexOf(name);
       if (!Site.isBiliLive()) return Tools.query(SiteIcons[location.host]?.[name])?.click();
       SiteIcons.name.webFull === name ? this.liveWebFullScreen() : this.getBiliLiveIcons()?.[index]?.click();
@@ -851,34 +847,30 @@
     }
   };
   const WebFullScreen = {
-    universalWebFullscreen(video) {
-      if (!this.topInfo || video.hasWebFull || Site.isMatch() || !this.isEnbleThisWebSiteAuto()) return;
-      if (video.offsetWidth === this.topInfo.innerWidth) return video.hasWebFull = true;
+    autoWebFullScreen(video) {
+      if (this.player !== video) return;
+      if (Site.isMatch() && this.isDisableAuto()) return;
+      if (!Site.isMatch() && !this.isEnbleThisWebSiteAuto()) return;
+      if (!this.topInfo || video.hasWebFull || !video.offsetWidth) return;
+      if (video.offsetWidth >= this.topInfo.innerWidth) return video.hasWebFull = true;
       Tools.postMessage(window.top, { key: Keyboard.P });
-      video.hasWebFull = true;
-    },
-    specificWebFullscreen(video) {
-      if (this.player !== video) return false;
-      if (!video?.offsetWidth || !this.webFullElement) return false;
-      if (this.isDisableAuto() || video?.offsetWidth >= innerWidth) return true;
-      return Site.isBiliLive() ? this.liveWebFullScreen() : Tools.triggerClick(this.webFullElement);
     },
     liveWebFullScreen() {
       _unsafeWindow.top.scrollTo({ top: 70 });
-      const icons = this.getBiliLiveIcons();
       const el = Tools.query(":is(.lite-room, #player-ctnr)", top.document);
-      if (el) _unsafeWindow.top.scrollTo({ top: Tools.getElementRect(el)?.top ?? 0 });
+      if (el) _unsafeWindow.top.scrollTo({ top: Tools.getElementRect(el)?.top });
       if (!Tools.hasCls(document.body, "hide-asida-area")) {
         _unsafeWindow.top?.livePlayer?.volume(100);
         _unsafeWindow.top?.livePlayer?.switchQuality("10000");
         localStorage.setItem("FULLSCREEN-GIFT-PANEL-SHOW", 0);
         Tools.addCls(document.body, "hide-asida-area", "hide-aside-area");
       }
+      const icons = this.getBiliLiveIcons();
       return Tools.triggerClick(icons?.[1]);
     },
-    exitWebFullScreen() {
+    autoExitWebFullScreen() {
       if (!Site.isBili() && !Site.isAcFun()) return;
-      if (this.player.offsetWidth === innerWidth) this.webFullElement?.click();
+      if (this.player.offsetWidth === innerWidth) this.triggerIconElement(SiteIcons.name.webFull);
       setTimeout(() => {
         const isLast = Tools.query('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
         if (!Tools.query(".video-pod") || isLast) Tools.query(".bpx-player-ending-related-item-cancel")?.click();
@@ -1109,7 +1101,7 @@
   };
   const VideoEvents = {
     loadedmetadata() {
-      App.universalWebFullscreen(this);
+      App.autoWebFullScreen(this);
       Tools.querys('[id*="loading"]').forEach((el) => !Tools.query('[class*="player"]', el) && Tools.addCls(el, "_noplayer"));
     },
     loadeddata() {
@@ -1119,7 +1111,7 @@
     },
     timeupdate() {
       if (isNaN(this.duration)) return;
-      App.universalWebFullscreen(this);
+      App.autoWebFullScreen(this);
       App.cachePlayTime(this);
     },
     canplay() {
@@ -1129,12 +1121,10 @@
     },
     playing() {
       this.isEnded = false;
-      if (this.duration >= 10) {
-        App.setCurrentVideo(this);
-        App.useCachePlayTime(this);
-        App.useCachePlaybackRate(this);
-      }
-      App.specificWebFullscreen(this);
+      if (this.duration < 10) return;
+      App.setCurrentVideo(this);
+      App.useCachePlayTime(this);
+      App.useCachePlaybackRate(this);
     },
     pause() {
       Tools.query(".ec-no")?.click();
@@ -1143,7 +1133,7 @@
     ended() {
       this.isEnded = true;
       this.hasToast = false;
-      App.exitWebFullScreen();
+      App.autoExitWebFullScreen();
       App.delPlayTime();
     }
   };
