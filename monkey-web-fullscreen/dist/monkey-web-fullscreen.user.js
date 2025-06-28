@@ -843,12 +843,12 @@
       const cls = "__tsr";
       Tools.addCls(this.player, cls);
       Tools.setPart(this.player, cls);
-      this.player?.style?.setProperty(name, value);
       try {
         this.player.__trans = this.player.__trans ?? getComputedStyle(this.player)?.getPropertyValue("transform");
         this.player?.style?.setProperty("--deftsr", this.player.__trans);
       } catch (e) {
       }
+      this.player?.style?.setProperty(name, value);
       return this;
     }
   };
