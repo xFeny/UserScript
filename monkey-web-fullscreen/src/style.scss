@@ -35,9 +35,9 @@
   background-color: #000 !important;
 }
 
-@mixin __tsr() {
-  transform: rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) scale(var(--zomm, 1)) scaleX(var(--mirror, 1))
-    translate(var(--moveX, 0), var(--moveY, 0)) !important;
+@mixin __tsr($def: null) {
+  transform: #{$def} /**默认变换*/ scale(var(--scale, 1)) scale(var(--zoom, 1)) /**放大缩小*/ scaleX(var(--mirror, 1)) /**镜像反转*/
+    rotate(var(--rotate, 0deg)) /**旋转*/ translate(var(--moveX, 0), var(--moveY, 0)) /**平移*/ !important;
 }
 
 .__webFullScreen video,
@@ -58,7 +58,7 @@
   object-fit: contain !important;
   transform-origin: center !important;
   transition: transform 0.35s !important;
-  @include __tsr();
+  @include __tsr("var(--deftsr, matrix(1, 0, 0, 1, 0, 0))");
 }
 
 /**

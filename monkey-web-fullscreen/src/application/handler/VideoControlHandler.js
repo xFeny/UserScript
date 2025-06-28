@@ -98,7 +98,7 @@ export default {
     if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
 
     this.currentZoom = zoom;
-    this.setVideoTsr("--zomm", zoom / 100);
+    this.setVideoTsr("--zoom", zoom / 100);
     this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC * 2);
   },
   moveX: 0,
@@ -178,8 +178,16 @@ export default {
   },
   setVideoTsr(name, value) {
     const cls = "__tsr";
+    Tools.addCls(this.player, cls);
+    Tools.setPart(this.player, cls);
     this.player?.style?.setProperty(name, value);
-    if (!Tools.hasCls(cls)) Tools.addCls(this.player, cls), Tools.setPart(this.player, cls);
+
+    try {
+      // 默认 transform 样式
+      this.player.__trans = this.player.__trans ?? getComputedStyle(this.player)?.getPropertyValue("transform");
+      this.player?.style?.setProperty("--deftsr", this.player.__trans);
+    } catch (e) {}
+
     return this;
   },
 };
