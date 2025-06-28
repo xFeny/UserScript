@@ -180,7 +180,6 @@ export default {
     const cls = "__tsr";
     Tools.addCls(this.player, cls);
     Tools.setPart(this.player, cls);
-    this.player?.style?.setProperty(name, value);
 
     try {
       // 默认 transform 样式
@@ -188,6 +187,8 @@ export default {
       this.player?.style?.setProperty("--deftsr", this.player.__trans);
     } catch (e) {}
 
+    // transform 变换值
+    this.player?.style?.setProperty(name, value);
     return this;
   },
 };
