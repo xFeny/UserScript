@@ -10,7 +10,6 @@ export default {
   },
   loadeddata() {
     App.initVideoProperties(this);
-    this.__duration = this.duration;
     Tools.query(".conplaying")?.click(); // https://skr.skrcc.cc:666
   },
   timeupdate() {
@@ -27,8 +26,8 @@ export default {
     this.isEnded = false;
     if (this.duration < 10) return; // 超短的视频不操作
     App.setCurrentVideo(this);
-    App.useCachePlayTime(this);
     App.useCachePlaybackRate(this);
+    App.useCachePlayTime(this);
   },
   pause() {
     // https://www.mcydh.com、https://dick.xfani.com

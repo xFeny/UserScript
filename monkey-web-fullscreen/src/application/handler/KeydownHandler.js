@@ -11,11 +11,12 @@ import Keyboard from "../common/Keyboard";
  */
 export default {
   preventDefault(event, { code } = event) {
+    const preventKeys = [Keyboard.KeyM, Keyboard.KeyP].includes(code); // 要阻止事件传递的键
+    const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
     const overrideKey = [keyboard.Space, keyboard.Left, keyboard.Right]; // 空格 ◀▶ 键
     const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
-    const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
 
-    if (!isNumberKey && !isOverrideKey && !this.isZoomKey(event) && code !== Keyboard.KeyP) return;
+    if (!isNumberKey && !isOverrideKey && !this.isZoomKey(event) && !preventKeys) return;
     Tools.preventDefault(event);
   },
   isZoomKey(event) {
@@ -50,27 +51,28 @@ export default {
     this.processEvent({ key });
   },
   processEvent(data) {
-    // video可能在iframe中，向iframe传递事件
+    // video在iframe中，向iframe传递事件
     if (!this.player) Tools.sendToIFrames(data);
     if (data?.key) this.execHotKeyActions(data.key.toUpperCase());
   },
   execHotKeyActions(key) {
     // Tools.log("按下的键：", { key });
     const dict = {
-      KEYP: () => this.togglePIP(),
+      M: () => this.videoMuted(),
+      R: () => this.videoRotate(),
+      KEYR: () => this.videoMirror(),
       L: () => this.freezeVideoFrame(),
       K: () => this.freezeVideoFrame(true),
       ALT_NUMPADADD: () => this.zoomVideo(),
       ALT_NUMPADSUBTRACT: () => this.zoomVideo(true),
+      D: () => this.triggerIconElement(SiteIcons.name.danmaku),
       N: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
       P: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance()),
       ARROWLEFT: () => this.isOverrideKeyboard() && this.adjustVideoTime(-Storage.SKIP_INTERVAL.get()),
       ARROWRIGHT: () => this.isOverrideKeyboard() && this.adjustVideoTime(Storage.SKIP_INTERVAL.get()),
       0: () => this.adjustVideoTime(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
       SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.player),
-      D: () => this.triggerIconElement(SiteIcons.name.danmaku),
-      KEYR: () => this.videoRotateOrMirror(true),
-      R: () => this.videoRotateOrMirror(),
+      KEYP: () => this.togglePictureInPicture(),
       Z: () => this.defaultPlaybackRate(),
       KEYA: () => this.videoScreenshot(),
     };

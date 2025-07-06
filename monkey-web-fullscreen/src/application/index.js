@@ -12,7 +12,7 @@ export default window.App = {
   },
   normalSite: () => !window?.videoInfo && !window?.topInfo,
   isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
-  getVideo: () => Tools.querys("video:not([loop])").find(Tools.isVisible),
+  getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
   isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {

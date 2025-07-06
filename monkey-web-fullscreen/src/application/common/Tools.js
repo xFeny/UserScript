@@ -13,6 +13,7 @@ export default unsafeWindow.Tools = {
   querys: (selector, context) => querySelectorAll(selector, context),
   validDuration: (video) => !isNaN(video.duration) && video.duration !== Infinity,
   triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
+  toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, Consts.EMPTY),
   postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
   isVisible: (el) => !!(el?.offsetWidth || el?.offsetHeight || el?.getClientRects().length),
   getNumbers: (str) => (typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : []),
