@@ -1,15 +1,15 @@
 // ==UserScript==
-// @name         视频网站自动网页全屏｜倍速播放
+// @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.1.3
+// @version      3.1.4
 // @author       Feny
-// @description  支持哔哩哔哩、B站直播、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持任意视频倍速播放；支持播放进度记录；支持任意视频网站下集切换。
+// @description  默认支持哔哩哔哩（含直播）、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持倍速调节、视频截图、画面镜像反转、自由缩放与移动、播放进度记忆等功能；提供通用下集切换功能，适用于任意视频网站剧集，便捷实现剧集切换。
 // @license      GPL-3.0-only
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAqdJREFUWEftl91LFFEYxp/3jB9ESZjtSl51F1RUSgRCF/kHlF1IhiFhF65dqEQkBUErdJMStBukGwQre2NZUiCRqUiURkW65mIfqGUFsW6Ii0jY7p4Tc3Rqd5zaGVldAudynve8z28e3jMzh5Dmi1R/V0vQyRRWxgWG6x22SrcnOAhQcQIbwVtXba8y1EANSpS1xzJin5c/Dz+jRDPvGWoErwRw35zuh8ChpcXXFjbwi9k/WADA9viGgovGnxtFs6EmcApMvCdBA3oIIirl4N8NNQngmRYJiwTOE7EHHLERAmXFawQ6AdCQkRbjsZIMUvIFoV0HMSsEDjCgSK8tJqAHAEDAMWLKLOexx8tiVVDEhLLVQAtzRPcwKOUANSWCw1/rsBe6PcFz8dpfAdTFgtF+EmIvBG7pID7mZNl2zkVCFQbahzqHfYerddpNhFpdsnfqauzl8ZoEuO4JXdIKOefynnZlimxXhBbqjTZL/el8pzrAVjTGmKh12Bq1ddJs974abQDXfFMuAhQ6EodwDTHWAf6/BAoK8nD0cDEKtuVhyD+OzvvLXnyWJshyApedJ1F65M9n4tlAAF5fL168fGfJWCu2DDA61GpodLvjCdp8vfjyNWQJJGUAquvMzBzafD0yEc65KZCUAmiOo4FPEqS753VSiFUB0FxbPF244en6J8SqAoTD8zhYcjZ9AP6RCVRWNacHYPD5GJqudmBi8tvaAkxNBeUuuNv5NOkAqgUpm4FIJCrfA+r0z4bnTZmvCKCv+wrsts0JBg8fvZLGY28NfoqToFhOoOJ4CS40lMu2I28mpXFP37DpJ9YXWgZQG+Tm5mBL7qakA2aGakUAZhqbrVkH0BLoB34fzcyml5K6pd/yaicRlQlgV0q6mmwitMOpyfpVKfsFya4w73cz9xQAAAAASUVORK5CYII=
 // @homepage     https://github.com/xFeny/UserScript/tree/main/monkey-web-fullscreen
-// @include      *://pages.iqiyi.com/p/zy/*
 // @include      *://www.ezdmw.site/Index/video/*
 // @include      *://player.ezdmw.com/danmuku/*
+// @include      *://pages.iqiyi.com/p/zy/*
 // @include      *://*bimiacg*.net/*/play*
 // @include      *://acgfta.com/play*
 // @include      *://ppoft.com/play*
@@ -17,13 +17,12 @@
 // @match        *://www.mgtv.com/b/*
 // @match        *://www.acfun.cn/v/*
 // @match        *://www.iqiyi.com/v_*
-// @match        *://v.pptv.com/show/*
 // @match        *://v.qq.com/x/page/*
 // @match        *://v.douyu.com/show/*
 // @match        *://v.qq.com/x/cover/*
 // @match        *://live.bilibili.com/*
 // @match        *://v.youku.com/video?*
-// @match        *://haokan.baidu.com/v?*
+// @match        *://v.youku.com/v_show/*
 // @match        *://live.acfun.cn/live/*
 // @match        *://www.acfun.cn/bangumi/*
 // @match        *://www.bilibili.com/list/*
@@ -31,6 +30,7 @@
 // @match        *://www.bilibili.com/*/play/*
 // @match        *://v.qq.com/live/p/newtopic/*
 // @match        *://www.bilibili.com/festival/*
+// @match        *://v.qq.com/wasm-kernel/*/fake-video*
 // @require      https://unpkg.com/notyf@3.10.0/notyf.min.js
 // @require      data:application/javascript,%3Bwindow.notyf%3D%7BNotyf%7D%3B
 // @require      https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.js
@@ -53,11 +53,14 @@
 // @note         *://*/*
 // ==/UserScript==
 
-(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const o=document.createElement("style");o.textContent=t,document.head.append(o)})(' @charset "UTF-8";[part=monkey-toast],::part(monkey-toast){left:10px!important;bottom:17%!important;color:#fff!important;font-size:13px!important;padding:6px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.__webFullScreen,::part(__webFullScreen){top:0!important;left:0!important;margin:0!important;padding:0!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important}.__webFullScreen video,::part(__video){top:0!important;left:0!important;width:100vw!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important;transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr,::part(__tsr){object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc,::part(__hc){cursor:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .__menu{color:#666;display:flex;cursor:pointer;font-size:20px;font-weight:400;float:none!important;align-items:center!important;margin-bottom:15px!important;justify-content:space-between!important}.monkey-web-fullscreen .__menu:hover{color:#333}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important}.monkey-web-fullscreen .__menu input{outline:none;cursor:pointer;opacity:1!important;width:20px!important;height:20px!important;position:static!important;appearance:auto!important;-webkit-appearance:auto!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen th{font-weight:600!important}.monkey-web-fullscreen th,.monkey-web-fullscreen td{font-size:14px!important;line-height:28px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,#buffer,#install,#a1 #tips,#player #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,#player #loading-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}} ');
+(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const o=document.createElement("style");o.textContent=t,document.head.append(o)})(' @charset "UTF-8";[part=monkey-toast],::part(monkey-toast){left:10px!important;bottom:17%!important;color:#fff!important;font-size:13px!important;padding:6px 15px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.__webFullScreen,::part(__webFullScreen){top:0!important;left:0!important;margin:0!important;padding:0!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important}.__webFullScreen video,::part(__video){top:0!important;left:0!important;width:100vw!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important;transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr,::part(__tsr){object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc,::part(__hc){cursor:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .__menu{color:#666;display:flex;cursor:pointer;font-size:20px;font-weight:400;float:none!important;align-items:center!important;margin-bottom:15px!important;justify-content:space-between!important}.monkey-web-fullscreen .__menu:hover{color:#333}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important}.monkey-web-fullscreen .__menu input{outline:none;cursor:pointer;opacity:1!important;width:20px!important;height:20px!important;position:static!important;appearance:auto!important;-webkit-appearance:auto!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen th{font-weight:600!important}.monkey-web-fullscreen th,.monkey-web-fullscreen td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,#buffer,#install,#a1 #tips,#player #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,#player #loading-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}} ');
 
 (function (notyf, Swal) {
   'use strict';
 
+  var __defProp = Object.defineProperty;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   const Consts = Object.freeze({
     EMPTY: "",
     MIN_ZOOM: 50,
@@ -154,6 +157,7 @@
     querys: (selector, context) => querySelectorAll(selector, context),
     validDuration: (video) => !isNaN(video.duration) && video.duration !== Infinity,
     triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
+    toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, Consts.EMPTY),
     postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
     isVisible: (el) => !!(el?.offsetWidth || el?.offsetHeight || el?.getClientRects().length),
     getNumbers: (str) => typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : [],
@@ -290,7 +294,7 @@
     },
     normalSite: () => !window?.videoInfo && !window?.topInfo,
     isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
-    getVideo: () => Tools.querys("video:not([loop])").find(Tools.isVisible),
+    getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
     isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
     setupVisibleListener() {
       window.addEventListener("visibilitychange", () => {
@@ -459,6 +463,7 @@
     KeyD: "KeyD",
     KeyK: "KeyK",
     KeyL: "KeyL",
+    KeyM: "KeyM",
     KeyN: "KeyN",
     KeyP: "KeyP",
     KeyR: "KeyR",
@@ -476,9 +481,7 @@
     "live.bilibili.com": { webFull: "#businessContainerElement" },
     "live.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled" },
     "www.bilibili.com": { webFull: ".bpx-player-ctrl-web", next: ".bpx-player-ctrl-next" },
-    "haokan.baidu.com": { webFull: ".art-control-fullscreenWeb", next: ".art-control-next" },
     "v.douyu.com": { webFull: ".ControllerBar-PageFull-Icon", danmaku: ".BarrageSwitch-icon" },
-    "v.pptv.com": { webFull: ".w-expand-container > div", danmaku: ".w-barrage", next: ".w-next" },
     "www.iqiyi.com": { webFull: ".iqp-btn-webscreen", danmaku: "#barrage_switch", next: ".iqp-btn-next" },
     "v.youku.com": { webFull: "#webfullscreen-icon", danmaku: "#barrage-switch", next: ".kui-next-icon-0" },
     "www.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled", next: ".btn-next-part div" },
@@ -489,10 +492,11 @@
   };
   const Keydown = {
     preventDefault(event, { code } = event) {
+      const preventKeys = [Keyboard.KeyM, Keyboard.KeyP].includes(code);
+      const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
       const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
       const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
-      const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
-      if (!isNumberKey && !isOverrideKey && !this.isZoomKey(event) && code !== Keyboard.KeyP) return;
+      if (!isNumberKey && !isOverrideKey && !this.isZoomKey(event) && !preventKeys) return;
       Tools.preventDefault(event);
     },
     isZoomKey(event) {
@@ -530,20 +534,21 @@
     },
     execHotKeyActions(key) {
       const dict = {
-        KEYP: () => this.togglePIP(),
+        M: () => this.videoMuted(),
+        R: () => this.videoRotate(),
+        KEYR: () => this.videoMirror(),
         L: () => this.freezeVideoFrame(),
         K: () => this.freezeVideoFrame(true),
         ALT_NUMPADADD: () => this.zoomVideo(),
         ALT_NUMPADSUBTRACT: () => this.zoomVideo(true),
+        D: () => this.triggerIconElement(SiteIcons.name.danmaku),
         N: () => Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode(),
         P: () => Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance(),
         ARROWLEFT: () => this.isOverrideKeyboard() && this.adjustVideoTime(-Storage.SKIP_INTERVAL.get()),
         ARROWRIGHT: () => this.isOverrideKeyboard() && this.adjustVideoTime(Storage.SKIP_INTERVAL.get()),
         0: () => this.adjustVideoTime(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
         SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.player),
-        D: () => this.triggerIconElement(SiteIcons.name.danmaku),
-        KEYR: () => this.videoRotateOrMirror(true),
-        R: () => this.videoRotateOrMirror(),
+        KEYP: () => this.togglePictureInPicture(),
         Z: () => this.defaultPlaybackRate(),
         KEYA: () => this.videoScreenshot()
       };
@@ -654,21 +659,22 @@
     shortcutKeysPopup() {
       const shortcutKeys = [
         { key: "P", desc: "切换网页全屏" },
-        { key: "N", desc: "切换下一集视频" },
-        { key: "D", desc: "弹幕显示 / 隐藏" },
-        { key: "Z", desc: "恢复 1.0x 正常倍速" },
-        { key: "R", desc: "90° 循环旋转视频角度" },
+        { key: "N", desc: "切换下集视频" },
+        { key: "Z", desc: "恢复正常倍速" },
+        { key: "R", desc: "画面旋转 90 度" },
+        { key: "M", desc: "静音 / 取消静音" },
+        { key: "D", desc: "显示 / 隐藏 弹幕" },
         { key: "L / K", desc: "下一帧 / 上一帧" },
         { key: "Shift R", desc: "视频水平镜像翻转" },
-        { key: "Shift P", desc: "进入或退出画中画" },
-        { key: "Ctrl Alt A", desc: "视频画面截图（默认禁用）" },
-        { key: "数字 0️", desc: "快进 30 秒" },
-        { key: "1️ 至 9️", desc: "直接设置 1️ 至 9️ 倍速" },
-        { key: "◀️▶️", desc: "快退 / 快进 5 秒（默认禁用）" },
-        { key: "空格", desc: "播放 / 暂停（默认禁用）" },
-        { key: "Alt ➕ / ➖", desc: "视频缩放（默认禁用）" },
-        { key: "A / S 或 ➕ / ➖", desc: "倍速 ±0.25" },
-        { key: "Alt ◀️🔼🔽▶️", desc: "视频上下左右方向移动（默认禁用）" }
+        { key: "Shift P", desc: "进入 / 退出 画中画" },
+        { key: "Ctrl Alt A", desc: "视频截图 (默认禁用)" },
+        { key: "Alt ➕ / ➖", desc: "视频缩放 (默认禁用)" },
+        { key: "A / S 或 ➕ / ➖", desc: "播放倍速 ±0.25" },
+        { key: "Alt ◀️🔼🔽▶️", desc: "移动视频画面 (默认禁用)" },
+        { key: "◀️▶️", desc: "快退 / 快进 5秒 (默认禁用)" },
+        { key: "空格", desc: "播放 / 暂停 (默认禁用)" },
+        { key: "1️ 至 9️", desc: "1️ 至 9️ 倍速" },
+        { key: "数字 0️", desc: "快进 30 秒" }
       ];
       const rows = shortcutKeys.map(({ key, desc }) => `<tr><td>${key}</td><td>${desc}</td></tr>`).join(Consts.EMPTY);
       Swal.fire({
@@ -686,29 +692,34 @@
     isEnded() {
       return Math.floor(this.player.currentTime) === Math.floor(this.player.duration);
     },
+    isDynamicDuration(video) {
+      if (!video?.__duration) return false;
+      return Math.floor(video.duration) > Math.floor(video.__duration);
+    },
     initVideoProperties(video) {
       video.volume = 1;
       video.hasToast = false;
       video.hasWebFull = false;
+      video.__duration = video.duration;
     },
     playOrPause: (video) => Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause(),
     tryplay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),
     checkUsable() {
       if (!this.player || this.isDisablePlaybackRate()) return false;
       if (this.isBackgroundVideo(this.player) || this.isEnded()) return false;
-      if (this.isLive() || this.player.duration > this.player?.__duration) return false;
+      if (this.isLive() || this.isDynamicDuration(this.player)) return false;
       if (!Tools.validDuration(this.player)) return false;
       return true;
     },
     setPlaybackRate(playRate, show = true) {
       if (!this.checkUsable()) return;
-      playRate = (+playRate).toFixed(2).replace(/\.?0+$/, Consts.EMPTY);
-      window?.EnhancerVideo?.setPlaybackRate(this.player, playRate);
-      if (show) this.customToast("正在以", `${playRate}x`, "倍速播放");
-      Storage.CACHED_PLAY_RATE.set(playRate);
+      window.EnhancerVideo.setPlaybackRate(this.player, playRate);
+      if (show) this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
+      Storage.CACHED_PLAY_RATE.set(this.player.playbackRate);
     },
     adjustPlaybackRate(step = Storage.PLAY_RATE_STEP.get()) {
-      const playRate = Math.max(Storage.PLAY_RATE_STEP.get(), this.player.playbackRate + step);
+      if (!this.player) return;
+      const playRate = Math.max(Storage.PLAY_RATE_STEP.get(), Number(this.player.playbackRate) + step);
       this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
     },
     defaultPlaybackRate() {
@@ -719,26 +730,29 @@
     useCachePlaybackRate(video) {
       if (this.isDisablePlaybackRate()) return;
       const playRate = Storage.CACHED_PLAY_RATE.get();
-      if (Consts.DEF_PLAY_RATE === playRate || video.playbackRate === playRate) return;
+      if (Consts.DEF_PLAY_RATE === playRate || Number(video.playbackRate) === playRate) return;
       this.setPlaybackRate(playRate, !video.hasToast);
       video.hasToast = true;
     },
     adjustVideoTime(second = Storage.SKIP_INTERVAL.get()) {
       if (!this.player || !Tools.validDuration(this.player) || second > 0 && this.player.isEnded) return;
-      const currentTime = Math.min(this.player.currentTime + second, this.player.duration);
+      const currentTime = Math.min(Number(this.player.currentTime) + second, this.player.duration);
       this.setCurrentTime(currentTime);
     },
     cachePlayTime(video) {
-      if (!this.topInfo || this.isLive() || !Tools.validDuration(this.player)) return;
-      if (this.player.duration > this.player?.__duration || this.player.duration < 120) return;
+      if (this.isDynamicDuration(video) || video.duration < 120) return;
+      if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
+      if (!this.topInfo || this.isLive() || !Tools.validDuration(video)) return;
       if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded() || this.isMultVideo()) return this.delPlayTime();
-      if (video.currentTime > Storage.SKIP_INTERVAL.get()) Storage.PLAY_TIME.set(this.topInfo.hash, video.currentTime - 1, 7);
+      Storage.PLAY_TIME.set(this.topInfo.hash, Number(video.currentTime) - 1, 7);
     },
     useCachePlayTime(video) {
       if (this.hasUsedPlayTime || !this.topInfo || this.isLive()) return;
       const time = Storage.PLAY_TIME.get(this.topInfo.hash);
-      if (time <= video.currentTime) return this.hasUsedPlayTime = true;
-      this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3, false);
+      if (time <= Number(video.currentTime)) return this.hasUsedPlayTime = true;
+      this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
+        el.style.setProperty("transform", `translateY(${-5 - el.offsetHeight}px)`);
+      });
       this.hasUsedPlayTime = true;
       this.setCurrentTime(time);
     },
@@ -746,14 +760,24 @@
     setCurrentTime(currentTime) {
       if (currentTime) this.player.currentTime = Math.max(0, currentTime);
     },
-    togglePIP() {
+    videoMuted() {
+      if (!this.player) return;
+      this.player.muted = !this.player.muted;
+      const tips = this.player.muted ? "🔇 已静音" : "🔊 取消静音";
+      this.showToast(tips, Consts.ONE_SEC);
+    },
+    togglePictureInPicture() {
       if (!this.player) return;
       document.pictureInPictureElement ? document.exitPictureInPicture() : this.player?.requestPictureInPicture();
     },
-    rotation: 0,
-    videoRotateOrMirror(mirror = false) {
+    videoMirror() {
       if (!this.player) return;
-      if (mirror) return this.isMirrored = !this.isMirrored, this.setVideoTsr("--mirror", this.isMirrored ? -1 : 1);
+      this.isMirrored = !this.isMirrored;
+      this.setVideoTsr("--mirror", this.isMirrored ? -1 : 1);
+    },
+    rotation: 0,
+    videoRotate() {
+      if (!this.player) return;
       this.rotation = (this.rotation + 90) % 360;
       const { videoWidth, videoHeight } = this.player;
       const isVertical = [90, 270].includes(this.rotation);
@@ -767,7 +791,7 @@
       if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
       this.currentZoom = zoom;
       this.setVideoTsr("--zoom", zoom / 100);
-      this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC * 2);
+      this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC);
     },
     moveX: 0,
     moveY: 0,
@@ -783,7 +807,7 @@
       this.moveX += x ?? 0;
       this.moveY += y ?? 0;
       this.setVideoTsr("--moveX", `${this.moveX}px`).setVideoTsr("--moveY", `${this.moveY}px`);
-      this.showToast(`${desc}：${moveX === this.moveX ? this.moveY : this.moveX}px`, Consts.ONE_SEC * 2);
+      this.showToast(`${desc}：${moveX === this.moveX ? this.moveY : this.moveX}px`, Consts.ONE_SEC);
     },
     videoScreenshot() {
       if (!this.player || this.isDisableScreenshot()) return;
@@ -812,20 +836,23 @@
       span.appendChild(document.createTextNode(startText));
       const child = span.cloneNode(true);
       child.textContent = colorText;
-      child.setAttribute("style", "margin:0 3px!important;color:#ff6101!important;");
+      child.setAttribute("style", "margin:0 3px!important;color:#FF5F00!important;");
       span.appendChild(child);
       span.appendChild(document.createTextNode(endText));
-      this.showToast(span, duration, isRemove);
+      return this.showToast(span, duration, isRemove);
     },
-    showToast(content, duration = Consts.ONE_SEC * 5, isRemove = true) {
-      const el = document.createElement("div");
-      el.setAttribute("part", "monkey-toast");
-      if (isRemove) Tools.query('[part="monkey-toast"]')?.remove();
-      content instanceof Element ? el.appendChild(content) : el.innerHTML = content;
-      const videoWrap = this.getVideoWrapper();
-      const target = videoWrap?.matches("video") ? videoWrap?.parentElement : videoWrap;
-      target?.appendChild(el);
-      setTimeout(() => (el.style.opacity = 0, setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
+    showToast(content, duration = Consts.ONE_SEC * 3, isRemove = true) {
+      return new Promise((resolve) => {
+        const el = document.createElement("div");
+        el.setAttribute("part", "monkey-toast");
+        if (isRemove) Tools.query('[part="monkey-toast"]')?.remove();
+        content instanceof Element ? el.appendChild(content) : el.innerHTML = content;
+        const videoWrap = this.getVideoWrapper();
+        const target = videoWrap?.matches("video") ? videoWrap?.parentElement : videoWrap;
+        target?.appendChild(el);
+        setTimeout(() => (el.style.opacity = 0, setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
+        resolve(el);
+      });
     },
     formatTime(seconds) {
       if (isNaN(seconds)) return "00:00";
@@ -1112,7 +1139,6 @@
     },
     loadeddata() {
       App.initVideoProperties(this);
-      this.__duration = this.duration;
       Tools.query(".conplaying")?.click();
     },
     timeupdate() {
@@ -1129,8 +1155,8 @@
       this.isEnded = false;
       if (this.duration < 10) return;
       App.setCurrentVideo(this);
-      App.useCachePlayTime(this);
       App.useCachePlaybackRate(this);
+      App.useCachePlayTime(this);
     },
     pause() {
       Tools.query(".ec-no")?.click();
@@ -1144,13 +1170,16 @@
     }
   };
   class VideoEnhancer {
+    // 腾讯视频 fake-iframe-video
     constructor() {
+      __publicField(this, "attr", "enhanced");
+      __publicField(this, "selector", ":is(video, fake-video):not([enhanced])");
       this.setupObserver();
       this.setupExistingVideos();
       this.hookMediaMethod("play", (video) => this.enhanced(video));
     }
     setupExistingVideos() {
-      const videos = Tools.querys("video:not([enhanced])");
+      const videos = Tools.querys(this.selector);
       videos.forEach((video) => this.enhanced(video));
     }
     setupObserver() {
@@ -1163,43 +1192,72 @@
     }
     processAddedNodes(nodes) {
       for (const node of nodes) {
-        if (node instanceof HTMLVideoElement && !node.hasAttribute("enhanced")) {
+        if (node instanceof HTMLVideoElement && !node.hasAttribute(this.attr)) {
           this.enhanced(node);
-        } else if (node.nodeType === Node.ELEMENT_NODE && node.hasChildNodes()) {
-          const childVideos = Tools.querys("video:not([enhanced])", node);
+        } else if (node instanceof Element && node.hasChildNodes()) {
+          const childVideos = Tools.querys(this.selector, node);
           childVideos.forEach((video) => this.enhanced(video));
         }
       }
     }
     enhanced(video) {
-      if (video.hasAttribute("enhanced")) return;
+      if (video.hasAttribute(this.attr)) return;
       this.setupEventListeners(video);
-      this.floorVideoDuration(video);
     }
     setupEventListeners(video) {
-      video.setAttribute("enhanced", true);
+      video.setAttribute(this.attr, true);
       Object.entries(VideoEvents).forEach(([type, handler]) => {
         video.removeEventListener(type, handler, true);
         video.addEventListener(type, handler, true);
       });
     }
     setPlaybackRate(video, playRate) {
-      this.defineProperty(video, "playbackRate", { set: (val, setter, t) => val === t?.__playbackRate && setter(val) });
-      video.playbackRate = video.__playbackRate = playRate;
+      this.bypassPlaybackRateLimit(video);
+      video.playbackRate = video.__playRate = Tools.toFixed(playRate);
     }
-    floorVideoDuration(video) {
-      this.defineProperty(video, "duration", { get: (value) => Math.floor(value) });
+    /**
+     * 绕过视频播放器的播放速率限制
+     * 支持标准HTML5视频元素和特殊实现(如腾讯视频的fake-video)
+     *
+     * 实现原理:
+     * 1. 对于标准HTMLMediaElement，直接设置playbackRate属性
+     * 2. 对于特殊实现(如fake-video)，拦截setter并调用其内部方法
+     * 3. 保留原始功能的同时覆盖速率限制逻辑
+     *
+     * @param {HTMLMediaElement|Object} video - 视频元素或fake-video实例
+     * @see 腾讯视频fake-video实现 https://v.qq.com/wasm-kernel/1.0.49/fake-video-element-iframe.js
+     */
+    bypassPlaybackRateLimit(video) {
+      this.defineProperty(video, "playbackRate", {
+        set(value, setter) {
+          if (this.playbackRate === value) return;
+          if (this instanceof HTMLMediaElement) return this.__playRate === value && setter(value);
+          this._playbackRate = value;
+          this._quality.setPlaybackRate(value);
+          this?.mailToWorker({ cmd: "callWorker_setRate", rate: value });
+          Promise.resolve().then(() => {
+            this?.emit("ratechange", this._playbackRate);
+          });
+        }
+      });
     }
-    defineProperty(video, propertyKey, descriptors) {
+    defineProperty(video, property, descs) {
       try {
-        const original = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, propertyKey);
-        Object.defineProperty(video, propertyKey, {
-          get: descriptors.get ? () => descriptors.get(original.get.call(video)) : original.get,
-          set: descriptors.set ? (value) => descriptors.set(value, original.set.bind(video), video) : original.set,
+        const isMediaElement = video instanceof HTMLMediaElement;
+        const videoPrototype = isMediaElement ? HTMLMediaElement.prototype : Object.getPrototypeOf(video);
+        const original = Object.getOwnPropertyDescriptor(videoPrototype, property);
+        if (!original) throw new Error(`属性 ${property} 不存在`);
+        Object.defineProperty(isMediaElement ? video : videoPrototype, property, {
+          get() {
+            return descs.get ? descs.get.call(this, original.get.call(this)) : original.get.call(this);
+          },
+          set(value) {
+            descs.set ? descs.set.call(this, value, original.set.bind(this)) : original.set.call(this, value);
+          },
           configurable: true
         });
       } catch (e) {
-        console.error(`Error modifying ${propertyKey} property:`, e);
+        console.error(`修改 ${property} 属性时出错：`, e);
       }
     }
     hookMediaMethod(method, callback) {
