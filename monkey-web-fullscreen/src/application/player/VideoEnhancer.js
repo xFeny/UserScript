@@ -1,4 +1,3 @@
-import { isElement } from "../common/shadow-dom-utils";
 import Tools from "../common/Tools";
 import VideoEvents from "./VideoEventsHandler";
 
@@ -9,6 +8,7 @@ import VideoEvents from "./VideoEventsHandler";
 export default class VideoEnhancer {
   attr = "enhanced";
   selector = ":is(video, fake-video):not([enhanced])"; // 腾讯视频 fake-iframe-video
+  defaultTsr = { zoom: 100, moveX: 0, moveY: 0, rotation: 0, isMirrored: false };
 
   constructor() {
     this.setupObserver();
@@ -50,6 +50,7 @@ export default class VideoEnhancer {
   enhanced(video) {
     if (video.hasAttribute(this.attr)) return;
     this.setupEventListeners(video);
+    video.tsr = { ...this.defaultTsr };
   }
 
   setupEventListeners(video) {
@@ -58,6 +59,10 @@ export default class VideoEnhancer {
       video.removeEventListener(type, handler, true);
       video.addEventListener(type, handler, true);
     });
+  }
+
+  resetTsr(video) {
+    video.tsr = { ...this.defaultTsr };
   }
 
   setPlaybackRate(video, playRate) {

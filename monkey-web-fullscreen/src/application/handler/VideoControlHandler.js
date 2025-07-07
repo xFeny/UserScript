@@ -67,6 +67,7 @@ export default {
   },
   useCachePlayTime(video) {
     if (this.hasUsedPlayTime || !this.topInfo || this.isLive()) return;
+
     const time = Storage.PLAY_TIME.get(this.topInfo.hash);
     if (time <= Number(video.currentTime)) return (this.hasUsedPlayTime = true);
     this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
@@ -81,45 +82,46 @@ export default {
   },
   videoMuted() {
     if (!this.player) return;
+
     this.player.muted = !this.player.muted;
     const tips = this.player.muted ? "🔇 已静音" : "🔊 取消静音";
     this.showToast(tips, Consts.ONE_SEC);
   },
   togglePictureInPicture() {
-    if (!this.player) return;
-    document.pictureInPictureElement ? document.exitPictureInPicture() : this.player?.requestPictureInPicture();
+    if (this.player) document.pictureInPictureElement ? document.exitPictureInPicture() : this.player?.requestPictureInPicture();
   },
   videoMirrorFlip() {
     if (!this.player) return;
-    this.isMirrored = !this.isMirrored;
-    this.setVideoTsr("--mirror", this.isMirrored ? -1 : 1);
+
+    const tsr = this.player.tsr;
+    tsr.isMirrored = !tsr.isMirrored;
+    this.setVideoTsr("--mirror", tsr.isMirrored ? -1 : 1);
   },
-  rotation: 0,
   videoRotate() {
     if (!this.player) return;
-    this.rotation = (this.rotation + 90) % 360;
+
+    const tsr = this.player.tsr;
+    tsr.rotation = (tsr.rotation + 90) % 360;
     const { videoWidth, videoHeight } = this.player;
-    const isVertical = [90, 270].includes(this.rotation);
+    const isVertical = [90, 270].includes(tsr.rotation);
     const scale = isVertical ? videoHeight / videoWidth : 1;
-    this.setVideoTsr("--scale", scale).setVideoTsr("--rotate", `${this.rotation}deg`);
-    // 测试视频：https://www.bilibili.com/video/BV1DT5AzLEMb、https://www.bilibili.com/video/BV13Y9FYfEVu
+    this.setVideoTsr("--scale", scale).setVideoTsr("--rotate", `${tsr.rotation}deg`);
   },
-  currentZoom: Consts.DEF_ZOOM,
   videoZoom(isDown) {
     if (!this.player || this.isDisableZoom()) return;
-    const zoom = this.currentZoom + (isDown ? -Consts.ZOOM_STEP : Consts.ZOOM_STEP);
+
+    const tsr = this.player.tsr;
+    const zoom = tsr.zoom + (isDown ? -Consts.ZOOM_STEP : Consts.ZOOM_STEP);
     if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
 
-    this.currentZoom = zoom;
+    tsr.zoom = zoom;
     this.setVideoTsr("--zoom", zoom / 100);
     this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC);
   },
-  moveX: 0,
-  moveY: 0,
   moveVideo(direction) {
     if (!this.player || this.isDisableZoom()) return;
 
-    const moveX = this.moveX;
+    const tsr = this.player.tsr;
     const { x, y, desc } = {
       ALT_ARROWUP: { y: -Consts.MOVE_STEP, desc: "向上移动" },
       ALT_ARROWDOWN: { y: Consts.MOVE_STEP, desc: "向下移动" },
@@ -127,18 +129,20 @@ export default {
       ALT_ARROWRIGHT: { x: Consts.MOVE_STEP, desc: "向右移动" },
     }[direction];
 
-    this.moveX += x ?? 0;
-    this.moveY += y ?? 0;
-    this.setVideoTsr("--moveX", `${this.moveX}px`).setVideoTsr("--moveY", `${this.moveY}px`);
-    this.showToast(`${desc}：${moveX === this.moveX ? this.moveY : this.moveX}px`, Consts.ONE_SEC);
+    ((tx = 0, ty = 0) => ((tsr.moveX += tx), (tsr.moveY += ty)))(x, y);
+    this.setVideoTsr("--moveX", `${tsr.moveX}px`).setVideoTsr("--moveY", `${tsr.moveY}px`);
+    this.showToast(`${desc}：${x ? tsr.moveX : tsr.moveY}px`, Consts.ONE_SEC);
   },
   restTransform() {
     if (!this.player || this.isDisableZoom()) return;
 
-    this.currentZoom = 100;
-    this.setVideoTsr("--zoom", this.currentZoom / 100)
-      .setVideoTsr("--moveX", `${(this.moveX = 0)}px`)
-      .setVideoTsr("--moveY", `${(this.moveY = 0)}px`);
+    this.setVideoTsr("--zoom", 1)
+      .setVideoTsr("--moveX", 0)
+      .setVideoTsr("--moveY", 0)
+      .setVideoTsr("--scale", 1)
+      .setVideoTsr("--mirror", 1)
+      .setVideoTsr("--rotate", "0deg");
+    window.EnhancerVideo.resetTsr(this.player);
   },
   videoScreenshot() {
     if (!this.player || this.isDisableScreenshot()) return;
