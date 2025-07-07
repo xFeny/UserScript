@@ -16,12 +16,12 @@ export default {
     const overrideKey = [keyboard.Space, keyboard.Left, keyboard.Right]; // 空格 ◀▶ 键
     const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
 
-    if (!isNumberKey && !isOverrideKey && !this.isZoomKey(event) && !preventKeys) return;
+    if (!isNumberKey && !isOverrideKey && !preventKeys) return;
     Tools.preventDefault(event);
   },
-  isZoomKey(event) {
-    const zommKey = [keyboard.NumpadAdd, keyboard.Subtract, Keyboard.Up, Keyboard.Down, keyboard.Left, keyboard.Right];
-    return event.altKey && zommKey.includes(event.code) && !this.isDisableZoom();
+  processkeystrokes({ key, code, ctrlKey, shiftKey, altKey }) {
+    const keys = [ctrlKey && "ctrl", shiftKey && "shift", altKey && "alt", /[A-Za-z0-9]/.test(key) ? key : code];
+    return keys.filter(Boolean).join("_");
   },
   setupKeydownListener() {
     window.addEventListener("keyup", (event) => this.preventDefault(event), true); // 腾讯视频
@@ -31,23 +31,20 @@ export default {
       if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
       if (data?.videoInfo) return this.setParentVideoInfo(data.videoInfo);
       if (data?.topInfo) window.topInfo = this.topInfo = data.topInfo;
-      if (data?.defaultPlaybackRate) this.defaultPlaybackRate();
+      if (data?.defaultPlaybackRate) this.defPlaybackRate();
       this.processEvent(data);
     });
   },
-  keydownHandler(event, { key, code, altKey, ctrlKey, shiftKey } = event) {
+  keydownHandler(event, { key, code } = event) {
     // Tools.log("键盘事件：", event);
     const target = event.composedPath()[0];
     const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
     if (this.normalSite() || isInput || target?.isContentEditable) return;
     if (!Object.values(keyboard).includes(code) && !Tools.isNumber(key)) return;
+
     this.preventDefault(event);
-    if (this.isZoomKey(event)) key = "ALT_" + code;
-    if (ctrlKey && altKey && keyboard.KeyA === code) key = code; // Ctrl Alt A  键截图
-    if (keyboard.Space === code || (shiftKey && [keyboard.KeyP, keyboard.KeyR].includes(code))) key = code;
-    if (!altKey && !ctrlKey && !shiftKey && [keyboard.KeyP, keyboard.KeyN].includes(code)) {
-      return Tools.postMessage(window.top, { key });
-    }
+    key = this.processkeystrokes(event);
+    if ([keyboard.P, keyboard.N].includes(key)) return Tools.postMessage(window.top, { key });
     this.processEvent({ key });
   },
   processEvent(data) {
@@ -60,11 +57,11 @@ export default {
     const dict = {
       M: () => this.videoMuted(),
       R: () => this.videoRotate(),
-      KEYR: () => this.videoMirror(),
+      Z: () => this.defPlaybackRate(),
       L: () => this.freezeVideoFrame(),
       K: () => this.freezeVideoFrame(true),
-      ALT_NUMPADADD: () => this.zoomVideo(),
-      ALT_NUMPADSUBTRACT: () => this.zoomVideo(true),
+      ALT_NUMPADADD: () => this.videoZoom(),
+      ALT_NUMPADSUBTRACT: () => this.videoZoom(true),
       D: () => this.triggerIconElement(SiteIcons.name.danmaku),
       N: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
       P: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance()),
@@ -72,15 +69,20 @@ export default {
       ARROWRIGHT: () => this.isOverrideKeyboard() && this.adjustVideoTime(Storage.SKIP_INTERVAL.get()),
       0: () => this.adjustVideoTime(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
       SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.player),
-      KEYP: () => this.togglePictureInPicture(),
-      Z: () => this.defaultPlaybackRate(),
-      KEYA: () => this.videoScreenshot(),
+      SHIFT_P: () => this.togglePictureInPicture(),
+      CTRL_ALT_A: () => this.videoScreenshot(),
+      SHIFT_R: () => this.videoMirrorFlip(),
+      CTRL_Z: () => this.restTransform(),
     };
+
     // 倍速加减
-    [keyboard.A, keyboard.ADD].forEach((k) => (dict[k] = () => this.adjustPlaybackRate(Storage.PLAY_RATE_STEP.get())));
-    [keyboard.S, keyboard.SUB].forEach((k) => (dict[k] = () => this.adjustPlaybackRate(-Storage.PLAY_RATE_STEP.get())));
+    const step = Storage.PLAY_RATE_STEP.get();
+    [keyboard.A, keyboard.Add.toUpperCase()].forEach((k) => (dict[k] = () => this.adjustPlaybackRate(step)));
+    [keyboard.S, keyboard.Sub.toUpperCase()].forEach((k) => (dict[k] = () => this.adjustPlaybackRate(-step)));
+
     // 视频上下左右移动
     ["ALT_ARROWUP", "ALT_ARROWDOWN", "ALT_ARROWLEFT", "ALT_ARROWRIGHT"].forEach((k) => (dict[k] = () => this.moveVideo(k)));
+
     // 执行函数
     dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
   },

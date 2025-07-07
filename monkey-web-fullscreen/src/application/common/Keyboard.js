@@ -3,10 +3,9 @@
  */
 export default Object.freeze({
   A: "A",
+  N: "N",
   P: "P",
   S: "S",
-  ADD: "+",
-  SUB: "-",
   KeyA: "KeyA",
   KeyD: "KeyD",
   KeyK: "KeyK",
@@ -22,6 +21,6 @@ export default Object.freeze({
   Down: "ArrowDown",
   Left: "ArrowLeft",
   Right: "ArrowRight",
-  Subtract: "NumpadSubtract",
-  NumpadAdd: "NumpadAdd",
+  Sub: "NumpadSubtract",
+  Add: "NumpadAdd",
 });

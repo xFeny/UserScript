@@ -40,7 +40,7 @@ export default {
     const playRate = Math.max(Storage.PLAY_RATE_STEP.get(), Number(this.player.playbackRate) + step);
     this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
   },
-  defaultPlaybackRate() {
+  defPlaybackRate() {
     if (this.isDisablePlaybackRate()) return;
     this.setPlaybackRate(Consts.DEF_PLAY_RATE, false);
     this.showToast("已恢复正常倍速播放");
@@ -89,7 +89,7 @@ export default {
     if (!this.player) return;
     document.pictureInPictureElement ? document.exitPictureInPicture() : this.player?.requestPictureInPicture();
   },
-  videoMirror() {
+  videoMirrorFlip() {
     if (!this.player) return;
     this.isMirrored = !this.isMirrored;
     this.setVideoTsr("--mirror", this.isMirrored ? -1 : 1);
@@ -105,7 +105,7 @@ export default {
     // 测试视频：https://www.bilibili.com/video/BV1DT5AzLEMb、https://www.bilibili.com/video/BV13Y9FYfEVu
   },
   currentZoom: Consts.DEF_ZOOM,
-  zoomVideo(isDown) {
+  videoZoom(isDown) {
     if (!this.player || this.isDisableZoom()) return;
     const zoom = this.currentZoom + (isDown ? -Consts.ZOOM_STEP : Consts.ZOOM_STEP);
     if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
@@ -131,6 +131,13 @@ export default {
     this.moveY += y ?? 0;
     this.setVideoTsr("--moveX", `${this.moveX}px`).setVideoTsr("--moveY", `${this.moveY}px`);
     this.showToast(`${desc}：${moveX === this.moveX ? this.moveY : this.moveX}px`, Consts.ONE_SEC);
+  },
+  restTransform() {
+    if (!this.player) return;
+    this.currentZoom = 100;
+    this.setVideoTsr("--zoom", this.currentZoom / 100)
+      .setVideoTsr("--moveX", `${(this.moveX = 0)}px`)
+      .setVideoTsr("--moveY", `${(this.moveY = 0)}px`);
   },
   videoScreenshot() {
     if (!this.player || this.isDisableScreenshot()) return;
