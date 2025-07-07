@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.1.4
+// @version      3.1.5
 // @author       Feny
 // @description  默认支持哔哩哔哩（含直播）、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持倍速调节、视频截图、画面镜像反转、自由缩放与移动、播放进度记忆等功能；提供通用下集切换功能，适用于任意视频网站剧集，便捷实现剧集切换。
 // @license      GPL-3.0-only
@@ -455,10 +455,9 @@
   };
   const Keyboard = Object.freeze({
     A: "A",
+    N: "N",
     P: "P",
     S: "S",
-    ADD: "+",
-    SUB: "-",
     KeyA: "KeyA",
     KeyD: "KeyD",
     KeyK: "KeyK",
@@ -474,8 +473,8 @@
     Down: "ArrowDown",
     Left: "ArrowLeft",
     Right: "ArrowRight",
-    Subtract: "NumpadSubtract",
-    NumpadAdd: "NumpadAdd"
+    Sub: "NumpadSubtract",
+    Add: "NumpadAdd"
   });
   const SiteIcons = {
     "live.bilibili.com": { webFull: "#businessContainerElement" },
@@ -496,12 +495,12 @@
       const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
       const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
       const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
-      if (!isNumberKey && !isOverrideKey && !this.isZoomKey(event) && !preventKeys) return;
+      if (!isNumberKey && !isOverrideKey && !preventKeys) return;
       Tools.preventDefault(event);
     },
-    isZoomKey(event) {
-      const zommKey = [Keyboard.NumpadAdd, Keyboard.Subtract, Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right];
-      return event.altKey && zommKey.includes(event.code) && !this.isDisableZoom();
+    processkeystrokes({ key, code, ctrlKey, shiftKey, altKey }) {
+      const keys = [ctrlKey && "ctrl", shiftKey && "shift", altKey && "alt", /[A-Za-z0-9]/.test(key) ? key : code];
+      return keys.filter(Boolean).join("_");
     },
     setupKeydownListener() {
       window.addEventListener("keyup", (event) => this.preventDefault(event), true);
@@ -510,22 +509,18 @@
         if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
         if (data?.videoInfo) return this.setParentVideoInfo(data.videoInfo);
         if (data?.topInfo) window.topInfo = this.topInfo = data.topInfo;
-        if (data?.defaultPlaybackRate) this.defaultPlaybackRate();
+        if (data?.defaultPlaybackRate) this.defPlaybackRate();
         this.processEvent(data);
       });
     },
-    keydownHandler(event, { key, code, altKey, ctrlKey, shiftKey } = event) {
+    keydownHandler(event, { key, code } = event) {
       const target = event.composedPath()[0];
       const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
       if (this.normalSite() || isInput || target?.isContentEditable) return;
       if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
       this.preventDefault(event);
-      if (this.isZoomKey(event)) key = "ALT_" + code;
-      if (ctrlKey && altKey && Keyboard.KeyA === code) key = code;
-      if (Keyboard.Space === code || shiftKey && [Keyboard.KeyP, Keyboard.KeyR].includes(code)) key = code;
-      if (!altKey && !ctrlKey && !shiftKey && [Keyboard.KeyP, Keyboard.KeyN].includes(code)) {
-        return Tools.postMessage(window.top, { key });
-      }
+      key = this.processkeystrokes(event);
+      if ([Keyboard.P, Keyboard.N].includes(key)) return Tools.postMessage(window.top, { key });
       this.processEvent({ key });
     },
     processEvent(data) {
@@ -536,11 +531,11 @@
       const dict = {
         M: () => this.videoMuted(),
         R: () => this.videoRotate(),
-        KEYR: () => this.videoMirror(),
+        Z: () => this.defPlaybackRate(),
         L: () => this.freezeVideoFrame(),
         K: () => this.freezeVideoFrame(true),
-        ALT_NUMPADADD: () => this.zoomVideo(),
-        ALT_NUMPADSUBTRACT: () => this.zoomVideo(true),
+        ALT_NUMPADADD: () => this.videoZoom(),
+        ALT_NUMPADSUBTRACT: () => this.videoZoom(true),
         D: () => this.triggerIconElement(SiteIcons.name.danmaku),
         N: () => Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode(),
         P: () => Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance(),
@@ -548,12 +543,14 @@
         ARROWRIGHT: () => this.isOverrideKeyboard() && this.adjustVideoTime(Storage.SKIP_INTERVAL.get()),
         0: () => this.adjustVideoTime(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
         SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.player),
-        KEYP: () => this.togglePictureInPicture(),
-        Z: () => this.defaultPlaybackRate(),
-        KEYA: () => this.videoScreenshot()
+        SHIFT_P: () => this.togglePictureInPicture(),
+        CTRL_ALT_A: () => this.videoScreenshot(),
+        SHIFT_R: () => this.videoMirrorFlip(),
+        CTRL_Z: () => this.restTransform()
       };
-      [Keyboard.A, Keyboard.ADD].forEach((k) => dict[k] = () => this.adjustPlaybackRate(Storage.PLAY_RATE_STEP.get()));
-      [Keyboard.S, Keyboard.SUB].forEach((k) => dict[k] = () => this.adjustPlaybackRate(-Storage.PLAY_RATE_STEP.get()));
+      const step = Storage.PLAY_RATE_STEP.get();
+      [Keyboard.A, Keyboard.Add.toUpperCase()].forEach((k) => dict[k] = () => this.adjustPlaybackRate(step));
+      [Keyboard.S, Keyboard.Sub.toUpperCase()].forEach((k) => dict[k] = () => this.adjustPlaybackRate(-step));
       ["ALT_ARROWUP", "ALT_ARROWDOWN", "ALT_ARROWLEFT", "ALT_ARROWRIGHT"].forEach((k) => dict[k] = () => this.moveVideo(k));
       dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
     },
@@ -665,6 +662,7 @@
         { key: "M", desc: "静音 / 取消静音" },
         { key: "D", desc: "显示 / 隐藏 弹幕" },
         { key: "L / K", desc: "下一帧 / 上一帧" },
+        { key: "Ctrl Z", desc: "复位缩放与移动" },
         { key: "Shift R", desc: "视频水平镜像翻转" },
         { key: "Shift P", desc: "进入 / 退出 画中画" },
         { key: "Ctrl Alt A", desc: "视频截图 (默认禁用)" },
@@ -722,7 +720,7 @@
       const playRate = Math.max(Storage.PLAY_RATE_STEP.get(), Number(this.player.playbackRate) + step);
       this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
     },
-    defaultPlaybackRate() {
+    defPlaybackRate() {
       if (this.isDisablePlaybackRate()) return;
       this.setPlaybackRate(Consts.DEF_PLAY_RATE, false);
       this.showToast("已恢复正常倍速播放");
@@ -770,7 +768,7 @@
       if (!this.player) return;
       document.pictureInPictureElement ? document.exitPictureInPicture() : this.player?.requestPictureInPicture();
     },
-    videoMirror() {
+    videoMirrorFlip() {
       if (!this.player) return;
       this.isMirrored = !this.isMirrored;
       this.setVideoTsr("--mirror", this.isMirrored ? -1 : 1);
@@ -785,7 +783,7 @@
       this.setVideoTsr("--scale", scale).setVideoTsr("--rotate", `${this.rotation}deg`);
     },
     currentZoom: Consts.DEF_ZOOM,
-    zoomVideo(isDown) {
+    videoZoom(isDown) {
       if (!this.player || this.isDisableZoom()) return;
       const zoom = this.currentZoom + (isDown ? -Consts.ZOOM_STEP : Consts.ZOOM_STEP);
       if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
@@ -808,6 +806,11 @@
       this.moveY += y ?? 0;
       this.setVideoTsr("--moveX", `${this.moveX}px`).setVideoTsr("--moveY", `${this.moveY}px`);
       this.showToast(`${desc}：${moveX === this.moveX ? this.moveY : this.moveX}px`, Consts.ONE_SEC);
+    },
+    restTransform() {
+      if (!this.player) return;
+      this.currentZoom = 100;
+      this.setVideoTsr("--zoom", this.currentZoom / 100).setVideoTsr("--moveX", `${this.moveX = 0}px`).setVideoTsr("--moveY", `${this.moveY = 0}px`);
     },
     videoScreenshot() {
       if (!this.player || this.isDisableScreenshot()) return;
