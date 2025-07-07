@@ -133,7 +133,8 @@ export default {
     this.showToast(`${desc}：${moveX === this.moveX ? this.moveY : this.moveX}px`, Consts.ONE_SEC);
   },
   restTransform() {
-    if (!this.player) return;
+    if (!this.player || this.isDisableZoom()) return;
+
     this.currentZoom = 100;
     this.setVideoTsr("--zoom", this.currentZoom / 100)
       .setVideoTsr("--moveX", `${(this.moveX = 0)}px`)
