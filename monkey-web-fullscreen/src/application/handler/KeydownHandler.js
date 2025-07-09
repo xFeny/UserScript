@@ -9,12 +9,13 @@ import Keyboard from "../common/Keyboard";
  * 快捷键逻辑处理
  */
 export default {
-  preventDefault(event, { code } = event) {
+  preventDefault(event, { code, altKey } = event) {
     const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
     const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
     const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
     const preventKeys = [Keyboard.KeyK, Keyboard.KeyL, Keyboard.KeyM, Keyboard.KeyR, Keyboard.KeyS].includes(code);
-    if (isNumberKey || isOverrideKey || preventKeys) Tools.preventDefault(event);
+    const zoomKeys = !this.isDisableZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
+    if (isNumberKey || isOverrideKey || preventKeys || (altKey && zoomKeys)) Tools.preventDefault(event);
   },
   processkeystrokes({ key, code, ctrlKey, shiftKey, altKey }) {
     code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
