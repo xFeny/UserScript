@@ -123,17 +123,17 @@ export default {
 
     const tsr = this.player.tsr;
     const { x, y, desc } = {
-      ALT_ARROWUP: { y: -Consts.MOVE_STEP, desc: "向上移动" },
-      ALT_ARROWDOWN: { y: Consts.MOVE_STEP, desc: "向下移动" },
-      ALT_ARROWLEFT: { x: -Consts.MOVE_STEP, desc: "向左移动" },
-      ALT_ARROWRIGHT: { x: Consts.MOVE_STEP, desc: "向右移动" },
+      ALT_UP: { y: -Consts.MOVE_STEP, desc: "向上移动" },
+      ALT_DOWN: { y: Consts.MOVE_STEP, desc: "向下移动" },
+      ALT_LEFT: { x: -Consts.MOVE_STEP, desc: "向左移动" },
+      ALT_RIGHT: { x: Consts.MOVE_STEP, desc: "向右移动" },
     }[direction];
 
     ((tx = 0, ty = 0) => ((tsr.moveX += tx), (tsr.moveY += ty)))(x, y);
     this.setVideoTsr("--moveX", `${tsr.moveX}px`).setVideoTsr("--moveY", `${tsr.moveY}px`);
     this.showToast(`${desc}：${x ? tsr.moveX : tsr.moveY}px`, Consts.ONE_SEC);
   },
-  restTransform() {
+  restoreTransform() {
     if (!this.player || this.isDisableZoom()) return;
 
     this.setVideoTsr("--zoom", 1)

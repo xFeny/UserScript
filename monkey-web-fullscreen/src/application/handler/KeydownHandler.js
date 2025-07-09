@@ -2,7 +2,6 @@ import Site from "../common/Site";
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
-import keyboard from "../common/Keyboard";
 import SiteIcons from "../common/SiteIcons";
 import Keyboard from "../common/Keyboard";
 
@@ -11,16 +10,15 @@ import Keyboard from "../common/Keyboard";
  */
 export default {
   preventDefault(event, { code } = event) {
-    const preventKeys = [Keyboard.KeyM, Keyboard.KeyP].includes(code); // 要阻止事件传递的键
-    const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
-    const overrideKey = [keyboard.Space, keyboard.Left, keyboard.Right]; // 空格 ◀▶ 键
+    const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
     const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
-
-    if (!isNumberKey && !isOverrideKey && !preventKeys) return;
-    Tools.preventDefault(event);
+    const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
+    const preventKeys = [Keyboard.KeyK, Keyboard.KeyL, Keyboard.KeyM, Keyboard.KeyR, Keyboard.KeyS].includes(code);
+    if (isNumberKey || isOverrideKey || preventKeys) Tools.preventDefault(event);
   },
   processkeystrokes({ key, code, ctrlKey, shiftKey, altKey }) {
-    const keys = [ctrlKey && "ctrl", shiftKey && "shift", altKey && "alt", /[A-Za-z0-9]/.test(key) ? key : code];
+    code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
+    const keys = [ctrlKey && "ctrl", shiftKey && "shift", altKey && "alt", /[0-9]/.test(key) ? key : code];
     return keys.filter(Boolean).join("_");
   },
   setupKeydownListener() {
@@ -36,15 +34,15 @@ export default {
     });
   },
   keydownHandler(event, { key, code } = event) {
-    // Tools.log("键盘事件：", event);
+    // Tools.log("键盘事件：", { key, code });
     const target = event.composedPath()[0];
     const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
     if (this.normalSite() || isInput || target?.isContentEditable) return;
-    if (!Object.values(keyboard).includes(code) && !Tools.isNumber(key)) return;
+    if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
 
     this.preventDefault(event);
     key = this.processkeystrokes(event);
-    if ([keyboard.P, keyboard.N].includes(key)) return Tools.postMessage(window.top, { key });
+    if ([Keyboard.KeyN, Keyboard.KeyP].includes(code)) return Tools.postMessage(window.top, { key });
     this.processEvent({ key });
   },
   processEvent(data) {
@@ -60,28 +58,31 @@ export default {
       Z: () => this.defPlaybackRate(),
       L: () => this.freezeVideoFrame(),
       K: () => this.freezeVideoFrame(true),
-      ALT_NUMPADADD: () => this.videoZoom(),
-      ALT_NUMPADSUBTRACT: () => this.videoZoom(true),
-      D: () => this.triggerIconElement(SiteIcons.name.danmaku),
+      D: () => Site.isMatch() && this.triggerIconElement(SiteIcons.name.danmaku),
       N: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
       P: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance()),
-      ARROWLEFT: () => this.isOverrideKeyboard() && this.adjustVideoTime(-Storage.SKIP_INTERVAL.get()),
-      ARROWRIGHT: () => this.isOverrideKeyboard() && this.adjustVideoTime(Storage.SKIP_INTERVAL.get()),
+      LEFT: () => this.isOverrideKeyboard() && this.adjustVideoTime(-Storage.SKIP_INTERVAL.get()),
+      RIGHT: () => this.isOverrideKeyboard() && this.adjustVideoTime(Storage.SKIP_INTERVAL.get()),
       0: () => this.adjustVideoTime(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
       SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.player),
       SHIFT_P: () => this.togglePictureInPicture(),
       CTRL_ALT_A: () => this.videoScreenshot(),
       SHIFT_R: () => this.videoMirrorFlip(),
-      CTRL_Z: () => this.restTransform(),
+      CTRL_Z: () => this.restoreTransform(),
+      ALT_SUB: () => this.videoZoom(true),
+      ALT_ADD: () => this.videoZoom(),
     };
 
     // 倍速加减
     const step = Storage.PLAY_RATE_STEP.get();
-    [keyboard.A, keyboard.Add.toUpperCase()].forEach((k) => (dict[k] = () => this.adjustPlaybackRate(step)));
-    [keyboard.S, keyboard.Sub.toUpperCase()].forEach((k) => (dict[k] = () => this.adjustPlaybackRate(-step)));
+    ["A", "ADD"].forEach((k) => (dict[k] = () => this.adjustPlaybackRate(step)));
+    ["S", "SUB"].forEach((k) => (dict[k] = () => this.adjustPlaybackRate(-step)));
 
-    // 视频上下左右移动
-    ["ALT_ARROWUP", "ALT_ARROWDOWN", "ALT_ARROWLEFT", "ALT_ARROWRIGHT"].forEach((k) => (dict[k] = () => this.moveVideo(k)));
+    // CTRL_[0-6] 设置10-16x倍速
+    Array.from({ length: 7 }, (_, i) => (dict[`CTRL_${i}`] = () => this.setPlaybackRate(10 + i)));
+
+    // 视频移动
+    ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => (dict[k] = () => this.moveVideo(k)));
 
     // 执行函数
     dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));

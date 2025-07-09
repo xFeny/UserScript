@@ -2,10 +2,7 @@
  * 脚本使用到的键盘code值
  */
 export default Object.freeze({
-  A: "A",
-  N: "N",
   P: "P",
-  S: "S",
   KeyA: "KeyA",
   KeyD: "KeyD",
   KeyK: "KeyK",
@@ -16,11 +13,11 @@ export default Object.freeze({
   KeyR: "KeyR",
   KeyS: "KeyS",
   KeyZ: "KeyZ",
-  Space: "Space",
   Up: "ArrowUp",
   Down: "ArrowDown",
   Left: "ArrowLeft",
   Right: "ArrowRight",
   Sub: "NumpadSubtract",
   Add: "NumpadAdd",
+  Space: "Space",
 });
