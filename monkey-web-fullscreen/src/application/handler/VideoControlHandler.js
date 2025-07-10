@@ -200,8 +200,8 @@ export default {
     return [...(h ? [h] : []), m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
   },
   isMultVideo() {
-    const playerSrc = this.videoInfo?.src;
-    const videos = Tools.querys("video").filter((video) => video.currentSrc !== playerSrc && !isNaN(video.duration));
+    const playSrc = this.videoInfo?.src;
+    const videos = Tools.querys("video").filter((v) => (v.src ?? v.currentSrc) !== playSrc && !isNaN(v.duration));
     return videos.length > 1;
   },
   setVideoTsr(name, value) {
