@@ -9,11 +9,18 @@ export default window.App = {
     this.setupMutationObserver();
     this.setupUrlChangeListener();
     this.setupMouseMoveListener();
+    document.addEventListener("load", () => this.triggerStartElement(), true);
   },
   normalSite: () => !window?.videoInfo && !window?.topInfo,
   isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
   getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
   isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
+  triggerStartElement() {
+    // https://www.zhihu.com 、https://www.jumomo.cc 、https://www.jiaozi.me 、https://www.kmvod.cc
+    const element = Tools.query("._qrp4qg, .ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
+    if (!element || Tools.isTooFrequent("start")) return;
+    setTimeout(() => element?.click() & element?.remove(), 150);
+  },
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
       if (this.normalSite()) return;
@@ -37,17 +44,10 @@ export default window.App = {
     if (Tools.isTooFrequent()) return;
     const observer = Tools.createObserver(document.body, () => {
       this.removeLoginPopups();
-      this.triggerStartElement();
       this.setCurrentVideo(this.getVideo());
       if (this.topInfo) observer.disconnect();
     });
     setTimeout(() => observer.disconnect(), Consts.ONE_SEC * 10);
-  },
-  triggerStartElement() {
-    // https://www.zhihu.com 、https://www.jumomo.cc 、https://www.jiaozi.me 、https://www.kmvod.cc
-    const element = Tools.query("._qrp4qg, .ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
-    if (!element || Tools.isTooFrequent("start")) return;
-    setTimeout(() => element?.click() & element?.remove(), 150);
   },
   setCurrentVideo(video) {
     if (!video || this.player === video) return;

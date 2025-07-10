@@ -13,7 +13,7 @@ export default {
     const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
     const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
     const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
-    const preventKeys = [Keyboard.KeyK, Keyboard.KeyL, Keyboard.KeyM, Keyboard.KeyR, Keyboard.KeyS].includes(code);
+    const preventKeys = [Keyboard.KeyK, Keyboard.KeyL, Keyboard.KeyM, Keyboard.KeyN, Keyboard.KeyP, Keyboard.KeyR].includes(code);
     const zoomKeys = !this.isDisableZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
     if (isNumberKey || isOverrideKey || preventKeys || (altKey && zoomKeys)) Tools.preventDefault(event);
   },
