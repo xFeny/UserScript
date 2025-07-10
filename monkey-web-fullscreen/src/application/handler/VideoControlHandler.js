@@ -201,7 +201,7 @@ export default {
   },
   isMultVideo() {
     const playSrc = this.videoInfo?.src;
-    const videos = Tools.querys("video").filter((v) => (v.src ?? v.currentSrc) !== playSrc && !isNaN(v.duration));
+    const videos = Tools.querys("video").filter((v) => v.currentSrc !== playSrc && !isNaN(v.duration));
     return videos.length > 1;
   },
   setVideoTsr(name, value) {
