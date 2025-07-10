@@ -27,7 +27,7 @@ export default {
   exitWebFull() {
     const wrap = this.webFullWrap;
     if (this.player) Tools.delPart(this.player, Consts.videoPart);
-    if (this.webFullWrap?.matches("video")) wrap.controls = wrap.ctrl;
+    if (wrap.matches("video")) wrap.controls = wrap.ctrl;
 
     Tools.querys(`.${Consts.webFull}`).forEach((el) => (Tools.delCls(el, Consts.webFull), Tools.delPart(el, Consts.webFull)));
     Tools.scrollTop((Tools.getElementRect(wrap)?.top < 0 ? wrap?.top + wrap.scrollY : wrap?.top) - 120);
