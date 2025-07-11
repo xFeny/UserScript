@@ -1,6 +1,5 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
-import Keyboard from "../common/Keyboard";
 import SiteIcons from "../common/SiteIcons";
 /**
  * 网页全屏逻辑处理
@@ -12,7 +11,7 @@ export default {
     if (!Site.isMatch() && !this.isEnbleThisWebSiteAuto()) return;
     if (!this.topInfo || video.hasWebFull || !video.offsetWidth) return;
     if (video.offsetWidth >= this.topInfo.innerWidth) return (video.hasWebFull = true);
-    Tools.postMessage(window.top, { key: Keyboard.P });
+    Tools.postMessage(window.top, { key: "P" });
   },
   liveWebFullScreen() {
     unsafeWindow.top.scrollTo({ top: 70 });
