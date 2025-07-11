@@ -13,9 +13,9 @@ export default {
     const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
     const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
     const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
-    const preventKeys = [Keyboard.A, Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R, Keyboard.S];
+    const preventKeys = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
     const zoomKeys = !this.isDisableZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
-    if (isNumberKey || isOverrideKey || preventKeys.includes(code) || (altKey && zoomKeys)) Tools.preventDefault(event);
+    if (isNumberKey || isOverrideKey || preventKeys || (altKey && zoomKeys)) Tools.preventDefault(event);
   },
   processkeystrokes({ key, code, ctrlKey, shiftKey, altKey }) {
     code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
