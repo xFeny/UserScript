@@ -6,7 +6,7 @@ import Tools from "../common/Tools";
  */
 export default {
   webFullEnhance() {
-    if (this.normalSite() || Tools.isTooFrequent("enhance")) return;
+    if (this.normalSite() || Tools.isTooFrequent("enhance") || !this.videoInfo) return;
     // 退出网页全屏
     if (this.webFullWrap) return this.exitWebFull();
 
@@ -45,24 +45,41 @@ export default {
   },
   getVideoIFrame() {
     if (!this?.videoInfo?.frameSrc) return null;
-    const url = new URL(this.videoInfo.frameSrc);
-    const src = decodeURI(url.pathname + url.search);
-    return Tools.query(`iframe[src*="${src}"]`);
+    const { pathname, search } = new URL(this.videoInfo.frameSrc);
+    const decodedSearch = decodeURI(search); // 先解码得到实际字符串
+    const partialSearch = decodedSearch.slice(0, decodedSearch.length * 0.8);
+    return Tools.query(`iframe[src*="${pathname + partialSearch}"]`);
   },
   getVideoWrapper() {
     return this.findVideoControlBar() ?? this.findVideoContainer();
   },
-  findVideoControlBar() {
-    const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
-    const ctrl = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"]`;
-    const controlBar = Tools.findParentWithChild(this.player, ctrl);
-    const { centerX, centerY } = Tools.getCenterPoint(controlBar);
-    return Tools.pointInElement(centerX, centerY, this.player) ? controlBar : null;
+  findVideoControlBar(maxLevel = 3) {
+    const ignore = new Set();
+    const { player: video, player: element } = this;
+    const videoRect = Tools.getElementRect(video);
+    const baseSelector = ':is([class*="control" i], [id*="control"], [class*="ctrl"])';
+
+    for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
+      const ignoreSelector = ignore.size > 0 ? `:not(.${[...ignore].map((el) => Array.from(el.classList).join("."))})` : null;
+      const selector = ignoreSelector ? `${baseSelector}${ignoreSelector}` : baseSelector;
+      const controlBar = Tools.query(selector, parent);
+      if (!controlBar) continue;
+
+      Tools.dispatchMousemove(controlBar);
+      const { centerX, centerY } = Tools.getCenterPoint(controlBar);
+      const { width, top, left, right } = Tools.getElementRect(controlBar);
+
+      const inVideoRect = Tools.pointInElement(centerX, centerY, video) && width > videoRect.width / 2;
+      const intersect = left === videoRect.left && right === videoRect.right && top === videoRect.bottom;
+      if (inVideoRect || intersect) return parent;
+      ignore.add(controlBar);
+    }
+    return null;
   },
   findVideoContainer(maxLevel = 5) {
-    const video = this.player;
-    let container = this.player;
+    let { player: video, player: container } = this;
     const { width: videoWidth, height: videoHeight } = Tools.getElementRect(video);
+
     for (let parent = video?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
       const { width, height } = Tools.getElementRect(parent);
       if (width === videoWidth && height === videoHeight) container = parent;
