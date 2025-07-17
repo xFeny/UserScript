@@ -12,24 +12,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Create vertical scroll elements
   const verticalFade = createAndAppendElement("div", "wsx_fade wsx_vertical_fade", document.body);
-  const verticalScroll = createAndAppendElement(
-    "div",
-    "wsx_scroll wsx_vertical_scroll",
-    document.body
-  );
+  const verticalScroll = createAndAppendElement("div", "wsx_scroll wsx_vertical_scroll", document.body);
   createAndAppendElement("div", "wsx_scroll_bar wsx_vertical_scroll_bar", verticalScroll);
 
   // Create horizontal scroll elements
-  const horizontalFade = createAndAppendElement(
-    "div",
-    "wsx_fade wsx_horizontal_fade",
-    document.body
-  );
-  const horizontalScroll = createAndAppendElement(
-    "div",
-    "wsx_scroll wsx_horizontal_scroll",
-    document.body
-  );
+  const horizontalFade = createAndAppendElement("div", "wsx_fade wsx_horizontal_fade", document.body);
+  const horizontalScroll = createAndAppendElement("div", "wsx_scroll wsx_horizontal_scroll", document.body);
   createAndAppendElement("div", "wsx_scroll_bar wsx_horizontal_scroll_bar", horizontalScroll);
 
   let content = document.documentElement || document.body;
@@ -86,13 +74,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const scrollHeight = Math.max((wHeight / dHeight) * wHeight, 30);
     const scrollWidth = Math.max((wWidth / dWidth) * wWidth, 30);
     const top =
-      ((document.documentElement.scrollTop || document.body.scrollTop) / (dHeight - wHeight)) *
-      (wHeight - scrollHeight);
+      ((document.documentElement.scrollTop || document.body.scrollTop) / (dHeight - wHeight)) * (wHeight - scrollHeight);
     verticalScroll.style.top = `${top}px`;
     verticalScroll.style.height = `${scrollHeight}px`;
-    const left =
-      ((document.documentElement.scrollLeft || document.body.scrollLeft) / (dWidth - wWidth)) *
-      (wWidth - scrollWidth);
+    const left = ((document.documentElement.scrollLeft || document.body.scrollLeft) / (dWidth - wWidth)) * (wWidth - scrollWidth);
     horizontalScroll.style.left = `${left}px`;
     horizontalScroll.style.width = `${scrollWidth}px`;
 

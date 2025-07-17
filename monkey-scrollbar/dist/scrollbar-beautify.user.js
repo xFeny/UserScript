@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         滚动条美化
 // @namespace    npm/vite-plugin-monkey
-// @version      1.3.2
+// @version      1.3.3
 // @author       Feny
 // @description  移植于Scroll Style插件，且使用🌈彩虹滚动条🌈脚本的CSS样式
 // @license      MIT
@@ -12,7 +12,7 @@
 // @run-at       document-body
 // ==/UserScript==
 
-(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const e=document.createElement("style");e.textContent=t,document.head.append(e)})(' @charset "UTF-8";:root{scrollbar-width:none!important}body::-webkit-scrollbar,::-webkit-scrollbar-track,::-webkit-scrollbar-corner,::-webkit-scrollbar-button,::-webkit-scrollbar-track-piece,::-webkit-scrollbar-track:horizontal{display:none!important}::-webkit-scrollbar{width:7px;height:7px;display:static!important}::-webkit-scrollbar-thumb{background:linear-gradient(to bottom,#ff567f,#fbeb91,#2ec2ff,#8375ff)!important;border-radius:5px!important;box-shadow:inset 0 0 10px #fff!important}::-webkit-scrollbar-thumb:horizontal{background:linear-gradient(to right,#ff567f,#fbeb91,#2ec2ff,#8375ff)!important;border-radius:5px!important;box-shadow:inset 0 0 10px #fff!important}.wsx_scroll{margin:0;padding:0;-webkit-user-select:none;user-select:none;pointer-events:none;display:none;position:fixed;z-index:999999999;transition:opacity .2s linear}.wsx_scroll_bar{margin:0;padding:0;-webkit-user-select:none;user-select:none;pointer-events:none;position:relative}.wsx_fade{margin:0;padding:0;-webkit-user-select:none;user-select:none;pointer-events:none;display:block;position:fixed;z-index:9999999999}.wsx_vertical_scroll{top:0;right:0;width:30px}.wsx_vertical_scroll_bar{left:19px;opacity:.6;height:100%;width:7px;border-radius:5px!important;background:linear-gradient(to bottom,#ff567f,#fbeb91,#2ec2ff,#8375ff)!important}.wsx_vertical_fade{top:0;right:0;width:30px;height:100%}.wsx_horizontal_scroll{left:0;bottom:0;height:30px}.wsx_horizontal_scroll_bar{top:20px;width:100%;opacity:.6;height:7px;border-radius:5px!important;background:linear-gradient(to right,#ff567f,#fbeb91,#2ec2ff,#8375ff)!important}.wsx_horizontal_fade{left:0;bottom:0;width:100%;height:30px} ');
+(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const e=document.createElement("style");e.textContent=t,document.head.append(e)})(' @charset "UTF-8";:root{scrollbar-width:none!important}body::-webkit-scrollbar,::-webkit-scrollbar-track,::-webkit-scrollbar-corner,::-webkit-scrollbar-button,::-webkit-scrollbar-track-piece,::-webkit-scrollbar-track:horizontal{display:none!important}::-webkit-scrollbar{width:7px!important;height:7px!important;display:static!important}::-webkit-scrollbar-thumb{background:linear-gradient(to bottom,#ff567f,#fbeb91,#2ec2ff,#8375ff)!important;border-radius:5px!important;border:none!important;box-shadow:inset 0 0 10px #fff!important}::-webkit-scrollbar-thumb:horizontal{background:linear-gradient(to right,#ff567f,#fbeb91,#2ec2ff,#8375ff)!important;border-radius:5px!important;border:none!important;box-shadow:inset 0 0 10px #fff!important}.wsx_scroll{margin:0;padding:0;-webkit-user-select:none;user-select:none;pointer-events:none;display:none;position:fixed;z-index:999999999;transition:opacity .2s linear}.wsx_scroll_bar{margin:0;padding:0;-webkit-user-select:none;user-select:none;pointer-events:none;position:relative}.wsx_fade{margin:0;padding:0;-webkit-user-select:none;user-select:none;pointer-events:none;display:block;position:fixed;z-index:9999999999}.wsx_vertical_scroll{top:0;right:0;width:30px}.wsx_vertical_scroll_bar{left:19px;opacity:.6;height:100%;width:7px!important;border-radius:5px!important;background:linear-gradient(to bottom,#ff567f,#fbeb91,#2ec2ff,#8375ff)!important}.wsx_vertical_fade{top:0;right:0;width:30px;height:100%}.wsx_horizontal_scroll{left:0;bottom:0;height:30px}.wsx_horizontal_scroll_bar{top:20px;width:100%;opacity:.6;height:7px!important;border-radius:5px!important;background:linear-gradient(to right,#ff567f,#fbeb91,#2ec2ff,#8375ff)!important}.wsx_horizontal_fade{left:0;bottom:0;width:100%;height:30px} ');
 
 (function () {
   'use strict';
@@ -26,22 +26,10 @@
       return el;
     }
     const verticalFade = createAndAppendElement("div", "wsx_fade wsx_vertical_fade", document.body);
-    const verticalScroll = createAndAppendElement(
-      "div",
-      "wsx_scroll wsx_vertical_scroll",
-      document.body
-    );
+    const verticalScroll = createAndAppendElement("div", "wsx_scroll wsx_vertical_scroll", document.body);
     createAndAppendElement("div", "wsx_scroll_bar wsx_vertical_scroll_bar", verticalScroll);
-    const horizontalFade = createAndAppendElement(
-      "div",
-      "wsx_fade wsx_horizontal_fade",
-      document.body
-    );
-    const horizontalScroll = createAndAppendElement(
-      "div",
-      "wsx_scroll wsx_horizontal_scroll",
-      document.body
-    );
+    const horizontalFade = createAndAppendElement("div", "wsx_fade wsx_horizontal_fade", document.body);
+    const horizontalScroll = createAndAppendElement("div", "wsx_scroll wsx_horizontal_scroll", document.body);
     createAndAppendElement("div", "wsx_scroll_bar wsx_horizontal_scroll_bar", horizontalScroll);
     let content = document.documentElement || document.body;
     let changeY = window.innerHeight;

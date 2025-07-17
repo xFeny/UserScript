@@ -24,7 +24,7 @@ export default {
   },
   playing() {
     this.isEnded = false;
-    if (this.duration < 10) return; // 超短的视频不操作
+    if (this.duration < 5) return; // 超短的视频不操作
     App.setCurrentVideo(this);
     App.useCachePlaybackRate(this);
     App.useCachePlayTime(this);
@@ -39,6 +39,6 @@ export default {
     this.isEnded = true;
     this.hasToast = false;
     App.autoExitWebFullScreen();
-    App.delPlayTime();
+    App.delPlayTime(this);
   },
 };

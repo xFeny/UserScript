@@ -62,13 +62,13 @@ export default {
     if (this.isDynamicDuration(video) || video.duration < 120) return;
     if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
     if (!this.topInfo || this.isLive() || !Tools.validDuration(video)) return;
-    if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded() || this.isMultVideo()) return this.delPlayTime();
-    Storage.PLAY_TIME.set(this.topInfo.hash, Number(video.currentTime) - 1, 7);
+    if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded() || this.isMultVideo()) return this.delPlayTime(video);
+    Storage.PLAY_TIME.set(this.getTimeKey(video), Number(video.currentTime) - 1, 7);
   },
   useCachePlayTime(video) {
     if (this.hasUsedPlayTime || !this.topInfo || this.isLive()) return;
 
-    const time = Storage.PLAY_TIME.get(this.topInfo.hash);
+    const time = Storage.PLAY_TIME.get(this.getTimeKey(video));
     if (time <= Number(video.currentTime)) return (this.hasUsedPlayTime = true);
     this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
       el.style.setProperty("transform", `translateY(${-5 - el.offsetHeight}px)`);
@@ -76,7 +76,12 @@ export default {
     this.hasUsedPlayTime = true;
     this.setCurrentTime(time);
   },
-  delPlayTime: () => Storage.PLAY_TIME.del(window?.topInfo?.hash),
+  delPlayTime(video) {
+    Storage.PLAY_TIME.del(this.getTimeKey(video));
+  },
+  getTimeKey(video) {
+    return this?.topInfo?.hash + "_" + video.duration;
+  },
   setCurrentTime(currentTime) {
     if (currentTime) this.player.currentTime = Math.max(0, currentTime);
   },
@@ -84,6 +89,7 @@ export default {
     if (!this.player) return;
 
     this.player.muted = !this.player.muted;
+    this.player.volume = this.player.muted ? 0 : 1;
     const tips = this.player.muted ? "🔇 已静音" : "🔊 取消静音";
     this.showToast(tips, Consts.ONE_SEC);
   },

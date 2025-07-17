@@ -44,14 +44,15 @@ export default window.App = {
     if (Tools.isTooFrequent()) return;
     const observer = Tools.createObserver(document.body, () => {
       this.removeLoginPopups();
-      this.setCurrentVideo(this.getVideo());
+      const video = this.getVideo();
+      if (!!video.offsetWidth) this.setCurrentVideo(video);
       if (this.topInfo) observer.disconnect();
     });
     setTimeout(() => observer.disconnect(), Consts.ONE_SEC * 10);
   },
   setCurrentVideo(video) {
-    if (!video || this.player === video) return;
-    if (Tools.getElementRect(video).width < 200 || this.isBackgroundVideo(video)) return;
+    if (!video || this.player === video || (this.player && !this.player.paused)) return;
+    if (video.offsetWidth < 200 || this.isBackgroundVideo(video)) return;
 
     this.player = video;
     this.setVideoInfo(video);
@@ -64,7 +65,7 @@ export default window.App = {
   },
   setParentVideoInfo(videoInfo) {
     window.videoInfo = this.videoInfo = videoInfo;
-    if (!Tools.isTopWin()) return (videoInfo.frameSrc = location.href), Tools.postMessage(window.parent, { videoInfo });
+    if (!Tools.isTopWin()) return (videoInfo.iframeSrc = location.href), Tools.postMessage(window.parent, { videoInfo });
     this.setupPickerEpisodeListener();
     this.setupScriptMenuCommand();
     this.sendTopInfo();
@@ -92,11 +93,11 @@ export default window.App = {
   },
   toggleCursor(hide = false) {
     if (this.normalSite() || Tools.isTooFrequent("cursor")) return;
-    const videoWrap = this.getVideoHostContainer();
     const cls = "__hc";
 
     if (!hide) return Tools.querys(`.${cls}`).forEach((el) => (Tools.delCls(el, cls), Tools.delPart(el, cls)));
-    [this?.video, ...Tools.getParents(videoWrap, true, 3)].forEach((el) => {
+
+    [...Tools.getParents(this.player, true, 3), ...Tools.getIFrames()].forEach((el) => {
       el?.blur(), Tools.addCls(el, cls), Tools.setPart(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
     });
   },

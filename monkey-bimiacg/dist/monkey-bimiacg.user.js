@@ -68,6 +68,7 @@
     setupMutationObserver() {
       const observer = new MutationObserver(() => {
         document.querySelector(".line_button2")?.remove();
+        document.querySelector(".ABP-Unit")?.removeAttribute("style");
       });
       observer.observe(document.body, { childList: true, subtree: true });
       setTimeout(() => observer.disconnect(), 5e3);

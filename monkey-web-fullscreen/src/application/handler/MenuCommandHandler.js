@@ -34,9 +34,9 @@ export default {
     const siteFun = () => ENABLE_THIS.set(host, !isEnble);
     const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
     [
-      { title: "设置零键秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL, isDisable: this.isLive() },
-      { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isDisable: this.isLive() || this.isDisablePlaybackRate() },
-      { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isDisable: this.isLive() || !this.isOverrideKeyboard() },
+      { title: "设置零键秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL, isDisable: false },
+      { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isDisable: this.isDisablePlaybackRate() },
+      { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isDisable: !this.isOverrideKeyboard() },
       { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isDisable: Site.isMatch(), fn: siteFun },
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isDisable: !EPISODE_SELECTOR.get(host), fn: delPicker },
       { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isDisable: false, fn: () => this.shortcutKeysPopup() },

@@ -34,6 +34,23 @@
   transition: none !important;
   z-index: 2147483646 !important;
   background-color: #000 !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  display: flex !important;
+}
+
+.__webFullScreen {
+  /** 为 control 做特殊处理 */
+  .vjs-control-bar,
+  .ytp-chrome-bottom,
+  .ytp-chapter-hover-container {
+    left: 0 !important;
+    width: 100vw !important;
+  }
+
+  .__flex-1 {
+    flex: 1 !important;
+  }
 }
 
 @mixin __tsr($def: null) {
@@ -230,7 +247,8 @@
 .art-layer-autoPlayback,
 .art-layer-auto-playback,
 .invoke-app-floating-tips,
-.invoke-app-san-container {
+.invoke-app-san-container,
+.ABP-Unit .ABP-Comment-List {
   display: none !important;
 }
 
@@ -239,4 +257,8 @@
   #loading:not(:has([class*="player"])) {
     display: none !important;
   }
+}
+
+.ABP-Unit .ABP-Player {
+  width: 100% !important;
 }

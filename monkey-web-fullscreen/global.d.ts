@@ -6,7 +6,7 @@ interface VideoInfo {
   centerY: number; // 视频中心点 y 坐标
   src: string; // 视频源地址
   isLive: boolean; // 是否为直播
-  frameSrc?: string; // 所在 iframe 的源地址
+  iframeSrc?: string; // 所在 iframe 的源地址
 }
 
 /**
