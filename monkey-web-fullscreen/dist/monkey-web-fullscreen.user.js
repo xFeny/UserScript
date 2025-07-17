@@ -1122,10 +1122,11 @@
       return ctrlParent ? this.findVideoContainer(ctrlParent) : this.findVideoContainer();
     },
     findVideoCtrlBarParent() {
-      const ctrl = '[class*="contr" i], [id*="control"], [class*="ctrl"], [class*="progress"]';
-      const controlBar = Tools.findParentWithChild(this.player, ctrl);
-      const { centerX, centerY } = Tools.getCenterPoint(controlBar);
-      return Tools.pointInElement(centerX, centerY, this.player) ? controlBar : null;
+      const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
+      const ctrl = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"], [class*="progress"]`;
+      const ctrlParent = Tools.findParentWithChild(this.player, ctrl);
+      const { centerX, centerY } = Tools.getCenterPoint(ctrlParent);
+      return Tools.pointInElement(centerX, centerY, this.player) ? ctrlParent : null;
     },
     findVideoContainer(container, maxLevel = 5) {
       const video = this.player;
