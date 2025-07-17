@@ -111,13 +111,13 @@ export default unsafeWindow.Tools = {
     }
     return parents;
   },
-  simpleHash(str) {
-    let hash = 0;
+  hashCode(str) {
+    let hash = 0x811c9dc5;
     for (let i = 0; i < str.length; i++) {
-      hash = (hash << 5) + hash + str.charCodeAt(i);
-      hash |= 0;
+      hash ^= str.charCodeAt(i);
+      hash = (hash * 0x01000193) >>> 0; // 确保无符号32位整数运算
     }
-    return hash >>> 0;
+    return hash;
   },
   /**
    * 通过 XPath 查找元素，支持文本内容或属性值匹配

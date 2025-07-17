@@ -45,7 +45,7 @@ export default window.App = {
     const observer = Tools.createObserver(document.body, () => {
       this.removeLoginPopups();
       const video = this.getVideo();
-      if (!!video.offsetWidth) this.setCurrentVideo(video);
+      if (!!video?.offsetWidth) this.setCurrentVideo(video);
       if (this.topInfo) observer.disconnect();
     });
     setTimeout(() => observer.disconnect(), Consts.ONE_SEC * 10);
@@ -74,7 +74,7 @@ export default window.App = {
     // 向iframe传递顶级窗口信息
     const title = document.title;
     const { host, href } = location;
-    window.topInfo = this.topInfo = { title, innerWidth, host, href, hash: Tools.simpleHash(href) };
+    window.topInfo = this.topInfo = { title, innerWidth, host, href, hash: Tools.hashCode(href) };
     Tools.sendToIFrames({ topInfo });
   },
   setupMouseMoveListener() {
