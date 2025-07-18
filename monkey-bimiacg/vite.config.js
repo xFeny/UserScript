@@ -8,6 +8,7 @@ const match = [
   "*://acgfta.com/play*",
   "*://*bimiacg*.net/*/play*",
   "*://player.ezdmw.com/danmuku/*",
+  "*://player.danmuzf.vip/danmuku/*",
   "*://www.ezdmw.site/Index/video/*",
 ];
 
