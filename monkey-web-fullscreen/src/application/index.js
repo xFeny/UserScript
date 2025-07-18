@@ -74,7 +74,8 @@ export default window.App = {
     // 向iframe传递顶级窗口信息
     const title = document.title;
     const { host, href } = location;
-    window.topInfo = this.topInfo = { title, innerWidth, host, href, hash: Tools.hashCode(href) };
+    const topInfo = { title, innerWidth, host, href, hash: Tools.hashCode(href) };
+    window.topInfo = this.topInfo = topInfo;
     Tools.sendToIFrames({ topInfo });
   },
   setupMouseMoveListener() {
