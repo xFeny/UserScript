@@ -18,3 +18,11 @@
   height: 0 !important;
   display: none !important;
 }
+
+.ABP-Unit .ABP-Comment-List {
+  display: none !important;
+}
+
+.ABP-Unit .ABP-Player {
+  width: 100% !important;
+}

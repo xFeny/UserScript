@@ -247,8 +247,7 @@
 .art-layer-autoPlayback,
 .art-layer-auto-playback,
 .invoke-app-floating-tips,
-.invoke-app-san-container,
-.ABP-Unit .ABP-Comment-List {
+.invoke-app-san-container {
   display: none !important;
 }
 
@@ -257,8 +256,4 @@
   #loading:not(:has([class*="player"])) {
     display: none !important;
   }
-}
-
-.ABP-Unit .ABP-Player {
-  width: 100% !important;
 }
