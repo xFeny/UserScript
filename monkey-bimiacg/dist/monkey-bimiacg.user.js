@@ -12,6 +12,7 @@
 // @match        *://acgfta.com/play*
 // @match        *://*bimiacg*.net/*/play*
 // @match        *://player.ezdmw.com/danmuku/*
+// @match        *://player.danmuzf.vip/danmuku/*
 // @match        *://www.ezdmw.site/Index/video/*
 // @grant        GM_addStyle
 // @run-at       document-body
