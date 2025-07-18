@@ -101,7 +101,7 @@
   function isDocument(node) {
     return node instanceof Document;
   }
-  function* getShadowRoots(node, deep) {
+  function* getShadowRoots(node, deep = false) {
     if (!node || !isElement(node) && !isDocument(node)) return;
     if (isElement(node) && node.shadowRoot) {
       yield node.shadowRoot;
@@ -117,7 +117,7 @@
       let walkerNode = walker.nextNode();
       while (walkerNode) {
         if (isElement(walkerNode) && walkerNode.shadowRoot) {
-          {
+          if (deep) {
             toWalk.push(walkerNode.shadowRoot);
           }
           yield walkerNode.shadowRoot;
@@ -130,7 +130,7 @@
   function querySelector(selector, subject = document) {
     const immediate = subject.querySelector(selector);
     if (immediate) return immediate;
-    const shadowRoots = [...getShadowRoots(subject)];
+    const shadowRoots = [...getShadowRoots(subject, true)];
     for (const root of shadowRoots) {
       const match = root.querySelector(selector);
       if (match) return match;
@@ -139,7 +139,7 @@
   }
   function querySelectorAll(selector, subject = document) {
     const results = [...subject.querySelectorAll(selector)];
-    const shadowRoots = [...getShadowRoots(subject)];
+    const shadowRoots = [...getShadowRoots(subject, true)];
     for (const root of shadowRoots) {
       results.push(...root.querySelectorAll(selector));
     }
@@ -352,7 +352,8 @@
     sendTopInfo() {
       const title = document.title;
       const { host, href } = location;
-      window.topInfo = this.topInfo = { title, innerWidth, host, href, hash: Tools.hashCode(href) };
+      const topInfo = { title, innerWidth, host, href, hash: Tools.hashCode(href) };
+      window.topInfo = this.topInfo = topInfo;
       Tools.sendToIFrames({ topInfo });
     },
     setupMouseMoveListener() {
