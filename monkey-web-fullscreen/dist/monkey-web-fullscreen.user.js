@@ -466,7 +466,6 @@
   };
   const Keyboard = Object.freeze({
     A: "KeyA",
-    C: "KeyC",
     D: "KeyD",
     K: "KeyK",
     L: "KeyL",
@@ -538,7 +537,7 @@
         0: () => this.adjustVideoTime(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
         SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.player),
         SHIFT_P: () => this.togglePictureInPicture(),
-        SHIFT_C: () => this.toggleNativeControls(),
+        SHIFT_L: () => this.toggleNativeControls(),
         CTRL_ALT_A: () => this.videoScreenshot(),
         SHIFT_R: () => this.videoMirrorFlip(),
         CTRL_Z: () => this.restoreTransform(),
@@ -661,7 +660,7 @@
         { key: "D", desc: "显示 / 隐藏 弹幕" },
         { key: "L / K", desc: "下一帧 / 上一帧" },
         { key: "Ctrl Z", desc: "复位缩放与移动" },
-        { key: "Shift C", desc: "显示原生控制栏" },
+        { key: "Shift L", desc: "显示原生控制栏" },
         { key: "Shift R", desc: "视频水平镜像翻转" },
         { key: "Shift P", desc: "进入 / 退出 画中画" },
         { key: "Ctrl Alt A", desc: "视频截图 (默认禁用)" },
