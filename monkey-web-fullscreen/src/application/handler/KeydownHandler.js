@@ -67,7 +67,7 @@ export default {
       0: () => this.adjustVideoTime(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
       SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.player),
       SHIFT_P: () => this.togglePictureInPicture(),
-      SHIFT_C: () => this.toggleNativeControls(),
+      SHIFT_L: () => this.toggleNativeControls(),
       CTRL_ALT_A: () => this.videoScreenshot(),
       SHIFT_R: () => this.videoMirrorFlip(),
       CTRL_Z: () => this.restoreTransform(),
