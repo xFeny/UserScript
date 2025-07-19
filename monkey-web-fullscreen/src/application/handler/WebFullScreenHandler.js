@@ -5,7 +5,7 @@ import SiteIcons from "../common/SiteIcons";
  * 网页全屏逻辑处理
  */
 export default {
-  autoWebFullScreen(video) {
+  autoWebFullscreen(video) {
     if (this.player !== video) return;
     if (Site.isMatch() && this.isDisableAuto()) return;
     if (!Site.isMatch() && !this.isEnbleThisWebSiteAuto()) return;
@@ -13,7 +13,7 @@ export default {
     if (video.offsetWidth >= this.topInfo.innerWidth) return (video.hasWebFull = true);
     Tools.postMessage(window.top, { key: "P" });
   },
-  liveWebFullScreen() {
+  liveWebFullscreen() {
     unsafeWindow.top.scrollTo({ top: 70 });
     const el = Tools.query(":is(.lite-room, #player-ctnr)", top.document);
     if (el) unsafeWindow.top.scrollTo({ top: Tools.getElementRect(el)?.top });
@@ -28,7 +28,7 @@ export default {
     const icons = this.getBiliLiveIcons();
     return Tools.triggerClick(icons?.[1]);
   },
-  autoExitWebFullScreen() {
+  autoExitWebFullscreen() {
     if (!Site.isBili() && !Site.isAcFun()) return;
     if (this.player.offsetWidth === innerWidth) this.triggerIconElement(SiteIcons.name.webFull);
     // B站视频合集播放的是合集最后一个或关闭了合集自动连播，点击“取消连播”按钮

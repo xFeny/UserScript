@@ -96,6 +96,7 @@ export default {
       { key: "D", desc: "显示 / 隐藏 弹幕" },
       { key: "L / K", desc: "下一帧 / 上一帧" },
       { key: "Ctrl Z", desc: "复位缩放与移动" },
+      { key: "Shift C", desc: "显示原生控制栏" },
       { key: "Shift R", desc: "视频水平镜像翻转" },
       { key: "Shift P", desc: "进入 / 退出 画中画" },
       { key: "Ctrl Alt A", desc: "视频截图 (默认禁用)" },

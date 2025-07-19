@@ -5,7 +5,7 @@ import Tools from "../common/Tools";
  */
 export default {
   loadedmetadata() {
-    App.autoWebFullScreen(this);
+    App.autoWebFullscreen(this);
     Tools.querys('[id*="loading"]').forEach((el) => !Tools.query('[class*="player"]', el) && Tools.addCls(el, "_noplayer"));
   },
   loadeddata() {
@@ -14,7 +14,7 @@ export default {
   },
   timeupdate() {
     if (isNaN(this.duration)) return;
-    App.autoWebFullScreen(this);
+    App.autoWebFullscreen(this);
     App.cachePlayTime(this);
   },
   canplay() {
@@ -38,7 +38,7 @@ export default {
   ended() {
     this.isEnded = true;
     this.hasToast = false;
-    App.autoExitWebFullScreen();
+    App.autoExitWebFullscreen();
     App.delPlayTime(this);
   },
 };

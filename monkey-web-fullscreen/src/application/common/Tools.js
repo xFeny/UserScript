@@ -134,12 +134,10 @@ export default unsafeWindow.Tools = {
     return Array.from({ length: nodes.snapshotLength }, (_, i) => nodes.snapshotItem(i)).filter((el) => !el.matches("script"));
   },
   setPart(node, value) {
-    if (!node?.getRootNode()?.host) return;
     const parts = node?.getAttribute("part")?.split(/\s+/) ?? [];
     node?.setAttribute("part", [...new Set([...parts, value])].join(" ").trim());
   },
   delPart(node, value) {
-    if (!node?.getRootNode()?.host) return;
     const parts = (node?.getAttribute("part")?.split(/\s+/) ?? []).filter((v) => v !== value);
     node?.setAttribute("part", parts.join(" ").trim());
   },

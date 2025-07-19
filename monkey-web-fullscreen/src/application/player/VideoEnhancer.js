@@ -49,6 +49,7 @@ export default class VideoEnhancer {
 
   enhanced(video) {
     if (video.hasAttribute(this.attr)) return;
+    video.__ctrl = video.controls;
     this.setupEventListeners(video);
     video.tsr = { ...this.defaultTsr };
   }

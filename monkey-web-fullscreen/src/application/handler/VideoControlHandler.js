@@ -173,6 +173,10 @@ export default {
     !this.player.paused && this.player.pause();
     this.player.currentTime += (isPrev ? -1 : 1) / 24;
   },
+  toggleNativeControls() {
+    if (!this.player) return;
+    this.player.controls = !this.player.controls;
+  },
   customToast(startText, colorText, endText, duration, isRemove) {
     const span = document.createElement("span");
     span.appendChild(document.createTextNode(startText));
@@ -211,9 +215,7 @@ export default {
     return videos.length > 1;
   },
   setVideoTsr(name, value) {
-    const cls = "__tsr";
-    Tools.addCls(this.player, cls);
-    Tools.setPart(this.player, cls);
+    Tools.setPart(this.player, "__tsr");
 
     try {
       // 默认 transform 样式

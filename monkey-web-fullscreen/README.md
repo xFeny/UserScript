@@ -26,6 +26,7 @@
 | D | 显示 / 隐藏 弹幕           |
 | L / K | 视频 下一帧 / 上一帧 |
 | Ctrl  Z | 复位缩放与移动 |
+| Shift  C | 显示原生控制栏 |
 | Shift  R | 视频水平镜像翻转             |
 | Shift  P | 进入 / 退出 画中画 |
 | Ctrl  Alt  A | 视频截图 (默认禁用) |
@@ -188,7 +189,7 @@
 如需关闭此功能，请在脚本中注释掉以下代码：
 
 ```js
-App.exitWebFullScreen();
+App.autoExitWebFullscreen();
 ```
 #### 播放进度记录
 

@@ -67,6 +67,7 @@ export default {
       0: () => this.adjustVideoTime(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
       SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.player),
       SHIFT_P: () => this.togglePictureInPicture(),
+      SHIFT_C: () => this.toggleNativeControls(),
       CTRL_ALT_A: () => this.videoScreenshot(),
       SHIFT_R: () => this.videoMirrorFlip(),
       CTRL_Z: () => this.restoreTransform(),
@@ -92,6 +93,6 @@ export default {
     if (Tools.isTooFrequent("icon")) return;
     const index = Object.values(SiteIcons.name).indexOf(name);
     if (!Site.isBiliLive()) return Tools.query(SiteIcons[location.host]?.[name])?.click();
-    SiteIcons.name.webFull === name ? this.liveWebFullScreen() : this.getBiliLiveIcons()?.[index]?.click();
+    SiteIcons.name.webFull === name ? this.liveWebFullscreen() : this.getBiliLiveIcons()?.[index]?.click();
   },
 };
