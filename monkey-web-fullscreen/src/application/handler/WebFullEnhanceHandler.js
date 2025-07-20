@@ -116,9 +116,7 @@ export default {
             }
           }
         }
-      } catch (e) {
-        console.error("无法访问样式表规则:", e);
-      }
+      } catch (e) {}
     }
 
     return false;
