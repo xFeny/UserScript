@@ -51,8 +51,12 @@ export default {
     return Tools.query(`iframe[src*="${pathname + partial}"]`);
   },
   getVideoWrapper() {
+    if (this.player.__wrapper) return this.player.__wrapper;
+
     const controlsParent = this.findVideoCtrlBarParent();
-    return controlsParent ? this.findVideoContainer(controlsParent) : this.findVideoContainer();
+    const wrapper = controlsParent ? this.findVideoContainer(controlsParent) : this.findVideoContainer();
+    this.player.__wrapper = wrapper;
+    return wrapper;
   },
   findVideoCtrlBarParent() {
     const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
@@ -84,9 +88,10 @@ export default {
    * @returns {boolean} 如果元素有显式设置的px/em/rem单位的宽度或高度则返回true，否则返回false
    */
   hasExplicitSize(element) {
-    const regex = /^\d+(\.\d+)?(px|em|rem)$/;
     // 检查是否通过内联样式设置了固定宽度或高度
-    if (regex.test(element.style.width) || element.style.height) return true;
+    if (this.isFixedSizeValue(element.style)) return true;
+
+    const start = performance.now();
 
     // 检查是否通过外联样式设置了固定宽度或高度
     for (let i = 0; i < document.styleSheets.length; i++) {
@@ -95,30 +100,30 @@ export default {
         const rules = sheet.cssRules || sheet.rules;
         for (let j = 0; j < rules.length; j++) {
           const rule = rules[j];
-          if (rule instanceof CSSStyleRule) {
-            if (element.matches(rule.selectorText)) {
-              const width = rule.style.getPropertyValue("width");
-              const height = rule.style.getPropertyValue("height");
-              if (width && regex.test(width)) return true;
-              if (height && regex.test(height)) return true;
-            }
-          } else if (rule instanceof CSSMediaRule) {
+          if (this.checkStyleRule(element, rule)) return true;
+          if (rule instanceof CSSMediaRule) {
             if (window.matchMedia(rule.conditionText).matches) {
               for (let k = 0; k < rule.cssRules.length; k++) {
                 const mediaRule = rule.cssRules[k];
-                if (mediaRule instanceof CSSStyleRule && element.matches(mediaRule.selectorText)) {
-                  const width = mediaRule.style.getPropertyValue("width");
-                  const height = mediaRule.style.getPropertyValue("height");
-                  if (width && regex.test(width)) return true;
-                  if (height && regex.test(height)) return true;
-                }
+                if (this.checkStyleRule(element, mediaRule)) return true;
               }
             }
           }
         }
       } catch (e) {}
     }
+    const end = performance.now();
+    console.log(`耗时：${end - start}毫秒`);
 
     return false;
+  },
+  checkStyleRule(element, rule) {
+    return rule instanceof CSSStyleRule && element.matches(rule.selectorText) && this.isFixedSizeValue(rule.style);
+  },
+  isFixedSizeValue(style) {
+    const regex = /^\d+(\.\d+)?(px|em|rem)$/;
+    const width = style.getPropertyValue("width") || style.width;
+    const height = style.getPropertyValue("height") || style.height;
+    return (width && regex.test(width)) || (height && regex.test(height));
   },
 };
