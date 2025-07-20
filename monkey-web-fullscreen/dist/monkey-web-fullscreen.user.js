@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.1.8.1
+// @version      3.1.8.2
 // @author       Feny
 // @description  默认支持哔哩哔哩（含直播）、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持倍速调节、视频截图、画面镜像翻转、自由缩放与移动、播放进度记忆等功能；提供通用下集切换功能，适用于任意视频网站剧集，实现便捷的剧集切换。
 // @license      GPL-3.0-only
@@ -1129,7 +1129,8 @@
       const { centerX, centerY } = Tools.getCenterPoint(controlsParent);
       const { width: videoW } = Tools.getElementRect(this.player);
       const { width } = Tools.getElementRect(controlsParent);
-      return width <= videoW && Tools.pointInElement(centerX, centerY, this.player) ? controlsParent : null;
+      const inRect = Tools.pointInElement(centerX, centerY, this.player);
+      return Math.floor(width) <= Math.floor(videoW) && inRect ? controlsParent : null;
     },
     findVideoContainer(container, maxLevel = 4) {
       const video = this.player;
@@ -1140,10 +1141,50 @@
         const { width, height } = Tools.getElementRect(parent);
         const hasExplicitWidth = regex.test(parent.style.width);
         const hasExplicitHeight = regex.test(parent.style.height);
-        if (!parent.matches("video") && (hasExplicitWidth || hasExplicitHeight)) return parent;
-        if (width === cw && height === ch) container = parent;
+        if (!parent.matches("video") && (hasExplicitWidth || hasExplicitHeight || this.hasExplicitSize(parent))) return parent;
+        if (Math.floor(width) === Math.floor(cw) && Math.floor(height) === Math.floor(ch)) container = parent;
       }
       return container;
+    },
+    /**
+     * 检查元素是否通过CSS显式设置了固定宽度或高度
+     * @param {HTMLElement} element - 需要检查的DOM元素
+     * @returns {boolean} 如果元素有显式设置的px/em/rem单位的宽度或高度则返回true，否则返回false
+     */
+    hasExplicitSize(element) {
+      const regex = /^\d+(\.\d+)?(px|em|rem)$/;
+      for (let i = 0; i < document.styleSheets.length; i++) {
+        const sheet = document.styleSheets[i];
+        try {
+          const rules = sheet.cssRules || sheet.rules;
+          for (let j = 0; j < rules.length; j++) {
+            const rule = rules[j];
+            if (rule instanceof CSSStyleRule) {
+              if (element.matches(rule.selectorText)) {
+                const width = rule.style.getPropertyValue("width");
+                const height = rule.style.getPropertyValue("height");
+                if (width && regex.test(width)) return true;
+                if (height && regex.test(height)) return true;
+              }
+            } else if (rule instanceof CSSMediaRule) {
+              if (window.matchMedia(rule.conditionText).matches) {
+                for (let k = 0; k < rule.cssRules.length; k++) {
+                  const mediaRule = rule.cssRules[k];
+                  if (mediaRule instanceof CSSStyleRule && element.matches(mediaRule.selectorText)) {
+                    const width = mediaRule.style.getPropertyValue("width");
+                    const height = mediaRule.style.getPropertyValue("height");
+                    if (width && regex.test(width)) return true;
+                    if (height && regex.test(height)) return true;
+                  }
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.error("无法访问样式表规则:", e);
+        }
+      }
+      return false;
     }
   };
   const VideoEvents = {
