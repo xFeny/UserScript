@@ -91,8 +91,6 @@ export default {
     // 检查是否通过内联样式设置了固定宽度或高度
     if (this.isFixedSizeValue(element.style)) return true;
 
-    const start = performance.now();
-
     // 检查是否通过外联样式设置了固定宽度或高度
     for (let i = 0; i < document.styleSheets.length; i++) {
       const sheet = document.styleSheets[i];
@@ -112,9 +110,6 @@ export default {
         }
       } catch (e) {}
     }
-    const end = performance.now();
-    console.log(`耗时：${end - start}毫秒`);
-
     return false;
   },
   checkStyleRule(element, rule) {
