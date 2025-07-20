@@ -1179,7 +1179,6 @@
             }
           }
         } catch (e) {
-          console.error("无法访问样式表规则:", e);
         }
       }
       return false;
