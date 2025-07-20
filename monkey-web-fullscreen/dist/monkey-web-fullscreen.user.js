@@ -1135,24 +1135,22 @@
     findVideoContainer(container, maxLevel = 4) {
       const video = this.player;
       container = container ?? video;
-      const regex = /^\d+(\.\d+)?(px|em|rem)$/;
       const { width: cw, height: ch } = Tools.getElementRect(container);
       for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
         const { width, height } = Tools.getElementRect(parent);
-        const hasExplicitWidth = regex.test(parent.style.width);
-        const hasExplicitHeight = regex.test(parent.style.height);
-        if (!parent.matches("video") && (hasExplicitWidth || hasExplicitHeight || this.hasExplicitSize(parent))) return parent;
+        if (!parent.matches("video") && this.hasExplicitSize(parent)) return parent;
         if (Math.floor(width) === Math.floor(cw) && Math.floor(height) === Math.floor(ch)) container = parent;
       }
       return container;
     },
     /**
-     * 检查元素是否通过CSS显式设置了固定宽度或高度
+     * 检查元素是否设置了固定宽度或高度
      * @param {HTMLElement} element - 需要检查的DOM元素
      * @returns {boolean} 如果元素有显式设置的px/em/rem单位的宽度或高度则返回true，否则返回false
      */
     hasExplicitSize(element) {
       const regex = /^\d+(\.\d+)?(px|em|rem)$/;
+      if (regex.test(element.style.width) || element.style.height) return true;
       for (let i = 0; i < document.styleSheets.length; i++) {
         const sheet = document.styleSheets[i];
         try {
