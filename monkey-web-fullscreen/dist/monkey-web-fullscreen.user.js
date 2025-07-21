@@ -1118,7 +1118,7 @@
       return Tools.query(`iframe[src*="${pathname + partial}"]`);
     },
     getVideoWrapper() {
-      if (this.player.__wrapper) return this.player.__wrapper;
+      if (this.player?.__wrapper?.hasChildNodes()) return this.player.__wrapper;
       const controlsParent = this.findVideoCtrlBarParent();
       const wrapper = controlsParent ? this.findVideoContainer(controlsParent) : this.findVideoContainer();
       this.player.__wrapper = wrapper;
@@ -1141,15 +1141,15 @@
       const { width: cw, height: ch } = Tools.getElementRect(container);
       for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
         const { width, height } = Tools.getElementRect(parent);
-        if (!parent.matches("video") && this.hasExplicitSize(parent)) return parent;
         if (Math.floor(width) === Math.floor(cw) && Math.floor(height) === Math.floor(ch)) container = parent;
+        if (!parent.matches("video") && this.hasExplicitSize(parent)) return container;
       }
       return container;
     },
     /**
      * 检查元素是否设置了固定宽度或高度
      * @param {HTMLElement} element - 需要检查的DOM元素
-     * @returns {boolean} 如果元素有显式设置的px/em/rem单位的宽度或高度则返回true，否则返回false
+     * @returns {boolean} 如果宽度或高度是固定尺寸(px/em/rem)或包含CSS变量语法(var())则返回true，否则返回false
      */
     hasExplicitSize(element) {
       if (this.isFixedSizeValue(element.style)) return true;
@@ -1178,10 +1178,13 @@
       return rule instanceof CSSStyleRule && element.matches(rule.selectorText) && this.isFixedSizeValue(rule.style);
     },
     isFixedSizeValue(style) {
-      const regex = /^\d+(\.\d+)?(px|em|rem)$/;
+      const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
+      const cssVarRegex = /var\(\s*--[^,)]+(?:\s*,\s*[^)]*)?\)/;
       const width = style.getPropertyValue("width") || style.width;
       const height = style.getPropertyValue("height") || style.height;
-      return width && regex.test(width) || height && regex.test(height);
+      const hasFixedWidth = sizeRegex.test(width) || cssVarRegex.test(width);
+      const hasFixedHeight = sizeRegex.test(height) || cssVarRegex.test(height);
+      return hasFixedWidth || hasFixedHeight;
     }
   };
   const VideoEvents = {
