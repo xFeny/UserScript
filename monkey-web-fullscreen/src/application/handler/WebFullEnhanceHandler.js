@@ -18,17 +18,21 @@ export default {
     wrap.top = wrap.top ?? wrap.getBoundingClientRect()?.top ?? 0;
     wrap.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
     Tools.getParents(this.player, false, 3)?.forEach((el) => Tools.addCls(el, "__flex-1"));
-    Tools.getParents(wrap, true)?.forEach((el) => Tools.setPart(el, Consts.webFull));
-
-    // video特殊处理
     if (this.player) Tools.setPart(this.player, Consts.videoPart);
+
+    Tools.getParents(wrap, true)?.forEach((el) => {
+      el.__cssText = el.style.cssText;
+      Tools.setPart(el, Consts.webFull);
+      el.style.setProperty("width", "100vw", "important");
+      el.style.setProperty("height", "100vh", "important");
+    });
   },
   exitWebFull() {
     const wrap = this.webFullWrap;
     if (this.player) Tools.delPart(this.player, Consts.videoPart);
 
     Tools.getParents(this.player, false, 3)?.forEach((el) => Tools.delCls(el, "__flex-1"));
-    Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
+    Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => (Tools.delPart(el, Consts.webFull), (el.style = el.__cssText)));
     Tools.scrollTop((Tools.getElementRect(wrap)?.top < 0 ? wrap?.top + wrap.scrollY : wrap?.top) - 120);
     this.webFullWrap = null;
   },
