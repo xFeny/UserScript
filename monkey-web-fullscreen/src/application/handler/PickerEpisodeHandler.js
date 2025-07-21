@@ -30,7 +30,7 @@ export default {
         const number = this.getEpisodeNumber(target);
         if (!number) return Tools.notyf("点击位置无数字 (•ิ_•ิ)?", true);
 
-        !hasCurrentSelector ? this.pickerCurrentEpisodeChain(target) : this.pickerRelativeEpisodeChain(target);
+        hasCurrentSelector ? this.pickerRelativeEpisodeChain(target) : this.pickerCurrentEpisodeChain(target);
       },
       true
     );
@@ -41,10 +41,10 @@ export default {
       validBtnCallback(value) {
         try {
           const number = this.getEpisodeNumber(Tools.query(value));
-          !!number ? Tools.notyf(`当前集数：${number}`) : Tools.notyf("获取集数失败 〒▽〒", true);
+          number ? Tools.notyf(`当前集数：${number}`) : Tools.notyf("获取集数失败 〒▽〒", true);
         } catch (e) {
           Tools.notyf("获取集数失败 〒▽〒", true);
-          console.error(e);
+          console.debug(e);
         }
       },
       confirmCallback(value) {
@@ -60,10 +60,10 @@ export default {
         try {
           const container = this.getEpisodeWrapper(Tools.query(value));
           const numbers = this.getAllEpisodes(container)?.map(this.getEpisodeNumber);
-          !!numbers.length ? Tools.notyf(`所有集数：${numbers.join(" ")}`) : Tools.notyf("获取集数失败 〒▽〒", true);
+          numbers.length ? Tools.notyf(`所有集数：${numbers.join(" ")}`) : Tools.notyf("获取集数失败 〒▽〒", true);
         } catch (e) {
           Tools.notyf("获取集数失败 〒▽〒", true);
-          console.error(e);
+          console.debug(e);
         }
       },
       confirmCallback(value) {

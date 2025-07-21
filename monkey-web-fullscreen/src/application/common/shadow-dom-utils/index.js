@@ -35,11 +35,11 @@ function* getShadowRoots(node, deep = false) {
   const doc = isDocument(node) ? node : node.getRootNode({ composed: true });
   if (!doc.createTreeWalker) return;
 
+  let currentNode;
   const toWalk = [node];
-  let currentNode = undefined;
   while ((currentNode = toWalk.pop())) {
     const walker = doc.createTreeWalker(currentNode, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_DOCUMENT_FRAGMENT, {
-      acceptNode: (node) => (isElement(node) && node.shadowRoot ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP),
+      acceptNode: (child) => (isElement(child) && child.shadowRoot ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP),
     });
 
     let walkerNode = walker.nextNode();

@@ -108,7 +108,9 @@ export default {
             }
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.debug(e);
+      }
     }
     return false;
   },

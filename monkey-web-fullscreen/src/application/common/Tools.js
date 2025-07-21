@@ -98,7 +98,7 @@ export default unsafeWindow.Tools = {
     const classList = Array.from(ele.classList);
     if (classList.length === 0) return tagInfo;
     // 检查是否包含特殊字符
-    if (/[:\[\]]/.test(ele.className)) return `${tagInfo}[class="${ele.className}"]`;
+    if (/[:[\]]/.test(ele.className)) return `${tagInfo}[class="${ele.className}"]`;
     // 过滤数字类名
     const classes = classList.filter((cls) => this.noNumber(cls));
     return classes.length ? `${tagInfo}.${classes.join(".")}` : tagInfo;

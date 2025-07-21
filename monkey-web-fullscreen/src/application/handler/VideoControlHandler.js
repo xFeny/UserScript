@@ -166,6 +166,7 @@ export default {
       const popup = window.open(Consts.EMPTY, "_blank", "width=1000,height=570,top=130,left=270");
       popup.document.title = "鼠标右键选择「图片另存为」";
       popup.document.body.appendChild(canvas);
+      console.debug(e);
     }
   },
   freezeVideoFrame(isPrev) {
@@ -221,7 +222,9 @@ export default {
       // 默认 transform 样式
       this.player.__trans = this.player.__trans ?? getComputedStyle(this.player)?.getPropertyValue("transform");
       this.player?.style?.setProperty("--deftsr", this.player.__trans);
-    } catch (e) {}
+    } catch (e) {
+      console.debug(e);
+    }
 
     // transform 变换值
     this.player?.style?.setProperty(name, value);

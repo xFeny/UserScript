@@ -26,6 +26,7 @@ class StorageItem {
     try {
       return JSON.parse(value);
     } catch (e) {
+      console.debug(e);
       return value;
     }
   }

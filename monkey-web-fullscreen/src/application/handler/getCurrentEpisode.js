@@ -125,7 +125,8 @@
     return null;
   }
 
-  console.log("当前集元素：", (currEpisode = getCurrentEpisode()));
+  const currEpisode = getCurrentEpisode();
+  console.log("当前集元素：", currEpisode);
   console.log("所有剧集元素：", getAllEpisodes(currEpisode));
   console.log("上集的元素：", getTargetEpisode(currEpisode, true));
   console.log("下集的元素：", getTargetEpisode(currEpisode));
