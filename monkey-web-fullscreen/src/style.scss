@@ -64,7 +64,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] {
   top: 0 !important;
   left: 0 !important;
   width: 100vw !important;
-  height: clamp(calc(100vh - 80px), 100vh, 100%) !important;
+  height: clamp(calc(100vh - 100%), 100vh, 100%) !important;
   object-fit: contain !important;
   @include __tsr();
 }
