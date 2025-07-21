@@ -70,7 +70,7 @@ export default unsafeWindow.Tools = {
     }
     return null;
   },
-  findParentWithChild(element, selector, maxLevel = 5) {
+  findParentWithChild(element, selector, maxLevel = 8) {
     for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
       if (this.query(selector, parent)) return parent;
     }

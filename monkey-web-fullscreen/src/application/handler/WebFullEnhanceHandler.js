@@ -85,7 +85,7 @@ export default {
   /**
    * 检查元素是否设置了固定宽度或高度
    * @param {HTMLElement} element - 需要检查的DOM元素
-   * @returns {boolean} 如果宽度或高度是固定尺寸(px/em/rem)或包含CSS变量语法(var())则返回true，否则返回false
+   * @returns {boolean} 如果宽度或高度是固定尺寸则返回true，否则返回false
    */
   hasExplicitSize(element) {
     // 检查是否通过内联样式设置了固定宽度或高度
@@ -109,7 +109,7 @@ export default {
           }
         }
       } catch (e) {
-        console.debug(e);
+        console.debug(`无法访问样式表 ${sheet.href}:`, e);
       }
     }
     return false;
@@ -118,12 +118,14 @@ export default {
     return rule instanceof CSSStyleRule && element.matches(rule.selectorText) && this.isFixedSizeValue(rule.style);
   },
   isFixedSizeValue(style) {
+    // 匹配固定单位: px, em, rem (支持小数)
     const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
-    const cssVarRegex = /var\(\s*--[^,)]+(?:\s*,\s*[^)]*)?\)/;
+    // 匹配CSS函数: calc, var, min, max, clamp
+    const cssFunRegex = /(calc|var|min|max|clamp)\([^)]+\)/;
     const width = style.getPropertyValue("width") || style.width;
     const height = style.getPropertyValue("height") || style.height;
-    const hasFixedWidth = sizeRegex.test(width) || cssVarRegex.test(width);
-    const hasFixedHeight = sizeRegex.test(height) || cssVarRegex.test(height);
+    const hasFixedWidth = sizeRegex.test(width) || cssFunRegex.test(width);
+    const hasFixedHeight = sizeRegex.test(height) || cssFunRegex.test(height);
     return hasFixedWidth || hasFixedHeight;
   },
 };

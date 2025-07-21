@@ -13,9 +13,7 @@
   background: rgba(0, 0, 0, 0.75) !important;
 }
 
-/**
-* 视频网页全屏
-*/
+/** 视频网页全屏相关样式 START **/
 ::part(webFullscreen),
 [part*="webFullscreen"],
 body[part*="webFullscreen"] [part*="webFullscreen"] {
@@ -68,10 +66,9 @@ body[part*="webFullscreen"] [part*="webFullscreen"] {
   object-fit: contain !important;
   @include __tsr();
 }
+/** 视频网页全屏相关样式 END **/
 
-/**
-* 视频水平翻转、旋转角度
-*/
+/** 视频变换样式 */
 ::part(__tsr),
 [part*="__tsr"] {
   object-fit: contain !important;
@@ -80,17 +77,13 @@ body[part*="webFullscreen"] [part*="webFullscreen"] {
   @include __tsr("var(--deftsr, matrix(1, 0, 0, 1, 0, 0))");
 }
 
-/**
-* 隐藏鼠标光标
-*/
+/** 隐藏鼠标光标 **/
 ::part(__hc),
 [part*="__hc"] {
   cursor: none !important;
 }
 
-/**
-* 拾取剧集、更多设置弹窗样式
-*/
+/** 拾取剧集、更多设置弹窗样式 **/
 .monkey-web-fullscreen {
   z-index: 9999999999 !important;
 
@@ -219,7 +212,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] {
   }
 }
 
-/* 隐藏B站的提示 START */
+/** 隐藏B站的提示 START **/
 .login-tip,
 .login-guide,
 .live-room-app #sidebar-vm,
@@ -232,7 +225,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] {
 #bilibili-player .bpx-player-dialog-wrap {
   display: none !important;
 }
-/* 隐藏B站的提示 END */
+/** 隐藏B站的提示 END **/
 
 #buffer,
 #install,
@@ -252,7 +245,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] {
   display: none !important;
 }
 
-/* 现代浏览器（支持 :has()）使用原生选择器 */
+/** 现代浏览器（支持 :has()）使用原生选择器 **/
 @supports (selector(:has(div))) {
   #loading:not(:has([class*="player"])) {
     display: none !important;
