@@ -41,7 +41,9 @@ body[part*="webFullscreen"] [part*="webFullscreen"] {
   flex-direction: column !important;
   overflow: hidden !important;
   display: flex !important;
+}
 
+[part*="webFullscreen"] {
   /** 为 control 做特殊处理 */
   .vjs-control-bar,
   .ytp-chrome-bottom,

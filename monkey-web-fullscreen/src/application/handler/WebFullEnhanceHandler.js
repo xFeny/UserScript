@@ -23,8 +23,7 @@ export default {
     Tools.getParents(wrap, true)?.forEach((el) => {
       el.__cssText = el.style.cssText;
       Tools.setPart(el, Consts.webFull);
-      el.style.setProperty("width", "100vw", "important");
-      el.style.setProperty("height", "100vh", "important");
+      el.style.cssText += "width:100vw!important;height:100vh!important;";
     });
   },
   exitWebFull() {
@@ -99,7 +98,7 @@ export default {
       for (let i = 0; i < root.styleSheets.length; i++) {
         const sheet = root.styleSheets[i];
         try {
-          const rules = sheet.cssRules || sheet.rules;
+          const rules = sheet.cssRules;
           for (let j = 0; j < rules.length; j++) {
             const rule = rules[j];
             if (this.checkStyleRule(element, rule)) return true;
