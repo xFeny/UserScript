@@ -18,7 +18,7 @@ export default {
     App.cachePlayTime(this);
   },
   canplay() {
-    if (this.hasTryplay || App.isMultVideo()) return;
+    if (this.hasTryplay || Tools.querys("video").length) return;
     this.hasTryplay = true;
     App.tryplay(this);
   },

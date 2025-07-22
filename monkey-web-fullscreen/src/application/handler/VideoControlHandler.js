@@ -62,7 +62,7 @@ export default {
     if (this.isDynamicDuration(video) || video.duration < 120) return;
     if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
     if (!this.topInfo || this.isLive() || !Tools.validDuration(video)) return;
-    if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded() || this.isMultVideo()) return this.delPlayTime(video);
+    if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.delPlayTime(video);
     Storage.PLAY_TIME.set(this.getTimeKey(video), Number(video.currentTime) - 1, 7);
   },
   useCachePlayTime(video) {
@@ -209,11 +209,6 @@ export default {
     const m = Math.floor((seconds % 3600) / 60);
     const s = Math.floor(seconds % 60);
     return [...(h ? [h] : []), m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
-  },
-  isMultVideo() {
-    const playSrc = this.videoInfo?.src;
-    const videos = Tools.querys("video").filter((v) => v.currentSrc !== playSrc && !isNaN(v.duration));
-    return videos.length > 1;
   },
   setVideoTsr(name, value) {
     Tools.addCls(this.player, "__tsr");

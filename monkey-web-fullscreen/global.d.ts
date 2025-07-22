@@ -49,12 +49,6 @@ interface App {
   exitWebFullScreen(): void;
 
   /**
-   * 检查是否存在多个视频元素
-   * @returns 是否存在多个视频元素
-   */
-  isMultVideo(): boolean;
-
-  /**
    * 记录当前视频播放进度
    * @param video 视频元素
    */
