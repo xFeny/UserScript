@@ -21,8 +21,7 @@ export default {
     Tools.getParents(this.player, false, 3)?.forEach((el) => Tools.addCls(el, "__flex-1"));
 
     Tools.getParents(wrap, true)?.forEach((el) => {
-      el.__cssText = el.style.cssText;
-      Tools.setPart(el, Consts.webFull);
+      (el.__cssText = el.style.cssText), Tools.setPart(el, Consts.webFull);
       el.style.cssText += "width:100vw!important;height:100vh!important;";
     });
   },
