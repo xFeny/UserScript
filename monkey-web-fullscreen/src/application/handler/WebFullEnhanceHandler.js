@@ -91,7 +91,7 @@ export default {
    */
   hasExplicitSize(element) {
     // 检查是否通过内联样式设置了固定宽度或高度
-    if (this.isFixedSizeValue(element.style, element)) return true;
+    if (this.isFixedSizeValue(element.style)) return true;
 
     // 检查是否通过外联样式设置了固定宽度或高度
     const roots = [...getShadowRoots(document.body, true), document];
