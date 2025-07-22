@@ -12,6 +12,7 @@ export default class VideoEnhancer {
 
   constructor() {
     this.setupObserver();
+    this.hackAttachShadow();
     this.setupExistingVideos();
     // 防止有些`video`没有增强到
     this.hookMediaMethod("play", (video) => this.enhanced(video));
@@ -125,6 +126,16 @@ export default class VideoEnhancer {
     HTMLMediaElement.prototype[method] = function () {
       callback.call(this, this);
       return original.apply(this, arguments);
+    };
+  }
+
+  hackAttachShadow() {
+    Element.prototype._attachShadow = Element.prototype.attachShadow;
+    Element.prototype.attachShadow = function (options) {
+      const shadowRoot = this._attachShadow.call(this, { ...options, mode: "open" });
+      const shadowEvent = new CustomEvent("shadow-attached", { bubbles: true, detail: { shadowRoot } });
+      document.dispatchEvent(shadowEvent);
+      return shadowRoot;
     };
   }
 }

@@ -10,7 +10,6 @@ export default Object.freeze({
   ONE_SEC: 1000,
   DEF_PLAY_RATE: 1,
   MAX_PLAY_RATE: 16,
-  videoPart: "__video",
   webFull: "webFullscreen",
   MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN",
 });

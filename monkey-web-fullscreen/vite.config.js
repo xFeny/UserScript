@@ -78,6 +78,19 @@ export default defineConfig({
           "sweetalert2/dist/sweetalert2.min.css": cdn.unpkg("sweetalert2"),
           "notyf/notyf.min.css": cdn.unpkg(),
         },
+        cssSideEffects: () => {
+          return (cssText) => {
+            const style = document.createElement("style");
+            style.textContent = cssText;
+
+            // 向 Shadow DOM 插入样式
+            document.addEventListener("shadow-attached", (e) => {
+              requestAnimationFrame(() => e.detail.shadowRoot.prepend(style.cloneNode(true)));
+            });
+            // 向 document.head 插入样式
+            typeof GM_addStyle === "function" ? GM_addStyle(cssText) : document.head.append(style.cloneNode(true));
+          };
+        },
       },
     }),
   ],

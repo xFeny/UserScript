@@ -25,7 +25,7 @@ export function isDocument(node) {
  * @param deep 是否递归遍历 shadow root 内部
  * @yields 发现的 shadow root
  */
-function* getShadowRoots(node, deep = false) {
+export function* getShadowRoots(node, deep = false) {
   if (!node || (!isElement(node) && !isDocument(node))) return;
 
   if (isElement(node) && node.shadowRoot) {

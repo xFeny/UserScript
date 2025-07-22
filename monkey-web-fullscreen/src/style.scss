@@ -1,5 +1,10 @@
-[part="monkey-toast"],
-::part(monkey-toast) {
+@mixin __tsr($def: null) {
+  transform: #{$def} /**默认变换*/ scale(var(--scale, 1)) scale(var(--zoom, 1)) /**放大缩小*/ scaleX(var(--mirror, 1)) /**镜像反转*/
+    rotate(var(--rotate, 0deg)) /**旋转*/ translate(var(--moveX, 0), var(--moveY, 0)) /**平移*/ !important;
+}
+
+/** 信息提示 **/
+.monkey-toast {
   left: 10px !important;
   bottom: 16% !important;
   color: #fff !important;
@@ -35,9 +40,7 @@
   flex-direction: column !important;
   overflow: hidden !important;
   display: flex !important;
-}
 
-[part*="webFullscreen"] {
   /** 为 control 做特殊处理 */
   .vjs-control-bar,
   .ytp-chrome-bottom,
@@ -51,15 +54,9 @@
   }
 }
 
-@mixin __tsr($def: null) {
-  transform: #{$def} /**默认变换*/ scale(var(--scale, 1)) scale(var(--zoom, 1)) /**放大缩小*/ scaleX(var(--mirror, 1)) /**镜像反转*/
-    rotate(var(--rotate, 0deg)) /**旋转*/ translate(var(--moveX, 0), var(--moveY, 0)) /**平移*/ !important;
-}
-
-::part(__video),
-[part*="webFullscreen"] video,
 /** 增强选择器优先级 **/
- body[part*="webFullscreen"] [part*="webFullscreen"] video {
+[part*="webFullscreen"] video,
+body[part*="webFullscreen"] [part*="webFullscreen"] video {
   top: 0 !important;
   left: 0 !important;
   width: 100vw !important;
@@ -70,8 +67,7 @@
 /** 视频网页全屏相关样式 END **/
 
 /** 视频变换样式 */
-::part(__tsr),
-[part*="__tsr"] {
+.__tsr {
   object-fit: contain !important;
   transform-origin: center !important;
   transition: transform 0.35s !important;
@@ -79,8 +75,7 @@
 }
 
 /** 隐藏鼠标光标 **/
-::part(__hc),
-[part*="__hc"] {
+.__hc {
   cursor: none !important;
 }
 

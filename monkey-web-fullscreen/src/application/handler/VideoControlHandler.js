@@ -191,8 +191,8 @@ export default {
   showToast(content, duration = Consts.ONE_SEC * 3, isRemove = true) {
     return new Promise((resolve) => {
       const el = document.createElement("div");
-      el.setAttribute("part", "monkey-toast");
-      if (isRemove) Tools.query('[part="monkey-toast"]')?.remove();
+      el.setAttribute("class", "monkey-toast");
+      if (isRemove) Tools.query(".monkey-toast")?.remove();
       content instanceof Element ? el.appendChild(content) : (el.innerHTML = content);
 
       const videoWrap = this.getVideoWrapper();
@@ -216,7 +216,7 @@ export default {
     return videos.length > 1;
   },
   setVideoTsr(name, value) {
-    Tools.setPart(this.player, "__tsr");
+    Tools.addCls(this.player, "__tsr");
 
     try {
       // 默认 transform 样式

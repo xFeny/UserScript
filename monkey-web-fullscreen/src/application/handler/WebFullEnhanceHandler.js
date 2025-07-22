@@ -1,3 +1,4 @@
+import { getShadowRoots } from "../common/shadow-dom-utils";
 import Consts from "../common/Consts";
 import Tools from "../common/Tools";
 
@@ -18,7 +19,6 @@ export default {
     wrap.top = wrap.top ?? wrap.getBoundingClientRect()?.top ?? 0;
     wrap.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
     Tools.getParents(this.player, false, 3)?.forEach((el) => Tools.addCls(el, "__flex-1"));
-    if (this.player) Tools.setPart(this.player, Consts.videoPart);
 
     Tools.getParents(wrap, true)?.forEach((el) => {
       el.__cssText = el.style.cssText;
@@ -29,8 +29,6 @@ export default {
   },
   exitWebFull() {
     const wrap = this.webFullWrap;
-    if (this.player) Tools.delPart(this.player, Consts.videoPart);
-
     Tools.getParents(this.player, false, 3)?.forEach((el) => Tools.delCls(el, "__flex-1"));
     Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => (Tools.delPart(el, Consts.webFull), (el.style = el.__cssText)));
     Tools.scrollTop((Tools.getElementRect(wrap)?.top < 0 ? wrap?.top + wrap.scrollY : wrap?.top) - 120);
@@ -93,43 +91,47 @@ export default {
    */
   hasExplicitSize(element) {
     // 检查是否通过内联样式设置了固定宽度或高度
-    if (this.isFixedSizeValue(element.style)) return true;
+    if (this.isFixedSizeValue(element.style, element)) return true;
 
     // 检查是否通过外联样式设置了固定宽度或高度
-    for (let i = 0; i < document.styleSheets.length; i++) {
-      const sheet = document.styleSheets[i];
-      try {
-        const rules = sheet.cssRules || sheet.rules;
-        for (let j = 0; j < rules.length; j++) {
-          const rule = rules[j];
-          if (this.checkStyleRule(element, rule)) return true;
-          if (rule instanceof CSSMediaRule) {
-            if (window.matchMedia(rule.conditionText).matches) {
-              for (let k = 0; k < rule.cssRules.length; k++) {
-                const mediaRule = rule.cssRules[k];
-                if (this.checkStyleRule(element, mediaRule)) return true;
+    const roots = [...getShadowRoots(document.body, true), document];
+    for (const root of roots) {
+      for (let i = 0; i < root.styleSheets.length; i++) {
+        const sheet = root.styleSheets[i];
+        try {
+          const rules = sheet.cssRules || sheet.rules;
+          for (let j = 0; j < rules.length; j++) {
+            const rule = rules[j];
+            if (this.checkStyleRule(element, rule)) return true;
+            if (rule instanceof CSSMediaRule) {
+              if (window.matchMedia(rule.conditionText).matches) {
+                for (let k = 0; k < rule.cssRules.length; k++) {
+                  const mediaRule = rule.cssRules[k];
+                  if (this.checkStyleRule(element, mediaRule)) return true;
+                }
               }
             }
           }
+        } catch (e) {
+          console.debug(`无法访问样式表 ${sheet.href}:`, e);
         }
-      } catch (e) {
-        console.debug(`无法访问样式表 ${sheet.href}:`, e);
       }
     }
     return false;
   },
   checkStyleRule(element, rule) {
-    return rule instanceof CSSStyleRule && element.matches(rule.selectorText) && this.isFixedSizeValue(rule.style);
+    if (!(rule instanceof CSSStyleRule)) return false;
+    return element.matches(rule.selectorText) && this.isFixedSizeValue(rule.style);
   },
   isFixedSizeValue(style) {
     // 匹配固定单位: px, em, rem (支持小数)
     const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
     // 匹配CSS函数: calc, var, min, max, clamp
     const cssFunRegex = /(calc|var|min|max|clamp)\([^)]+\)/;
-    const width = style.getPropertyValue("width") || style.width;
-    const height = style.getPropertyValue("height") || style.height;
-    const hasFixedWidth = sizeRegex.test(width) || cssFunRegex.test(width);
-    const hasFixedHeight = sizeRegex.test(height) || cssFunRegex.test(height);
-    return hasFixedWidth || hasFixedHeight;
+
+    return ["width", "height"].some((prop) => {
+      const value = style.getPropertyValue(prop) || style[prop];
+      return value && (sizeRegex.test(value) || cssFunRegex.test(value));
+    });
   },
 };

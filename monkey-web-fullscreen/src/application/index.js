@@ -96,10 +96,10 @@ export default window.App = {
     if (this.normalSite() || Tools.isTooFrequent("cursor")) return;
     const cls = "__hc";
 
-    if (!hide) return Tools.querys(`[part*=${cls}]`).forEach((el) => Tools.delPart(el, cls));
+    if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
 
     [...Tools.getParents(this.player, true, 3), ...Tools.getIFrames()].forEach((el) => {
-      el?.blur(), Tools.setPart(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
+      el?.blur(), Tools.addCls(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
     });
   },
 };
