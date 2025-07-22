@@ -20,7 +20,8 @@
 
 /** 视频网页全屏相关样式 START **/
 ::part(webFullscreen),
-[part*="webFullscreen"] {
+[part*="webFullscreen"],
+body[part*="webFullscreen"] [part*="webFullscreen"] {
   top: 0 !important;
   left: 0 !important;
   margin: 0 !important;

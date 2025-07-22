@@ -74,7 +74,7 @@ export default {
   },
   findVideoContainer(container, maxLevel = 4) {
     const video = this.player;
-    container = container ?? video;
+    container = container ?? video.parentElement;
     const { width: cw, height: ch } = Tools.getElementRect(container);
 
     for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
