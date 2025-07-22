@@ -1156,7 +1156,7 @@
      * @returns {boolean} 如果宽度或高度是固定尺寸则返回true，否则返回false
      */
     hasExplicitSize(element) {
-      if (this.isFixedSizeValue(element.style, element)) return true;
+      if (this.isFixedSizeValue(element.style)) return true;
       const roots = [...getShadowRoots(document.body, true), document];
       for (const root of roots) {
         for (let i = 0; i < root.styleSheets.length; i++) {
