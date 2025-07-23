@@ -362,8 +362,8 @@
         timer = setTimeout(() => this.toggleCursor(true), Consts.ONE_SEC * 3);
         if (target instanceof HTMLVideoElement) this.setCurrentVideo(target);
       };
-      document.addEventListener("mousemove", (e) => handleMouseEvent(e));
-      document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
+      document.addEventListener("mousemove", (e2) => handleMouseEvent(e2));
+      document.addEventListener("mouseover", (e2) => e2.target.matches("video, iframe") && handleMouseEvent(e2));
     },
     toggleCursor(hide = false) {
       if (this.normalSite() || Tools.isTooFrequent("cursor")) return;
@@ -394,7 +394,7 @@
       const value = this.useLocalStorage ? localStorage.getItem(key) : _GM_getValue(key);
       try {
         return JSON.parse(value);
-      } catch (e) {
+      } catch (e2) {
         return value;
       }
     }
@@ -822,12 +822,12 @@
       try {
         ctx.drawImage(this.player, 0, 0, canvas.width, canvas.height);
         _GM_download(canvas.toDataURL("image/png"), `视频截图_${Date.now()}.png`);
-      } catch (e) {
+      } catch (e2) {
         canvas.style.setProperty("max-width", "98vw");
         const popup = window.open(Consts.EMPTY, "_blank", "width=1000,height=570,top=130,left=270");
         popup.document.title = "鼠标右键选择「图片另存为」";
         popup.document.body.appendChild(canvas);
-        console.debug(e);
+        console.debug(e2);
       }
     },
     freezeVideoFrame(isPrev) {
@@ -874,8 +874,8 @@
       try {
         this.player.__trans = this.player.__trans ?? getComputedStyle(this.player)?.getPropertyValue("transform");
         this.player?.style?.setProperty("--deftsr", this.player.__trans);
-      } catch (e) {
-        console.debug(e);
+      } catch (e2) {
+        console.debug(e2);
       }
       this.player?.style?.setProperty(name, value);
       return this;
@@ -1019,9 +1019,9 @@
           try {
             const number = this.getEpisodeNumber(Tools.query(value));
             number ? Tools.notyf(`当前集数：${number}`) : Tools.notyf("获取集数失败 〒▽〒", true);
-          } catch (e) {
+          } catch (e2) {
             Tools.notyf("获取集数失败 〒▽〒", true);
-            console.debug(e);
+            console.debug(e2);
           }
         },
         confirmCallback(value) {
@@ -1038,9 +1038,9 @@
             const container = this.getEpisodeWrapper(Tools.query(value));
             const numbers = this.getAllEpisodes(container)?.map(this.getEpisodeNumber);
             numbers.length ? Tools.notyf(`所有集数：${numbers.join(" ")}`) : Tools.notyf("获取集数失败 〒▽〒", true);
-          } catch (e) {
+          } catch (e2) {
             Tools.notyf("获取集数失败 〒▽〒", true);
-            console.debug(e);
+            console.debug(e2);
           }
         },
         confirmCallback(value) {
@@ -1154,24 +1154,27 @@
       for (const root of roots) {
         for (let i = 0; i < root.styleSheets.length; i++) {
           const sheet = root.styleSheets[i];
-          try {
-            const rules = sheet.cssRules;
-            for (let j = 0; j < rules.length; j++) {
-              const rule = rules[j];
-              if (this.checkStyleRule(element, rule)) return true;
-              if (rule instanceof CSSMediaRule) {
-                if (window.matchMedia(rule.conditionText).matches) {
-                  for (let k = 0; k < rule.cssRules.length; k++) {
-                    const mediaRule = rule.cssRules[k];
-                    if (this.checkStyleRule(element, mediaRule)) return true;
-                  }
-                }
-              }
+          return this.checkStyleSheet(element, sheet);
+        }
+      }
+      return false;
+    },
+    checkStyleSheet(element, sheet) {
+      try {
+        const rules = sheet.cssRules;
+        for (let j = 0; j < rules.length; j++) {
+          const rule = rules[j];
+          if (this.checkStyleRule(element, rule)) return true;
+          if (rule instanceof CSSMediaRule) {
+            if (!window.matchMedia(rule.conditionText).matches) continue;
+            for (let k = 0; k < rule.cssRules.length; k++) {
+              const mediaRule = rule.cssRules[k];
+              if (this.checkStyleRule(element, mediaRule)) return true;
             }
-          } catch (e) {
-            console.debug(`无法访问样式表 ${sheet.href}:`, e);
           }
         }
+      } catch (error) {
+        console.debug(`无法访问样式表 ${sheet.href}:`, e);
       }
       return false;
     },
@@ -1319,8 +1322,8 @@
           },
           configurable: true
         });
-      } catch (e) {
-        console.error(`修改 ${property} 属性时出错：`, e);
+      } catch (e2) {
+        console.error(`修改 ${property} 属性时出错：`, e2);
       }
     }
     hookMediaMethod(method, callback) {
@@ -1340,8 +1343,8 @@
       };
     }
   }
-  const cssLoader = (e) => {
-    const t = GM_getResourceText(e);
+  const cssLoader = (e2) => {
+    const t = GM_getResourceText(e2);
     return GM_addStyle(t), t;
   };
   cssLoader("sweetalert2");
