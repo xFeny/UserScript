@@ -96,24 +96,27 @@ export default {
     for (const root of roots) {
       for (let i = 0; i < root.styleSheets.length; i++) {
         const sheet = root.styleSheets[i];
-        try {
-          const rules = sheet.cssRules;
-          for (let j = 0; j < rules.length; j++) {
-            const rule = rules[j];
-            if (this.checkStyleRule(element, rule)) return true;
-            if (rule instanceof CSSMediaRule) {
-              if (window.matchMedia(rule.conditionText).matches) {
-                for (let k = 0; k < rule.cssRules.length; k++) {
-                  const mediaRule = rule.cssRules[k];
-                  if (this.checkStyleRule(element, mediaRule)) return true;
-                }
-              }
-            }
+        return this.checkStyleSheet(element, sheet);
+      }
+    }
+    return false;
+  },
+  checkStyleSheet(element, sheet) {
+    try {
+      const rules = sheet.cssRules;
+      for (let j = 0; j < rules.length; j++) {
+        const rule = rules[j];
+        if (this.checkStyleRule(element, rule)) return true;
+        if (rule instanceof CSSMediaRule) {
+          if (!window.matchMedia(rule.conditionText).matches) continue;
+          for (let k = 0; k < rule.cssRules.length; k++) {
+            const mediaRule = rule.cssRules[k];
+            if (this.checkStyleRule(element, mediaRule)) return true;
           }
-        } catch (e) {
-          console.debug(`无法访问样式表 ${sheet.href}:`, e);
         }
       }
+    } catch (error) {
+      console.debug(`无法访问样式表 ${sheet.href}:`, e);
     }
     return false;
   },
