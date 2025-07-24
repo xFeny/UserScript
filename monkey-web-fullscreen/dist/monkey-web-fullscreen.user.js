@@ -918,7 +918,7 @@
   };
   const SwitchEpisode = {
     switchEpisode(isPrev = false) {
-      const targetEpisode = this.getTargetEpisode(this.getCurrentEpisode(), isPrev) ?? this.getTargetEpisodeByText(isPrev);
+      const targetEpisode = this.getTargetEpisode(this.getCurrentEpisode(), isPrev) ?? this.getTargetEpisodeByText(isPrev) ?? this.getTargetEpisodeByClass(isPrev);
       this.jumpToTargetEpisode(targetEpisode);
     },
     getCurrentEpisode() {
@@ -986,6 +986,10 @@
       const ignore = (el) => !el?.innerText?.includes("自动");
       const texts = isPrev ? ["上集", "上一集", "上话", "上一话", "上一个"] : ["下集", "下一集", "下话", "下一话", "下一个"];
       return Tools.findByText("attr", texts).filter(ignore).shift() ?? Tools.findByText("text", texts).filter(ignore).shift();
+    },
+    getTargetEpisodeByClass(isPrev = false) {
+      if (isPrev) return null;
+      return Tools.query("[class*='control'] [class*='next' i]");
     },
     compareLeftRight: (numbers, compareNumber = 0, index) => ({
       leftSmall: numbers.some((val, i) => i < index && val < compareNumber),
