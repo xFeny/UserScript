@@ -94,25 +94,24 @@ export default {
     // 检查是否通过外联样式设置了固定宽度或高度
     const roots = [...getShadowRoots(document.body, true), document];
     for (const root of roots) {
-      for (let i = 0; i < root.styleSheets.length; i++) {
-        const sheet = root.styleSheets[i];
-        try {
-          const rules = sheet.cssRules;
-          for (let j = 0; j < rules.length; j++) {
-            const rule = rules[j];
-            if (this.checkStyleRule(element, rule)) return true;
-            if (rule instanceof CSSMediaRule) {
-              if (!window.matchMedia(rule.conditionText)?.matches) continue;
-              for (let k = 0; k < rule.cssRules.length; k++) {
-                const mediaRule = rule.cssRules[k];
-                if (this.checkStyleRule(element, mediaRule)) return true;
-              }
-            }
+      for (const sheet of root.styleSheets) {
+        if (this.checkStyleSheet(element, sheet)) return true;
+      }
+    }
+    return false;
+  },
+  checkStyleSheet(element, sheet) {
+    try {
+      for (const rule of sheet.cssRules) {
+        if (this.checkStyleRule(element, rule)) return true;
+        if (rule instanceof CSSMediaRule && window.matchMedia(rule.conditionText)?.matches) {
+          for (const mediaRule of rule.cssRules) {
+            if (this.checkStyleRule(element, mediaRule)) return true;
           }
-        } catch (e) {
-          console.debug(`无法访问样式表 ${sheet.href}:`, e);
         }
       }
+    } catch (e) {
+      console.debug(`无法访问样式表 ${sheet.href}:`, e);
     }
     return false;
   },

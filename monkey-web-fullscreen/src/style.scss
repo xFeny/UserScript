@@ -146,6 +146,8 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   }
 
   .__menu {
+    margin: 0;
+    padding: 0;
     color: #666;
     display: flex;
     cursor: pointer;
