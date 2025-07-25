@@ -762,9 +762,10 @@
     },
     videoMuted() {
       if (!this.player) return;
-      this.player.muted = !this.player.muted;
-      this.player.volume = this.player.muted ? 0 : 1;
-      const tips = this.player.muted ? "🔇 已静音" : "🔊 取消静音";
+      const isMuted = this.player.muted || !this.player.volume;
+      this.player.muted = !isMuted;
+      this.player.volume = Number(isMuted);
+      const tips = isMuted ? "🔊 取消静音" : "🔇 已静音";
       this.showToast(tips, Consts.ONE_SEC);
     },
     togglePictureInPicture() {

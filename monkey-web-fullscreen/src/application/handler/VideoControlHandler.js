@@ -88,9 +88,11 @@ export default {
   videoMuted() {
     if (!this.player) return;
 
-    this.player.muted = !this.player.muted;
-    this.player.volume = this.player.muted ? 0 : 1;
-    const tips = this.player.muted ? "🔇 已静音" : "🔊 取消静音";
+    // 判断当前是否为静音状态（同时检查 muted 和 volume）
+    const isMuted = this.player.muted || !this.player.volume;
+    this.player.muted = !isMuted;
+    this.player.volume = Number(isMuted);
+    const tips = isMuted ? "🔊 取消静音" : "🔇 已静音";
     this.showToast(tips, Consts.ONE_SEC);
   },
   togglePictureInPicture() {
