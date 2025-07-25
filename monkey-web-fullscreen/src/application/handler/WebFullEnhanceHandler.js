@@ -51,12 +51,8 @@ export default {
     return Tools.query(`iframe[src*="${pathname + partial}"]`);
   },
   getVideoWrapper() {
-    if (this.player?.__wrapper?.hasChildNodes()) return this.player.__wrapper;
-
     const controlsParent = this.findVideoCtrlBarParent();
-    const wrapper = controlsParent ? this.findVideoContainer(controlsParent) : this.findVideoContainer();
-    this.player.__wrapper = wrapper;
-    return wrapper;
+    return controlsParent ? this.findVideoContainer(controlsParent) : this.findVideoContainer();
   },
   findVideoCtrlBarParent() {
     const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
@@ -87,18 +83,25 @@ export default {
    * @param {HTMLElement} element - 需要检查的DOM元素
    * @returns {boolean} 如果宽度或高度是固定尺寸则返回true，否则返回false
    */
+  sizeCheckCache: new WeakMap(),
   hasExplicitSize(element) {
-    // 检查是否通过内联样式设置了固定宽度或高度
+    // 检查内联样式
     if (this.isFixedSizeValue(element.style)) return true;
 
-    // 检查是否通过外联样式设置了固定宽度或高度
+    // 检查缓存结果
+    if (this.sizeCheckCache.has(element)) return this.sizeCheckCache.get(element);
+
+    // 检查外联样式并缓存结果
+    const result = this.getCachedStyleSheets().some((sheet) => this.checkStyleSheet(element, sheet));
+    this.sizeCheckCache.set(element, result);
+    return result;
+  },
+  styleSheetCache: [],
+  getCachedStyleSheets() {
+    if (this.styleSheetCache.length) return this.styleSheetCache;
     const roots = [...getShadowRoots(document.body, true), document];
-    for (const root of roots) {
-      for (const sheet of root.styleSheets) {
-        if (this.checkStyleSheet(element, sheet)) return true;
-      }
-    }
-    return false;
+    roots.forEach((root) => this.styleSheetCache.push(...Array.from(root.styleSheets)));
+    return this.styleSheetCache;
   },
   checkStyleSheet(element, sheet) {
     try {
@@ -120,11 +123,8 @@ export default {
     return element.matches(rule.selectorText) && this.isFixedSizeValue(rule.style);
   },
   isFixedSizeValue(style) {
-    // 匹配固定单位: px, em, rem (支持小数)
     const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
-    // 匹配CSS函数: calc, var, min, max, clamp
     const cssFunRegex = /(calc|var|min|max|clamp)\([^)]+\)/;
-
     return ["width", "height"].some((prop) => {
       const value = style.getPropertyValue(prop) || style[prop];
       return value && (sizeRegex.test(value) || cssFunRegex.test(value));
