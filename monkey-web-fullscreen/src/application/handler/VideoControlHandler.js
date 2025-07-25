@@ -198,6 +198,7 @@ export default {
 
       const videoWrap = this.getVideoWrapper();
       const target = videoWrap?.matches("video") ? videoWrap?.parentElement : videoWrap;
+      // target.style.setProperty("position", "relative");
       target?.appendChild(el);
 
       setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
