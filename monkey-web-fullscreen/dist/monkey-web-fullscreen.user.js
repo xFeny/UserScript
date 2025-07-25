@@ -392,7 +392,11 @@
     }
     getItem(key) {
       const value = this.useLocalStorage ? localStorage.getItem(key) : _GM_getValue(key);
-      return value?.startsWith("{") && value?.endsWith("}") ? JSON.parse(value) : value;
+      try {
+        return JSON.parse(value);
+      } catch (e) {
+        return value;
+      }
     }
     parser(value) {
       return this.valueParser ? this.valueParser(value) : value;
