@@ -1169,9 +1169,7 @@
         for (const rule of sheet.cssRules) {
           if (this.checkStyleRule(element, rule)) return true;
           if (rule instanceof CSSMediaRule && window.matchMedia(rule.conditionText)?.matches) {
-            for (const mediaRule of rule.cssRules) {
-              if (this.checkStyleRule(element, mediaRule)) return true;
-            }
+            return Array.from(rule.cssRules).some((mediaRule) => this.checkStyleRule(element, mediaRule));
           }
         }
       } catch (e) {
