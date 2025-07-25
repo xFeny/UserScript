@@ -56,7 +56,7 @@ export default window.App = {
 
     this.player = video;
     this.setVideoInfo(video);
-    window?.EnhancerVideo?.enhanced(video);
+    window.videoEnhance.enhanced(video);
   },
   setVideoInfo(video) {
     const isLive = Object.is(video.duration, Infinity);

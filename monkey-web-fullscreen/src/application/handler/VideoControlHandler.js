@@ -31,7 +31,7 @@ export default {
   },
   setPlaybackRate(playRate, show = true) {
     if (!this.checkUsable()) return;
-    window.EnhancerVideo.setPlaybackRate(this.player, playRate);
+    window.videoEnhance.setPlaybackRate(this.player, playRate);
     if (show) this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
     Storage.CACHED_PLAY_RATE.set(this.player.playbackRate);
   },
@@ -148,7 +148,7 @@ export default {
       .setVideoTsr("--scale", 1)
       .setVideoTsr("--mirror", 1)
       .setVideoTsr("--rotate", "0deg");
-    window.EnhancerVideo.resetTsr(this.player);
+    window.videoEnhance.resetTsr(this.player);
   },
   videoScreenshot() {
     if (!this.player || this.isDisableScreenshot()) return;

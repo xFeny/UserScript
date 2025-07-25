@@ -24,78 +24,81 @@ interface TopInfo {
  * App 接口定义：分离接口与变量声明
  */
 interface App {
-  /** 设置当前 `video` */
+  // index 方法
+  init(): void;
+  normalSite(): boolean;
+  isLive(): boolean;
   setCurrentVideo(video: HTMLVideoElement): void;
-
-  /** 获取 `video` 宿主容器，如果在`iframe`中，返回`iframe` */
-  getVideoHostContainer(): Element | null;
-
-  /**
-   * 通用网页全屏，适用于所有网站
-   * @param video 视频元素
-   */
-  universalWebFullscreen(video: HTMLVideoElement): void;
-
-  /**
-   * 只适用于 `@match` 中的网站
-   * @param video 视频元素
-   * @returns 是否成功网页全屏
-   */
-  specificWebFullscreen(video: HTMLVideoElement): boolean;
-
-  /**
-   * 哔哩哔哩播放结束自动退出网页全屏
-   */
-  exitWebFullScreen(): void;
-
-  /**
-   * 记录当前视频播放进度
-   * @param video 视频元素
-   */
-  cachePlayTime(video: HTMLVideoElement): void;
-
-  /**
-   * 恢复上次记录的播放进度
-   * @param video 视频元素
-   */
-  useCachePlayTime(video: HTMLVideoElement): void;
-
-  /**
-   * 删除记录的播放进度
-   */
-  delPlayTime(): void;
-
-  /**
-   * 应用记忆的倍速
-   * @param video 视频元素
-   */
-  useCachePlaybackRate(video: HTMLVideoElement): void;
-
-  /**
-   * 初始化视频属性
-   */
-  initVideoProperties(video: HTMLVideoElement): void;
-
-  /**
-   * 尝试播放视频
-   * @param video 视频元素
-   */
-  tryplay(video: HTMLVideoElement): void;
-
-  /**
-   * 当前视频元素
-   */
   player: HTMLVideoElement | null | undefined;
-
-  /**
-   * 视频信息数据
-   */
   videoInfo: VideoInfo | null | undefined;
-
-  /**
-   * 顶级窗口信息数据
-   */
   topInfo: TopInfo | null | undefined;
+
+  // KeydownHandler 方法
+  setupKeydownListener(): void;
+  triggerIconElement(name: string): void;
+
+  // WebLoginHandler 方法
+  removeLoginPopups(): void;
+
+  // MenuCommandHandler 方法
+  isDisableZoom(): boolean;
+  isDisableAuto(): boolean;
+  isOverrideKeyboard(): boolean;
+  isDisablePlaybackRate(): boolean;
+  isDisableScreenshot(): boolean;
+  isEnbleThisWebSiteAuto(): boolean;
+  setupScriptMenuCommand(): void;
+
+  // PickerEpisodeHandler 方法
+  setupPickerEpisodeListener(): void;
+  getCurrentEpisodeBySelector(): HTMLElement;
+
+  // SwitchEpisodeHandler 方法
+  switchEpisode(): void;
+  getEpisodeNumber(element: HTMLElement): number;
+  getAllEpisodes(element: HTMLElement): HTMLElement[];
+  getEpisodeWrapper(element: HTMLElement): HTMLElement;
+
+  // VideoControlHandler 方法
+  isEnded(): boolean;
+  isDynamicDuration(video: HTMLVideoElement): boolean;
+  initVideoProperties(video: HTMLVideoElement): void;
+  playOrPause(video: HTMLVideoElement): void;
+  tryplay(video: HTMLVideoElement): void;
+  setPlaybackRate(playRate: number, show?: boolean): void;
+  adjustPlaybackRate(step?: number): void;
+  defPlaybackRate(): void;
+  useCachePlaybackRate(video: HTMLVideoElement): void;
+  adjustVideoTime(second?: number): void;
+  cachePlayTime(video: HTMLVideoElement): void;
+  useCachePlayTime(video: HTMLVideoElement): void;
+  delPlayTime(video: HTMLVideoElement): void;
+  setCurrentTime(currentTime: number): void;
+  videoMuted(): void;
+  togglePictureInPicture(): void;
+  videoMirrorFlip(): void;
+  videoRotate(): void;
+  videoZoom(isDown?: boolean): void;
+  moveVideo(direction: string): void;
+  restoreTransform(): void;
+  videoScreenshot(): void;
+  freezeVideoFrame(isPrev?: boolean): void;
+  toggleNativeControls(): void;
+
+  // WebFullScreenHandler 方法
+  autoWebFullscreen(video: HTMLVideoElement): void;
+  liveWebFullscreen(): void;
+  autoExitWebFullscreen(): void;
+  getBiliLiveIcons(): NodeListOf<Element>;
+
+  // WebFullEnhanceHandler 方法
+  webFullEnhance(): void;
+  exitWebFull(): void;
+  getVideoHostContainer(): Element | null;
+  getVideoIFrame(): HTMLIFrameElement | null;
+  getVideoWrapper(): Element | null;
+  findVideoCtrlBarParent(): Element | null;
+  findVideoContainer(container?: Element, maxLevel?: number): Element;
 }
 
 /**
@@ -120,14 +123,19 @@ declare class VideoEnhancer {
    * @param callback 自定义处理，接收当前媒体元素实例
    */
   hookMediaMethod(method: String, callback: (element: HTMLMediaElement) => void): void;
+
+  /**
+   * 重写 Element.prototype.attachShadow 方法，确保创建的 ShadowRoot 模式为 "open"，并触发自定义事件
+   */
+  hackAttachShadow(): void;
 }
 
 // -------------------- 全局作用域类型声明 --------------------
 declare global {
   /** 全局应用程序对象（可直接通过 App.xxx 调用） */
   const App: App;
-  /** 视频增强器实例（可直接通过 EnhancerVideo.xxx 调用） */
-  const EnhancerVideo: VideoEnhancer;
+  /** 视频增强器实例（可直接通过 videoEnhance.xxx 调用） */
+  const videoEnhance: VideoEnhancer;
   /** 视频信息 */
   const videoInfo: VideoInfo | null | undefined;
   /** 顶级窗口信息 */
@@ -135,8 +143,8 @@ declare global {
   interface Window {
     /** 全局应用程序对象（可直接通过 App.xxx 调用） */
     App: App;
-    /** 视频增强器实例（可直接通过 EnhancerVideo.xxx 调用） */
-    EnhancerVideo: VideoEnhancer;
+    /** 视频增强器实例（可直接通过 videoEnhance.xxx 调用） */
+    videoEnhance: VideoEnhancer;
     /** 视频信息 */
     videoInfo: VideoInfo | null | undefined;
     /** 顶级窗口信息 */

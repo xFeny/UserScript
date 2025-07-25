@@ -19,6 +19,6 @@ import "notyf/notyf.min.css";
   });
 });
 
-window.EnhancerVideo = new VideoEnhancer();
+window.videoEnhance = new VideoEnhancer();
 unsafeWindow.AUTO_WEB_FULLSCREEN = App;
 App.init();
