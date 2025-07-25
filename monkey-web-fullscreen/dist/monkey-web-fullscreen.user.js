@@ -765,8 +765,7 @@
       const isMuted = this.player.muted || !this.player.volume;
       this.player.muted = !isMuted;
       this.player.volume = Number(isMuted);
-      const tips = isMuted ? "🔊 取消静音" : "🔇 已静音";
-      this.showToast(tips, Consts.ONE_SEC);
+      this.showToast(isMuted ? "🔊 取消静音" : "🔇 已静音", Consts.ONE_SEC);
     },
     togglePictureInPicture() {
       if (this.player) document.pictureInPictureElement ? document.exitPictureInPicture() : this.player?.requestPictureInPicture();
