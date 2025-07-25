@@ -23,7 +23,7 @@ class StorageItem {
 
   getItem(key) {
     const value = this.useLocalStorage ? localStorage.getItem(key) : GM_getValue(key);
-    return value.startsWith("{") && value.endsWith("}") ? JSON.parse(value) : value;
+    return value?.startsWith("{") && value?.endsWith("}") ? JSON.parse(value) : value;
   }
 
   parser(value) {
