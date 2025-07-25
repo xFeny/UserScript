@@ -855,9 +855,9 @@
         el.setAttribute("class", "monkey-toast");
         if (isRemove) Tools.query(".monkey-toast")?.remove();
         content instanceof Element ? el.appendChild(content) : el.innerHTML = content;
-        const videoWrap = this.getVideoWrapper();
-        const target = videoWrap?.matches("video") ? videoWrap?.parentElement : videoWrap;
-        target?.appendChild(el);
+        const wrapper = this.getVideoWrapper();
+        wrapper.style.setProperty("position", "relative");
+        wrapper.appendChild(el);
         setTimeout(() => (el.style.opacity = 0, setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
         resolve(el);
       });
