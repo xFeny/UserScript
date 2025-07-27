@@ -8,6 +8,7 @@ import WebFullScreen from "./application/handler/WebFullScreenHandler";
 import SwitchEpisode from "./application/handler/SwitchEpisodeHandler";
 import PickerEpisode from "./application/handler/PickerEpisodeHandler";
 import WebFullEnhance from "./application/handler/WebFullEnhanceHandler";
+import CrossOriginStyleManager from "./application/common/CrossOriginStyle";
 import VideoEnhancer from "./application/player/VideoEnhancer";
 import "sweetalert2/dist/sweetalert2.min.css";
 import "notyf/notyf.min.css";
@@ -19,6 +20,7 @@ import "notyf/notyf.min.css";
   });
 });
 
+new CrossOriginStyleManager();
 window.videoEnhance = new VideoEnhancer();
 unsafeWindow.AUTO_WEB_FULLSCREEN = App;
 App.init();

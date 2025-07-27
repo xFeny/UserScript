@@ -100,7 +100,11 @@ export default {
   getCachedStyleSheets() {
     if (this.styleSheetCache.length) return this.styleSheetCache;
     const roots = [...getShadowRoots(document.body, true), document];
-    roots.forEach((root) => this.styleSheetCache.push(...Array.from(root.styleSheets)));
+    roots.forEach((root) => {
+      const styleSheets = Array.from(root.styleSheets);
+      const adoptedStyleSheets = Array.from(root.adoptedStyleSheets);
+      this.styleSheetCache.push(...styleSheets, ...adoptedStyleSheets);
+    });
     return this.styleSheetCache;
   },
   checkStyleSheet(element, sheet) {
@@ -125,9 +129,10 @@ export default {
   isFixedSizeValue(style) {
     const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
     const cssFunRegex = /(calc|var|min|max|clamp)\([^)]+\)/;
+    const percentRegex = /^(?!100(\.0+)?%)\d+(\.\d+)?%$/; // 匹配非100%的百分比
     return ["width", "height"].some((prop) => {
       const value = style.getPropertyValue(prop) || style[prop];
-      return value && (sizeRegex.test(value) || cssFunRegex.test(value));
+      return value && (sizeRegex.test(value) || cssFunRegex.test(value) || percentRegex.test(value));
     });
   },
 };

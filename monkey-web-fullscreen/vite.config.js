@@ -59,7 +59,7 @@ export default defineConfig({
         match,
         include,
         author: "Feny",
-        version: "3.1.9.1",
+        version: "3.2.0",
         license: "GPL-3.0-only",
         description: description.join("；"),
         name: "视频自动网页全屏｜倍速播放",
