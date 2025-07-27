@@ -94,6 +94,7 @@ export default {
     // 检查外联样式并缓存结果
     const result = this.getCachedStyleSheets().some((sheet) => this.checkStyleSheet(element, sheet));
     this.sizeCheckCache.set(element, result);
+
     return result;
   },
   styleSheetCache: [],
@@ -129,7 +130,7 @@ export default {
   isFixedSizeValue(style) {
     const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
     const cssFunRegex = /(calc|var|min|max|clamp)\([^)]+\)/;
-    const percentRegex = /^(?!100(\.0+)?%)\d+(\.\d+)?%$/; // 匹配非100%的百分比
+    const percentRegex = /^(?!100(\.0+)?%)\d+(\.\d+)?%$/; // 匹配非100%
     return ["width", "height"].some((prop) => {
       const value = style.getPropertyValue(prop) || style[prop];
       return value && (sizeRegex.test(value) || cssFunRegex.test(value) || percentRegex.test(value));

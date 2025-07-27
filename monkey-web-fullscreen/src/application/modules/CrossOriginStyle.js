@@ -35,7 +35,7 @@ export default class CrossOriginStyleManager {
     };
 
     // 过滤并收集所有跨域样式表URL
-    const links = Array.from(document.querySelectorAll('link[rel="stylesheet"][href]'))
+    const links = Array.from(document.head.querySelectorAll('link[rel="stylesheet"][href]'))
       .filter((link) => new URL(link.href).origin !== window.origin)
       .map((link) => link.href);
 
