@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.1.9.1
+// @version      3.2.0
 // @author       Feny
 // @description  默认支持哔哩哔哩（含直播）、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持倍速调节、视频截图、画面镜像翻转、自由缩放与移动、播放进度记忆等功能；提供通用下集切换功能，适用于任意视频网站剧集，实现便捷的剧集切换。
 // @license      GPL-3.0-only
@@ -1159,7 +1159,11 @@
     getCachedStyleSheets() {
       if (this.styleSheetCache.length) return this.styleSheetCache;
       const roots = [...getShadowRoots(document.body, true), document];
-      roots.forEach((root) => this.styleSheetCache.push(...Array.from(root.styleSheets)));
+      roots.forEach((root) => {
+        const styleSheets = Array.from(root.styleSheets);
+        const adoptedStyleSheets = Array.from(root.adoptedStyleSheets);
+        this.styleSheetCache.push(...styleSheets, ...adoptedStyleSheets);
+      });
       return this.styleSheetCache;
     },
     checkStyleSheet(element, sheet) {
@@ -1184,12 +1188,45 @@
     isFixedSizeValue(style) {
       const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
       const cssFunRegex = /(calc|var|min|max|clamp)\([^)]+\)/;
+      const percentRegex = /^(?!100(\.0+)?%)\d+(\.\d+)?%$/;
       return ["width", "height"].some((prop) => {
         const value = style.getPropertyValue(prop) || style[prop];
-        return value && (sizeRegex.test(value) || cssFunRegex.test(value));
+        return value && (sizeRegex.test(value) || cssFunRegex.test(value) || percentRegex.test(value));
       });
     }
   };
+  class CrossOriginStyleManager {
+    constructor() {
+      const worker = new Worker(URL.createObjectURL(new Blob([`
+      self.onmessage = async e => {
+        self.postMessage(await Promise.all(
+          e.data.map(async href => {
+            try {
+              const res = await fetch(href);
+              return { href, cssText: await res.text() };
+            } catch (err) {
+              return { href, error: err.message };
+            }
+          })
+        ));
+      };
+    `], { type: "application/javascript" })));
+      worker.onmessage = function({ data }) {
+        data.forEach(({ href, cssText, error }) => {
+          if (error) return;
+          try {
+            const styleSheet = new CSSStyleSheet();
+            styleSheet.replaceSync(cssText);
+            document.adoptedStyleSheets = [...document.adoptedStyleSheets, styleSheet];
+          } catch (err) {
+            console.error(`样式应用失败: ${href}`, err);
+          }
+        });
+      };
+      const links = Array.from(document.querySelectorAll('link[rel="stylesheet"][href]')).filter((link) => new URL(link.href).origin !== window.origin).map((link) => link.href);
+      worker.postMessage(links);
+    }
+  }
   const VideoEvents = {
     loadedmetadata() {
       App.autoWebFullscreen(this);
@@ -1353,6 +1390,7 @@
       App$1[key] = value instanceof Function ? value.bind(App$1) : value;
     });
   });
+  new CrossOriginStyleManager();
   window.videoEnhance = new VideoEnhancer();
   _unsafeWindow.AUTO_WEB_FULLSCREEN = App$1;
   App$1.init();
