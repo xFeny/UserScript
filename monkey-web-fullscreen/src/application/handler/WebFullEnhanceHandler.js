@@ -52,7 +52,7 @@ export default {
   },
   getVideoWrapper() {
     const controlsParent = this.findVideoCtrlBarParent();
-    return controlsParent ? this.findVideoContainer(controlsParent) : this.findVideoContainer();
+    return controlsParent ? this.findVideoContainer(controlsParent, 2) : this.findVideoContainer();
   },
   findVideoCtrlBarParent() {
     const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
