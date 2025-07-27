@@ -1,6 +1,6 @@
 import { Notyf } from "notyf";
 import Consts from "./Consts";
-import { querySelector, querySelectorAll } from "./shadow-dom-utils";
+import { querySelector, querySelectorAll } from "../modules/shadow-dom-utils";
 
 export default unsafeWindow.Tools = {
   noNumber: (str) => !/\d/.test(str),

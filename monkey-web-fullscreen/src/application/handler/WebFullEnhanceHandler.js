@@ -1,4 +1,4 @@
-import { getShadowRoots } from "../common/shadow-dom-utils";
+import { getShadowRoots } from "../modules/shadow-dom-utils";
 import Consts from "../common/Consts";
 import Tools from "../common/Tools";
 
