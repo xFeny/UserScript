@@ -1223,7 +1223,7 @@
           }
         });
       };
-      const links = Array.from(document.querySelectorAll('link[rel="stylesheet"][href]')).filter((link) => new URL(link.href).origin !== window.origin).map((link) => link.href);
+      const links = Array.from(document.head.querySelectorAll('link[rel="stylesheet"][href]')).filter((link) => new URL(link.href).origin !== window.origin).map((link) => link.href);
       worker.postMessage(links);
     }
   }
