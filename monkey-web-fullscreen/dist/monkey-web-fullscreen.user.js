@@ -491,7 +491,7 @@
       const zoomKeys = !this.isDisableZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
       if (isNumberKey || isOverrideKey || preventKeys || altKey && zoomKeys) Tools.preventDefault(event);
     },
-    processkeystrokes({ key, code, ctrlKey, shiftKey, altKey }) {
+    processKeystrokes({ key, code, ctrlKey, shiftKey, altKey }) {
       code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
       const keys = [ctrlKey && "ctrl", shiftKey && "shift", altKey && "alt", /[0-9]/.test(key) ? key : code];
       return keys.filter(Boolean).join("_");
@@ -513,7 +513,7 @@
       if (this.normalSite() || isInput || target?.isContentEditable) return;
       if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
       this.preventDefault(event);
-      key = this.processkeystrokes(event);
+      key = this.processKeystrokes(event);
       if ([Keyboard.N, Keyboard.P].includes(code)) return Tools.postMessage(window.top, { key });
       this.processEvent({ key });
     },
