@@ -25,18 +25,18 @@
 | M | 静音 / 取消静音 |
 | D | 显示 / 隐藏 弹幕           |
 | L / K | 视频 下一帧 / 上一帧 |
-| Ctrl  Z | 复位缩放与移动 |
-| Shift  L | 显示原生控制栏 |
-| Shift  R | 视频水平镜像翻转             |
-| Shift  P | 进入 / 退出 画中画 |
-| Ctrl  Alt  A | 视频截图 (默认禁用) |
-| Alt  ➕ / ➖ | 视频缩放 10% (默认禁用)  |
-| A / S  或  ➕ / ➖ | 播放倍速 ±0.25               |
-| Alt  ◀️🔼🔽▶️ | 移动视频画面 (默认禁用) |
+| Ctrl <b style='color:#bbb'>+</b> Z | 复位缩放与移动 |
+| Shift <b style='color:#bbb'>+</b> L | 显示原生控制栏 |
+| Shift <b style='color:#bbb'>+</b> R | 视频水平镜像翻转             |
+| Shift <b style='color:#bbb'>+</b> P | 进入 / 退出 画中画 |
+| Ctrl <b style='color:#bbb'>+</b> Alt <b style='color:#bbb'>+</b> A | 视频截图 (默认禁用) |
+| Alt <b style='color:#bbb'>+</b> <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 视频缩放 10% (默认禁用)  |
+| A / S  或  <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 播放倍速 ±0.25               |
+| Alt <b style='color:#bbb'>+</b> ◀️🔼🔽▶️ | 移动视频画面 (默认禁用) |
 | ◀️▶️           | 快退 / 快进 5秒 (默认禁用)      |
 | 空格      | 播放 / 暂停 (默认禁用)         |
 | 1️⃣ 至 9️⃣  | 1️⃣ 至 9️⃣ 倍速 |
-| Ctrl  0️⃣ 至 6️⃣ | 10 - 16x 倍速 |
+| Ctrl <b style='color:#bbb'>+</b> 0️⃣ 至 6️⃣ | 10 - 16x 倍速 |
 | 数字 0️⃣   | 快进 30 秒                   |
 
 ### 自动网页全屏
@@ -53,7 +53,7 @@
 // @note        *://*/*
 ```
 
-改成：
+修改为：
 
 ```js
 // @match        *://*/*
