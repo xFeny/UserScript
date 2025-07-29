@@ -1149,8 +1149,9 @@
       const elements = [...this.videoAncestorElements].reverse();
       for (const element of elements) {
         const { viewWidth, viewHeight } = this.topWin;
-        const { offsetWidth, offsetHeight } = this.player;
-        if (offsetWidth === viewWidth && offsetHeight === viewHeight) return;
+        const { offsetWidth: ew, offsetHeight: eh } = element;
+        const { offsetWidth: vw, offsetHeight: vh } = this.player;
+        if (ew === viewWidth && eh === viewHeight && vw === viewWidth && vh === viewHeight) return;
         Tools.setPart(element, Consts.webFull);
       }
     }
