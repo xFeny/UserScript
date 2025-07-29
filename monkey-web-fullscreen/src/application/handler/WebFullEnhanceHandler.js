@@ -1,4 +1,3 @@
-import { getShadowRoots } from "../modules/shadow-dom-utils";
 import Consts from "../common/Consts";
 import Tools from "../common/Tools";
 
@@ -9,31 +8,35 @@ export default {
   webFullEnhance() {
     if (this.normalSite() || Tools.isTooFrequent("enhance")) return;
     // 退出网页全屏
-    if (this.webFullWrap) return this.exitWebFull();
+    if (this.fullscreenWrapper) return this.exitWebFullEnhance();
 
-    const wrap = this.getVideoHostContainer();
-    if (!wrap || wrap.matches(":is(html, body)")) return;
+    const container = this.getVideoHostContainer();
+    if (!container || container.matches(":is(html, body)")) return;
 
     // 进入网页全屏
-    this.webFullWrap = wrap;
-    wrap.top = wrap.top ?? wrap.getBoundingClientRect()?.top ?? 0;
-    wrap.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    this.fullscreenWrapper = container;
+    container.top = container.top ?? container.getBoundingClientRect()?.top ?? 0;
+    container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
     Tools.getParents(this.player, false, 3)?.forEach((el) => Tools.addCls(el, "__flex-1"));
+    Tools.getParents(container, true)?.forEach(this.applyFullscreenStyles);
 
-    Tools.getParents(wrap, true)?.forEach((el) => {
-      (el.__cssText = el.style.cssText), Tools.setPart(el, Consts.webFull);
-      el.style.cssText += "width:100vw!important;height:100vh!important;";
-    });
+    // 确保网页全屏成功
+    this.ensureWebFullscreen();
   },
-  exitWebFull() {
-    const wrap = this.webFullWrap;
+  applyFullscreenStyles(el) {
+    el.__cssText = el.style.cssText;
+    Tools.setPart(el, Consts.webFull);
+    el.style.cssText += "width:100vw!important;height:100vh!important;";
+  },
+  exitWebFullEnhance() {
+    const container = this.fullscreenWrapper;
     Tools.getParents(this.player, false, 3)?.forEach((el) => Tools.delCls(el, "__flex-1"));
     Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => (Tools.delPart(el, Consts.webFull), (el.style = el.__cssText)));
-    Tools.scrollTop((Tools.getElementRect(wrap)?.top < 0 ? wrap?.top + wrap.scrollY : wrap?.top) - 120);
-    this.webFullWrap = null;
+    Tools.scrollTop((Tools.getElementRect(container)?.top < 0 ? container?.top + container.scrollY : container?.top) - 120);
+    this.fullscreenWrapper = null;
   },
   getVideoHostContainer() {
-    if (this.player) return this.getVideoWrapper();
+    if (this.player) return this.getVideoContainer();
 
     const videoIFrame = this.getVideoIFrame();
     if (videoIFrame) return videoIFrame;
@@ -50,90 +53,43 @@ export default {
     const partial = decoded.slice(0, decoded.length * 0.8);
     return Tools.query(`iframe[src*="${pathname + partial}"]`);
   },
-  getVideoWrapper() {
-    const controlsParent = this.findVideoCtrlBarParent();
-    return controlsParent ? this.findVideoContainer(controlsParent, 2) : this.findVideoContainer();
+  getVideoContainer() {
+    const controlsContainer = this.findControlBarContainer();
+    return controlsContainer ? this.findVideoParentContainer(controlsContainer) : this.findVideoParentContainer();
   },
-  findVideoCtrlBarParent() {
+  findControlBarContainer() {
     const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
     const ctrl = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"], [class*="progress"]`;
-    const controlsParent = Tools.findParentWithChild(this.player, ctrl);
-    if (!controlsParent) return null;
+    const controlsContainer = Tools.findParentWithChild(this.player, ctrl);
+    if (!controlsContainer) return null;
 
-    const { centerX, centerY } = Tools.getCenterPoint(controlsParent);
+    const { centerX, centerY } = Tools.getCenterPoint(controlsContainer);
     const { width: videoW } = Tools.getElementRect(this.player);
-    const { width } = Tools.getElementRect(controlsParent);
+    const { width } = Tools.getElementRect(controlsContainer);
     const inRect = Tools.pointInElement(centerX, centerY, this.player);
-    return Math.floor(width) <= Math.floor(videoW) && inRect ? controlsParent : null;
+    return Math.floor(width) <= Math.floor(videoW) && inRect ? controlsContainer : null;
   },
-  findVideoContainer(container, maxLevel = 4) {
+  videoAncestorElements: new Set(),
+  findVideoParentContainer(container, maxLevel = 4) {
     const video = this.player;
     container = container ?? video.parentElement;
     const { width: cw, height: ch } = Tools.getElementRect(container);
 
     for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
+      this.videoAncestorElements.add(parent);
       const { width, height } = Tools.getElementRect(parent);
       if (Math.floor(width) === Math.floor(cw) && Math.floor(height) === Math.floor(ch)) container = parent;
-      if (!parent.matches("video") && this.hasExplicitSize(parent)) return container;
     }
     return container;
   },
-  /**
-   * 检查元素是否设置了固定宽度或高度
-   * @param {HTMLElement} element - 需要检查的DOM元素
-   * @returns {boolean} 如果宽度或高度是固定尺寸则返回true，否则返回false
-   */
-  sizeCheckCache: new WeakMap(),
-  hasExplicitSize(element) {
-    // 检查内联样式
-    if (this.isFixedSizeValue(element.style)) return true;
-
-    // 检查缓存结果
-    if (this.sizeCheckCache.has(element)) return this.sizeCheckCache.get(element);
-
-    // 检查外联样式并缓存结果
-    const result = this.getCachedStyleSheets().some((sheet) => this.checkStyleSheet(element, sheet));
-    this.sizeCheckCache.set(element, result);
-
-    return result;
-  },
-  styleSheetCache: [],
-  getCachedStyleSheets() {
-    if (this.styleSheetCache.length) return this.styleSheetCache;
-    const roots = [...getShadowRoots(document.body, true), document];
-    roots.forEach((root) => {
-      const styleSheets = Array.from(root.styleSheets);
-      const adoptedStyleSheets = Array.from(root.adoptedStyleSheets);
-      this.styleSheetCache.push(...styleSheets, ...adoptedStyleSheets);
-    });
-    return this.styleSheetCache;
-  },
-  checkStyleSheet(element, sheet) {
-    try {
-      for (const rule of sheet.cssRules) {
-        if (this.checkStyleRule(element, rule)) return true;
-        if (rule instanceof CSSMediaRule && window.matchMedia(rule.conditionText)?.matches) {
-          for (const mediaRule of rule.cssRules) {
-            if (this.checkStyleRule(element, mediaRule)) return true;
-          }
-        }
-      }
-    } catch (e) {
-      console.debug(`无法访问样式表 ${sheet.href}:`, e);
+  ensureWebFullscreen() {
+    const elements = [...this.videoAncestorElements].reverse();
+    for (const element of elements) {
+      const { width: cw, height: ch } = Tools.getElementRect(this.player);
+      const { width, height } = Tools.getElementRect(element);
+      Tools.log(element, { width, height }, { cw, ch });
+      if (Math.floor(width) === Math.floor(cw) && Math.floor(height) === Math.floor(ch)) return;
+      this.applyFullscreenStyles(element);
     }
-    return false;
-  },
-  checkStyleRule(element, rule) {
-    if (!(rule instanceof CSSStyleRule)) return false;
-    return element.matches(rule.selectorText) && this.isFixedSizeValue(rule.style);
-  },
-  isFixedSizeValue(style) {
-    const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
-    const cssFunRegex = /(calc|var|min|max|clamp)\([^)]+\)/;
-    const percentRegex = /^(?!100(\.0+)?%)\d+(\.\d+)?%$/; // 匹配非100%
-    return ["width", "height"].some((prop) => {
-      const value = style.getPropertyValue(prop) || style[prop];
-      return value && (sizeRegex.test(value) || cssFunRegex.test(value) || percentRegex.test(value));
-    });
   },
 };

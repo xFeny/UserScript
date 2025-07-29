@@ -196,7 +196,7 @@ export default {
       if (isRemove) Tools.query(".monkey-toast")?.remove();
       content instanceof Element ? el.appendChild(content) : (el.innerHTML = content);
 
-      this.getVideoWrapper()?.appendChild(el);
+      this.getVideoContainer()?.appendChild(el);
       setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
       resolve(el);
     });

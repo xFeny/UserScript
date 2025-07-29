@@ -96,9 +96,7 @@ interface App {
   exitWebFull(): void;
   getVideoHostContainer(): Element | null;
   getVideoIFrame(): HTMLIFrameElement | null;
-  getVideoWrapper(): Element | null;
-  findVideoCtrlBarParent(): Element | null;
-  findVideoContainer(container?: Element, maxLevel?: number): Element;
+  getVideoContainer(): Element | null;
 }
 
 /**
