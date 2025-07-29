@@ -15,7 +15,7 @@ export default {
   isOverrideKeyboard: () => Storage.OVERRIDE_KEYBOARD.get(),
   isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
   isDisableScreenshot: () => Storage.DISABLE_SCREENSHOT.get(),
-  isEnbleThisWebSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : window?.topInfo?.host),
+  isEnbleThisWebSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin() || Tools.isTooFrequent("menu")) return;
     this.setupMenuChangeListener();

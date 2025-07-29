@@ -11,7 +11,7 @@ export default window.App = {
     this.setupMouseMoveListener();
     document.addEventListener("load", () => this.triggerStartElement(), true);
   },
-  normalSite: () => !window?.videoInfo && !window?.topInfo,
+  normalSite: () => !window?.videoInfo && !window?.topWin,
   isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
   getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
   isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
@@ -46,7 +46,7 @@ export default window.App = {
       this.removeLoginPopups();
       const video = this.getVideo();
       if (video?.offsetWidth) this.setCurrentVideo(video);
-      if (this.topInfo) observer.disconnect();
+      if (this.topWin) observer.disconnect();
     });
     setTimeout(() => observer.disconnect(), Consts.ONE_SEC * 10);
   },
@@ -68,15 +68,15 @@ export default window.App = {
     if (!Tools.isTopWin()) return (videoInfo.iframeSrc = location.href), Tools.postMessage(window.parent, { videoInfo });
     this.setupPickerEpisodeListener();
     this.setupScriptMenuCommand();
-    this.sendTopInfo();
+    this.sendTopWinInfo();
   },
-  sendTopInfo() {
+  sendTopWinInfo() {
     // 向iframe传递顶级窗口信息
-    const title = document.title;
-    const { host, href } = location;
-    const topInfo = { title, innerWidth, host, href, hash: Tools.hashCode(href) };
-    window.topInfo = this.topInfo = topInfo;
-    Tools.sendToIFrames({ topInfo });
+    const { host, href: url } = location;
+    const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
+    const topWin = { host, viewWidth, viewHeight, urlHash: Tools.hashCode(url) };
+    window.topWin = this.topWin = topWin;
+    Tools.sendToIFrames({ topWin });
   },
   setupMouseMoveListener() {
     let timer = null;

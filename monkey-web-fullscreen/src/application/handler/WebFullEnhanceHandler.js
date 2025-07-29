@@ -17,21 +17,13 @@ export default {
     this.fullscreenWrapper = container;
     container.top = container.top ?? container.getBoundingClientRect()?.top ?? 0;
     container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
-    Tools.getParents(this.player, false, 3)?.forEach((el) => Tools.addCls(el, "__flex-1"));
-    Tools.getParents(container, true)?.forEach(this.applyFullscreenStyles);
+    Tools.getParents(container, true)?.forEach((el) => Tools.setPart(el, Consts.webFull));
 
-    // 确保网页全屏成功
-    this.ensureWebFullscreen();
-  },
-  applyFullscreenStyles(el) {
-    el.__cssText = el.style.cssText;
-    Tools.setPart(el, Consts.webFull);
-    el.style.cssText += "width:100vw!important;height:100vh!important;";
+    this.ensureWebFullscreen(); // 确保网页全屏成功
   },
   exitWebFullEnhance() {
     const container = this.fullscreenWrapper;
-    Tools.getParents(this.player, false, 3)?.forEach((el) => Tools.delCls(el, "__flex-1"));
-    Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => (Tools.delPart(el, Consts.webFull), (el.style = el.__cssText)));
+    Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
     Tools.scrollTop((Tools.getElementRect(container)?.top < 0 ? container?.top + container.scrollY : container?.top) - 120);
     this.fullscreenWrapper = null;
   },
@@ -54,42 +46,47 @@ export default {
     return Tools.query(`iframe[src*="${pathname + partial}"]`);
   },
   getVideoContainer() {
-    const controlsContainer = this.findControlBarContainer();
-    return controlsContainer ? this.findVideoParentContainer(controlsContainer) : this.findVideoParentContainer();
+    const ctrlContainer = this.findControlBarContainer();
+    return ctrlContainer ? this.findVideoParentContainer(ctrlContainer) : this.findVideoParentContainer();
   },
   findControlBarContainer() {
     const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
     const ctrl = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"], [class*="progress"]`;
-    const controlsContainer = Tools.findParentWithChild(this.player, ctrl);
-    if (!controlsContainer) return null;
+    const ctrlContainer = Tools.findParentWithChild(this.player, ctrl);
+    if (!ctrlContainer) return null;
 
-    const { centerX, centerY } = Tools.getCenterPoint(controlsContainer);
-    const { width: videoW } = Tools.getElementRect(this.player);
-    const { width } = Tools.getElementRect(controlsContainer);
+    const { centerX, centerY } = Tools.getCenterPoint(ctrlContainer);
     const inRect = Tools.pointInElement(centerX, centerY, this.player);
-    return Math.floor(width) <= Math.floor(videoW) && inRect ? controlsContainer : null;
+    return ctrlContainer.offsetWidth <= this.player.offsetWidth && inRect ? ctrlContainer : null;
   },
   videoAncestorElements: new Set(),
   findVideoParentContainer(container, maxLevel = 4) {
     const video = this.player;
     container = container ?? video.parentElement;
-    const { width: cw, height: ch } = Tools.getElementRect(container);
+    const { offsetWidth: cw, offsetHeight: ch } = container;
 
     for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
+      if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
+      if (this.hasExplicitSize(parent)) return container;
       this.videoAncestorElements.add(parent);
-      const { width, height } = Tools.getElementRect(parent);
-      if (Math.floor(width) === Math.floor(cw) && Math.floor(height) === Math.floor(ch)) container = parent;
     }
     return container;
+  },
+  hasExplicitSize(element) {
+    const style = element.style;
+    const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
+    return ["width", "height"].some((prop) => {
+      const value = style.getPropertyValue(prop);
+      return value && sizeRegex.test(value);
+    });
   },
   ensureWebFullscreen() {
     const elements = [...this.videoAncestorElements].reverse();
     for (const element of elements) {
-      const { width: cw, height: ch } = Tools.getElementRect(this.player);
-      const { width, height } = Tools.getElementRect(element);
-      Tools.log(element, { width, height }, { cw, ch });
-      if (Math.floor(width) === Math.floor(cw) && Math.floor(height) === Math.floor(ch)) return;
-      this.applyFullscreenStyles(element);
+      const { viewWidth, viewHeight } = this.topWin;
+      const { offsetWidth, offsetHeight } = this.player;
+      if (offsetWidth === viewWidth && offsetHeight === viewHeight) return;
+      Tools.setPart(element, Consts.webFull);
     }
   },
 };

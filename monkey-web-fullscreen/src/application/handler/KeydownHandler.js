@@ -29,7 +29,7 @@ export default {
       // Tools.log(location.href, "接收到消息：", data);
       if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
       if (data?.videoInfo) return this.setParentVideoInfo(data.videoInfo);
-      if (data?.topInfo) window.topInfo = this.topInfo = data.topInfo;
+      if (data?.topWin) window.topWin = this.topWin = data.topWin;
       if (data?.defaultPlaybackRate) this.defPlaybackRate();
       this.processEvent(data);
     });

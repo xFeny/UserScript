@@ -9,8 +9,8 @@ export default {
     if (this.player !== video) return;
     if (Site.isMatch() && this.isDisableAuto()) return;
     if (!Site.isMatch() && !this.isEnbleThisWebSiteAuto()) return;
-    if (!this.topInfo || video.hasWebFull || !video.offsetWidth) return;
-    if (video.offsetWidth >= this.topInfo.innerWidth) return (video.hasWebFull = true);
+    if (!this.topWin || video.hasWebFull || !video.offsetWidth) return;
+    if (video.offsetWidth >= this.topWin.viewWidth) return (video.hasWebFull = true);
     Tools.postMessage(window.top, { key: "P" });
   },
   liveWebFullscreen() {

@@ -61,12 +61,12 @@ export default {
   cachePlayTime(video) {
     if (this.isDynamicDuration(video) || video.duration < 120) return;
     if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
-    if (!this.topInfo || this.isLive() || !Tools.validDuration(video)) return;
+    if (!this.topWin || this.isLive() || !Tools.validDuration(video)) return;
     if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.delPlayTime(video);
     Storage.PLAY_TIME.set(this.getTimeKey(video), Number(video.currentTime) - 1, 7);
   },
   useCachePlayTime(video) {
-    if (this.hasUsedPlayTime || !this.topInfo || this.isLive()) return;
+    if (this.hasUsedPlayTime || !this.topWin || this.isLive()) return;
 
     const time = Storage.PLAY_TIME.get(this.getTimeKey(video));
     if (time <= Number(video.currentTime)) return (this.hasUsedPlayTime = true);
@@ -80,7 +80,7 @@ export default {
     Storage.PLAY_TIME.del(this.getTimeKey(video));
   },
   getTimeKey(video) {
-    return this?.topInfo?.hash + "_" + video.duration;
+    return this.topWin.urlHash + "_" + video.duration;
   },
   setCurrentTime(currentTime) {
     if (currentTime) this.player.currentTime = Math.max(0, currentTime);

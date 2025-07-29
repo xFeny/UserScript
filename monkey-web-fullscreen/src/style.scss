@@ -52,10 +52,6 @@ body[part*="webFullscreen"] [part*="webFullscreen"] {
     left: 0 !important;
     width: 100vw !important;
   }
-
-  .__flex-1 {
-    flex: 1 !important;
-  }
 }
 
 /** 增强选择器优先级 **/

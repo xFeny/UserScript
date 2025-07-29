@@ -12,12 +12,12 @@ interface VideoInfo {
 /**
  * 顶级窗口信息数据接口
  */
-interface TopInfo {
-  title: string; // 页面标题
-  innerWidth: number; // 窗口宽度
+interface TopWin {
+  viewWidth: number; // 视口宽度
+  viewHeight: number; // 视口宽度
   host: string; // 域名
-  href: string; // 当前 URL
-  hash: string; // URL 哈希值（简化版）
+  url: string; // 当前 URL
+  urlHash: string; // URL 哈希值（简化版）
 }
 
 /**
@@ -31,7 +31,7 @@ interface App {
   setCurrentVideo(video: HTMLVideoElement): void;
   player: HTMLVideoElement | null | undefined;
   videoInfo: VideoInfo | null | undefined;
-  topInfo: TopInfo | null | undefined;
+  topWin: TopWin | null | undefined;
 
   // KeydownHandler 方法
   setupKeydownListener(): void;
@@ -137,7 +137,7 @@ declare global {
   /** 视频信息 */
   const videoInfo: VideoInfo | null | undefined;
   /** 顶级窗口信息 */
-  const topInfo: TopInfo | null | undefined;
+  const topWin: TopWin | null | undefined;
   interface Window {
     /** 全局应用程序对象（可直接通过 App.xxx 调用） */
     App: App;
@@ -146,7 +146,7 @@ declare global {
     /** 视频信息 */
     videoInfo: VideoInfo | null | undefined;
     /** 顶级窗口信息 */
-    topInfo: TopInfo | null | undefined;
+    topWin: TopWin | null | undefined;
   }
 }
 
