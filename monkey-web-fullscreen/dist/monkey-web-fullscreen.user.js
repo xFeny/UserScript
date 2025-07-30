@@ -1146,9 +1146,9 @@
       });
     },
     ensureWebFullscreen() {
+      const { viewWidth, viewHeight } = this.topWin;
       const elements = [...this.videoAncestorElements].reverse();
       for (const element of elements) {
-        const { viewWidth, viewHeight } = this.topWin;
         const { offsetWidth, offsetHeight } = this.player;
         if (offsetWidth === viewWidth && offsetHeight === viewHeight) return;
         Tools.setPart(element, Consts.webFull);
