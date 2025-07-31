@@ -64,6 +64,7 @@ export default {
     const video = this.player;
     container = container ?? video.parentElement;
     const { offsetWidth: cw, offsetHeight: ch } = container;
+    this.videoAncestorElements.clear();
 
     for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
       if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
