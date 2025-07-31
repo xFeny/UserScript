@@ -111,6 +111,7 @@ class TimedStorage extends StorageItem {
  * DISABLE_SCREENSHOT  禁用视频截图
  * REL_EPISODE_SELECTOR  通用切换下集—集数列表中的任意一集 拾取的CSS选择器
  * CURR_EPISODE_SELECTOR  通用切换下集—当前播放集数 拾取的CSS选择器
+ * STORAGE_DAYS 视频播放进度要保存的天数
  * PLAY_TIME  记录的播放进度
  */
 export default {
@@ -127,5 +128,6 @@ export default {
   DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
   CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
   REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
+  STORAGE_DAYS: new StorageItem("STORAGE_DAYS", 7, false, parseFloat),
   PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat),
 };
