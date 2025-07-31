@@ -9,7 +9,7 @@ export default {
     Tools.querys('[id*="loading"]').forEach((el) => !Tools.query('[class*="player"]', el) && Tools.addCls(el, "_noplayer"));
   },
   loadeddata() {
-    App.initVideoProperties(this);
+    App.initVideoProps(this);
     Tools.query(".conplaying")?.click(); // https://skr.skrcc.cc:666
   },
   timeupdate() {
@@ -20,14 +20,14 @@ export default {
   canplay() {
     if (this.hasTryplay || Tools.querys("video").length) return;
     this.hasTryplay = true;
-    App.tryplay(this);
+    App.tryAutoPlay(this);
   },
   playing() {
     this.isEnded = false;
     if (this.duration < 5) return; // 超短的视频不操作
     App.setCurrentVideo(this);
-    App.useCachePlaybackRate(this);
-    App.useCachePlayTime(this);
+    App.applyCachedPlayRate(this);
+    App.applyCachedTime(this);
   },
   pause() {
     // https://www.mcydh.com、https://dick.xfani.com
@@ -39,6 +39,6 @@ export default {
     this.isEnded = true;
     this.hasToast = false;
     App.autoExitWebFullscreen();
-    App.delPlayTime(this);
+    App.clearCachedTime(this);
   },
 };

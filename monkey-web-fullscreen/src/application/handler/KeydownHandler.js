@@ -30,7 +30,7 @@ export default {
       if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
       if (data?.videoInfo) return this.setParentVideoInfo(data.videoInfo);
       if (data?.topWin) window.topWin = this.topWin = data.topWin;
-      if (data?.defaultPlaybackRate) this.defPlaybackRate();
+      if (data?.defaultPlaybackRate) this.resetToDefaultPlayRate();
       this.processEvent(data);
     });
   },
@@ -54,25 +54,25 @@ export default {
   execHotKeyActions(key) {
     // Tools.log("按下的键：", { key });
     const dict = {
-      M: () => this.videoMuted(),
-      R: () => this.videoRotate(),
-      Z: () => this.defPlaybackRate(),
+      M: () => this.toggleMute(),
+      R: () => this.rotateVideo(),
       L: () => this.freezeVideoFrame(),
       K: () => this.freezeVideoFrame(true),
+      Z: () => this.resetToDefaultPlayRate(),
       D: () => Site.isMatch() && this.triggerIconElement(SiteIcons.name.danmaku),
       N: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
       P: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance()),
-      LEFT: () => this.isOverrideKeyboard() && this.adjustVideoTime(-Storage.SKIP_INTERVAL.get()),
-      RIGHT: () => this.isOverrideKeyboard() && this.adjustVideoTime(Storage.SKIP_INTERVAL.get()),
-      0: () => this.adjustVideoTime(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
-      SPACE: () => this.isOverrideKeyboard() && this.playOrPause(this.player),
+      LEFT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(-Storage.SKIP_INTERVAL.get()),
+      RIGHT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(Storage.SKIP_INTERVAL.get()),
+      0: () => this.adjustPlayProgress(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
+      SPACE: () => this.isOverrideKeyboard() && this.togglePlayPause(this.player),
       SHIFT_P: () => this.togglePictureInPicture(),
       SHIFT_L: () => this.toggleNativeControls(),
-      CTRL_ALT_A: () => this.videoScreenshot(),
-      SHIFT_R: () => this.videoMirrorFlip(),
-      CTRL_Z: () => this.restoreTransform(),
-      ALT_SUB: () => this.videoZoom(true),
-      ALT_ADD: () => this.videoZoom(),
+      CTRL_ALT_A: () => this.captureScreenshot(),
+      CTRL_Z: () => this.resetVideoTransform(),
+      SHIFT_R: () => this.toggleMirrorFlip(),
+      ALT_SUB: () => this.zoomVideo(true),
+      ALT_ADD: () => this.zoomVideo(),
     };
 
     // 倍速加减
@@ -84,7 +84,7 @@ export default {
     Array.from({ length: 7 }, (_, i) => (dict[`CTRL_${i}`] = () => this.setPlaybackRate(10 + i)));
 
     // 视频移动
-    ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => (dict[k] = () => this.moveVideo(k)));
+    ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => (dict[k] = () => this.moveVideoPosition(k)));
 
     // 执行函数
     dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));

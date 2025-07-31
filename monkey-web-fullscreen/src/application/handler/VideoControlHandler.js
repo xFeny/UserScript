@@ -14,15 +14,14 @@ export default {
     if (!video?.__duration) return false;
     return Math.floor(video.duration) > Math.floor(video.__duration);
   },
-  initVideoProperties(video) {
+  initVideoProps(video) {
     video.volume = 1;
     video.hasToast = false;
     video.hasWebFull = false;
     video.__duration = video.duration;
-    video.hashCode = `${this.topWin.urlHash}_${video.duration}`;
   },
-  playOrPause: (video) => (Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause()),
-  tryplay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),
+  togglePlayPause: (video) => (Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause()),
+  tryAutoPlay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),
   checkUsable() {
     if (!this.player || this.isDisablePlaybackRate()) return false;
     if (this.isBackgroundVideo(this.player) || this.isEnded()) return false;
@@ -41,12 +40,12 @@ export default {
     const playRate = Math.max(Storage.PLAY_RATE_STEP.get(), Number(this.player.playbackRate) + step);
     this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
   },
-  defPlaybackRate() {
+  resetToDefaultPlayRate() {
     if (this.isDisablePlaybackRate()) return;
     this.setPlaybackRate(Consts.DEF_PLAY_RATE, false);
     this.showToast("已恢复正常倍速播放");
   },
-  useCachePlaybackRate(video) {
+  applyCachedPlayRate(video) {
     if (this.isDisablePlaybackRate()) return;
     const playRate = Storage.CACHED_PLAY_RATE.get();
     // Tools.log(`当前播放倍速为：${video.playbackRate}，记忆倍速为：${playRate}`);
@@ -54,7 +53,7 @@ export default {
     this.setPlaybackRate(playRate, !video.hasToast);
     video.hasToast = true;
   },
-  adjustVideoTime(second = Storage.SKIP_INTERVAL.get()) {
+  adjustPlayProgress(second = Storage.SKIP_INTERVAL.get()) {
     if (!this.player || !Tools.validDuration(this.player) || (second > 0 && this.player.isEnded)) return;
     const currentTime = Math.min(Number(this.player.currentTime) + second, this.player.duration);
     this.setCurrentTime(currentTime);
@@ -63,13 +62,13 @@ export default {
     if (this.isDynamicDuration(video) || video.duration < 120) return;
     if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
     if (!this.topWin || this.isLive() || !Tools.validDuration(video)) return;
-    if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.delPlayTime(video);
-    Storage.PLAY_TIME.set(video.hashCode, Number(video.currentTime) - 1, 7);
+    if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.clearCachedTime(video);
+    Storage.PLAY_TIME.set(this.getCacheTimeKey(video), Number(video.currentTime) - 1, 7);
   },
-  useCachePlayTime(video) {
+  applyCachedTime(video) {
     if (this.hasUsedPlayTime || !this.topWin || this.isLive()) return;
 
-    const time = Storage.PLAY_TIME.get(video.hashCode);
+    const time = Storage.PLAY_TIME.get(this.getCacheTimeKey(video));
     if (time <= Number(video.currentTime)) return (this.hasUsedPlayTime = true);
     this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
       el.style.setProperty("transform", `translateY(${-5 - el.offsetHeight}px)`);
@@ -77,11 +76,16 @@ export default {
     this.hasUsedPlayTime = true;
     this.setCurrentTime(time);
   },
-  delPlayTime: (video) => Storage.PLAY_TIME.del(video.hashCode),
+  clearCachedTime(video) {
+    Storage.PLAY_TIME.del(this.getCacheTimeKey(video));
+  },
+  getCacheTimeKey(video) {
+    return this.topWin.urlHash + "_" + video.duration;
+  },
   setCurrentTime(currentTime) {
     if (currentTime) this.player.currentTime = Math.max(0, currentTime);
   },
-  videoMuted() {
+  toggleMute() {
     if (!this.player) return;
 
     // 判断当前是否为静音状态（同时检查 muted 和 volume）
@@ -93,14 +97,14 @@ export default {
   togglePictureInPicture() {
     if (this.player) document.pictureInPictureElement ? document.exitPictureInPicture() : this.player?.requestPictureInPicture();
   },
-  videoMirrorFlip() {
+  toggleMirrorFlip() {
     if (!this.player) return;
 
     const tsr = this.player.tsr;
     tsr.isMirrored = !tsr.isMirrored;
     this.setVideoTsr("--mirror", tsr.isMirrored ? -1 : 1);
   },
-  videoRotate() {
+  rotateVideo() {
     if (!this.player) return;
 
     const tsr = this.player.tsr;
@@ -110,7 +114,7 @@ export default {
     const scale = isVertical ? videoHeight / videoWidth : 1;
     this.setVideoTsr("--scale", scale).setVideoTsr("--rotate", `${tsr.rotation}deg`);
   },
-  videoZoom(isDown) {
+  zoomVideo(isDown) {
     if (!this.player || this.isDisableZoom()) return;
 
     const tsr = this.player.tsr;
@@ -121,7 +125,7 @@ export default {
     this.setVideoTsr("--zoom", zoom / 100);
     this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC);
   },
-  moveVideo(direction) {
+  moveVideoPosition(direction) {
     if (!this.player || this.isDisableZoom()) return;
 
     const tsr = this.player.tsr;
@@ -136,7 +140,7 @@ export default {
     this.setVideoTsr("--moveX", `${tsr.moveX}px`).setVideoTsr("--moveY", `${tsr.moveY}px`);
     this.showToast(`${desc}：${x ? tsr.moveX : tsr.moveY}px`, Consts.ONE_SEC);
   },
-  restoreTransform() {
+  resetVideoTransform() {
     if (!this.player || this.isDisableZoom()) return;
 
     this.setVideoTsr("--zoom", 1)
@@ -147,7 +151,7 @@ export default {
       .setVideoTsr("--rotate", "0deg");
     window.videoEnhance.resetTsr(this.player);
   },
-  videoScreenshot() {
+  captureScreenshot() {
     if (!this.player || this.isDisableScreenshot()) return;
     this.player.setAttribute("crossorigin", "anonymous");
     const canvas = document.createElement("canvas");
@@ -192,7 +196,7 @@ export default {
       if (isRemove) Tools.query(".monkey-toast")?.remove();
       content instanceof Element ? el.appendChild(content) : (el.innerHTML = content);
 
-      this.getVideoContainer()?.appendChild(el);
+      (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2)).appendChild(el);
       setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
       resolve(el);
     });
