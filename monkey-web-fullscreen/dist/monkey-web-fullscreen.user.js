@@ -463,6 +463,7 @@
     DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
     CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
     REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
+    STORAGE_DAYS: new StorageItem("STORAGE_DAYS", 7, false, parseFloat),
     PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat)
   };
   const SiteIcons = {
@@ -618,6 +619,7 @@
         { title: "设置零键秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL, isDisable: false },
         { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isDisable: this.isDisablePlaybackRate() },
         { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isDisable: !this.isOverrideKeyboard() },
+        { title: "设置进度保存天数", cache: Storage.STORAGE_DAYS, isDisable: false },
         { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isDisable: Site.isMatch(), fn: siteFun },
         { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isDisable: !EPISODE_SELECTOR.get(host), fn: delPicker },
         { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isDisable: false, fn: () => this.shortcutKeysPopup() },
@@ -754,7 +756,7 @@
       if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
       if (!this.topWin || this.isLive() || !Tools.validDuration(video)) return;
       if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.clearCachedTime(video);
-      Storage.PLAY_TIME.set(this.getCacheTimeKey(video), Number(video.currentTime) - 1, 7);
+      Storage.PLAY_TIME.set(this.getCacheTimeKey(video), Number(video.currentTime) - 1, Storage.STORAGE_DAYS.get());
       this.clearVideosCacheTime();
     },
     applyCachedTime(video) {
