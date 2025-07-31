@@ -696,6 +696,7 @@
       video.hasToast = false;
       video.hasWebFull = false;
       video.__duration = video.duration;
+      video.hashCode = `${this.topWin.urlHash}_${video.duration}`;
     },
     playOrPause: (video) => Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause(),
     tryplay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),
@@ -739,11 +740,11 @@
       if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
       if (!this.topWin || this.isLive() || !Tools.validDuration(video)) return;
       if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.delPlayTime(video);
-      Storage.PLAY_TIME.set(this.getTimeKey(video), Number(video.currentTime) - 1, 7);
+      Storage.PLAY_TIME.set(video.hashCode, Number(video.currentTime) - 1, 7);
     },
     useCachePlayTime(video) {
       if (this.hasUsedPlayTime || !this.topWin || this.isLive()) return;
-      const time = Storage.PLAY_TIME.get(this.getTimeKey(video));
+      const time = Storage.PLAY_TIME.get(video.hashCode);
       if (time <= Number(video.currentTime)) return this.hasUsedPlayTime = true;
       this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
         el.style.setProperty("transform", `translateY(${-5 - el.offsetHeight}px)`);
@@ -751,12 +752,7 @@
       this.hasUsedPlayTime = true;
       this.setCurrentTime(time);
     },
-    delPlayTime(video) {
-      Storage.PLAY_TIME.del(this.getTimeKey(video));
-    },
-    getTimeKey(video) {
-      return this.topWin.urlHash + "_" + video.duration;
-    },
+    delPlayTime: (video) => Storage.PLAY_TIME.del(video.hashCode),
     setCurrentTime(currentTime) {
       if (currentTime) this.player.currentTime = Math.max(0, currentTime);
     },
@@ -798,10 +794,10 @@
       if (!this.player || this.isDisableZoom()) return;
       const tsr = this.player.tsr;
       const { x, y, desc } = {
-        ALT_UP: { y: -Consts.MOVE_STEP, desc: "向上移动" },
-        ALT_DOWN: { y: Consts.MOVE_STEP, desc: "向下移动" },
-        ALT_LEFT: { x: -Consts.MOVE_STEP, desc: "向左移动" },
-        ALT_RIGHT: { x: Consts.MOVE_STEP, desc: "向右移动" }
+        ALT_UP: { y: -Consts.MOVE_STEP, desc: "垂直移动" },
+        ALT_DOWN: { y: Consts.MOVE_STEP, desc: "垂直移动" },
+        ALT_LEFT: { x: -Consts.MOVE_STEP, desc: "水平移动" },
+        ALT_RIGHT: { x: Consts.MOVE_STEP, desc: "水平移动" }
       }[direction];
       ((tx = 0, ty = 0) => (tsr.moveX += tx, tsr.moveY += ty))(x, y);
       this.setVideoTsr("--moveX", `${tsr.moveX}px`).setVideoTsr("--moveY", `${tsr.moveY}px`);
