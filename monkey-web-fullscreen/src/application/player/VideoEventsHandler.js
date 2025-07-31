@@ -18,8 +18,8 @@ export default {
     App.cachePlayTime(this);
   },
   canplay() {
-    if (this.hasTryplay || Tools.querys("video").length) return;
-    this.hasTryplay = true;
+    if (this.hasTryAutoPlay || Tools.isMultiVideo()) return;
+    this.hasTryAutoPlay = true;
     App.tryAutoPlay(this);
   },
   playing() {

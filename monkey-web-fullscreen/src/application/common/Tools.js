@@ -9,6 +9,7 @@ export default unsafeWindow.Tools = {
   scrollTop: (top) => window.scrollTo({ top }),
   alert: (...data) => window.alert(data.join(" ")),
   getElementRect: (el) => el?.getBoundingClientRect(),
+  isMultiVideo: () => querySelectorAll("video").length > 1,
   query: (selector, context) => querySelector(selector, context),
   querys: (selector, context) => querySelectorAll(selector, context),
   validDuration: (video) => !isNaN(video.duration) && video.duration !== Infinity,

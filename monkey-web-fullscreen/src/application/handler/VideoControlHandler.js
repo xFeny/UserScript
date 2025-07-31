@@ -64,23 +64,33 @@ export default {
     if (!this.topWin || this.isLive() || !Tools.validDuration(video)) return;
     if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.clearCachedTime(video);
     Storage.PLAY_TIME.set(this.getCacheTimeKey(video), Number(video.currentTime) - 1, 7);
+    this.clearVideosCacheTime();
   },
   applyCachedTime(video) {
-    if (this.hasUsedPlayTime || !this.topWin || this.isLive()) return;
-
+    if (this.hasAppliedCachedTime || !this.topWin || this.isLive()) return;
+    // 从存储中获取该视频的缓存播放时间
     const time = Storage.PLAY_TIME.get(this.getCacheTimeKey(video));
-    if (time <= Number(video.currentTime)) return (this.hasUsedPlayTime = true);
+    if (time <= Number(video.currentTime)) return (this.hasAppliedCachedTime = true);
+
+    this.setCurrentTime(time);
+    this.hasAppliedCachedTime = true;
     this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
       el.style.setProperty("transform", `translateY(${-5 - el.offsetHeight}px)`);
     });
-    this.hasUsedPlayTime = true;
-    this.setCurrentTime(time);
   },
   clearCachedTime(video) {
     Storage.PLAY_TIME.del(this.getCacheTimeKey(video));
   },
   getCacheTimeKey(video) {
-    return this.topWin.urlHash + "_" + video.duration;
+    return `${this.topWin.urlHash}_${Math.floor(video.duration)}`;
+  },
+  clearVideosCacheTime() {
+    setTimeout(() => {
+      if (!Tools.isMultiVideo()) return;
+      const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
+      const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
+      if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
+    });
   },
   setCurrentTime(currentTime) {
     if (currentTime) this.player.currentTime = Math.max(0, currentTime);
@@ -197,11 +207,10 @@ export default {
       content instanceof Element ? el.appendChild(content) : (el.innerHTML = content);
 
       const container = this.findVideoParentContainer(null, 2);
-      !container.offsetHeight && container.style.setProperty("height", "inherit");
-      container.prepend(el);
+      !container.offsetHeight && container.style.setProperty("height", "inherit"); // youtube
+      container.prepend(el), resolve(el);
 
       setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
-      resolve(el);
     });
   },
   formatTime(seconds) {

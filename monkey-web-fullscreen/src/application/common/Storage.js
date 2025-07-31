@@ -41,6 +41,24 @@ class StorageItem {
   removeItem(key) {
     this.useLocalStorage ? localStorage.removeItem(key) : GM_deleteValue(key);
   }
+
+  fuzzyGet(pattern) {
+    const result = {};
+    this.fuzzyMatch(pattern, (key) => (result[key] = this.get(key)));
+    return result;
+  }
+
+  fuzzyDel(pattern) {
+    this.fuzzyMatch(pattern, (key) => this.removeItem(key));
+  }
+
+  fuzzyMatch(pattern, callback) {
+    const keys = this.useLocalStorage ? Object.keys(localStorage) : GM_listValues();
+    keys.forEach((key) => {
+      const isMatch = pattern instanceof RegExp ? pattern.test(key) : key.includes(pattern);
+      if (isMatch) callback.call(this, key);
+    });
+  }
 }
 
 /**
@@ -49,7 +67,7 @@ class StorageItem {
 class TimedStorage extends StorageItem {
   constructor(name, defaultValue, useLocalStorage, valueParser) {
     super(name, defaultValue, useLocalStorage, valueParser);
-    this.clearExpired();
+    this.cleanupExpiredData();
   }
 
   set(suffix, value, expires) {
@@ -69,14 +87,11 @@ class TimedStorage extends StorageItem {
     this.removeItem(this.name + suffix);
   }
 
-  clearExpired() {
-    const keys = this.useLocalStorage ? Object.keys(localStorage) : GM_listValues();
-    keys
-      .filter((key) => key.includes(this.name))
-      .forEach((key) => {
-        const storage = this.getItem(key);
-        if (storage?.expires && storage.expires < Date.now()) this.removeItem(key);
-      });
+  cleanupExpiredData() {
+    this.fuzzyMatch(this.name, (key) => {
+      const storage = this.getItem(key);
+      if (storage?.expires && storage.expires < Date.now()) this.removeItem(key);
+    });
   }
 }
 
