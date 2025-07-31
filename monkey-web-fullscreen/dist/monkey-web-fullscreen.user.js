@@ -855,7 +855,9 @@
         el.setAttribute("class", "monkey-toast");
         if (isRemove) Tools.query(".monkey-toast")?.remove();
         content instanceof Element ? el.appendChild(content) : el.innerHTML = content;
-        (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2)).appendChild(el);
+        const container = this.findVideoParentContainer(null, 2);
+        !container.offsetHeight && container.style.setProperty("height", "inherit");
+        container.prepend(el);
         setTimeout(() => (el.style.opacity = 0, setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
         resolve(el);
       });
@@ -1130,6 +1132,7 @@
       const video = this.player;
       container = container ?? video.parentElement;
       const { offsetWidth: cw, offsetHeight: ch } = container;
+      this.videoAncestorElements.clear();
       for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
         if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
         if (this.hasExplicitSize(parent)) return container;
