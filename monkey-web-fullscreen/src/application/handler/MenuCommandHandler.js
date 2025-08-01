@@ -24,9 +24,13 @@ export default {
   },
   setupMenuChangeListener() {
     const host = location.host;
-    [Storage.CLOSE_PLAY_RATE.name, Storage.OVERRIDE_KEYBOARD.name, ENABLE_THIS.name + host, EPISODE_SELECTOR.name + host].forEach(
-      (key) => GM_addValueChangeListener(key, () => this.registMenuCommand())
-    );
+    [
+      ENABLE_THIS.name + host,
+      Storage.CLOSE_PLAY_RATE.name,
+      EPISODE_SELECTOR.name + host,
+      Storage.OVERRIDE_KEYBOARD.name,
+      Storage.DISABLE_MEMORY_TIME.name,
+    ].forEach((key) => GM_addValueChangeListener(key, () => this.registMenuCommand()));
   },
   registMenuCommand() {
     const host = location.host;
@@ -37,7 +41,7 @@ export default {
       { title: "设置零键秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL, isDisable: false },
       { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isDisable: this.isDisablePlaybackRate() },
       { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isDisable: !this.isOverrideKeyboard() },
-      { title: "设置进度保存天数", cache: Storage.STORAGE_DAYS, isDisable: false },
+      { title: "设置进度保存天数", cache: Storage.STORAGE_DAYS, isDisable: Storage.DISABLE_MEMORY_TIME.get() },
       { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isDisable: Site.isMatch(), fn: siteFun },
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isDisable: !EPISODE_SELECTOR.get(host), fn: delPicker },
       { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isDisable: false, fn: () => this.shortcutKeysPopup() },

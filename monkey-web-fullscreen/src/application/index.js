@@ -66,8 +66,7 @@ export default window.App = {
   setParentVideoInfo(videoInfo) {
     window.videoInfo = this.videoInfo = videoInfo;
     if (!Tools.isTopWin()) return (videoInfo.iframeSrc = location.href), Tools.postMessage(window.parent, { videoInfo });
-    this.setupPickerEpisodeListener();
-    this.setupScriptMenuCommand();
+    setTimeout(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
     this.sendTopWinInfo();
   },
   sendTopWinInfo() {

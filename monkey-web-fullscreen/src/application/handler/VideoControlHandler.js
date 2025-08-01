@@ -64,9 +64,10 @@ export default {
     if (!this.topWin || this.isLive() || !Tools.validDuration(video)) return;
     if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.clearCachedTime(video);
     Storage.PLAY_TIME.set(this.getCacheTimeKey(video), Number(video.currentTime) - 1, Storage.STORAGE_DAYS.get());
-    this.clearVideosCacheTime();
+    this.clearMultiVideoCacheTime(); // 清除多视频页记忆的播放进度，如：抖音网页版
   },
   applyCachedTime(video) {
+    if (Storage.DISABLE_MEMORY_TIME.get()) return this.clearCachedTime(video);
     if (this.hasAppliedCachedTime || !this.topWin || this.isLive()) return;
     // 从存储中获取该视频的缓存播放时间
     const time = Storage.PLAY_TIME.get(this.getCacheTimeKey(video));
@@ -84,7 +85,7 @@ export default {
   getCacheTimeKey(video) {
     return `${this.topWin.urlHash}_${Math.floor(video.duration)}`;
   },
-  clearVideosCacheTime() {
+  clearMultiVideoCacheTime() {
     setTimeout(() => {
       if (!Tools.isMultiVideo()) return;
       const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
