@@ -55,9 +55,11 @@ export default {
     const ctrlContainer = Tools.findParentWithChild(this.player, ctrl);
     if (!ctrlContainer) return null;
 
+    const { width } = Tools.getElementRect(ctrlContainer);
+    const { width: vw } = Tools.getElementRect(this.player);
     const { centerX, centerY } = Tools.getCenterPoint(ctrlContainer);
     const inRect = Tools.pointInElement(centerX, centerY, this.player);
-    return ctrlContainer.offsetWidth <= this.player.offsetWidth && inRect ? ctrlContainer : null;
+    return Math.floor(width) <= Math.floor(vw) && inRect ? ctrlContainer : null;
   },
   videoAncestorElements: new Set(),
   findVideoParentContainer(container, maxLevel = 4) {
@@ -66,6 +68,7 @@ export default {
     const { offsetWidth: cw, offsetHeight: ch } = container;
     this.videoAncestorElements.clear();
 
+    // 循环向上查找与初始元素宽高相等的父元素
     for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
       if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
       if (this.hasExplicitSize(parent)) return container;

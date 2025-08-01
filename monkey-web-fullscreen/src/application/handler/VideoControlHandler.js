@@ -64,7 +64,7 @@ export default {
     if (!this.topWin || this.isLive() || !Tools.validDuration(video)) return;
     if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.clearCachedTime(video);
     Storage.PLAY_TIME.set(this.getCacheTimeKey(video), Number(video.currentTime) - 1, Storage.STORAGE_DAYS.get());
-    this.clearMultiVideoCacheTime(); // 清除多视频页记忆的播放进度，如：抖音网页版
+    this.clearMultiVideoCacheTime(); // 清除页面内多视频的播放进度存储，如：抖音网页版
   },
   applyCachedTime(video) {
     if (Storage.DISABLE_MEMORY_TIME.get()) return this.clearCachedTime(video);
@@ -207,10 +207,7 @@ export default {
       if (isRemove) Tools.query(".monkey-toast")?.remove();
       content instanceof Element ? el.appendChild(content) : (el.innerHTML = content);
 
-      const container = this.findVideoParentContainer(null, 2);
-      !container.offsetHeight && container.style.setProperty("height", "inherit"); // youtube
-      container.prepend(el), resolve(el);
-
+      (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2)).prepend(el), resolve(el);
       setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
     });
   },
