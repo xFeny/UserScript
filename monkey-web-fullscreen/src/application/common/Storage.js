@@ -44,7 +44,7 @@ class StorageItem {
 
   fuzzyGet(pattern) {
     const result = {};
-    this.fuzzyMatch(pattern, (key) => (result[key] = this.get(key)));
+    this.fuzzyMatch(pattern, (key) => (result[key] = this.getItem(key)));
     return result;
   }
 
