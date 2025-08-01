@@ -885,9 +885,7 @@
         el.setAttribute("class", "monkey-toast");
         if (isRemove) Tools.query(".monkey-toast")?.remove();
         content instanceof Element ? el.appendChild(content) : el.innerHTML = content;
-        const container = this.findVideoParentContainer(null, 2);
-        !container.offsetHeight && container.style.setProperty("height", "inherit");
-        container.prepend(el), resolve(el);
+        (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2)).prepend(el), resolve(el);
         setTimeout(() => (el.style.opacity = 0, setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
       });
     },
@@ -1152,9 +1150,11 @@
       const ctrl = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"], [class*="progress"]`;
       const ctrlContainer = Tools.findParentWithChild(this.player, ctrl);
       if (!ctrlContainer) return null;
+      const { width } = Tools.getElementRect(ctrlContainer);
+      const { width: vw } = Tools.getElementRect(this.player);
       const { centerX, centerY } = Tools.getCenterPoint(ctrlContainer);
       const inRect = Tools.pointInElement(centerX, centerY, this.player);
-      return ctrlContainer.offsetWidth <= this.player.offsetWidth && inRect ? ctrlContainer : null;
+      return Math.floor(width) <= Math.floor(vw) && inRect ? ctrlContainer : null;
     },
     videoAncestorElements: /* @__PURE__ */ new Set(),
     findVideoParentContainer(container, maxLevel = 4) {
