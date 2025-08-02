@@ -759,6 +759,7 @@
       if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
       if (!this.topWin || this.isLive() || !Tools.validDuration(video)) return;
       if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.clearCachedTime(video);
+      if (video.duration - video.currentTime <= Storage.ZERO_KEY_SKIP_INTERVAL.get()) return this.clearCachedTime(video);
       Storage.PLAY_TIME.set(this.getCacheTimeKey(video), Number(video.currentTime) - 1, Storage.STORAGE_DAYS.get());
       this.clearMultiVideoCacheTime();
     },
