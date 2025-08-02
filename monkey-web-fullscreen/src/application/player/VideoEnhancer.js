@@ -7,8 +7,10 @@ import VideoEvents from "./VideoEventsHandler";
  */
 export default class VideoEnhancer {
   attr = "enhanced";
-  selector = ":is(video, fake-video):not([enhanced])"; // 腾讯视频 fake-iframe-video
+  selector = ":is(video, fake-video):not([enhanced])"; // 腾讯视频 fake-video
   defaultTsr = { zoom: 100, moveX: 0, moveY: 0, rotation: 0, isMirrored: false };
+  danmuSelector = ':is([class*="danmu" i], [class*="danmaku" i], [class*="barrage" i])';
+  videoEvents = Object.entries(VideoEvents);
 
   constructor() {
     this.setupObserver();
@@ -25,26 +27,19 @@ export default class VideoEnhancer {
   }
 
   setupObserver() {
-    Tools.createObserver(document.body, (mutationsList) => {
-      for (const mutation of mutationsList) {
-        if (mutation.type !== "childList" || mutation.addedNodes.length === 0) return;
-        this.processAddedNodes(mutation.addedNodes); // 处理新增的节点
-      }
+    Tools.createObserver(document.body, (mutations) => {
+      mutations.forEach((m) => m.type === "childList" && this.processAddedNodes(m.addedNodes));
     });
   }
 
   processAddedNodes(nodes) {
-    // 遍历所有新增节点
+    const { selector, danmuSelector } = this;
     for (const node of nodes) {
-      // 如果节点是video元素且未被增强过
-      if (node instanceof HTMLVideoElement && !node.hasAttribute(this.attr)) {
-        this.enhanced(node);
-      }
-      // 如果节点是元素且有子节点，则递归处理其子节点
-      else if (node instanceof Element && node.hasChildNodes()) {
-        const childVideos = Tools.querys(this.selector, node);
-        childVideos.forEach((video) => this.enhanced(video));
-      }
+      if (!(node instanceof Element) || node.matches(danmuSelector)) continue;
+      // 若当前节点是未增强的视频元素，直接增强
+      if (node.matches(selector)) this.enhanced(node);
+      // 若当前节点有子节点，查询并增强其中的视频元素
+      else if (node.hasChildNodes()) Tools.querys(selector, node).forEach((video) => this.enhanced(video));
     }
   }
 
@@ -57,7 +52,7 @@ export default class VideoEnhancer {
 
   setupEventListeners(video) {
     video.setAttribute(this.attr, true);
-    Object.entries(VideoEvents).forEach(([type, handler]) => {
+    this.videoEvents.forEach(([type, handler]) => {
       video.removeEventListener(type, handler, true);
       video.addEventListener(type, handler, true);
     });
