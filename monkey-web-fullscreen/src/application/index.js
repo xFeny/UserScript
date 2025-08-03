@@ -56,6 +56,7 @@ export default window.App = {
 
     this.player = video;
     this.setVideoInfo(video);
+    this.setupVideoObserver(video);
     window.videoEnhance.enhanced(video);
   },
   setVideoInfo(video) {
@@ -76,6 +77,23 @@ export default window.App = {
     const topWin = { host, viewWidth, viewHeight, urlHash: Tools.hashCode(url) };
     window.topWin = this.topWin = topWin;
     Tools.sendToIFrames({ topWin });
+  },
+  setupVideoObserver(video) {
+    this.playerObserver?.disconnect();
+    const handlePlayerChange = (mutations) => {
+      mutations.forEach((mutation) => {
+        const { attributeName, oldValue, target } = mutation;
+        const newValue = target.getAttribute(attributeName);
+        if (attributeName !== "src" || oldValue === newValue || !newValue) return;
+        // Tools.log(`视频源变化: ${oldValue ?? "空"} => ${newValue ?? "空"}`);
+        this.player = null;
+        this.setVideoInfo(target);
+        this.hasAppliedCachedTime = false;
+      });
+    };
+
+    const options = { attributes: true, attributeOldValue: true };
+    this.playerObserver = Tools.createObserver(video, handlePlayerChange, options);
   },
   setupMouseMoveListener() {
     let timer = null;

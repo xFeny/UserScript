@@ -59,10 +59,10 @@ export default unsafeWindow.Tools = {
     const dict = { clientX, clientY, bubbles: true };
     element.dispatchEvent(new MouseEvent("mousemove", dict));
   },
-  createObserver(target, callback) {
+  createObserver(target, callback, options) {
     const observer = new MutationObserver(callback);
     target = target instanceof Element ? target : this.query(target);
-    observer.observe(target, { childList: true, subtree: true });
+    observer.observe(target, { childList: true, subtree: true, ...options });
     return observer;
   },
   closest(element, selector, maxLevel = 3) {
