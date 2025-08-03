@@ -13,8 +13,8 @@ export default {
   isTencent: () => /v.qq.com\/x/.test(location.href),
   isQiyi: () => /iqiyi.com\/v_*/.test(location.href),
   isDouyu: () => /v.douyu.com\/show/.test(location.href),
+  isBili: () => /bilibili.com\/video/.test(location.href),
   isBiliLive: () => location.host === "live.bilibili.com",
-  isBili: () => /bilibili.com\/(video|list)/.test(location.href),
   isLivePage: () => !location.host.endsWith("live") && /\blive\b/.test(location.href),
   isMatch: () => matches.some((match) => match.test(location.href.replace(location.search, Consts.EMPTY))),
 };
