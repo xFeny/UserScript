@@ -201,10 +201,10 @@
       const dict = { clientX, clientY, bubbles: true };
       element.dispatchEvent(new MouseEvent("mousemove", dict));
     },
-    createObserver(target, callback) {
+    createObserver(target, callback, options) {
       const observer = new MutationObserver(callback);
       target = target instanceof Element ? target : this.query(target);
-      observer.observe(target, { childList: true, subtree: true });
+      observer.observe(target, { childList: true, subtree: true, ...options });
       return observer;
     },
     closest(element, selector, maxLevel = 3) {
@@ -333,6 +333,7 @@
       if (video.offsetWidth < 200 || this.isBackgroundVideo(video)) return;
       this.player = video;
       this.setVideoInfo(video);
+      this.setupVideoObserver(video);
       window.videoEnhance.enhanced(video);
     },
     setVideoInfo(video) {
@@ -352,6 +353,21 @@
       const topWin = { host, viewWidth, viewHeight, urlHash: Tools.hashCode(url) };
       window.topWin = this.topWin = topWin;
       Tools.sendToIFrames({ topWin });
+    },
+    setupVideoObserver(video) {
+      this.playerObserver?.disconnect();
+      const handlePlayerChange = (mutations) => {
+        mutations.forEach((mutation) => {
+          const { attributeName, oldValue, target } = mutation;
+          const newValue = target.getAttribute(attributeName);
+          if (attributeName !== "src" || oldValue === newValue || !newValue) return;
+          this.player = null;
+          this.setVideoInfo(target);
+          this.hasAppliedCachedTime = false;
+        });
+      };
+      const options = { attributes: true, attributeOldValue: true };
+      this.playerObserver = Tools.createObserver(video, handlePlayerChange, options);
     },
     setupMouseMoveListener() {
       let timer = null;
