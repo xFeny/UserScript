@@ -11,7 +11,7 @@ export default window.App = {
     this.setupMouseMoveListener();
     document.addEventListener("load", () => this.triggerStartElement(), true);
   },
-  normalSite: () => !window?.videoInfo && !window?.topWin,
+  isNormalSite: () => !window?.videoInfo && !window?.topWin,
   isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
   getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
   isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
@@ -23,7 +23,7 @@ export default window.App = {
   },
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
-      if (this.normalSite()) return;
+      if (this.isNormalSite()) return;
       const video = this.isLive() ? this.getVideo() : this.player;
       if (!video || video?.isEnded || !Tools.isVisible(video)) return;
       document.hidden ? video?.pause() : video?.play();
@@ -63,9 +63,9 @@ export default window.App = {
   setVideoInfo(video) {
     const isLive = Object.is(video.duration, Infinity);
     const videoInfo = { ...Tools.getCenterPoint(video), src: video.currentSrc, isLive };
-    this.setParentVideoInfo(videoInfo);
+    this.setParentWinVideoInfo(videoInfo);
   },
-  setParentVideoInfo(videoInfo) {
+  setParentWinVideoInfo(videoInfo) {
     window.videoInfo = this.videoInfo = videoInfo;
     if (!Tools.isTopWin()) return (videoInfo.iframeSrc = location.href), Tools.postMessage(window.parent, { videoInfo });
     setTimeout(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
@@ -81,7 +81,7 @@ export default window.App = {
   },
   setupVideoObserver(video) {
     this.playerObserver?.disconnect();
-    const handlePlayerChange = (mutations) => {
+    const handleAttrChange = (mutations) => {
       mutations.forEach((mutation) => {
         const { attributeName, oldValue, target } = mutation;
         const newValue = target.getAttribute(attributeName);
@@ -96,7 +96,7 @@ export default window.App = {
     };
 
     const options = { attributes: true, attributeOldValue: true };
-    this.playerObserver = Tools.createObserver(video, handlePlayerChange, options);
+    this.playerObserver = Tools.createObserver(video, handleAttrChange, options);
   },
   setupMouseMoveListener() {
     let timer = null;
@@ -113,7 +113,7 @@ export default window.App = {
     document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
   },
   toggleCursor(hide = false) {
-    if (this.normalSite() || Tools.isTooFrequent("cursor")) return;
+    if (this.isNormalSite() || Tools.isTooFrequent("cursor")) return;
     const cls = "__hc";
 
     if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));

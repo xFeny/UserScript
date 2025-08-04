@@ -6,7 +6,7 @@ import Tools from "../common/Tools";
  */
 export default {
   webFullEnhance() {
-    if (this.normalSite() || Tools.isTooFrequent("enhance")) return;
+    if (this.isNormalSite() || Tools.isTooFrequent("enhance")) return;
     // 退出网页全屏
     if (this.fullscreenWrapper) return this.exitWebFullEnhance();
 

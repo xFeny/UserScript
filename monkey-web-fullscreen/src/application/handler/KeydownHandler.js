@@ -28,7 +28,7 @@ export default {
     window.addEventListener("message", ({ data }) => {
       // Tools.log(location.href, "接收到消息：", data);
       if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
-      if (data?.videoInfo) return this.setParentVideoInfo(data.videoInfo);
+      if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
       if (data?.topWin) window.topWin = this.topWin = data.topWin;
       if (data?.defaultPlaybackRate) this.resetToDefaultPlayRate();
       this.processEvent(data);
@@ -38,7 +38,7 @@ export default {
     // Tools.log("键盘事件：", { key, code });
     const target = event.composedPath()[0];
     const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
-    if (this.normalSite() || isInput || target?.isContentEditable) return;
+    if (this.isNormalSite() || isInput || target?.isContentEditable) return;
     if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
 
     this.preventDefault(event);
