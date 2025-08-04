@@ -4,9 +4,9 @@ import Consts from "./common/Consts";
 
 export default window.App = {
   init() {
+    this.setupDocBodyObserver();
     this.setupVisibleListener();
     this.setupKeydownListener();
-    this.setupMutationObserver();
     this.setupUrlChangeListener();
     this.setupMouseMoveListener();
     document.addEventListener("load", () => this.triggerStartElement(), true);
@@ -37,18 +37,19 @@ export default window.App = {
         window.dispatchEvent(new Event(method));
       };
     };
-    const handler = () => this.setupMutationObserver();
+    const handler = () => this.setupDocBodyObserver();
     ["popstate", "pushState", "replaceState"].forEach((t) => _wr(t) & window.addEventListener(t, handler));
   },
-  setupMutationObserver() {
-    if (Tools.isTooFrequent()) return;
-    const observer = Tools.createObserver(document.body, () => {
+  setupDocBodyObserver() {
+    this.bodyObserver?.disconnect();
+    clearTimeout(this.observerTimeout);
+    this.bodyObserver = Tools.createObserver(document.body, () => {
       this.removeLoginPopups();
       const video = this.getVideo();
       if (video?.offsetWidth) this.setCurrentVideo(video);
-      if (this.topWin) observer.disconnect();
+      if (this.topWin) this.bodyObserver.disconnect();
     });
-    setTimeout(() => observer.disconnect(), Consts.ONE_SEC * 10);
+    this.observerTimeout = setTimeout(() => this.bodyObserver?.disconnect(), Consts.ONE_SEC * 10);
   },
   setCurrentVideo(video) {
     if (!video || this.player === video || (this.player && !this.player.paused)) return;
@@ -86,6 +87,8 @@ export default window.App = {
         const newValue = target.getAttribute(attributeName);
         if (attributeName !== "src" || oldValue === newValue || !newValue) return;
         // Tools.log(`视频源变化: ${oldValue ?? "空"} => ${newValue ?? "空"}`);
+
+        // 确保topWin信息的即时性和可靠性
         this.player = null;
         this.setVideoInfo(target);
         this.hasAppliedCachedTime = false;
