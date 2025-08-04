@@ -12,7 +12,7 @@ export default {
     return Math.floor(this.player.currentTime) === Math.floor(this.player.duration);
   },
   isDynamicDuration(video) {
-    if (!video?.__duration) return false;
+    if (!video?.__duration) return (video.__duration = video.duration) || false;
     return Math.floor(video.duration) > Math.floor(video.__duration);
   },
   initVideoProps(video) {
