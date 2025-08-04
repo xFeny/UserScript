@@ -52,7 +52,7 @@ export default window.App = {
     this.observerTimeout = setTimeout(() => this.bodyObserver?.disconnect(), Consts.ONE_SEC * 10);
   },
   setCurrentVideo(video) {
-    if (!video || this.player === video || !this.player?.paused) return;
+    if (!video || this.player === video || (this.player && !this.player.paused)) return;
     if (video.offsetWidth < 200 || this.isBackgroundVideo(video)) return;
 
     this.player = video;

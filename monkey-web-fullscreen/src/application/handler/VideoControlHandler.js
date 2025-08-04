@@ -8,6 +8,7 @@ import Storage from "../common/Storage";
  */
 export default {
   isEnded() {
+    if (!this.player) return false;
     return Math.floor(this.player.currentTime) === Math.floor(this.player.duration);
   },
   isDynamicDuration(video) {
