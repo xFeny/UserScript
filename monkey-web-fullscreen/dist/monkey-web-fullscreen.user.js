@@ -283,9 +283,9 @@
   };
   const App$1 = window.App = {
     init() {
+      this.setupDocBodyObserver();
       this.setupVisibleListener();
       this.setupKeydownListener();
-      this.setupMutationObserver();
       this.setupUrlChangeListener();
       this.setupMouseMoveListener();
       document.addEventListener("load", () => this.triggerStartElement(), true);
@@ -315,18 +315,19 @@
           window.dispatchEvent(new Event(method));
         };
       };
-      const handler = () => this.setupMutationObserver();
+      const handler = () => this.setupDocBodyObserver();
       ["popstate", "pushState", "replaceState"].forEach((t) => _wr(t) & window.addEventListener(t, handler));
     },
-    setupMutationObserver() {
-      if (Tools.isTooFrequent()) return;
-      const observer = Tools.createObserver(document.body, () => {
+    setupDocBodyObserver() {
+      this.bodyObserver?.disconnect();
+      clearTimeout(this.observerTimeout);
+      this.bodyObserver = Tools.createObserver(document.body, () => {
         this.removeLoginPopups();
         const video = this.getVideo();
         if (video?.offsetWidth) this.setCurrentVideo(video);
-        if (this.topWin) observer.disconnect();
+        if (this.topWin) this.bodyObserver.disconnect();
       });
-      setTimeout(() => observer.disconnect(), Consts.ONE_SEC * 10);
+      this.observerTimeout = setTimeout(() => this.bodyObserver?.disconnect(), Consts.ONE_SEC * 10);
     },
     setCurrentVideo(video) {
       if (!video || this.player === video || this.player && !this.player.paused) return;
@@ -1228,7 +1229,7 @@
       if (this.duration < 5) return;
       App.setCurrentVideo(this);
       App.applyCachedPlayRate(this);
-      App.applyCachedTime(this);
+      setTimeout(() => App.applyCachedTime(this), 10);
     },
     pause() {
       Tools.query(".ec-no")?.click();
