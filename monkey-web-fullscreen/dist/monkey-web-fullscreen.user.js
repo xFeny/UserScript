@@ -290,7 +290,7 @@
       this.setupMouseMoveListener();
       document.addEventListener("load", () => this.triggerStartElement(), true);
     },
-    normalSite: () => !window?.videoInfo && !window?.topWin,
+    isNormalSite: () => !window?.videoInfo && !window?.topWin,
     isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
     getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
     isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
@@ -301,7 +301,7 @@
     },
     setupVisibleListener() {
       window.addEventListener("visibilitychange", () => {
-        if (this.normalSite()) return;
+        if (this.isNormalSite()) return;
         const video = this.isLive() ? this.getVideo() : this.player;
         if (!video || video?.isEnded || !Tools.isVisible(video)) return;
         document.hidden ? video?.pause() : video?.play();
@@ -340,9 +340,9 @@
     setVideoInfo(video) {
       const isLive = Object.is(video.duration, Infinity);
       const videoInfo = { ...Tools.getCenterPoint(video), src: video.currentSrc, isLive };
-      this.setParentVideoInfo(videoInfo);
+      this.setParentWinVideoInfo(videoInfo);
     },
-    setParentVideoInfo(videoInfo) {
+    setParentWinVideoInfo(videoInfo) {
       window.videoInfo = this.videoInfo = videoInfo;
       if (!Tools.isTopWin()) return videoInfo.iframeSrc = location.href, Tools.postMessage(window.parent, { videoInfo });
       setTimeout(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
@@ -357,7 +357,7 @@
     },
     setupVideoObserver(video) {
       this.playerObserver?.disconnect();
-      const handlePlayerChange = (mutations) => {
+      const handleAttrChange = (mutations) => {
         mutations.forEach((mutation) => {
           const { attributeName, oldValue, target } = mutation;
           const newValue = target.getAttribute(attributeName);
@@ -368,7 +368,7 @@
         });
       };
       const options = { attributes: true, attributeOldValue: true };
-      this.playerObserver = Tools.createObserver(video, handlePlayerChange, options);
+      this.playerObserver = Tools.createObserver(video, handleAttrChange, options);
     },
     setupMouseMoveListener() {
       let timer = null;
@@ -383,7 +383,7 @@
       document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
     },
     toggleCursor(hide = false) {
-      if (this.normalSite() || Tools.isTooFrequent("cursor")) return;
+      if (this.isNormalSite() || Tools.isTooFrequent("cursor")) return;
       const cls = "__hc";
       if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
       [...Tools.getParents(this.player, true, 3), ...Tools.getIFrames()].forEach((el) => {
@@ -533,7 +533,7 @@
       window.addEventListener("keydown", (event) => this.keydownHandler.call(this, event), true);
       window.addEventListener("message", ({ data }) => {
         if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
-        if (data?.videoInfo) return this.setParentVideoInfo(data.videoInfo);
+        if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
         if (data?.topWin) window.topWin = this.topWin = data.topWin;
         if (data?.defaultPlaybackRate) this.resetToDefaultPlayRate();
         this.processEvent(data);
@@ -542,7 +542,7 @@
     keydownHandler(event, { key, code } = event) {
       const target = event.composedPath()[0];
       const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
-      if (this.normalSite() || isInput || target?.isContentEditable) return;
+      if (this.isNormalSite() || isInput || target?.isContentEditable) return;
       if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
       this.preventDefault(event);
       key = this.processKeystrokes(event);
@@ -1128,7 +1128,7 @@
   };
   const WebFullEnhance = {
     webFullEnhance() {
-      if (this.normalSite() || Tools.isTooFrequent("enhance")) return;
+      if (this.isNormalSite() || Tools.isTooFrequent("enhance")) return;
       if (this.fullscreenWrapper) return this.exitWebFullEnhance();
       const container = this.getVideoHostContainer();
       if (!container || container.matches(":is(html, body)")) return;
