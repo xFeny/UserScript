@@ -26,7 +26,7 @@ interface TopWin {
 interface App {
   // index 方法
   init(): void;
-  normalSite(): boolean;
+  isNormalSite(): boolean;
   isLive(): boolean;
   setCurrentVideo(video: HTMLVideoElement): void;
   player: HTMLVideoElement | null | undefined;
