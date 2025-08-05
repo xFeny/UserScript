@@ -1183,12 +1183,12 @@
       this.videoAncestorElements.clear();
       for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
         if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
-        if (this.hasExplicitSize(parent)) return container;
+        if (this.hasExplicitlySize(parent)) return container;
         this.videoAncestorElements.add(parent);
       }
       return container;
     },
-    hasExplicitSize(element) {
+    hasExplicitlySize(element) {
       const style = element.style;
       const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
       return ["width", "height"].some((prop) => {
@@ -1230,7 +1230,7 @@
       if (this.duration < 5) return;
       App.setCurrentVideo(this);
       App.applyCachedPlayRate(this);
-      setTimeout(() => App.applyCachedTime(this), 30);
+      setTimeout(() => App.applyCachedTime(this), 20);
     },
     pause() {
       Tools.query(".ec-no")?.click();
