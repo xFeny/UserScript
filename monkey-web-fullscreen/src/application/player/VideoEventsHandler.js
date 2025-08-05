@@ -27,7 +27,7 @@ export default {
     if (this.duration < 5) return; // 超短的视频不操作
     App.setCurrentVideo(this);
     App.applyCachedPlayRate(this);
-    setTimeout(() => App.applyCachedTime(this), 10); // 确保topWin信息的即时性和可靠性
+    setTimeout(() => App.applyCachedTime(this), 30); // 确保topWin信息的即时性和可靠性
   },
   pause() {
     // https://www.mcydh.com、https://dick.xfani.com
