@@ -1230,7 +1230,7 @@
       if (this.duration < 5) return;
       App.setCurrentVideo(this);
       App.applyCachedPlayRate(this);
-      setTimeout(() => App.applyCachedTime(this), 10);
+      setTimeout(() => App.applyCachedTime(this), 30);
     },
     pause() {
       Tools.query(".ec-no")?.click();
