@@ -344,8 +344,8 @@
     },
     setParentWinVideoInfo(videoInfo) {
       window.videoInfo = this.videoInfo = videoInfo;
-      if (!Tools.isTopWin()) return videoInfo.iframeSrc = location.href, Tools.postMessage(window.parent, { videoInfo });
-      setTimeout(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
+      if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iframeSrc: location.href } });
+      Promise.resolve().then(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
       this.sendTopWinInfo();
     },
     sendTopWinInfo() {
@@ -374,8 +374,7 @@
       let timer = null;
       const handleMouseEvent = ({ target, isTrusted }) => {
         if (!isTrusted) return;
-        clearTimeout(timer);
-        this.toggleCursor();
+        clearTimeout(timer), this.toggleCursor();
         timer = setTimeout(() => this.toggleCursor(true), Consts.ONE_SEC * 3);
         if (target instanceof HTMLVideoElement) this.setCurrentVideo(target);
       };
@@ -799,7 +798,7 @@
       return `${this.topWin.urlHash}_${Math.floor(video.duration)}`;
     },
     clearMultiVideoCacheTime() {
-      setTimeout(() => {
+      Promise.resolve().then(() => {
         if (!Tools.isMultiVideo()) return;
         const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
         const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
