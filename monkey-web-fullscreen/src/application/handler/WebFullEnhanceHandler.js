@@ -7,9 +7,11 @@ import Tools from "../common/Tools";
 export default {
   webFullEnhance() {
     if (this.isNormalSite() || Tools.isTooFrequent("enhance")) return;
+
     // 退出网页全屏
     if (this.fullscreenWrapper) return this.exitWebFullEnhance();
 
+    // video的宿主容器元素
     const container = this.getVideoHostContainer();
     if (!container || container.matches(":is(html, body)")) return;
 
@@ -19,7 +21,8 @@ export default {
     container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
     Tools.getParents(container, true)?.forEach((el) => Tools.setPart(el, Consts.webFull));
 
-    this.ensureWebFullscreen(); // 确保网页全屏成功
+    // 确保网页全屏成功
+    this.ensureWebFullscreen();
   },
   exitWebFullEnhance() {
     const container = this.fullscreenWrapper;
@@ -30,9 +33,11 @@ export default {
   getVideoHostContainer() {
     if (this.player) return this.getVideoContainer();
 
+    // video所在的iframe
     const videoIFrame = this.getVideoIFrame();
     if (videoIFrame) return videoIFrame;
 
+    // 与video中心点相交的iframe
     const ifrs = Tools.getIFrames();
     const { centerX, centerY } = this?.videoInfo ?? {};
     return ifrs.length <= 1 ? ifrs[0] : ifrs.find((el) => Tools.isVisible(el) && Tools.pointInElement(centerX, centerY, el));
@@ -59,6 +64,7 @@ export default {
     const { width: vw } = Tools.getElementRect(this.player);
     const { centerX, centerY } = Tools.getCenterPoint(ctrlContainer);
     const inRect = Tools.pointInElement(centerX, centerY, this.player);
+
     return Math.floor(width) <= Math.floor(vw) && inRect ? ctrlContainer : null;
   },
   videoAncestorElements: new Set(),
@@ -74,6 +80,7 @@ export default {
       if (this.hasExplicitlySize(parent)) return container;
       this.videoAncestorElements.add(parent);
     }
+
     return container;
   },
   hasExplicitlySize(element) {
@@ -87,6 +94,11 @@ export default {
   ensureWebFullscreen() {
     const { viewWidth, viewHeight } = this.topWin;
     const elements = [...this.videoAncestorElements].reverse();
+
+    // 确保video父元素的宽高与视窗一致
+    // findVideoParentContainer 获取到的父容器，由于外联css设置了固定的宽高
+    // 在网页全屏后，需要重新判断元素的宽高，确保视频成功网页全屏
+    // 如：https://www.toutiao.com
     for (const element of elements) {
       const { offsetWidth, offsetHeight } = this.player;
       if (offsetWidth === viewWidth && offsetHeight === viewHeight) return;
