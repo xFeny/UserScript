@@ -951,7 +951,7 @@
     autoExitWebFullscreen() {
       if (!Site.isBili() && !Site.isAcFun()) return;
       if (this.player.offsetWidth === innerWidth) this.triggerIconElement(SiteIcons.name.webFull);
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         const isLast = Tools.query('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
         if (!Tools.query(".video-pod") || isLast) Tools.query(".bpx-player-ending-related-item-cancel")?.click();
       });
@@ -1133,15 +1133,16 @@
       const container = this.getVideoHostContainer();
       if (!container || container.matches(":is(html, body)")) return;
       this.fullscreenWrapper = container;
-      container.top = container.top ?? container.getBoundingClientRect()?.top ?? 0;
+      container.top = container.top ?? Tools.getElementRect(container).top;
       container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
       Tools.getParents(container, true)?.forEach((el) => Tools.setPart(el, Consts.webFull));
+      Tools.scrollTop(container.scrollY + container.top);
       this.ensureWebFullscreen();
     },
     exitWebFullEnhance() {
       const container = this.fullscreenWrapper;
       Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
-      Tools.scrollTop((Tools.getElementRect(container)?.top < 0 ? container?.top + container.scrollY : container?.top) - 120);
+      requestAnimationFrame(() => Tools.scrollTop(container.scrollY));
       this.fullscreenWrapper = null;
     },
     getVideoHostContainer() {
