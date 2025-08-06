@@ -17,9 +17,12 @@ export default {
 
     // 进入网页全屏
     this.fullscreenWrapper = container;
-    container.top = container.top ?? container.getBoundingClientRect()?.top ?? 0;
+    container.top = container.top ?? Tools.getElementRect(container).top;
     container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
     Tools.getParents(container, true)?.forEach((el) => Tools.setPart(el, Consts.webFull));
+
+    // 滚动到视频容器位置
+    Tools.scrollTop(container.scrollY + container.top);
 
     // 确保网页全屏成功
     this.ensureWebFullscreen();
@@ -27,7 +30,7 @@ export default {
   exitWebFullEnhance() {
     const container = this.fullscreenWrapper;
     Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
-    Tools.scrollTop((Tools.getElementRect(container)?.top < 0 ? container?.top + container.scrollY : container?.top) - 120);
+    requestAnimationFrame(() => Tools.scrollTop(container.scrollY)); // 滚动到原始位置
     this.fullscreenWrapper = null;
   },
   getVideoHostContainer() {

@@ -32,7 +32,7 @@ export default {
     if (!Site.isBili() && !Site.isAcFun()) return;
     if (this.player.offsetWidth === innerWidth) this.triggerIconElement(SiteIcons.name.webFull);
     // B站视频合集播放的是合集最后一个或关闭了合集自动连播，点击“取消连播”按钮
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       const isLast = Tools.query('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
       if (!Tools.query(".video-pod") || isLast) Tools.query(".bpx-player-ending-related-item-cancel")?.click();
     });
