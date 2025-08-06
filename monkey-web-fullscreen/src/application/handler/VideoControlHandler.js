@@ -96,7 +96,7 @@ export default {
     return `${this.topWin.urlHash}_${Math.floor(video.duration)}`;
   },
   clearMultiVideoCacheTime() {
-    setTimeout(() => {
+    Promise.resolve().then(() => {
       if (!Tools.isMultiVideo()) return;
       const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
       const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
