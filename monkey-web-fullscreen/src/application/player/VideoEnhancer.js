@@ -128,6 +128,11 @@ export default class VideoEnhancer {
     Element.prototype._attachShadow = Element.prototype.attachShadow;
     Element.prototype.attachShadow = function (options) {
       const shadowRoot = this._attachShadow.call(this, { ...options, mode: "open" });
+
+      // 对外隐藏shadowRoot，模拟closed模式
+      Object.defineProperty(this, "shadowRoot", { configurable: true, get: () => null });
+
+      // 自定义事件
       const shadowEvent = new CustomEvent("shadow-attached", { bubbles: true, detail: { shadowRoot } });
       document.dispatchEvent(shadowEvent);
       return shadowRoot;
