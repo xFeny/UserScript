@@ -19,7 +19,7 @@ export default {
     this.fullscreenWrapper = container;
     container.top = container.top ?? Tools.getElementRect(container).top;
     container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
-    Tools.getParents(container, true)?.forEach((el) => Tools.setPart(el, Consts.webFull));
+    Tools.getParents(container, true).forEach((el) => Tools.setPart(el, Consts.webFull));
 
     // 滚动到视频容器位置，解决微博网页全屏后，在退出时不在原始位置问题
     Tools.scrollTop(container.scrollY + container.top);
@@ -29,7 +29,7 @@ export default {
   },
   exitWebFullEnhance() {
     const container = this.fullscreenWrapper;
-    Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
+    [...Tools.getParents(container, true), ...this.videoParents].forEach((el) => Tools.delPart(el, Consts.webFull));
     requestAnimationFrame(() => Tools.scrollTop(container.scrollY)); // 滚动到原始位置
     this.fullscreenWrapper = null;
   },
@@ -70,18 +70,18 @@ export default {
 
     return Math.floor(width) <= Math.floor(vw) && inRect ? ctrlContainer : null;
   },
-  videoAncestorElements: new Set(),
+  videoParents: new Set(),
   findVideoParentContainer(container, maxLevel = 4) {
     const video = this.player;
     container = container ?? video.parentElement;
     const { offsetWidth: cw, offsetHeight: ch } = container;
-    this.videoAncestorElements.clear();
+    this.videoParents.clear();
 
     // 循环向上查找与初始元素宽高相等的父元素
     for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
       if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
       if (this.hasExplicitlySize(parent)) return container;
-      this.videoAncestorElements.add(parent);
+      this.videoParents.add(parent);
     }
 
     return container;
@@ -96,7 +96,7 @@ export default {
   },
   ensureWebFullscreen() {
     const { viewWidth, viewHeight } = this.topWin;
-    const elements = [...this.videoAncestorElements].reverse();
+    const elements = [...this.videoParents].reverse();
 
     // 确保video父元素的宽高与视窗一致
     // findVideoParentContainer 获取到的父容器，由于外联css设置了固定的宽高
