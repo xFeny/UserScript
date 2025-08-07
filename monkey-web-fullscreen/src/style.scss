@@ -17,6 +17,10 @@
   font-weight: normal !important;
   transition: opacity 0.3s ease-in !important;
   background: rgba(0, 0, 0, 0.75) !important;
+
+  span {
+    display: inline !important;
+  }
 }
 
 /** 视频网页全屏相关样式 START **/
