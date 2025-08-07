@@ -1,6 +1,6 @@
 import Consts from "./Consts";
 
-// 获取脚本@match匹配规则
+// 获取脚本`@match`匹配规则
 const matches = GM_info.script.matches
   .filter((match) => match !== "*://*/*")
   .map((match) => new RegExp(match.replace(/\*/g, "\\S+")));

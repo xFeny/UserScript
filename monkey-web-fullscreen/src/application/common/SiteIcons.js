@@ -1,5 +1,5 @@
 /**
- * 脚本`@match` 网页全屏、弹幕、下一集css选择器配置
+ * 脚本`@match`的网站 网页全屏、弹幕、下一集css选择器配置
  */
 export default {
   "live.bilibili.com": { webFull: "#businessContainerElement" },

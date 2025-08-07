@@ -4,7 +4,8 @@ import Site from "../common/Site";
 import Swal from "sweetalert2";
 
 /**
- * 手动采集剧集元素选择器
+ * 手动采集剧集元素选择器，进行下集切换适配
+ *
  * https://gqc7.top/
  * https://ddys.pro/
  * https://gaze.run/

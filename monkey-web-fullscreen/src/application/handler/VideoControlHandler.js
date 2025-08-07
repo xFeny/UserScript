@@ -5,6 +5,7 @@ import Storage from "../common/Storage";
 
 /**
  * 视频控制相关逻辑处理
+ * 如：倍速、快进、缩放、移动等
  */
 export default {
   isEnded() {

@@ -4,6 +4,10 @@ import Storage from "../common/Storage";
 
 /**
  * 通用性切换视频下集
+ * 实现原理：
+ * - 通过地址栏URL，模糊查找当前集的元素，定位所有剧集和当前集下标，得到目标集
+ * - 通过特定文本获取目标集
+ * - 通过特定元素选择器取目标集
  */
 export default {
   switchEpisode(isPrev = false) {

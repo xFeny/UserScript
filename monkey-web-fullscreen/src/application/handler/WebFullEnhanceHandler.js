@@ -21,7 +21,7 @@ export default {
     container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
     Tools.getParents(container, true)?.forEach((el) => Tools.setPart(el, Consts.webFull));
 
-    // 滚动到视频容器位置
+    // 滚动到视频容器位置，解决微博网页全屏后，在退出时不在原始位置问题
     Tools.scrollTop(container.scrollY + container.top);
 
     // 确保网页全屏成功

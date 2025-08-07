@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELECTOR } = Storage;
 
 /**
- * 脚本菜单命令
+ * 脚本菜单相关逻辑处理
  */
 export default {
   isDisableZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),

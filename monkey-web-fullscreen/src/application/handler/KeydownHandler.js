@@ -6,7 +6,7 @@ import SiteIcons from "../common/SiteIcons";
 import Keyboard from "../common/Keyboard";
 
 /**
- * 快捷键逻辑处理
+ * 快捷键和消息相关逻辑处理
  */
 export default {
   preventDefault(event, { code, altKey } = event) {

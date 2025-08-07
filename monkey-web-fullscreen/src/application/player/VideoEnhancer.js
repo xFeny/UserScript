@@ -2,8 +2,8 @@ import Tools from "../common/Tools";
 import VideoEvents from "./VideoEventsHandler";
 
 /**
- * 自动为页面中的video元素添加事件监听
- * 支持动态添加的video元素
+ * 自动为页面中的video元素添加脚本的事件监听，支持动态添加的video元素
+ * 使得在多视频页面，切换视频播放时能更快速的应用到倍速
  */
 export default class VideoEnhancer {
   attr = "enhanced";
