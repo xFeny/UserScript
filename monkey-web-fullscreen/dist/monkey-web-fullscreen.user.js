@@ -1135,13 +1135,13 @@
       this.fullscreenWrapper = container;
       container.top = container.top ?? Tools.getElementRect(container).top;
       container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
-      Tools.getParents(container, true)?.forEach((el) => Tools.setPart(el, Consts.webFull));
+      Tools.getParents(container, true).forEach((el) => Tools.setPart(el, Consts.webFull));
       Tools.scrollTop(container.scrollY + container.top);
       this.ensureWebFullscreen();
     },
     exitWebFullEnhance() {
       const container = this.fullscreenWrapper;
-      Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
+      [...Tools.getParents(container, true), ...this.videoParents].forEach((el) => Tools.delPart(el, Consts.webFull));
       requestAnimationFrame(() => Tools.scrollTop(container.scrollY));
       this.fullscreenWrapper = null;
     },
@@ -1175,16 +1175,16 @@
       const inRect = Tools.pointInElement(centerX, centerY, this.player);
       return Math.floor(width) <= Math.floor(vw) && inRect ? ctrlContainer : null;
     },
-    videoAncestorElements: /* @__PURE__ */ new Set(),
+    videoParents: /* @__PURE__ */ new Set(),
     findVideoParentContainer(container, maxLevel = 4) {
       const video = this.player;
       container = container ?? video.parentElement;
       const { offsetWidth: cw, offsetHeight: ch } = container;
-      this.videoAncestorElements.clear();
+      this.videoParents.clear();
       for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
         if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
         if (this.hasExplicitlySize(parent)) return container;
-        this.videoAncestorElements.add(parent);
+        this.videoParents.add(parent);
       }
       return container;
     },
@@ -1198,7 +1198,7 @@
     },
     ensureWebFullscreen() {
       const { viewWidth, viewHeight } = this.topWin;
-      const elements = [...this.videoAncestorElements].reverse();
+      const elements = [...this.videoParents].reverse();
       for (const element of elements) {
         const { offsetWidth, offsetHeight } = this.player;
         if (offsetWidth === viewWidth && offsetHeight === viewHeight) return;
