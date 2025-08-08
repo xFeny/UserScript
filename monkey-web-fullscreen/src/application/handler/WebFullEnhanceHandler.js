@@ -28,9 +28,9 @@ export default {
     this.ensureWebFullscreen();
   },
   exitWebFullEnhance() {
-    const container = this.fullscreenWrapper;
-    [...Tools.getParents(container, true), ...this.videoParents].forEach((el) => Tools.delPart(el, Consts.webFull));
-    requestAnimationFrame(() => Tools.scrollTop(container.scrollY)); // 滚动到原始位置
+    const { scrollY } = this.fullscreenWrapper;
+    Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
+    requestAnimationFrame(() => Tools.scrollTop(scrollY)); // 滚动到原始位置
     this.fullscreenWrapper = null;
   },
   getVideoHostContainer() {

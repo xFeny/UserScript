@@ -28,8 +28,8 @@ export function isDocument(node) {
 export function* getShadowRoots(node, deep = false) {
   if (!node || (!isElement(node) && !isDocument(node))) return;
 
-  if (isElement(node) && node.shadowRoot) {
-    yield node.shadowRoot;
+  if (isElement(node) && node._shadowRoot) {
+    yield node._shadowRoot;
   }
 
   const doc = isDocument(node) ? node : node.getRootNode({ composed: true });
@@ -39,16 +39,16 @@ export function* getShadowRoots(node, deep = false) {
   const toWalk = [node];
   while ((currentNode = toWalk.pop())) {
     const walker = doc.createTreeWalker(currentNode, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_DOCUMENT_FRAGMENT, {
-      acceptNode: (child) => (isElement(child) && child.shadowRoot ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP),
+      acceptNode: (child) => (isElement(child) && child._shadowRoot ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP),
     });
 
     let walkerNode = walker.nextNode();
     while (walkerNode) {
-      if (isElement(walkerNode) && walkerNode.shadowRoot) {
+      if (isElement(walkerNode) && walkerNode._shadowRoot) {
         if (deep) {
-          toWalk.push(walkerNode.shadowRoot);
+          toWalk.push(walkerNode._shadowRoot);
         }
-        yield walkerNode.shadowRoot;
+        yield walkerNode._shadowRoot;
       }
       walkerNode = walker.nextNode();
     }
