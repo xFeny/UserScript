@@ -903,7 +903,7 @@
         el.setAttribute("class", "monkey-toast");
         if (isRemove) Tools.query(".monkey-toast")?.remove();
         content instanceof Element ? el.appendChild(content) : el.innerHTML = content;
-        (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2)).prepend(el), resolve(el);
+        (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2, false)).prepend(el), resolve(el);
         setTimeout(() => (el.style.opacity = 0, setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
       });
     },
@@ -1176,15 +1176,15 @@
       return Math.floor(width) <= Math.floor(vw) && inRect ? ctrlContainer : null;
     },
     videoParents: /* @__PURE__ */ new Set(),
-    findVideoParentContainer(container, maxLevel = 4) {
+    findVideoParentContainer(container, maxLevel = 4, track = true) {
       const video = this.player;
       container = container ?? video.parentElement;
       const { offsetWidth: cw, offsetHeight: ch } = container;
-      this.videoParents.clear();
+      if (track) this.videoParents.clear();
       for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
         if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
         if (this.hasExplicitlySize(parent)) return container;
-        this.videoParents.add(parent);
+        if (track) this.videoParents.add(parent);
       }
       return container;
     },
