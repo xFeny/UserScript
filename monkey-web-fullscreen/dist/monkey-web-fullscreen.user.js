@@ -1349,7 +1349,7 @@
       Element.prototype._attachShadow = Element.prototype.attachShadow;
       Element.prototype.attachShadow = function(options) {
         const shadowRoot = this._shadowRoot = this._attachShadow.call(this, { ...options, mode: "open" });
-        Object.defineProperty(this, "shadowRoot", { configurable: true, get: () => null });
+        if (options.mode === "closed") Object.defineProperty(this, "shadowRoot", { configurable: true, get: () => null });
         const shadowEvent = new CustomEvent("shadow-attached", { bubbles: true, detail: { shadowRoot } });
         document.dispatchEvent(shadowEvent);
         return shadowRoot;
