@@ -103,8 +103,8 @@ export default {
     // 在网页全屏后，需要重新判断元素的宽高，确保视频成功网页全屏
     // 如：https://www.toutiao.com
     for (const element of elements) {
-      const { offsetWidth, offsetHeight } = this.player;
-      if (offsetWidth === viewWidth && offsetHeight === viewHeight) return;
+      const { offsetWidth: width, offsetHeight: height } = this.player;
+      if (width === viewWidth && height === viewHeight && element.offsetHeight === viewHeight) continue;
       Tools.setPart(element, Consts.webFull);
     }
   },

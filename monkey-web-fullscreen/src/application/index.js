@@ -89,7 +89,6 @@ export default window.App = {
         // Tools.log(`视频源变化: ${oldValue ?? "空"} => ${newValue ?? "空"}`);
 
         // 确保topWin信息的即时性和可靠性
-        this.player = null;
         this.setVideoInfo(target);
         this.hasAppliedCachedTime = false;
       });
