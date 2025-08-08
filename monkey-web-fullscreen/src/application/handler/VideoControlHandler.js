@@ -219,7 +219,7 @@ export default {
       if (isRemove) Tools.query(".monkey-toast")?.remove();
       content instanceof Element ? el.appendChild(content) : (el.innerHTML = content);
 
-      (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2)).prepend(el), resolve(el);
+      (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2, false)).prepend(el), resolve(el);
       setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
     });
   },

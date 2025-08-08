@@ -71,17 +71,17 @@ export default {
     return Math.floor(width) <= Math.floor(vw) && inRect ? ctrlContainer : null;
   },
   videoParents: new Set(),
-  findVideoParentContainer(container, maxLevel = 4) {
+  findVideoParentContainer(container, maxLevel = 4, track = true) {
     const video = this.player;
     container = container ?? video.parentElement;
     const { offsetWidth: cw, offsetHeight: ch } = container;
-    this.videoParents.clear();
+    if (track) this.videoParents.clear(); // 仅网页全屏时
 
     // 循环向上查找与初始元素宽高相等的父元素
     for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
       if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
       if (this.hasExplicitlySize(parent)) return container;
-      this.videoParents.add(parent);
+      if (track) this.videoParents.add(parent);
     }
 
     return container;
