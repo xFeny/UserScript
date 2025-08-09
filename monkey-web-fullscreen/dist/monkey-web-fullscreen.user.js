@@ -636,7 +636,7 @@
       const siteFun = ({ cache }) => cache.set(host, !isEnble);
       const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
       const customWebFullscreen = ({ cache, title }) => cache.set(host, prompt(title, cache.get(host)) ?? cache.get(host));
-      [
+      const configs = [
         { title: "设置零键秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL, isHidden: false },
         { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isHidden: this.isDisablePlaybackRate() },
         { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isHidden: !this.isOverrideKeyboard() },
@@ -646,7 +646,8 @@
         { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
         { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isHidden: false, fn: () => this.shortcutKeysPopup() },
         { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isHidden: false, fn: () => this.moreSettPopup() }
-      ].forEach(({ title, cache, isHidden, fn }) => {
+      ];
+      configs.forEach(({ title, cache, isHidden, fn }) => {
         const id = `${cache.name}_MENU_ID`;
         _GM_unregisterMenuCommand(this[id]);
         if (isHidden) return;
