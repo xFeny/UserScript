@@ -635,10 +635,7 @@
       const isEnble = this.isEnbleThisWebSiteAuto();
       const siteFun = ({ cache }) => cache.set(host, !isEnble);
       const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
-      const customWebFullscreen = ({ cache, title }) => {
-        const input = prompt(title, cache.get(host));
-        if (input !== null) cache.set(host, input);
-      };
+      const customWebFullscreen = ({ cache, title }) => cache.set(host, prompt(title, cache.get(host)) ?? cache.get(host));
       [
         { title: "设置零键秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL, isHidden: false },
         { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isHidden: this.isDisablePlaybackRate() },
