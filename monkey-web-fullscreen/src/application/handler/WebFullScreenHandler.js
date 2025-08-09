@@ -10,7 +10,13 @@ export default {
     if (Site.isMatch() && this.isDisableAuto()) return;
     if (!Site.isMatch() && !this.isEnbleThisWebSiteAuto()) return;
     if (!this.topWin || video.hasWebFull || !video.offsetWidth) return;
-    if (video.offsetWidth >= this.topWin.viewWidth) return (video.hasWebFull = true);
+
+    // 视频元素宽高大于等于视窗，表示已网页全屏
+    const { offsetWidth, offsetHeight } = video;
+    const { viewWidth, viewHeight } = this.topWin;
+    if (offsetWidth >= viewWidth || offsetHeight >= viewHeight) return (video.hasWebFull = true);
+
+    // 发送网页全屏消息
     Tools.postMessage(window.top, { key: "P" });
   },
   liveWebFullscreen() {

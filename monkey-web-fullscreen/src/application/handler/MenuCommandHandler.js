@@ -4,7 +4,7 @@ import Tools from "../common/Tools";
 import Site from "../common/Site";
 import Swal from "sweetalert2";
 
-const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELECTOR, CUSTOM_WEB_FULL } = Storage;
+const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELECTOR } = Storage;
 
 /**
  * 脚本菜单相关逻辑处理
@@ -35,9 +35,9 @@ export default {
   registMenuCommand() {
     const host = location.host;
     const isEnble = this.isEnbleThisWebSiteAuto();
-    const siteFun = () => ENABLE_THIS.set(host, !isEnble);
+    const siteFun = ({ cache }) => cache.set(host, !isEnble);
     const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
-    const customWebFullscreen = (title) => CUSTOM_WEB_FULL.set(host, prompt(title, CUSTOM_WEB_FULL.get(host)));
+    const customWebFullscreen = ({ cache, title }) => cache.set(host, prompt(title, cache.get(host)));
 
     [
       { title: "设置零键秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL, isHidden: false },
@@ -45,7 +45,7 @@ export default {
       { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isHidden: !this.isOverrideKeyboard() },
       { title: "设置进度保存天数", cache: Storage.STORAGE_DAYS, isHidden: Storage.DISABLE_MEMORY_TIME.get() },
       { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatch(), fn: siteFun },
-      { title: "自定义此站网页全屏规则", cache: CUSTOM_WEB_FULL, isHidden: Site.isMatch(), fn: customWebFullscreen },
+      { title: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatch(), fn: customWebFullscreen },
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
       { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isHidden: false, fn: () => this.moreSettPopup() },
@@ -55,7 +55,7 @@ export default {
       if (isHidden) return;
 
       this[id] = GM_registerMenuCommand(title, () => {
-        if (fn) return fn.call(this, title);
+        if (fn) return fn.call(this, { cache, title });
 
         const input = prompt(title, cache.get());
         if (!isNaN(input) && cache.parser(input)) cache.set(input);
