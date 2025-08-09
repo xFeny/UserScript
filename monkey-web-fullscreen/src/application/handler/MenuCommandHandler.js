@@ -4,7 +4,7 @@ import Tools from "../common/Tools";
 import Site from "../common/Site";
 import Swal from "sweetalert2";
 
-const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELECTOR } = Storage;
+const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELECTOR, CUSTOM_WEB_FULL } = Storage;
 
 /**
  * 脚本菜单相关逻辑处理
@@ -37,22 +37,25 @@ export default {
     const isEnble = this.isEnbleThisWebSiteAuto();
     const siteFun = () => ENABLE_THIS.set(host, !isEnble);
     const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
+    const customWebFullscreen = (title) => CUSTOM_WEB_FULL.set(host, prompt(title, CUSTOM_WEB_FULL.get(host)));
+
     [
-      { title: "设置零键秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL, isDisable: false },
-      { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isDisable: this.isDisablePlaybackRate() },
-      { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isDisable: !this.isOverrideKeyboard() },
-      { title: "设置进度保存天数", cache: Storage.STORAGE_DAYS, isDisable: Storage.DISABLE_MEMORY_TIME.get() },
-      { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isDisable: Site.isMatch(), fn: siteFun },
-      { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isDisable: !EPISODE_SELECTOR.get(host), fn: delPicker },
-      { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isDisable: false, fn: () => this.shortcutKeysPopup() },
-      { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isDisable: false, fn: () => this.moreSettPopup() },
-    ].forEach(({ title, cache, isDisable, fn }) => {
+      { title: "设置零键秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL, isHidden: false },
+      { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isHidden: this.isDisablePlaybackRate() },
+      { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isHidden: !this.isOverrideKeyboard() },
+      { title: "设置进度保存天数", cache: Storage.STORAGE_DAYS, isHidden: Storage.DISABLE_MEMORY_TIME.get() },
+      { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatch(), fn: siteFun },
+      { title: "自定义此站网页全屏规则", cache: CUSTOM_WEB_FULL, isHidden: Site.isMatch(), fn: customWebFullscreen },
+      { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
+      { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isHidden: false, fn: () => this.shortcutKeysPopup() },
+      { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isHidden: false, fn: () => this.moreSettPopup() },
+    ].forEach(({ title, cache, isHidden, fn }) => {
       const id = `${cache.name}_MENU_ID`;
       GM_unregisterMenuCommand(this[id]);
-      if (isDisable) return;
+      if (isHidden) return;
 
       this[id] = GM_registerMenuCommand(title, () => {
-        if (fn) return fn.call(this);
+        if (fn) return fn.call(this, title);
 
         const input = prompt(title, cache.get());
         if (!isNaN(input) && cache.parser(input)) cache.set(input);

@@ -129,5 +129,6 @@ export default {
   CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
   REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
   STORAGE_DAYS: new StorageItem("STORAGE_DAYS", 7, false, parseFloat),
+  CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", "", false),
   PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat),
 };
