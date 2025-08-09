@@ -987,7 +987,7 @@
       }).map(this.getEpisodeWrapper).filter((el) => this.getAllEpisodes(el).map(this.getEpisodeNumber).filter(Boolean).length > 1);
       return eles.length <= 1 ? eles[0] : eles.find((el) => Tools.hasCls(el, "cur", "active") || !!this.getEpisodeNumber(el));
     },
-    getEpisodeNumber: (ele) => Tools.getNumbers(ele?.innerText?.replace(/-/g, Consts.EMPTY))?.shift(),
+    getEpisodeNumber: (ele) => Tools.getNumbers(ele?.innerText?.replace(/-|\./g, Consts.EMPTY))?.shift(),
     getTargetEpisode(element, isPrev = false) {
       if (!element) return;
       const episodes = this.getAllEpisodes(element);
@@ -1005,7 +1005,7 @@
       const sibling = Tools.findSibling(element, eleName);
       const children = Array.from(sibling?.parentElement?.children ?? []);
       return children.filter((ele) => {
-        const currClass = Array.from(ele.classList);
+        const currClass = Array.from(ele.classList).filter((cls) => !["cur", "active"].includes(cls));
         const hasSameClass = eleClass.some((value) => currClass.includes(value));
         return currClass.length ? hasSameClass : ele.tagName === eleName;
       });
