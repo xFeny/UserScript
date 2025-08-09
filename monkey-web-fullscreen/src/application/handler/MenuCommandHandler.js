@@ -39,7 +39,8 @@ export default {
     const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
     const customWebFullscreen = ({ cache, title }) => cache.set(host, prompt(title, cache.get(host)) ?? cache.get(host));
 
-    [
+    // 菜单配置项
+    const configs = [
       { title: "设置零键秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL, isHidden: false },
       { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isHidden: this.isDisablePlaybackRate() },
       { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isHidden: !this.isOverrideKeyboard() },
@@ -49,7 +50,10 @@ export default {
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
       { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isHidden: false, fn: () => this.moreSettPopup() },
-    ].forEach(({ title, cache, isHidden, fn }) => {
+    ];
+
+    // 注册菜单项
+    configs.forEach(({ title, cache, isHidden, fn }) => {
       const id = `${cache.name}_MENU_ID`;
       GM_unregisterMenuCommand(this[id]);
       if (isHidden) return;
@@ -63,6 +67,7 @@ export default {
     });
   },
   moreSettPopup() {
+    // 更多设置弹窗中的配置项
     const configs = [
       { name: "cut", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT },
       { name: "zoom", text: "禁用缩放与移动", cache: Storage.DISABLE_ZOOM_MOVE },
@@ -71,9 +76,13 @@ export default {
       { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, hide: this.isLive() },
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
     ];
+
+    // 将配置项数组转换为HTML字符串数组
+    // 每个配置项生成一个带复选框的标签元素
     const html = configs.map(
       ({ name, text, hide }) => `<label class="__menu ${hide && "hide"}">${text}<input name="${name}" type="checkbox"/></label>`
     );
+
     Swal.fire({
       width: 350,
       title: "更多设置",
