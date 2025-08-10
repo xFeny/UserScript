@@ -15,6 +15,5 @@ export default {
   isDouyu: () => /v.douyu.com\/show/.test(location.href),
   isBili: () => /bilibili.com\/video/.test(location.href),
   isBiliLive: () => location.host === "live.bilibili.com",
-  isLivePage: () => !location.host.endsWith("live") && /\blive\b/.test(location.href),
   isMatch: () => matches.some((match) => match.test(location.href.replace(location.search, Consts.EMPTY))),
 };

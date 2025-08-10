@@ -12,7 +12,6 @@ export default window.App = {
     document.addEventListener("load", () => this.triggerStartElement(), true);
   },
   isNormalSite: () => !window?.videoInfo && !window?.topWin,
-  isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
   getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
   isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
   triggerStartElement() {
@@ -24,7 +23,7 @@ export default window.App = {
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
       if (this.isNormalSite()) return;
-      const video = this.isLive() ? this.getVideo() : this.player;
+      const video = this.player ?? this.getVideo();
       if (!video || video?.isEnded || !Tools.isVisible(video)) return;
       document.hidden ? video?.pause() : video?.play();
     });

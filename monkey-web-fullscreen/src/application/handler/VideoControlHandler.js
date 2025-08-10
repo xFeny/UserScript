@@ -12,7 +12,12 @@ export default {
     if (!this.player) return false;
     return Math.floor(this.player.currentTime) === Math.floor(this.player.duration);
   },
+  isLive() {
+    if (!this.videoInfo && !this.player) return false;
+    return this.videoInfo.isLive || this?.player?.duration === Infinity || this.isDynamicDuration(this.player);
+  },
   isDynamicDuration(video) {
+    if (!video) return false;
     if (!video?.__duration) return (video.__duration = video.duration) || false;
     return Math.floor(video.duration) > Math.floor(video.__duration);
   },
@@ -24,16 +29,11 @@ export default {
   },
   togglePlayPause: (video) => (Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause()),
   tryAutoPlay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),
-  checkUsable() {
-    if (!this.player || this.isDisablePlaybackRate()) return false;
-    if (this.isBackgroundVideo(this.player) || this.isEnded()) return false;
-    if (this.isLive() || this.isDynamicDuration(this.player)) return false;
-    if (!Tools.validDuration(this.player)) return false;
-    return true;
-  },
   setPlaybackRate(playRate, show = true) {
-    if (!this.checkUsable()) return;
+    if (!this.player || isNaN(this.player.duration) || this.isDisablePlaybackRate()) return;
+    if (this.isLive() || this.isEnded() || this.isBackgroundVideo(this.player)) return;
 
+    // 设置倍速
     window.videoEnhance.setPlaybackRate(this.player, playRate);
     if (show) this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
     Storage.CACHED_PLAY_RATE.set(this.player.playbackRate);
@@ -46,32 +46,32 @@ export default {
   },
   resetToDefaultPlayRate() {
     if (this.isDisablePlaybackRate()) return;
-
     this.setPlaybackRate(Consts.DEF_PLAY_RATE, false);
     this.showToast("已恢复正常倍速播放");
   },
   applyCachedPlayRate(video) {
     if (this.isDisablePlaybackRate()) return;
 
+    // 应用记忆倍速
     const playRate = Storage.CACHED_PLAY_RATE.get();
-    // Tools.log(`当前播放倍速为：${video.playbackRate}，记忆倍速为：${playRate}`);
     if (Consts.DEF_PLAY_RATE === playRate || Number(video.playbackRate) === playRate) return;
     this.setPlaybackRate(playRate, !video.hasToast);
     video.hasToast = true;
   },
   adjustPlayProgress(second = Storage.SKIP_INTERVAL.get()) {
-    if (!this.player || !Tools.validDuration(this.player) || (second > 0 && this.player.isEnded)) return;
+    if (!this.player || this.isLive() || this.isEnded()) return;
 
+    // 跳过指定秒数
     const currentTime = Math.min(Number(this.player.currentTime) + second, this.player.duration);
     this.setCurrentTime(currentTime);
   },
   cachePlayTime(video) {
-    if (this.isDynamicDuration(video) || video.duration < 120) return;
+    if (!this.topWin || video.duration < 120 || this.isLive()) return;
     if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
-    if (!this.topWin || this.isLive() || !Tools.validDuration(video)) return;
 
+    // 禁用记忆、播放结束、距离结束30秒，清除记忆缓存
     if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.clearCachedTime(video);
-    if (video.duration - video.currentTime <= Storage.ZERO_KEY_SKIP_INTERVAL.get()) return this.clearCachedTime(video);
+    if (video.duration - video.currentTime <= 30) return this.clearCachedTime(video);
 
     Storage.PLAY_TIME.set(this.getCacheTimeKey(video), Number(video.currentTime) - 1, Storage.STORAGE_DAYS.get());
     this.clearMultiVideoCacheTime(); // 清除页面内多视频的播放进度存储，如：抖音网页版
