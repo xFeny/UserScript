@@ -108,8 +108,6 @@ class TimedStorage extends StorageItem {
  * ENABLE_THIS_SITE_AUTO  此站启/禁用自动网页全屏
  * DISABLE_MEMORY_TIME  禁用播放进度记录
  * DISABLE_ZOOM_MOVE  禁用缩放和移动
- * ENABLE_AUTO_NEXT   启用自动切换至下集
- * AUTO_NEXT_SEC    设置自动下集的提前秒数
  * DISABLE_SCREENSHOT  禁用视频截图
  * CURR_EPISODE_SELECTOR  通用切换下集—当前播放集数 拾取的CSS选择器
  * REL_EPISODE_SELECTOR   通用切换下集—集数列表中的任意一集 拾取的CSS选择器
@@ -129,8 +127,6 @@ export default {
   ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
   DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
   DISABLE_ZOOM_MOVE: new StorageItem("DISABLE_ZOOM_MOVE", true, false, (value) => Boolean(value)),
-  ENABLE_AUTO_NEXT: new StorageItem("ENABLE_AUTO_NEXT", false, false, (value) => Boolean(value)),
-  AUTO_NEXT_SEC: new StorageItem("AUTO_NEXT_SECONDS", 70, false, (value) => parseInt(value, 10)),
   DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
   CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
   REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
