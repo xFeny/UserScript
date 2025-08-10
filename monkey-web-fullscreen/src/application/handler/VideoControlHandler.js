@@ -23,8 +23,8 @@ export default {
   },
   initVideoProps(video) {
     video.volume = 1;
-    video.hasToast = false;
     video.hasWebFull = false;
+    video.hasApplyCachedRate = false;
     video.__duration = video.duration;
   },
   togglePlayPause: (video) => (Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause()),
@@ -32,11 +32,13 @@ export default {
   setPlaybackRate(playRate, show = true) {
     if (!this.player || isNaN(this.player.duration) || this.isDisablePlaybackRate()) return;
     if (this.isLive() || this.isEnded() || this.isBackgroundVideo(this.player)) return;
+    if (Number(this.player.playbackRate) === playRate) return;
 
     // 设置倍速
     window.videoEnhance.setPlaybackRate(this.player, playRate);
     if (show) this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
     Storage.CACHED_PLAY_RATE.set(this.player.playbackRate);
+    return Promise.resolve();
   },
   adjustPlaybackRate(step = Storage.PLAY_RATE_STEP.get()) {
     if (!this.player) return;
@@ -45,18 +47,12 @@ export default {
     this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
   },
   resetToDefaultPlayRate() {
-    if (this.isDisablePlaybackRate()) return;
-    this.setPlaybackRate(Consts.DEF_PLAY_RATE, false);
-    this.showToast("已恢复正常倍速播放");
+    this.setPlaybackRate(Consts.DEF_PLAY_RATE, false).then(() => this.showToast("已恢复正常倍速播放"));
   },
   applyCachedPlayRate(video) {
-    if (this.isDisablePlaybackRate()) return;
-
-    // 应用记忆倍速
     const playRate = Storage.CACHED_PLAY_RATE.get();
     if (Consts.DEF_PLAY_RATE === playRate || Number(video.playbackRate) === playRate) return;
-    this.setPlaybackRate(playRate, !video.hasToast);
-    video.hasToast = true;
+    this.setPlaybackRate(playRate, !video.hasApplyCachedRate).then(() => (video.hasApplyCachedRate = true));
   },
   adjustPlayProgress(second = Storage.SKIP_INTERVAL.get()) {
     if (!this.player || this.isLive() || this.isEnded()) return;

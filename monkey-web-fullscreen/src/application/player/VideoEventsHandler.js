@@ -37,7 +37,7 @@ export default {
   },
   ended() {
     this.isEnded = true;
-    this.hasToast = false;
+    this.hasApplyCachedRate = false;
     App.autoExitWebFullscreen();
     App.clearCachedTime(this);
   },

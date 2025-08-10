@@ -1,6 +1,7 @@
 import Site from "./common/Site";
 import Tools from "./common/Tools";
 import Consts from "./common/Consts";
+import Storage from "./common/Storage";
 
 export default window.App = {
   init() {
@@ -22,7 +23,8 @@ export default window.App = {
   },
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
-      if (this.isNormalSite()) return;
+      if (this.isNormalSite() || Storage.DISABLE_INVISIBLE_PAUSE.get()) return;
+
       const video = this.player ?? this.getVideo();
       if (!video || video?.isEnded || !Tools.isVisible(video)) return;
       document.hidden ? video?.pause() : video?.play();
