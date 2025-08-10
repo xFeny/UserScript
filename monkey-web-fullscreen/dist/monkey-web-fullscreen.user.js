@@ -91,7 +91,6 @@
     isDouyu: () => /v.douyu.com\/show/.test(location.href),
     isBili: () => /bilibili.com\/video/.test(location.href),
     isBiliLive: () => location.host === "live.bilibili.com",
-    isLivePage: () => !location.host.endsWith("live") && /\blive\b/.test(location.href),
     isMatch: () => matches.some((match) => match.test(location.href.replace(location.search, Consts.EMPTY)))
   };
   function isElement(node) {
@@ -154,7 +153,6 @@
     isMultiVideo: () => querySelectorAll("video").length > 1,
     query: (selector, context) => querySelector(selector, context),
     querys: (selector, context) => querySelectorAll(selector, context),
-    validDuration: (video) => !isNaN(video.duration) && video.duration !== Infinity,
     triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
     toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, Consts.EMPTY),
     postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
@@ -291,7 +289,6 @@
       document.addEventListener("load", () => this.triggerStartElement(), true);
     },
     isNormalSite: () => !window?.videoInfo && !window?.topWin,
-    isLive: () => Site.isLivePage() || window?.videoInfo?.isLive,
     getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
     isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
     triggerStartElement() {
@@ -302,7 +299,7 @@
     setupVisibleListener() {
       window.addEventListener("visibilitychange", () => {
         if (this.isNormalSite()) return;
-        const video = this.isLive() ? this.getVideo() : this.player;
+        const video = this.player ?? this.getVideo();
         if (!video || video?.isEnded || !Tools.isVisible(video)) return;
         document.hidden ? video?.pause() : video?.play();
       });
@@ -728,7 +725,12 @@
       if (!this.player) return false;
       return Math.floor(this.player.currentTime) === Math.floor(this.player.duration);
     },
+    isLive() {
+      if (!this.videoInfo && !this.player) return false;
+      return this.videoInfo.isLive || this?.player?.duration === Infinity || this.isDynamicDuration(this.player);
+    },
     isDynamicDuration(video) {
+      if (!video) return false;
       if (!video?.__duration) return (video.__duration = video.duration) || false;
       return Math.floor(video.duration) > Math.floor(video.__duration);
     },
@@ -740,15 +742,9 @@
     },
     togglePlayPause: (video) => Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause(),
     tryAutoPlay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),
-    checkUsable() {
-      if (!this.player || this.isDisablePlaybackRate()) return false;
-      if (this.isBackgroundVideo(this.player) || this.isEnded()) return false;
-      if (this.isLive() || this.isDynamicDuration(this.player)) return false;
-      if (!Tools.validDuration(this.player)) return false;
-      return true;
-    },
     setPlaybackRate(playRate, show = true) {
-      if (!this.checkUsable()) return;
+      if (!this.player || isNaN(this.player.duration) || this.isDisablePlaybackRate()) return;
+      if (this.isLive() || this.isEnded() || this.isBackgroundVideo(this.player)) return;
       window.videoEnhance.setPlaybackRate(this.player, playRate);
       if (show) this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
       Storage.CACHED_PLAY_RATE.set(this.player.playbackRate);
@@ -771,16 +767,15 @@
       video.hasToast = true;
     },
     adjustPlayProgress(second = Storage.SKIP_INTERVAL.get()) {
-      if (!this.player || !Tools.validDuration(this.player) || second > 0 && this.player.isEnded) return;
+      if (!this.player || this.isLive() || this.isEnded()) return;
       const currentTime = Math.min(Number(this.player.currentTime) + second, this.player.duration);
       this.setCurrentTime(currentTime);
     },
     cachePlayTime(video) {
-      if (this.isDynamicDuration(video) || video.duration < 120) return;
+      if (!this.topWin || video.duration < 120 || this.isLive()) return;
       if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
-      if (!this.topWin || this.isLive() || !Tools.validDuration(video)) return;
       if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.clearCachedTime(video);
-      if (video.duration - video.currentTime <= Storage.ZERO_KEY_SKIP_INTERVAL.get()) return this.clearCachedTime(video);
+      if (video.duration - video.currentTime <= 30) return this.clearCachedTime(video);
       Storage.PLAY_TIME.set(this.getCacheTimeKey(video), Number(video.currentTime) - 1, Storage.STORAGE_DAYS.get());
       this.clearMultiVideoCacheTime();
     },
