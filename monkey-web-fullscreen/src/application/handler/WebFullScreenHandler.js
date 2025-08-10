@@ -1,6 +1,8 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
+import Consts from "../common/Consts";
 import SiteIcons from "../common/SiteIcons";
+
 /**
  * 网页全屏逻辑处理
  */
@@ -8,6 +10,7 @@ export default {
   autoWebFullscreen(video) {
     if (this.player !== video) return;
     if (!this.topWin || video.hasWebFull || !video.offsetWidth) return;
+    if (Tools.isTooFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
     if ((Site.isMatch() && this.isDisableAuto()) || (!Site.isMatch() && !this.isEnbleThisWebSiteAuto())) return;
 
     // 视频元素宽高大于等于视窗，表示已网页全屏
