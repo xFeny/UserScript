@@ -7,6 +7,14 @@ import SiteIcons from "../common/SiteIcons";
  * 网页全屏逻辑处理
  */
 export default {
+  autoNextEpisode(video) {
+    if (isNaN(video.duration) || video.hasTryNextEpisode) return;
+    if (Tools.isTooFrequent("next", Consts.ONE_SEC, true)) return; // 节流，限制1秒执行一次
+    if (video.duration - video.currentTime > 70) return; // 距离结束还剩多少秒切换下集
+
+    Tools.postMessage(window.top, { key: "N" });
+    video.hasTryNextEpisode = true;
+  },
   autoWebFullscreen(video) {
     if (this.player !== video) return;
     if (!this.topWin || video.hasWebFull || !video.offsetWidth) return;

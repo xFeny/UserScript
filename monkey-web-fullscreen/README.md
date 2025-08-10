@@ -251,3 +251,32 @@ App.autoExitWebFullscreen();
 
 如果不需要该功能可在脚本菜单更多设置中「禁用标签页隐藏暂停」设置禁用。
 
+#### 自动切换下集
+
+功能已实现但未使用，需要手动修改代码进行使用
+
+```js
+{
+  // 自动切换下集逻辑
+  autoNextEpisode(video) {
+    if (isNaN(video.duration) || video.hasTryNextEpisode) return;
+    if (Tools.isTooFrequent("next", Consts.ONE_SEC, true)) return;
+    // 距离播放结束还剩70秒时切换下集，可修改为需要的秒数
+    if (video.duration - video.currentTime > 70) return;
+
+    Tools.postMessage(window.top, { key: "N" });
+    video.hasTryNextEpisode = true;
+  },
+  autoWebFullscreen(video) {}
+}
+```
+
+代码中找到 `timeupdate`，在`timeupdate`中添加一下代码：
+
+```js
+timeupdate() {
+  // 应用自动切换下集逻辑，默认不存在改行代码
+  App.autoNextEpisode(this);
+},
+```
+
