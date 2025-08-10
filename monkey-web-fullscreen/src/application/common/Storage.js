@@ -97,21 +97,24 @@ class TimedStorage extends StorageItem {
 
 /**
  * 缓存的 key-value
- * PLAY_RATE_STEP  倍速步进
- * CACHED_PLAY_RATE  用户设置的播放倍速
+ * PLAY_RATE_STEP  设置倍速步长
+ * CACHED_PLAY_RATE  记忆用户设置的播放倍速
  * CLOSE_PLAY_RATE  禁用视频倍速调节
  * SKIP_INTERVAL  设置快进/退秒数
  * OVERRIDE_KEYBOARD  启用 空格 ◀▶ 键控制
  * DISABLE_AUTO  禁用`@match`网址自动网页全屏
  * ZERO_KEY_SKIP_INTERVAL  设置零键快进时长
- *
+ * DISABLE_INVISIBLE_PAUSE  禁用标签页隐藏暂停
  * ENABLE_THIS_SITE_AUTO  此站启/禁用自动网页全屏
  * DISABLE_MEMORY_TIME  禁用播放进度记录
  * DISABLE_ZOOM_MOVE  禁用缩放和移动
+ * ENABLE_AUTO_NEXT   启用自动切换至下集
+ * AUTO_NEXT_SEC    设置自动下集的提前秒数
  * DISABLE_SCREENSHOT  禁用视频截图
- * REL_EPISODE_SELECTOR  通用切换下集—集数列表中的任意一集 拾取的CSS选择器
  * CURR_EPISODE_SELECTOR  通用切换下集—当前播放集数 拾取的CSS选择器
- * STORAGE_DAYS 视频播放进度要保存的天数
+ * REL_EPISODE_SELECTOR   通用切换下集—集数列表中的任意一集 拾取的CSS选择器
+ * STORAGE_DAYS   设置播放进度保存天数
+ * CUSTOM_WEB_FULL    自定义此站网页全屏容器
  * PLAY_TIME  记录的播放进度
  */
 export default {
