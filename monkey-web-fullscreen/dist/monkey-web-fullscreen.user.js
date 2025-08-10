@@ -930,6 +930,13 @@
     }
   };
   const WebFullScreen = {
+    autoNextEpisode(video) {
+      if (isNaN(video.duration) || video.hasTryNextEpisode) return;
+      if (Tools.isTooFrequent("next", Consts.ONE_SEC, true)) return;
+      if (video.duration - video.currentTime > 70) return;
+      Tools.postMessage(window.top, { key: "N" });
+      video.hasTryNextEpisode = true;
+    },
     autoWebFullscreen(video) {
       if (this.player !== video) return;
       if (!this.topWin || video.hasWebFull || !video.offsetWidth) return;
