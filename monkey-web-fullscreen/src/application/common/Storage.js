@@ -126,6 +126,8 @@ export default {
   ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
   DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
   DISABLE_ZOOM_MOVE: new StorageItem("DISABLE_ZOOM_MOVE", true, false, (value) => Boolean(value)),
+  ENABLE_AUTO_NEXT: new StorageItem("ENABLE_AUTO_NEXT", false, false, (value) => Boolean(value)),
+  AUTO_NEXT_SEC: new StorageItem("AUTO_NEXT_SECONDS", 70, false, (value) => parseInt(value, 10)),
   DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
   CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
   REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),

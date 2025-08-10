@@ -24,6 +24,7 @@ export default {
   initVideoProps(video) {
     video.volume = 1;
     video.hasWebFull = false;
+    video.hasTryNextEpisode = false;
     video.hasApplyCachedRate = false;
     video.__duration = video.duration;
   },
@@ -63,7 +64,8 @@ export default {
   },
   cachePlayTime(video) {
     if (!this.topWin || video.duration < 120 || this.isLive()) return;
-    if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
+    if (Tools.isTooFrequent("cacheTime", Consts.ONE_SEC, true)) return; // 节流
+    if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return; //播放时间太短
 
     // 禁用记忆、播放结束、距离结束30秒，清除记忆缓存
     if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.clearCachedTime(video);

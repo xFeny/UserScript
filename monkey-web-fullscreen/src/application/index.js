@@ -92,6 +92,7 @@ export default window.App = {
 
         // 确保topWin信息的即时性和可靠性
         this.setVideoInfo(target);
+        this.initVideoProps(target);
         this.hasAppliedCachedTime = false;
       });
     };
@@ -113,7 +114,7 @@ export default window.App = {
     document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
   },
   toggleCursor(hide = false) {
-    if (this.isNormalSite() || Tools.isTooFrequent("cursor")) return;
+    if (this.isNormalSite() || Tools.isTooFrequent("cursor", null, true)) return;
     const cls = "__hc";
 
     if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));

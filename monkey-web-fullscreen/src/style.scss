@@ -211,6 +211,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     -webkit-line-clamp: 4;
     text-overflow: ellipsis;
     -webkit-box-orient: vertical;
+    color: #fff !important;
   }
 }
 

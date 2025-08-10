@@ -32,12 +32,16 @@ export default unsafeWindow.Tools = {
     this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
   },
   lastTimeMap: new Map(),
-  isTooFrequent(key = "default", delay = 300) {
+  isTooFrequent(key = "default", delay = 300, isThrottle = false) {
     const now = Date.now();
     const lastTime = this.lastTimeMap.get(key) ?? 0;
-    const isFrequent = now - lastTime < delay;
-    this.lastTimeMap.set(key, now);
-    return isFrequent;
+    const timeDiff = now - lastTime;
+
+    // 节流模式：时间差满足条件时更新时间戳并返回true
+    if (isThrottle) return timeDiff >= delay && this.lastTimeMap.set(key, now) && true;
+
+    // 限制模式：始终更新时间戳，返回是否过于频繁
+    return this.lastTimeMap.set(key, now) && timeDiff < delay;
   },
   getCenterPoint(element) {
     if (!element) return { centerX: 0, centerY: 0 };

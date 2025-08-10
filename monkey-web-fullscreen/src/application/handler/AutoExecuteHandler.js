@@ -1,20 +1,38 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
 import SiteIcons from "../common/SiteIcons";
+import Consts from "../common/Consts";
+import Storage from "../common/Storage";
 /**
- * 网页全屏逻辑处理
+ * 自动执行逻辑处理
+ * 自动网页全屏、自动退出网页全屏、自动切换下集
  */
 export default {
+  autoNextEpisode(video) {
+    if (isNaN(video.duration) || video.hasTryNextEpisode) return;
+    if (Tools.isTooFrequent("next", Consts.ONE_SEC, true) || !Storage.ENABLE_AUTO_NEXT.get()) return;
+    if (video.duration - video.currentTime > Storage.AUTO_NEXT_SEC.get()) return;
+
+    // 发送切换下集消息
+    Tools.postMessage(window.top, { key: "N" });
+    video.hasTryNextEpisode = true;
+  },
   autoWebFullscreen(video) {
     if (this.player !== video) return;
-    if (Site.isMatch() && this.isDisableAuto()) return;
-    if (!Site.isMatch() && !this.isEnbleThisWebSiteAuto()) return;
     if (!this.topWin || video.hasWebFull || !video.offsetWidth) return;
+    if (Tools.isTooFrequent("autoWebFull", Consts.HALF_SEC, true)) return; // 节流
+
+    // 禁用自动网页全屏
+    if ((Site.isMatch() && this.isDisableAuto()) || (!Site.isMatch() && !this.isEnbleThisWebSiteAuto())) return;
 
     // 视频元素宽高大于等于视窗，表示已网页全屏
     const { offsetWidth, offsetHeight } = video;
     const { viewWidth, viewHeight } = this.topWin;
-    if (offsetWidth >= viewWidth || offsetHeight >= viewHeight) return (video.hasWebFull = true);
+    const parentWidth = video.parentNode.offsetWidth;
+    if (offsetWidth >= viewWidth || (offsetHeight >= viewHeight && parentWidth >= viewHeight)) {
+      video.hasWebFull = true;
+      return;
+    }
 
     // 发送网页全屏消息
     Tools.postMessage(window.top, { key: "P" });

@@ -28,6 +28,7 @@ export default {
       ENABLE_THIS.name + host,
       Storage.CLOSE_PLAY_RATE.name,
       EPISODE_SELECTOR.name + host,
+      Storage.ENABLE_AUTO_NEXT.name,
       Storage.OVERRIDE_KEYBOARD.name,
       Storage.DISABLE_MEMORY_TIME.name,
     ].forEach((key) => GM_addValueChangeListener(key, () => this.registMenuCommand()));
@@ -48,6 +49,7 @@ export default {
       { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatch(), fn: siteFun },
       { title: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatch(), fn: customWebFullscreen },
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
+      { title: "设置自动下集的提前秒数", cache: Storage.AUTO_NEXT_SEC, isHidden: !Storage.ENABLE_AUTO_NEXT.get() },
       { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isHidden: false, fn: () => this.moreSettPopup() },
     ];
@@ -74,7 +76,8 @@ export default {
       { name: "auto", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, hide: !Site.isMatch() },
       { name: "rate", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, hide: this.isLive() },
       { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, hide: this.isLive() },
-      { name: "time", text: "禁用标签页隐藏暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
+      { name: "pause", text: "禁用标签页隐藏暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
+      { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT },
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
     ];
 
