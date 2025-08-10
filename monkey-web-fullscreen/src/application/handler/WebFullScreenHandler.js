@@ -1,6 +1,7 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
+import Storage from "../common/Storage";
 import SiteIcons from "../common/SiteIcons";
 
 /**
@@ -10,7 +11,7 @@ export default {
   autoNextEpisode(video) {
     if (isNaN(video.duration) || video.hasTryNextEpisode) return;
     if (Tools.isTooFrequent("next", Consts.ONE_SEC, true)) return; // 节流，限制1秒执行一次
-    if (video.duration - video.currentTime > 70) return; // 距离结束还剩多少秒切换下集
+    if (video.duration - video.currentTime > Storage.AUTO_NEXT_SEC.get()) return; // 距离结束还剩多少秒切换下集
 
     Tools.postMessage(window.top, { key: "N" });
     video.hasTryNextEpisode = true;

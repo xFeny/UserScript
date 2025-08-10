@@ -253,25 +253,7 @@ App.autoExitWebFullscreen();
 
 #### 自动切换下集
 
-功能已实现但未使用，需要手动修改代码进行使用
-
-```js
-{
-  // 自动切换下集逻辑
-  autoNextEpisode(video) {
-    if (isNaN(video.duration) || video.hasTryNextEpisode) return;
-    if (Tools.isTooFrequent("next", Consts.ONE_SEC, true)) return;
-    // 距离播放结束还剩70秒时切换下集，可修改为需要的秒数
-    if (video.duration - video.currentTime > 70) return;
-
-    Tools.postMessage(window.top, { key: "N" });
-    video.hasTryNextEpisode = true;
-  },
-  autoWebFullscreen(video) {}
-}
-```
-
-代码中找到 `timeupdate`，在`timeupdate`中添加一下代码：
+功能已实现但未使用，如需要该功能，在代码中找到 `timeupdate` 并添加以下代码：
 
 ```js
 timeupdate() {
@@ -279,4 +261,21 @@ timeupdate() {
   App.autoNextEpisode(this);
 },
 ```
+如需要修改距离播放结束还剩多少秒时切换下集，将以下代码的注释放开，添加脚本菜单项操作。
+
+```js
+// 在 registMenuCommand() {} 中添加
+// { title: "设置自动下集的提前秒数", cache: Storage.AUTO_NEXT_SEC, isHidden: false },
+```
+
+或
+
+```js
+// 将代码中
+if (video.duration - video.currentTime > Storage.AUTO_NEXT_SEC.get()) return;
+// 修改成具体的数值
+if (video.duration - video.currentTime > 70) return;
+```
+
+<i style="color:red">**声明：**该功能暂不纳入未来版本迭代中默认功能范畴，需通过手动修改代码启用。</i>
 
