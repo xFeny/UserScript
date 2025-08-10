@@ -933,6 +933,7 @@
     autoWebFullscreen(video) {
       if (this.player !== video) return;
       if (!this.topWin || video.hasWebFull || !video.offsetWidth) return;
+      if (Tools.isTooFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
       if (Site.isMatch() && this.isDisableAuto() || !Site.isMatch() && !this.isEnbleThisWebSiteAuto()) return;
       const { offsetWidth, offsetHeight } = video;
       const { viewWidth, viewHeight } = this.topWin;
@@ -1228,7 +1229,6 @@
     timeupdate() {
       if (isNaN(this.duration)) return;
       App.autoWebFullscreen(this);
-      App.autoNextEpisode(this);
       App.cachePlayTime(this);
     },
     canplay() {
