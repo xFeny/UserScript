@@ -1169,6 +1169,7 @@
       Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
       requestAnimationFrame(() => Tools.scrollTop(scrollY));
       this.fullscreenWrapper = null;
+      this.videoParents.clear();
     },
     getVideoHostContainer() {
       if (this.player) return this.getVideoContainer();
@@ -1202,7 +1203,7 @@
       const inRect = Tools.pointInElement(centerX, centerY, this.player);
       return Math.floor(width) <= Math.floor(vw) && inRect ? ctrlContainer : null;
     },
-    videoParents: /* @__PURE__ */ new Set(),
+    videoParents: /* @__PURE__ */ new WeakSet(),
     findVideoParentContainer(container, maxLevel = 4, track = true) {
       const video = this.player;
       container = container ?? video.parentElement;
