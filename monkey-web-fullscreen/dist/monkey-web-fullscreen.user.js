@@ -1203,7 +1203,7 @@
       const inRect = Tools.pointInElement(centerX, centerY, this.player);
       return Math.floor(width) <= Math.floor(vw) && inRect ? ctrlContainer : null;
     },
-    videoParents: /* @__PURE__ */ new WeakSet(),
+    videoParents: /* @__PURE__ */ new Set(),
     findVideoParentContainer(container, maxLevel = 4, track = true) {
       const video = this.player;
       container = container ?? video.parentElement;
