@@ -15,7 +15,7 @@ export default {
   timeupdate() {
     if (isNaN(this.duration)) return;
     App.autoWebFullscreen(this);
-    App.autoNextEpisode(this);
+    // App.autoNextEpisode(this);
     App.cachePlayTime(this);
   },
   canplay() {
