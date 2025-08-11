@@ -87,10 +87,8 @@ export default class VideoEnhancer {
 
         this._playbackRate = value;
         this._quality.setPlaybackRate(value);
-        this?.mailToWorker({ cmd: "callWorker_setRate", rate: value });
-        Promise.resolve().then(() => {
-          this?.emit("ratechange", this._playbackRate);
-        });
+        // this?.mailToWorker({ cmd: "callWorker_setRate", rate: value });
+        Promise.resolve().then(() => this?.emit("ratechange", this._playbackRate));
       },
     });
   }
