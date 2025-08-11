@@ -15,7 +15,7 @@ export default {
   isOverrideKeyboard: () => Storage.OVERRIDE_KEYBOARD.get(),
   isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
   isDisableScreenshot: () => Storage.DISABLE_SCREENSHOT.get(),
-  isEnbleThisWebSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
+  isEnbleSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin() || Tools.isTooFrequent("menu")) return;
     this.setupMenuChangeListener();
@@ -34,7 +34,7 @@ export default {
   },
   registMenuCommand() {
     const host = location.host;
-    const isEnble = this.isEnbleThisWebSiteAuto();
+    const isEnble = this.isEnbleSiteAuto();
     const siteFun = ({ cache }) => cache.set(host, !isEnble);
     const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
     const customWebFullscreen = ({ cache, title }) => cache.set(host, prompt(title, cache.get(host)) ?? cache.get(host));

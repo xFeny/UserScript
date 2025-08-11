@@ -24,9 +24,10 @@ export default {
   initVideoProps(video) {
     video.volume = 1;
     video.hasWebFull = false;
-    video.hasTryNextEpisode = false;
+    video.hasTriedAutoNext = false;
     video.hasApplyCachedRate = false;
     video.__duration = video.duration;
+    Tools.resetLimitCounter("autoWebFull");
   },
   togglePlayPause: (video) => (Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause()),
   tryAutoPlay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),

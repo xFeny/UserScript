@@ -38,7 +38,6 @@ export default {
   },
   ended() {
     this.isEnded = true;
-    this.hasApplyCachedRate = false;
     App.autoExitWebFullscreen();
     App.clearCachedTime(this);
   },

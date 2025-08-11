@@ -43,6 +43,15 @@ export default unsafeWindow.Tools = {
     // 限制模式：始终更新时间戳，返回是否过于频繁
     return this.lastTimeMap.set(key, now) && timeDiff < delay;
   },
+  limitCountMap: new Map(),
+  isOverLimit(key = "default", maxCount = 10) {
+    const count = this.limitCountMap.get(key) ?? 0;
+    if (count < maxCount) return this.limitCountMap.set(key, count + 1) && false;
+    return true;
+  },
+  resetLimitCounter(key = "default") {
+    this.limitCountMap.set(key, 0);
+  },
   getCenterPoint(element) {
     if (!element) return { centerX: 0, centerY: 0 };
     const { top, left, width, height } = this.getElementRect(element);

@@ -46,7 +46,7 @@ interface App {
   isOverrideKeyboard(): boolean;
   isDisablePlaybackRate(): boolean;
   isDisableScreenshot(): boolean;
-  isEnbleThisWebSiteAuto(): boolean;
+  isEnbleSiteAuto(): boolean;
   setupScriptMenuCommand(): void;
 
   // PickerEpisodeHandler 方法
