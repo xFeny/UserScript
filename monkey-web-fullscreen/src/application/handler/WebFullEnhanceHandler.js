@@ -33,6 +33,7 @@ export default {
     Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
     requestAnimationFrame(() => Tools.scrollTop(scrollY)); // 滚动到原始位置
     this.fullscreenWrapper = null;
+    this.videoParents.clear();
   },
   getVideoHostContainer() {
     if (this.player) return this.getVideoContainer();
@@ -76,7 +77,7 @@ export default {
 
     return Math.floor(width) <= Math.floor(vw) && inRect ? ctrlContainer : null;
   },
-  videoParents: new Set(),
+  videoParents: new WeakSet(),
   findVideoParentContainer(container, maxLevel = 4, track = true) {
     const video = this.player;
     container = container ?? video.parentElement;
