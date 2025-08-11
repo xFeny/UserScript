@@ -484,7 +484,7 @@
       document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
     },
     toggleCursor(hide = false) {
-      if (this.isNormalSite() || Tools.isTooFrequent("cursor", null, true)) return;
+      if (this.isNormalSite() || Tools.isTooFrequent("cursor", void 0, true)) return;
       const cls = "__hc";
       if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
       [...Tools.getParents(this.player, true, 3), ...Tools.getIFrames()].forEach((el) => {
