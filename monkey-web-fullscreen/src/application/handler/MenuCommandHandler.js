@@ -30,6 +30,7 @@ export default {
       EPISODE_SELECTOR.name + host,
       Storage.OVERRIDE_KEYBOARD.name,
       Storage.DISABLE_MEMORY_TIME.name,
+      Storage.ENABLE_AUTO_NEXT_EPISODE.name,
     ].forEach((key) => GM_addValueChangeListener(key, () => this.registMenuCommand()));
   },
   registMenuCommand() {
@@ -44,11 +45,11 @@ export default {
       { title: "设置零键秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL, isHidden: false },
       { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isHidden: this.isDisablePlaybackRate() },
       { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isHidden: !this.isOverrideKeyboard() },
-      { title: "设置进度保存天数", cache: Storage.STORAGE_DAYS, isHidden: Storage.DISABLE_MEMORY_TIME.get() },
+      // { title: "设置进度保存天数", cache: Storage.STORAGE_DAYS, isHidden: Storage.DISABLE_MEMORY_TIME.get() },
       { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatch(), fn: siteFun },
-      { title: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatch(), fn: customWebFullscreen },
+      { title: "设置此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatch(), fn: customWebFullscreen },
+      { title: "设置自动下集的提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC, isHidden: Storage.ENABLE_AUTO_NEXT_EPISODE.get() },
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
-      // { title: "设置自动下集的提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC, isHidden: false },
       { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isHidden: false, fn: () => this.moreSettPopup() },
     ];
@@ -76,6 +77,7 @@ export default {
       { name: "rate", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, hide: this.isLive() },
       { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, hide: this.isLive() },
       { name: "pause", text: "禁用标签页隐藏暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
+      { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
     ];
 

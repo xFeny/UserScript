@@ -269,29 +269,6 @@ App.autoExitWebFullscreen();
 
 #### 自动切换下集
 
-功能已实现但未使用，如需要该功能，在代码中找到 `timeupdate` 并添加以下代码：
+脚本默认禁用「自动切换下集」功能，如果需要该功能可在脚本菜单更多设置中「启用自动切换至下集」设置启用。
 
-```js
-timeupdate() {
-  // 应用自动切换下集逻辑，默认不存在改行代码
-  App.autoNextEpisode(this);
-},
-```
-如需要修改距离播放结束还剩多少秒时切换下集，将以下代码的注释放开，添加脚本菜单项操作。
-
-```js
-// 在 registMenuCommand() {} 中添加
-// { title: "设置自动下集的提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC, isHidden: false },
-```
-
-或
-
-```js
-// 将代码中
-if (video.duration - video.currentTime > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return;
-// 修改成具体的数值
-if (video.duration - video.currentTime > 70) return;
-```
-
-<i style="color:red">**声明：**该功能暂不纳入未来版本迭代中默认功能范畴，有需要只能通过手动修改代码启用。</i>
-
+启用后可在脚本菜单中「设置自动下集的提前秒数」修改秒数，默认距离播放结束还剩70秒时尝试切换下集。

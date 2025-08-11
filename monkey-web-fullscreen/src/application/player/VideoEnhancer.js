@@ -125,9 +125,10 @@ export default class VideoEnhancer {
   }
 
   hackAttachShadow() {
-    Element.prototype._attachShadow = Element.prototype.attachShadow;
+    Element.prototype.__attachShadow = Element.prototype.attachShadow;
     Element.prototype.attachShadow = function (options) {
-      const shadowRoot = (this._shadowRoot = this._attachShadow.call(this, options));
+      if (this._shadowRoot) return this._shadowRoot;
+      const shadowRoot = (this._shadowRoot = this.__attachShadow.call(this, options));
       const shadowEvent = new CustomEvent("shadow-attached", { bubbles: true, detail: { shadowRoot } });
       document.dispatchEvent(shadowEvent);
       return shadowRoot;

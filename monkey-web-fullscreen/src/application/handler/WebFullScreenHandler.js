@@ -10,7 +10,7 @@ import SiteIcons from "../common/SiteIcons";
 export default {
   autoNextEpisode(video) {
     if (video.hasTriedAutoNext) return;
-    if (Tools.isTooFrequent("autoNext", Consts.ONE_SEC, true)) return; // 节流，一秒执行一次
+    if (Tools.isTooFrequent("autoNext", Consts.ONE_SEC, true) || !Storage.ENABLE_AUTO_NEXT_EPISODE.get()) return;
     if (video.duration - video.currentTime > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return; // 距离结束还剩多少秒切换下集
 
     Tools.postMessage(window.top, { key: "N" });
