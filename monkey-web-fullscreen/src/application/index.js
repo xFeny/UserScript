@@ -1,4 +1,3 @@
-import Site from "./common/Site";
 import Tools from "./common/Tools";
 import Consts from "./common/Consts";
 import Storage from "./common/Storage";

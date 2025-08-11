@@ -1,6 +1,6 @@
+import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
-import Tools from "../common/Tools";
 
 /**
  * 通用网页全屏

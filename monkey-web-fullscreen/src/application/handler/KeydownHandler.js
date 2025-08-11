@@ -2,8 +2,8 @@ import Site from "../common/Site";
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
-import SiteIcons from "../common/SiteIcons";
 import Keyboard from "../common/Keyboard";
+import SiteIcons from "../common/SiteIcons";
 
 /**
  * 快捷键和消息相关逻辑处理
