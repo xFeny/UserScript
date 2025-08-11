@@ -372,10 +372,10 @@
     DISABLE_AUTO: new StorageItem("CLOSE_AUTO_WEB_FULL_SCREEN", false, false, (value) => Boolean(value)),
     ZERO_KEY_SKIP_INTERVAL: new StorageItem("ZERO_KEY_SKIP_INTERVAL", 30, false, (value) => parseInt(value, 10)),
     DISABLE_INVISIBLE_PAUSE: new StorageItem("DISABLE_INVISIBLE_PAUSE", false, false, (value) => Boolean(value)),
+    AUTO_NEXT_ADVANCE_SEC: new StorageItem("AUTO_NEXT_ADVANCE_SECONDS", 70, false, (value) => parseInt(value, 10)),
     ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
     DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
     DISABLE_ZOOM_MOVE: new StorageItem("DISABLE_ZOOM_MOVE", true, false, (value) => Boolean(value)),
-    AUTO_NEXT_SEC: new StorageItem("AUTO_NEXT_SECONDS", 70, false, (value) => parseInt(value, 10)),
     DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
     CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
     REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
@@ -654,7 +654,7 @@
         { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatch(), fn: siteFun },
         { title: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatch(), fn: customWebFullscreen },
         { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
-        // { title: "设置自动下集的提前秒数", cache: Storage.AUTO_NEXT_SEC, isHidden: false },
+        // { title: "设置自动下集的提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC, isHidden: false },
         { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isHidden: false, fn: () => this.shortcutKeysPopup() },
         { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isHidden: false, fn: () => this.moreSettPopup() }
       ];
@@ -945,7 +945,7 @@
     autoNextEpisode(video) {
       if (video.hasTriedAutoNext) return;
       if (Tools.isTooFrequent("autoNext", Consts.ONE_SEC, true)) return;
-      if (video.duration - video.currentTime > Storage.AUTO_NEXT_SEC.get()) return;
+      if (video.duration - video.currentTime > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return;
       Tools.postMessage(window.top, { key: "N" });
       video.hasTriedAutoNext = true;
     },
