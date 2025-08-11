@@ -222,17 +222,13 @@
    
    #### 示例
    
-   **示例一：**
-   
-   网址：http://www.dyttbtw.com/vodplay/135284/1/1.html
+   **示例一：** http://www.dyttbtw.com/vodplay/135284/1/1.html
    
    效果对比图：https://pic1.imgdb.cn/item/68998b0c58cb8da5c8190353.png
    
    CSS 选择器：`#player_2086920243`
    
-   **示例二：**
-   
-   网址：https://www.douyin.com/?recommend=1
+   **示例二：** https://www.douyin.com/?recommend=1
    
    CSS 选择器：`#slidelist > div`
 
