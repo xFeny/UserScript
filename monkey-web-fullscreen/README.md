@@ -281,14 +281,14 @@ timeupdate() {
 
 ```js
 // 在 registMenuCommand() {} 中添加
-// { title: "设置自动下集的提前秒数", cache: Storage.AUTO_NEXT_SEC, isHidden: false },
+// { title: "设置自动下集的提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC, isHidden: false },
 ```
 
 或
 
 ```js
 // 将代码中
-if (video.duration - video.currentTime > Storage.AUTO_NEXT_SEC.get()) return;
+if (video.duration - video.currentTime > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return;
 // 修改成具体的数值
 if (video.duration - video.currentTime > 70) return;
 ```

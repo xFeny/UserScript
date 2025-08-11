@@ -11,7 +11,7 @@ export default {
   autoNextEpisode(video) {
     if (video.hasTriedAutoNext) return;
     if (Tools.isTooFrequent("autoNext", Consts.ONE_SEC, true)) return; // 节流，一秒执行一次
-    if (video.duration - video.currentTime > Storage.AUTO_NEXT_SEC.get()) return; // 距离结束还剩多少秒切换下集
+    if (video.duration - video.currentTime > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return; // 距离结束还剩多少秒切换下集
 
     Tools.postMessage(window.top, { key: "N" });
     video.hasTriedAutoNext = true;

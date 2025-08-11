@@ -105,6 +105,7 @@ class TimedStorage extends StorageItem {
  * DISABLE_AUTO  禁用`@match`网址自动网页全屏
  * ZERO_KEY_SKIP_INTERVAL  设置零键快进时长
  * DISABLE_INVISIBLE_PAUSE  禁用标签页隐藏暂停
+ * AUTO_NEXT_ADVANCE_SEC  设置自动下集的提前秒数
  * ENABLE_THIS_SITE_AUTO  此站启/禁用自动网页全屏
  * DISABLE_MEMORY_TIME  禁用播放进度记录
  * DISABLE_ZOOM_MOVE  禁用缩放和移动
@@ -124,10 +125,10 @@ export default {
   DISABLE_AUTO: new StorageItem("CLOSE_AUTO_WEB_FULL_SCREEN", false, false, (value) => Boolean(value)),
   ZERO_KEY_SKIP_INTERVAL: new StorageItem("ZERO_KEY_SKIP_INTERVAL", 30, false, (value) => parseInt(value, 10)),
   DISABLE_INVISIBLE_PAUSE: new StorageItem("DISABLE_INVISIBLE_PAUSE", false, false, (value) => Boolean(value)),
+  AUTO_NEXT_ADVANCE_SEC: new StorageItem("AUTO_NEXT_ADVANCE_SECONDS", 70, false, (value) => parseInt(value, 10)),
   ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
   DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
   DISABLE_ZOOM_MOVE: new StorageItem("DISABLE_ZOOM_MOVE", true, false, (value) => Boolean(value)),
-  AUTO_NEXT_SEC: new StorageItem("AUTO_NEXT_SECONDS", 70, false, (value) => parseInt(value, 10)),
   DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
   CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
   REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
