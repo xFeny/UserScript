@@ -10,8 +10,8 @@ const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELEC
  * 脚本菜单相关逻辑处理
  */
 export default {
-  isDisableZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
   isDisableAuto: () => Storage.DISABLE_AUTO.get(),
+  isDisableZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
   isOverrideKeyboard: () => Storage.OVERRIDE_KEYBOARD.get(),
   isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
   isDisableScreenshot: () => Storage.DISABLE_SCREENSHOT.get(),
@@ -48,7 +48,7 @@ export default {
       // { title: "设置进度保存天数", cache: Storage.STORAGE_DAYS, isHidden: Storage.DISABLE_MEMORY_TIME.get() },
       { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatch(), fn: siteFun },
       { title: "设置此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatch(), fn: customWebFullscreen },
-      { title: "设置自动下集的提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC, isHidden: Storage.ENABLE_AUTO_NEXT_EPISODE.get() },
+      { title: "设置自动下集提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC, isHidden: !Storage.ENABLE_AUTO_NEXT_EPISODE.get() },
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
       { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isHidden: false, fn: () => this.moreSettPopup() },
@@ -71,21 +71,23 @@ export default {
   moreSettPopup() {
     // 更多设置弹窗中的配置项
     const configs = [
-      { name: "cut", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT },
-      { name: "zoom", text: "禁用缩放与移动", cache: Storage.DISABLE_ZOOM_MOVE },
-      { name: "auto", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, hide: !Site.isMatch() },
-      { name: "rate", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, hide: this.isLive() },
-      { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, hide: this.isLive() },
-      { name: "pause", text: "禁用标签页隐藏暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
-      { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
-      { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
+      { name: "cut", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT, sendMsg: false },
+      { name: "zoom", text: "禁用缩放与移动", cache: Storage.DISABLE_ZOOM_MOVE, sendMsg: false },
+      { name: "auto", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, sendMsg: false, isHidden: !Site.isMatch() },
+      { name: "rate", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true, isHidden: this.isLive() },
+      { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, sendMsg: false, isHidden: this.isLive() },
+      { name: "pause", text: "禁用标签页隐藏暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE, sendMsg: false },
+      { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE, sendMsg: false },
+      { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD, sendMsg: false },
     ];
 
     // 将配置项数组转换为HTML字符串数组
     // 每个配置项生成一个带复选框的标签元素
-    const html = configs.map(
-      ({ name, text, hide }) => `<label class="__menu ${hide && "hide"}">${text}<input name="${name}" type="checkbox"/></label>`
-    );
+    const html = configs.map(({ name, text, isHidden, sendMsg }) => {
+      return `<label class="__menu ${
+        isHidden ? "hide" : Consts.EMPTY
+      }">${text}<input data-send="${sendMsg}" name="${name}" type="checkbox"/></label>`;
+    });
 
     Swal.fire({
       width: 350,
@@ -98,9 +100,8 @@ export default {
       didOpen(popup) {
         Tools.querys(".__menu input", popup).forEach((ele, i) => {
           ele.checked = configs[i].cache.get();
-          // checkbox点击监听
           ele.addEventListener("click", function () {
-            this.name === "rate" && Tools.postMessage(window, { defaultPlaybackRate: this.checked });
+            this.dataset.send && Tools.postMessage(window, { [`disable_${this.name}`]: this.checked });
             setTimeout(() => configs[i].cache.set(this.checked), 100), Tools.notyf("修改成功！");
           });
         });
