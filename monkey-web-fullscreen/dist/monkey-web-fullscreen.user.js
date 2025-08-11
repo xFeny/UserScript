@@ -74,26 +74,6 @@
     webFull: "webFullscreen",
     MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN"
   });
-  var _GM_addValueChangeListener = /* @__PURE__ */ (() => typeof GM_addValueChangeListener != "undefined" ? GM_addValueChangeListener : void 0)();
-  var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
-  var _GM_download = /* @__PURE__ */ (() => typeof GM_download != "undefined" ? GM_download : void 0)();
-  var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
-  var _GM_info = /* @__PURE__ */ (() => typeof GM_info != "undefined" ? GM_info : void 0)();
-  var _GM_listValues = /* @__PURE__ */ (() => typeof GM_listValues != "undefined" ? GM_listValues : void 0)();
-  var _GM_registerMenuCommand = /* @__PURE__ */ (() => typeof GM_registerMenuCommand != "undefined" ? GM_registerMenuCommand : void 0)();
-  var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
-  var _GM_unregisterMenuCommand = /* @__PURE__ */ (() => typeof GM_unregisterMenuCommand != "undefined" ? GM_unregisterMenuCommand : void 0)();
-  var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
-  const matches = _GM_info.script.matches.filter((match) => match !== "*://*/*").map((match) => new RegExp(match.replace(/\*/g, "\\S+")));
-  const Site = {
-    isAcFun: () => /acfun.cn\/v/.test(location.href),
-    isTencent: () => /v.qq.com\/x/.test(location.href),
-    isQiyi: () => /iqiyi.com\/v_*/.test(location.href),
-    isDouyu: () => /v.douyu.com\/show/.test(location.href),
-    isBili: () => /bilibili.com\/video/.test(location.href),
-    isBiliLive: () => location.host === "live.bilibili.com",
-    isMatch: () => matches.some((match) => match.test(location.href.replace(location.search, Consts.EMPTY)))
-  };
   function isElement(node) {
     return node instanceof Element;
   }
@@ -144,6 +124,16 @@
     }
     return results;
   }
+  var _GM_addValueChangeListener = /* @__PURE__ */ (() => typeof GM_addValueChangeListener != "undefined" ? GM_addValueChangeListener : void 0)();
+  var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
+  var _GM_download = /* @__PURE__ */ (() => typeof GM_download != "undefined" ? GM_download : void 0)();
+  var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
+  var _GM_info = /* @__PURE__ */ (() => typeof GM_info != "undefined" ? GM_info : void 0)();
+  var _GM_listValues = /* @__PURE__ */ (() => typeof GM_listValues != "undefined" ? GM_listValues : void 0)();
+  var _GM_registerMenuCommand = /* @__PURE__ */ (() => typeof GM_registerMenuCommand != "undefined" ? GM_registerMenuCommand : void 0)();
+  var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
+  var _GM_unregisterMenuCommand = /* @__PURE__ */ (() => typeof GM_unregisterMenuCommand != "undefined" ? GM_unregisterMenuCommand : void 0)();
+  var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
   const Tools = _unsafeWindow.Tools = {
     noNumber: (str) => !/\d/.test(str),
     isTopWin: () => window.top === window,
@@ -492,18 +482,15 @@
       });
     }
   };
-  const SiteIcons = {
-    "live.bilibili.com": { webFull: "#businessContainerElement" },
-    "live.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled" },
-    "www.bilibili.com": { webFull: ".bpx-player-ctrl-web", next: ".bpx-player-ctrl-next" },
-    "v.douyu.com": { webFull: ".ControllerBar-PageFull-Icon", danmaku: ".BarrageSwitch-icon" },
-    "www.iqiyi.com": { webFull: "[class*=videofullBtn]", danmaku: "[class*=danmuBtnSet] div", next: "[class*=buttons_playNext]" },
-    "v.youku.com": { webFull: "#webfullscreen-icon", danmaku: "#barrage-switch", next: ".kui-next-icon-0" },
-    "www.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled", next: ".btn-next-part div" },
-    "www.mgtv.com": { webFull: ".webfullscreenBtn i", danmaku: "div[class*='danmuSwitch']", next: ".icon-next" },
-    "v.qq.com": { webFull: ".txp_btn_fake", danmaku: ".barrage-switch", next: ".txp_btn_next_u" },
-    "tv.sohu.com": { webFull: ".x-pagefs-btn", danmaku: ".tm-tmbtn", next: ".x-next-btn" },
-    name: { full: "full", webFull: "webFull", next: "next", danmaku: "danmaku" }
+  const matches = _GM_info.script.matches.filter((match) => match !== "*://*/*").map((match) => new RegExp(match.replace(/\*/g, "\\S+")));
+  const Site = {
+    isAcFun: () => /acfun.cn\/v/.test(location.href),
+    isTencent: () => /v.qq.com\/x/.test(location.href),
+    isQiyi: () => /iqiyi.com\/v_*/.test(location.href),
+    isDouyu: () => /v.douyu.com\/show/.test(location.href),
+    isBili: () => /bilibili.com\/video/.test(location.href),
+    isBiliLive: () => location.host === "live.bilibili.com",
+    isMatch: () => matches.some((match) => match.test(location.href.replace(location.search, Consts.EMPTY)))
   };
   const Keyboard = Object.freeze({
     A: "KeyA",
@@ -524,6 +511,19 @@
     Add: "NumpadAdd",
     Space: "Space"
   });
+  const SiteIcons = {
+    "live.bilibili.com": { webFull: "#businessContainerElement" },
+    "live.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled" },
+    "www.bilibili.com": { webFull: ".bpx-player-ctrl-web", next: ".bpx-player-ctrl-next" },
+    "v.douyu.com": { webFull: ".ControllerBar-PageFull-Icon", danmaku: ".BarrageSwitch-icon" },
+    "www.iqiyi.com": { webFull: "[class*=videofullBtn]", danmaku: "[class*=danmuBtnSet] div", next: "[class*=buttons_playNext]" },
+    "v.youku.com": { webFull: "#webfullscreen-icon", danmaku: "#barrage-switch", next: ".kui-next-icon-0" },
+    "www.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled", next: ".btn-next-part div" },
+    "www.mgtv.com": { webFull: ".webfullscreenBtn i", danmaku: "div[class*='danmuSwitch']", next: ".icon-next" },
+    "v.qq.com": { webFull: ".txp_btn_fake", danmaku: ".barrage-switch", next: ".txp_btn_next_u" },
+    "tv.sohu.com": { webFull: ".x-pagefs-btn", danmaku: ".tm-tmbtn", next: ".x-next-btn" },
+    name: { full: "full", webFull: "webFull", next: "next", danmaku: "danmaku" }
+  };
   const Keydown = {
     preventDefault(event, { code, altKey } = event) {
       const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
