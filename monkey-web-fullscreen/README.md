@@ -226,11 +226,15 @@
    
    效果对比图：https://pic1.imgdb.cn/item/68998b0c58cb8da5c8190353.png
    
-   CSS 选择器：`#player_2086920243`
+   CSS 选择器：`#player_2086920243` ，显示控制栏
    
    **示例二：** https://www.douyin.com/?recommend=1
    
-   CSS 选择器：`#slidelist > div`
+   CSS 选择器：`#slidelist > div` ，滑动到下一个还支持网页全屏
+   
+   **示例三：** https://www.huya.com
+   
+   CSS 选择器：`#player-video` ，隐藏底部礼物栏
 
 ### 其他功能
 
