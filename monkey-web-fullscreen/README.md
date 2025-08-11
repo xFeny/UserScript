@@ -181,7 +181,7 @@
 - 保留特定区域（如弹幕、控制按钮）在网页全屏模式中始终可见
 - 解决部分网页全屏后内容被截断、缩放异常等问题
 
-##### 设置方式
+#### 设置方式
 
 通过 CSS 选择器来指定网页中需要进行全屏设置的元素
 
@@ -219,6 +219,22 @@
 
    - 若返回 `null`：说明选择器太简略，需要适当补充静态特征（如添加稳定的类名，如 `.control-bar.main`）。
    - 若返回结果为具体元素：则说明该选择器是有效的，可以用于设置全屏规则。
+   
+   #### 示例
+   
+   **示例一：**
+   
+   网址：http://www.dyttbtw.com/vodplay/135284/1/1.html
+   
+   效果对比图：https://pic1.imgdb.cn/item/68998b0c58cb8da5c8190353.png
+   
+   CSS 选择器：`#player_2086920243`
+   
+   **示例二：**
+   
+   网址：https://www.douyin.com/?recommend=1
+   
+   CSS 选择器：`#slidelist > div`
 
 ### 其他功能
 
@@ -277,5 +293,5 @@ if (video.duration - video.currentTime > Storage.AUTO_NEXT_SEC.get()) return;
 if (video.duration - video.currentTime > 70) return;
 ```
 
-<i style="color:red">**声明：**该功能暂不纳入未来版本迭代中默认功能范畴，需通过手动修改代码启用。</i>
+<i style="color:red">**声明：**该功能暂不纳入未来版本迭代中默认功能范畴，有需要只能通过手动修改代码启用。</i>
 
