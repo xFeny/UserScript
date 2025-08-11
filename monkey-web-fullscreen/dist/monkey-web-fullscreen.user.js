@@ -1342,10 +1342,7 @@
           if (this instanceof HTMLMediaElement) return this.__playRate === value && setter(value);
           this._playbackRate = value;
           this._quality.setPlaybackRate(value);
-          this?.mailToWorker({ cmd: "callWorker_setRate", rate: value });
-          Promise.resolve().then(() => {
-            this?.emit("ratechange", this._playbackRate);
-          });
+          Promise.resolve().then(() => this?.emit("ratechange", this._playbackRate));
         }
       });
     }
