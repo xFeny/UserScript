@@ -234,7 +234,7 @@
    
    **示例三：** https://www.huya.com
    
-   CSS 选择器：`#player-video` ，隐藏底部礼物栏
+   CSS 选择器：`#player-wrap` ，隐藏底部礼物栏
 
 ### 其他功能
 
