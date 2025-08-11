@@ -172,7 +172,7 @@
       return timeDiff >= delay ? this.lastTimeMap.set(key, now) && false : true;
     },
     limitCountMap: /* @__PURE__ */ new Map(),
-    isOverLimit(key = "default", maxCount = 10) {
+    isOverLimit(key = "default", maxCount = 5) {
       const count = this.limitCountMap.get(key) ?? 0;
       if (count < maxCount) return this.limitCountMap.set(key, count + 1) && false;
       return true;
