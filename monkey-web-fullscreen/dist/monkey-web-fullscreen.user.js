@@ -1188,7 +1188,7 @@
     },
     getVideoContainer() {
       const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin.host);
-      if (selector) return this.videoParents.clear(), Tools.query(selector);
+      if (selector) return Tools.query(selector);
       const ctrlContainer = this.findControlBarContainer();
       return ctrlContainer ? this.findVideoParentContainer(ctrlContainer) : this.findVideoParentContainer();
     },
