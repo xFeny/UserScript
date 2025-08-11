@@ -777,12 +777,12 @@
       this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
     },
     resetToDefaultPlayRate() {
-      this.setPlaybackRate(Consts.DEF_PLAY_RATE, false).then(() => this.showToast("已恢复正常倍速播放"));
+      this.setPlaybackRate(Consts.DEF_PLAY_RATE, false)?.then(() => this.showToast("已恢复正常倍速播放"));
     },
     applyCachedPlayRate(video) {
       const playRate = Storage.CACHED_PLAY_RATE.get();
       if (Consts.DEF_PLAY_RATE === playRate || Number(video.playbackRate) === playRate) return;
-      this.setPlaybackRate(playRate, !video.hasApplyCachedRate).then(() => video.hasApplyCachedRate = true);
+      this.setPlaybackRate(playRate, !video.hasApplyCachedRate)?.then(() => video.hasApplyCachedRate = true);
     },
     adjustPlayProgress(second = Storage.SKIP_INTERVAL.get()) {
       if (!this.player || this.isLive() || this.isEnded()) return;
