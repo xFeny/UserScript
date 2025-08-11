@@ -37,11 +37,11 @@ export default unsafeWindow.Tools = {
     const lastTime = this.lastTimeMap.get(key) ?? 0;
     const timeDiff = now - lastTime;
 
-    // 节流模式：时间差满足条件时更新时间戳并返回true
-    if (isThrottle) return timeDiff >= delay && this.lastTimeMap.set(key, now) && true;
+    // 限制模式：返回是否过于频繁
+    if (!isThrottle) return this.lastTimeMap.set(key, now) && timeDiff < delay;
 
-    // 限制模式：始终更新时间戳，返回是否过于频繁
-    return this.lastTimeMap.set(key, now) && timeDiff < delay;
+    // 节流模式：间隔满足时执行一次
+    return timeDiff >= delay ? this.lastTimeMap.set(key, now) && false : true;
   },
   limitCountMap: new Map(),
   isOverLimit(key = "default", maxCount = 10) {

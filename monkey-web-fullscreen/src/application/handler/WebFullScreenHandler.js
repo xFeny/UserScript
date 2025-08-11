@@ -10,7 +10,7 @@ import SiteIcons from "../common/SiteIcons";
 export default {
   autoNextEpisode(video) {
     if (video.hasTriedAutoNext) return;
-    if (Tools.isTooFrequent("autoNext", Consts.ONE_SEC, true)) return; // 节流，限制1秒执行一次
+    if (Tools.isTooFrequent("autoNext", Consts.ONE_SEC, true)) return; // 节流，一秒执行一次
     if (video.duration - video.currentTime > Storage.AUTO_NEXT_SEC.get()) return; // 距离结束还剩多少秒切换下集
 
     Tools.postMessage(window.top, { key: "N" });
@@ -23,14 +23,10 @@ export default {
     if ((Site.isMatch() && this.isDisableAuto()) || (!Site.isMatch() && !this.isEnbleSiteAuto())) return;
     if (Tools.isOverLimit("autoWebFull")) return (video.hasWebFull = true);
 
-    // 视频元素宽高大于等于视窗，表示已网页全屏
+    // 视频元素宽高 >= 浏览器视窗宽高，认为已网页全屏
     const { offsetWidth, offsetHeight } = video;
     const { viewWidth, viewHeight } = this.topWin;
-    const parentWidth = video.parentNode.offsetWidth;
-    if (offsetWidth >= viewWidth || (offsetHeight >= viewHeight && parentWidth >= viewWidth)) {
-      video.hasWebFull = true;
-      return;
-    }
+    if (offsetWidth >= viewWidth || offsetHeight >= viewHeight) return (video.hasWebFull = true);
 
     // 发送网页全屏消息
     Tools.postMessage(window.top, { key: "P" });

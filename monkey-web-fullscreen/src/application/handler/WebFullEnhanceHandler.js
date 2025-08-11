@@ -52,7 +52,7 @@ export default {
     const { pathname, search } = new URL(this.videoInfo.iframeSrc);
     const decoded = decodeURI(search); // 先解码得到实际字符串
     const partial = decoded.slice(0, decoded.length * 0.8);
-    return Tools.query(`iframe[src*="${pathname + partial}"]`);
+    return Tools.query(`iframe[src*="${pathname + partial}"]`) ?? Tools.query(`iframe[src*="${pathname}"]`);
   },
   getVideoContainer() {
     // 自定义网页全屏元素
