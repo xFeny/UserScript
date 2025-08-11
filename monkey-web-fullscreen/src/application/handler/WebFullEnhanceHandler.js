@@ -77,7 +77,7 @@ export default {
 
     return Math.floor(width) <= Math.floor(vw) && inRect ? ctrlContainer : null;
   },
-  videoParents: new WeakSet(),
+  videoParents: new Set(),
   findVideoParentContainer(container, maxLevel = 4, track = true) {
     const video = this.player;
     container = container ?? video.parentElement;
