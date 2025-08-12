@@ -69,6 +69,7 @@
     MAX_ZOOM: 400,
     HALF_SEC: 500,
     ONE_SEC: 1e3,
+    THREE_SEC: 3e3,
     DEF_PLAY_RATE: 1,
     MAX_PLAY_RATE: 16,
     webFull: "webFullscreen",
@@ -156,7 +157,7 @@
     delCls: (el, ...classes) => el?.classList.remove(...classes),
     addCls: (el, ...classes) => el?.classList.add(...classes),
     notyf(msg, isError = false) {
-      const notyf$1 = new notyf.Notyf({ duration: Consts.ONE_SEC * 3, position: { x: "center", y: "top" } });
+      const notyf$1 = new notyf.Notyf({ duration: Consts.THREE_SEC, position: { x: "center", y: "top" } });
       isError ? notyf$1.error(msg) : notyf$1.success(msg);
       return false;
     },
@@ -468,7 +469,7 @@
       const handleMouseEvent = ({ target, isTrusted }) => {
         if (!isTrusted) return;
         clearTimeout(timer), this.toggleCursor();
-        timer = setTimeout(() => this.toggleCursor(true), Consts.ONE_SEC * 3);
+        timer = setTimeout(() => this.toggleCursor(true), Consts.THREE_SEC);
         if (target instanceof HTMLVideoElement) this.setCurrentVideo(target);
       };
       document.addEventListener("mousemove", (e) => handleMouseEvent(e));
@@ -614,7 +615,7 @@
         _unsafeWindow.__BiliUser__.isLogin = true;
         _unsafeWindow.__BiliUser__.cache.data.isLogin = true;
         _unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
-      }, Consts.ONE_SEC * 3);
+      }, Consts.THREE_SEC);
     }
   };
   const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELECTOR } = Storage;
@@ -790,8 +791,8 @@
       this.setCurrentTime(currentTime);
     },
     cachePlayTime(video) {
-      if (!this.topWin || video.duration < 120 || this.isLive()) return;
       if (Tools.isTooFrequent("cacheTime", Consts.ONE_SEC, true)) return;
+      if (!this.topWin || video.paused || video.duration < 120 || this.isLive()) return;
       if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
       if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.clearCachedTime(video);
       if (video.duration - video.currentTime <= 30) return this.clearCachedTime(video);
@@ -915,14 +916,14 @@
       span.appendChild(document.createTextNode(endText));
       return this.showToast(span, duration, isRemove);
     },
-    showToast(content, duration = Consts.ONE_SEC * 3, isRemove = true) {
+    showToast(content, duration = Consts.THREE_SEC, isRemove = true) {
       return new Promise((resolve) => {
         const el = document.createElement("div");
         el.setAttribute("class", "monkey-toast");
         if (isRemove) Tools.query(".monkey-toast")?.remove();
         content instanceof Element ? el.appendChild(content) : el.innerHTML = content;
         (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2, false)).prepend(el), resolve(el);
-        setTimeout(() => (el.style.opacity = 0, setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
+        setTimeout(() => (el.style.opacity = 0, setTimeout(() => el.remove(), Consts.HALF_SEC)), duration);
       });
     },
     formatTime(seconds) {
@@ -947,7 +948,7 @@
   const WebFullScreen = {
     autoNextEpisode(video) {
       if (video.hasTriedAutoNext) return;
-      if (Tools.isTooFrequent("autoNext", Consts.ONE_SEC, true) || !Storage.ENABLE_AUTO_NEXT_EPISODE.get()) return;
+      if (Tools.isTooFrequent("autoNext", Consts.THREE_SEC, true) || !Storage.ENABLE_AUTO_NEXT_EPISODE.get()) return;
       if (video.duration - video.currentTime > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return;
       Tools.postMessage(window.top, { key: "N" });
       video.hasTriedAutoNext = true;
