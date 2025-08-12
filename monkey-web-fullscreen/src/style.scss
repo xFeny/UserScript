@@ -163,13 +163,15 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
       color: #333;
     }
 
-    &:last-of-type {
-      margin-bottom: 0 !important;
-    }
-
     &:nth-of-type(even) {
       padding-bottom: 10px !important;
       border-bottom: 1px solid #f3f3f3 !important;
+    }
+
+    &:last-of-type {
+      margin-bottom: 0 !important;
+      padding-bottom: 0 !important;
+      border-bottom: none !important;
     }
 
     input {

@@ -84,9 +84,8 @@ export default {
     // 将配置项数组转换为HTML字符串数组
     // 每个配置项生成一个带复选框的标签元素
     const html = configs.map(({ name, text, isHidden, sendMsg }) => {
-      return `<label class="__menu ${
-        isHidden ? "hide" : Consts.EMPTY
-      }">${text}<input data-send="${sendMsg}" name="${name}" type="checkbox"/></label>`;
+      if (isHidden) return Consts.EMPTY;
+      return `<label class="__menu">${text}<input data-send="${sendMsg}" name="${name}" type="checkbox"/></label>`;
     });
 
     Swal.fire({
