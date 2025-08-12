@@ -24,6 +24,6 @@ export default {
       unsafeWindow.__BiliUser__.isLogin = true;
       unsafeWindow.__BiliUser__.cache.data.isLogin = true;
       unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
-    }, Consts.ONE_SEC * 3);
+    }, Consts.THREE_SEC);
   },
 };

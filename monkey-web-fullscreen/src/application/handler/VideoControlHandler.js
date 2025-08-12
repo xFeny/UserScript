@@ -64,8 +64,8 @@ export default {
     this.setCurrentTime(currentTime);
   },
   cachePlayTime(video) {
-    if (!this.topWin || video.duration < 120 || this.isLive()) return;
     if (Tools.isTooFrequent("cacheTime", Consts.ONE_SEC, true)) return; // 节流
+    if (!this.topWin || video.paused || video.duration < 120 || this.isLive()) return;
     if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return; //播放时间太短
 
     // 禁用记忆、播放结束、距离结束30秒，清除记忆缓存
@@ -211,7 +211,7 @@ export default {
     span.appendChild(document.createTextNode(endText));
     return this.showToast(span, duration, isRemove);
   },
-  showToast(content, duration = Consts.ONE_SEC * 3, isRemove = true) {
+  showToast(content, duration = Consts.THREE_SEC, isRemove = true) {
     return new Promise((resolve) => {
       const el = document.createElement("div");
       el.setAttribute("class", "monkey-toast");
@@ -219,7 +219,7 @@ export default {
       content instanceof Element ? el.appendChild(content) : (el.innerHTML = content);
 
       (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2, false)).prepend(el), resolve(el);
-      setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.ONE_SEC / 3)), duration);
+      setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.HALF_SEC)), duration);
     });
   },
   formatTime(seconds) {

@@ -24,7 +24,7 @@ export default unsafeWindow.Tools = {
   delCls: (el, ...classes) => el?.classList.remove(...classes),
   addCls: (el, ...classes) => el?.classList.add(...classes),
   notyf(msg, isError = false) {
-    const notyf = new Notyf({ duration: Consts.ONE_SEC * 3, position: { x: "center", y: "top" } });
+    const notyf = new Notyf({ duration: Consts.THREE_SEC, position: { x: "center", y: "top" } });
     isError ? notyf.error(msg) : notyf.success(msg);
     return false;
   },

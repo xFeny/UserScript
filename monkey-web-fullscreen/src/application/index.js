@@ -105,7 +105,7 @@ export default window.App = {
       if (!isTrusted) return;
 
       clearTimeout(timer), this.toggleCursor();
-      timer = setTimeout(() => this.toggleCursor(true), Consts.ONE_SEC * 3);
+      timer = setTimeout(() => this.toggleCursor(true), Consts.THREE_SEC);
       if (target instanceof HTMLVideoElement) this.setCurrentVideo(target);
     };
 
