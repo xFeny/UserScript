@@ -685,6 +685,7 @@
         // { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE, sendMsg: false },
         { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD, sendMsg: false }
       ];
+      const configMap = Object.fromEntries(configs.map((item) => [item.name, item.cache]));
       const html = configs.map(({ name, text, isHidden, sendMsg }) => {
         if (isHidden) return Consts.EMPTY;
         return `<label class="__menu">${text}<input data-send="${sendMsg}" name="${name}" type="checkbox"/></label>`;
@@ -698,11 +699,11 @@
         html: html.join(Consts.EMPTY),
         customClass: { container: "monkey-web-fullscreen" },
         didOpen(popup) {
-          Tools.querys(".__menu input", popup).forEach((ele, i) => {
-            ele.checked = configs[i].cache.get();
+          Tools.querys(".__menu input", popup).forEach((ele) => {
+            ele.checked = configMap[ele.name].get();
             ele.addEventListener("click", function() {
               this.dataset.send && Tools.postMessage(window, { [`disable_${this.name}`]: this.checked });
-              setTimeout(() => configs[i].cache.set(this.checked), 100), Tools.notyf("修改成功！");
+              setTimeout(() => configMap[this.name].set(this.checked), 100), Tools.notyf("修改成功！");
             });
           });
         }
