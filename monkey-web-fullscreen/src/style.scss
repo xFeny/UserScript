@@ -156,7 +156,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     font-weight: normal;
     float: none !important;
     align-items: center !important;
-    margin-bottom: 13px !important;
+    margin-bottom: 10px !important;
     justify-content: space-between !important;
 
     &:hover {
@@ -165,6 +165,11 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 
     &:last-of-type {
       margin-bottom: 0 !important;
+    }
+
+    &:nth-of-type(even) {
+      padding-bottom: 10px !important;
+      border-bottom: 1px solid #f0f0f0 !important;
     }
 
     input {

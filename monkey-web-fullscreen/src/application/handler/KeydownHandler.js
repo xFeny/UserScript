@@ -59,9 +59,9 @@ export default {
       L: () => this.freezeVideoFrame(),
       K: () => this.freezeVideoFrame(true),
       Z: () => this.resetToDefaultPlayRate(),
-      D: () => Site.isMatch() && this.triggerIconElement(SiteIcons.name.danmaku),
-      N: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
-      P: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance()),
+      D: () => Site.isMatched() && this.triggerIconElement(SiteIcons.name.danmaku),
+      N: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
+      P: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance()),
       LEFT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(-Storage.SKIP_INTERVAL.get()),
       RIGHT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(Storage.SKIP_INTERVAL.get()),
       0: () => this.adjustPlayProgress(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
@@ -90,7 +90,7 @@ export default {
     dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
   },
   triggerIconElement(name) {
-    if (Tools.isTooFrequent("icon")) return;
+    if (Tools.isFrequent("icon")) return;
     const index = Object.values(SiteIcons.name).indexOf(name);
     if (!Site.isBiliLive()) return Tools.query(SiteIcons[location.host]?.[name])?.click();
     SiteIcons.name.webFull === name ? this.liveWebFullscreen() : this.getBiliLiveIcons()?.[index]?.click();

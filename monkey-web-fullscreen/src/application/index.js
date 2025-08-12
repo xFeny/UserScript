@@ -17,7 +17,7 @@ export default window.App = {
   triggerStartElement() {
     // https://www.zhihu.com 、https://www.jumomo.cc 、https://www.jiaozi.me 、https://www.kmvod.cc
     const element = Tools.query("._qrp4qg, .ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
-    if (!element || Tools.isTooFrequent("start")) return;
+    if (!element || Tools.isFrequent("start")) return;
     setTimeout(() => element?.click() & element?.remove(), 150);
   },
   setupVisibleListener() {
@@ -113,7 +113,7 @@ export default window.App = {
     document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
   },
   toggleCursor(hide = false) {
-    if (this.isNormalSite() || Tools.isTooFrequent("cursor", undefined, true)) return;
+    if (this.isNormalSite() || Tools.isFrequent("cursor", undefined, true)) return;
     const cls = "__hc";
 
     if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));

@@ -31,17 +31,17 @@ export default unsafeWindow.Tools = {
   sendToIFrames(data) {
     this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
   },
-  lastTimeMap: new Map(),
-  isTooFrequent(key = "default", delay = 300, isThrottle = false) {
+  freqTimes: new Map(),
+  isFrequent(key = "default", gap = 300, isThrottle = false) {
     const now = Date.now();
-    const lastTime = this.lastTimeMap.get(key) ?? 0;
-    const timeDiff = now - lastTime;
+    const last = this.freqTimes.get(key) ?? 0;
+    const delta = now - last;
 
     // 限制模式：返回是否过于频繁
-    if (!isThrottle) return this.lastTimeMap.set(key, now) && timeDiff < delay;
+    if (!isThrottle) return this.freqTimes.set(key, now) && delta < gap;
 
     // 节流模式：间隔满足时执行一次
-    return timeDiff >= delay ? this.lastTimeMap.set(key, now) && false : true;
+    return delta >= gap ? this.freqTimes.set(key, now) && false : true;
   },
   limitCountMap: new Map(),
   isOverLimit(key = "default", maxCount = 5) {

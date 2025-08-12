@@ -10,17 +10,18 @@ import SiteIcons from "../common/SiteIcons";
 export default {
   autoNextEpisode(video) {
     if (video.hasTriedAutoNext) return;
-    if (Tools.isTooFrequent("autoNext", Consts.THREE_SEC, true) || !Storage.ENABLE_AUTO_NEXT_EPISODE.get()) return;
-    if (video.duration - video.currentTime > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return; // 距离结束还剩多少秒切换下集
+    if (!Storage.ENABLE_AUTO_NEXT_EPISODE.get()) return;
+    if (Tools.isFrequent("autoNext", Consts.THREE_SEC, true)) return;
+    if (this.getRemainingTime(video) > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return; // 距离结束还剩多少秒切换下集
 
     Tools.postMessage(window.top, { key: "N" });
     video.hasTriedAutoNext = true;
   },
   autoWebFullscreen(video) {
     if (this.player !== video) return;
-    if (!this.topWin || video.hasWebFull || !video.offsetWidth) return;
-    if (Tools.isTooFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
-    if ((Site.isMatch() && this.isDisableAuto()) || (!Site.isMatch() && !this.isEnbleSiteAuto())) return;
+    if (Tools.isFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
+    if (video.hasWebFull || !this.topWin || !video.offsetWidth) return;
+    if ((Site.isMatched() && this.isDisableAuto()) || (!Site.isMatched() && !this.isEnbleSiteAuto())) return;
     if (Tools.isOverLimit("autoWebFull")) return (video.hasWebFull = true);
 
     // 视频元素宽高 >= 浏览器视窗宽高，认为已网页全屏

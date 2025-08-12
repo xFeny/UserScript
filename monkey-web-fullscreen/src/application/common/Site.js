@@ -1,9 +1,9 @@
 import Consts from "./Consts";
 
-// 获取脚本`@match`匹配规则
-const matches = GM_info.script.matches
-  .filter((match) => match !== "*://*/*")
-  .map((match) => new RegExp(match.replace(/\*/g, "\\S+")));
+// 将脚本中`@match`的规则转换成 JS 正则表达式
+const { matches, includes: excluded } = GM_info.script;
+const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
+const siteRegExp = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
 
 /**
  * 网站信息相关
@@ -15,5 +15,5 @@ export default {
   isDouyu: () => /v.douyu.com\/show/.test(location.href),
   isBili: () => /bilibili.com\/video/.test(location.href),
   isBiliLive: () => location.host === "live.bilibili.com",
-  isMatch: () => matches.some((match) => match.test(location.href.replace(location.search, Consts.EMPTY))),
+  isMatched: () => siteRegExp.some((match) => match.test(location.href.replace(location.search, Consts.EMPTY))),
 };

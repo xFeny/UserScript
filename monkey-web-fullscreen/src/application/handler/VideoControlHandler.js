@@ -10,7 +10,10 @@ import Storage from "../common/Storage";
 export default {
   isEnded() {
     if (!this.player) return false;
-    return Math.floor(this.player.currentTime) === Math.floor(this.player.duration);
+    if (this.player.ended) return true;
+    const { duration, currentTime } = this.player;
+    if (isNaN(duration) || duration <= 0) return false;
+    return duration - currentTime <= 0.1;
   },
   isLive() {
     if (!this.videoInfo && !this.player) return false;
@@ -29,6 +32,7 @@ export default {
     video.__duration = video.duration;
     Tools.resetLimitCounter("autoWebFull");
   },
+  getRemainingTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
   togglePlayPause: (video) => (Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause()),
   tryAutoPlay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),
   setPlaybackRate(playRate, show = true) {
@@ -64,13 +68,13 @@ export default {
     this.setCurrentTime(currentTime);
   },
   cachePlayTime(video) {
-    if (Tools.isTooFrequent("cacheTime", Consts.ONE_SEC, true)) return; // 节流
+    if (Tools.isFrequent("cacheTime", Consts.ONE_SEC, true)) return; // 节流
     if (!this.topWin || video.paused || video.duration < 120 || this.isLive()) return;
     if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return; //播放时间太短
 
     // 禁用记忆、播放结束、距离结束30秒，清除记忆缓存
     if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.clearCachedTime(video);
-    if (video.duration - video.currentTime <= 30) return this.clearCachedTime(video);
+    if (this.getRemainingTime(video) <= 30) return this.clearCachedTime(video);
 
     Storage.PLAY_TIME.set(this.getCacheTimeKey(video), Number(video.currentTime) - 1, Storage.STORAGE_DAYS.get());
     this.clearMultiVideoCacheTime(); // 清除页面内多视频的播放进度存储，如：抖音网页版
