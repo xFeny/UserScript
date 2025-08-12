@@ -81,6 +81,9 @@ export default {
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD, sendMsg: false },
     ];
 
+    // 创建name到cache的映射
+    const configMap = Object.fromEntries(configs.map((item) => [item.name, item.cache]));
+
     // 将配置项数组转换为HTML字符串数组
     // 每个配置项生成一个带复选框的标签元素
     const html = configs.map(({ name, text, isHidden, sendMsg }) => {
@@ -97,11 +100,11 @@ export default {
       html: html.join(Consts.EMPTY),
       customClass: { container: "monkey-web-fullscreen" },
       didOpen(popup) {
-        Tools.querys(".__menu input", popup).forEach((ele, i) => {
-          ele.checked = configs[i].cache.get();
+        Tools.querys(".__menu input", popup).forEach((ele) => {
+          ele.checked = configMap[ele.name].get();
           ele.addEventListener("click", function () {
             this.dataset.send && Tools.postMessage(window, { [`disable_${this.name}`]: this.checked });
-            setTimeout(() => configs[i].cache.set(this.checked), 100), Tools.notyf("修改成功！");
+            setTimeout(() => configMap[this.name].set(this.checked), 100), Tools.notyf("修改成功！");
           });
         });
       },
