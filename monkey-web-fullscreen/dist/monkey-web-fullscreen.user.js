@@ -676,19 +676,20 @@
     },
     moreSettPopup() {
       const configs = [
-        { name: "cut", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT, sendMsg: false },
-        { name: "zoom", text: "禁用缩放与移动", cache: Storage.DISABLE_ZOOM_MOVE, sendMsg: false },
+        { name: "cut", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT },
+        { name: "zoom", text: "禁用缩放与移动", cache: Storage.DISABLE_ZOOM_MOVE },
         { name: "rate", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true, isHidden: this.isLive() },
-        { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, sendMsg: false, isHidden: this.isLive() },
-        { name: "auto", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, sendMsg: false, isHidden: !Site.isMatched() },
-        { name: "pause", text: "禁用标签页隐藏暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE, sendMsg: false },
-        // { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE, sendMsg: false },
-        { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD, sendMsg: false }
+        { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, isHidden: this.isLive() },
+        { name: "auto", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, isHidden: !Site.isMatched() },
+        { name: "pause", text: "禁用标签页隐藏暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
+        // { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
+        { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD }
       ];
       const configMap = Object.fromEntries(configs.map((item) => [item.name, item.cache]));
       const html = configs.map(({ name, text, isHidden, sendMsg }) => {
         if (isHidden) return Consts.EMPTY;
-        return `<label class="__menu">${text}<input data-send="${sendMsg}" name="${name}" type="checkbox"/></label>`;
+        const sendAttr = sendMsg ? 'data-send="true"' : Consts.EMPTY;
+        return `<label class="__menu">${text}<input ${sendAttr} name="${name}" type="checkbox"/></label>`;
       });
       Swal.fire({
         width: 350,
