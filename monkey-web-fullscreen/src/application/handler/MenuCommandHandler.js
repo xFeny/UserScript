@@ -89,7 +89,11 @@ export default {
     const html = configs.map(({ name, text, isHidden, sendMsg }) => {
       if (isHidden) return Consts.EMPTY;
       const sendAttr = sendMsg ? 'data-send="true"' : Consts.EMPTY;
-      return `<label class="__menu">${text}<input ${sendAttr} name="${name}" type="checkbox"/></label>`;
+      return `
+        <label class="__menu">
+          ${text}<input ${sendAttr} name="${name}" type="checkbox"/>
+          <span class="toggle-track"></span>
+        </label>`;
     });
 
     Swal.fire({
