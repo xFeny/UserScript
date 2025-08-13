@@ -9,10 +9,9 @@ import Consts from "../common/Consts";
  */
 export default {
   removeLoginPopups() {
-    this.removeQiyiLogin(), this.removeBiliLogin(), this.removeTencentLogin();
+    this.removeBiliLogin(), this.removeTencentLogin();
   },
   removeTencentLogin: () => Site.isTencent() && Tools.query("#login_win")?.remove(),
-  removeQiyiLogin: () => Site.isQiyi() && Tools.query("#qy_pca_login_root")?.remove(),
   removeBiliLogin() {
     if (!Site.isBili() || this.BiliTimerID) return;
     if (document.cookie.includes("DedeUserID")) return unsafeWindow.player?.requestQuality(80); // 清晰度设置为 1080P

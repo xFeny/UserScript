@@ -44,7 +44,6 @@ export default window.App = {
     this.bodyObserver?.disconnect();
     clearTimeout(this.observerTimeout);
     this.bodyObserver = Tools.createObserver(document.body, () => {
-      this.removeLoginPopups();
       const video = this.getVideo();
       if (video?.offsetWidth) this.setCurrentVideo(video);
       if (this.topWin) this.bodyObserver.disconnect();

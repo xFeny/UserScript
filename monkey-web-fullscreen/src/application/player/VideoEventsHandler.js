@@ -29,6 +29,7 @@ export default {
     App.setCurrentVideo(this);
     App.applyCachedPlayRate(this);
     setTimeout(() => App.applyCachedTime(this), 20); // 确保topWin信息的即时性和可靠性
+    App.removeLoginPopups();
   },
   pause() {
     // https://www.mcydh.com、https://dick.xfani.com
