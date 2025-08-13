@@ -33,10 +33,10 @@
 // @match        *://v.qq.com/wasm-kernel/*/fake-video*
 // @require      https://unpkg.com/notyf@3.10.0/notyf.min.js
 // @require      data:application/javascript,%3Bwindow.notyf%3D%7BNotyf%7D%3B
-// @require      https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.js
+// @require      https://unpkg.com/sweetalert2@11.22.3/dist/sweetalert2.min.js
 // @require      data:application/javascript,%3Bwindow.sweetalert2%3DSwal%3B
 // @resource     notyf/notyf.min.css  https://unpkg.com/notyf@3.10.0/notyf.min.css
-// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.css
+// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.22.3/dist/sweetalert2.min.css
 // @grant        GM_addStyle
 // @grant        GM_addValueChangeListener
 // @grant        GM_deleteValue
@@ -789,6 +789,7 @@
       this.setPlaybackRate(Consts.DEF_PLAY_RATE, false)?.then(() => this.showToast("已恢复正常倍速播放"));
     },
     applyCachedPlayRate(video) {
+      if (video.hasApplyCachedRate) return;
       const playRate = Storage.CACHED_PLAY_RATE.get();
       if (Consts.DEF_PLAY_RATE === playRate || Number(video.playbackRate) === playRate) return;
       this.setPlaybackRate(playRate, !video.hasApplyCachedRate)?.then(() => video.hasApplyCachedRate = true);
@@ -815,7 +816,7 @@
       this.setCurrentTime(time);
       this.hasAppliedCachedTime = true;
       this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
-        el.style.setProperty("transform", `translateY(${-5 - el.offsetHeight}px)`);
+        el.style.setProperty("transform", `translateY(${ -5 - el.offsetHeight}px)`);
       });
     },
     clearCachedTime(video) {
@@ -1279,6 +1280,7 @@
     },
     ended() {
       this.isEnded = true;
+      this.hasApplyCachedRate = false;
       App.autoExitWebFullscreen();
       App.clearCachedTime(this);
     }
@@ -1287,7 +1289,6 @@
     constructor() {
       __publicField(this, "attr", "enhanced");
       __publicField(this, "selector", ":is(video, fake-video):not([enhanced])");
-      // 腾讯视频 fake-video
       __publicField(this, "defaultTsr", { zoom: 100, moveX: 0, moveY: 0, rotation: 0, isMirrored: false });
       __publicField(this, "danmuSelector", ':is([class*="danmu" i], [class*="danmaku" i], [class*="barrage" i])');
       __publicField(this, "videoEvents", Object.entries(VideoEvents));
@@ -1305,12 +1306,19 @@
         mutations.forEach((m) => m.type === "childList" && this.processAddedNodes(m.addedNodes));
       });
     }
-    processAddedNodes(nodes) {
+    /**
+     * 异步处理新增节点，避免阻塞主线程
+     * @param {NodeList} nodes - 新增节点列表
+     */
+    async processAddedNodes(nodes) {
       const { selector, danmuSelector } = this;
       for (const node of nodes) {
         if (!(node instanceof Element) || node.matches(danmuSelector)) continue;
-        if (node.matches(selector)) this.enhanced(node);
-        else if (node.hasChildNodes()) Tools.querys(selector, node).forEach((video) => this.enhanced(video));
+        if (node.matches(selector)) requestIdleCallback(() => this.enhanced(node));
+        else if (node.hasChildNodes()) {
+          Tools.querys(selector, node).forEach((video) => requestIdleCallback(() => this.enhanced(video)));
+        }
+        await new Promise((resolve) => setTimeout(resolve, 0));
       }
     }
     enhanced(video) {
@@ -1320,10 +1328,10 @@
       video.tsr = { ...this.defaultTsr };
     }
     setupEventListeners(video) {
-      video.setAttribute(this.attr, true);
       this.videoEvents.forEach(([type, handler]) => {
         video.removeEventListener(type, handler, true);
         video.addEventListener(type, handler, true);
+        video.setAttribute(this.attr, true);
       });
     }
     resetTsr(video) {

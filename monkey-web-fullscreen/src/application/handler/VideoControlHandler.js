@@ -56,6 +56,7 @@ export default {
     this.setPlaybackRate(Consts.DEF_PLAY_RATE, false)?.then(() => this.showToast("已恢复正常倍速播放"));
   },
   applyCachedPlayRate(video) {
+    if (video.hasApplyCachedRate) return;
     const playRate = Storage.CACHED_PLAY_RATE.get();
     if (Consts.DEF_PLAY_RATE === playRate || Number(video.playbackRate) === playRate) return;
     this.setPlaybackRate(playRate, !video.hasApplyCachedRate)?.then(() => (video.hasApplyCachedRate = true));

@@ -1,3 +1,4 @@
+import Consts from "../common/Consts";
 import Tools from "../common/Tools";
 import VideoEvents from "./VideoEventsHandler";
 
@@ -7,7 +8,7 @@ import VideoEvents from "./VideoEventsHandler";
  */
 export default class VideoEnhancer {
   attr = "enhanced";
-  selector = ":is(video, fake-video):not([enhanced])"; // 腾讯视频 fake-video
+  selector = ":is(video, fake-video):not([enhanced])";
   defaultTsr = { zoom: 100, moveX: 0, moveY: 0, rotation: 0, isMirrored: false };
   danmuSelector = ':is([class*="danmu" i], [class*="danmaku" i], [class*="barrage" i])';
   videoEvents = Object.entries(VideoEvents);
@@ -16,8 +17,7 @@ export default class VideoEnhancer {
     this.setupObserver();
     this.hackAttachShadow();
     this.setupExistingVideos();
-    // 防止有些`video`没有增强到
-    this.hookMediaMethod("play", (video) => this.enhanced(video));
+    this.hookMediaMethod("play", (video) => this.enhanced(video)); // 防止没有增强到
   }
 
   setupExistingVideos() {
@@ -32,14 +32,25 @@ export default class VideoEnhancer {
     });
   }
 
-  processAddedNodes(nodes) {
+  /**
+   * 异步处理新增节点，避免阻塞主线程
+   * @param {NodeList} nodes - 新增节点列表
+   */
+  async processAddedNodes(nodes) {
     const { selector, danmuSelector } = this;
     for (const node of nodes) {
       if (!(node instanceof Element) || node.matches(danmuSelector)) continue;
+
       // 若当前节点是未增强的视频元素，直接增强
-      if (node.matches(selector)) this.enhanced(node);
+      // 使用requestIdleCallback在浏览器空闲时处理，进一步优化性能
+      if (node.matches(selector)) requestIdleCallback(() => this.enhanced(node));
       // 若当前节点有子节点，查询并增强其中的视频元素
-      else if (node.hasChildNodes()) Tools.querys(selector, node).forEach((video) => this.enhanced(video));
+      else if (node.hasChildNodes()) {
+        Tools.querys(selector, node).forEach((video) => requestIdleCallback(() => this.enhanced(video)));
+      }
+
+      // 小延迟，避免一次处理过多节点
+      await new Promise((resolve) => setTimeout(resolve, 0));
     }
   }
 
@@ -51,10 +62,10 @@ export default class VideoEnhancer {
   }
 
   setupEventListeners(video) {
-    video.setAttribute(this.attr, true);
     this.videoEvents.forEach(([type, handler]) => {
       video.removeEventListener(type, handler, true);
       video.addEventListener(type, handler, true);
+      video.setAttribute(this.attr, true);
     });
   }
 
