@@ -415,7 +415,6 @@
       this.bodyObserver?.disconnect();
       clearTimeout(this.observerTimeout);
       this.bodyObserver = Tools.createObserver(document.body, () => {
-        this.removeLoginPopups();
         const video = this.getVideo();
         if (video?.offsetWidth) this.setCurrentVideo(video);
         if (this.topWin) this.bodyObserver.disconnect();
@@ -605,10 +604,9 @@
   };
   const WebLogin = {
     removeLoginPopups() {
-      this.removeQiyiLogin(), this.removeBiliLogin(), this.removeTencentLogin();
+      this.removeBiliLogin(), this.removeTencentLogin();
     },
     removeTencentLogin: () => Site.isTencent() && Tools.query("#login_win")?.remove(),
-    removeQiyiLogin: () => Site.isQiyi() && Tools.query("#qy_pca_login_root")?.remove(),
     removeBiliLogin() {
       if (!Site.isBili() || this.BiliTimerID) return;
       if (document.cookie.includes("DedeUserID")) return _unsafeWindow.player?.requestQuality(80);
@@ -1274,6 +1272,7 @@
       App.setCurrentVideo(this);
       App.applyCachedPlayRate(this);
       setTimeout(() => App.applyCachedTime(this), 20);
+      App.removeLoginPopups();
     },
     pause() {
       Tools.query(".ec-no")?.click();
