@@ -283,7 +283,7 @@ timeupdate() {
 
 ```js
 // 配置项所在位置：moreSettPopup(){ configs = {...} }
-// { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE, sendMsg: false },
+// { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
 ```
 
 2. 设置自动下集提前秒数（即距离播放结束还剩多少秒时尝试切换下集）：
