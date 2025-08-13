@@ -87,6 +87,10 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 .monkey-web-fullscreen {
   z-index: 9999999999 !important;
 
+  .hide {
+    display: none !important;
+  }
+
   .swal2-popup {
     font-size: 14px !important;
   }
@@ -115,6 +119,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     font-weight: bolder !important;
   }
 
+  /** 拾取下集元素弹窗布局 START **/
   h4 {
     color: red !important;
     margin: 0 auto !important;
@@ -141,11 +146,9 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
       box-shadow: 0 0 0 1px rgba(100, 150, 200, 0.5) !important;
     }
   }
+  /** 拾取下集元素弹窗布局 END **/
 
-  .hide {
-    display: none !important;
-  }
-
+  /** 更多设置弹窗布局 START **/
   .__menu {
     margin: 0 !important;
     padding: 0 !important;
@@ -209,27 +212,30 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
       transform: translateX(20px) !important;
     }
   }
+  /** 更多设置弹窗布局 END **/
 
+  /** 快捷键说明弹窗布局 START **/
   table {
     width: 100% !important;
     border-collapse: collapse !important;
-  }
 
-  th {
-    font-weight: 600 !important;
-  }
+    th {
+      font-weight: 600 !important;
+    }
 
-  th,
-  td {
-    line-height: 2 !important;
-    font-size: 13px !important;
-    vertical-align: middle !important;
-    border: 1px solid #e5e6eb !important;
-  }
+    th,
+    td {
+      line-height: 2 !important;
+      font-size: 13px !important;
+      vertical-align: middle !important;
+      border: 1px solid #e5e6eb !important;
+    }
 
-  tr:nth-child(odd) {
-    background-color: #f8f8f8 !important;
+    tr:nth-child(odd) {
+      background-color: #f8f8f8 !important;
+    }
   }
+  /** 快捷键说明弹窗布局 END **/
 }
 
 .notyf {
