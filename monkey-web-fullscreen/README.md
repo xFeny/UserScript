@@ -221,7 +221,7 @@
    
    **示例二：** https://www.douyin.com/?recommend=1
    
-   CSS 选择器：`#slidelist > div` ，滑动到下一个还支持网页全屏
+   CSS 选择器：`#slidelist > div` ，切换到下一个视频还支持网页全屏
    
    **示例三：** https://www.huya.com
    
