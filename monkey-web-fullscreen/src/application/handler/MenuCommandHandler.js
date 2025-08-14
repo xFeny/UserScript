@@ -93,10 +93,10 @@ export default {
     });
   },
   settingPopup() {
-    const { html: disableItemsHtml, configMap: disableItemsMap } = this.genDisableItems();
-    const { html: paramsItemsHtml, configMap: paramsItemsMap } = this.genParamsItems();
-    const { html: ignoreItemsHtml, configMap: ignoreItemsMap } = this.genIgnoreItems();
-    const configMap = { ...disableItemsMap, ...paramsItemsMap, ...ignoreItemsMap };
+    const { html: disableItemsHtml, cacheMap: disableItemsMap } = this.genDisableItems();
+    const { html: paramsItemsHtml, cacheMap: paramsItemsMap } = this.genParamsItems();
+    const { html: ignoreItemsHtml, cacheMap: ignoreItemsMap } = this.genIgnoreItems();
+    const cacheMap = { ...disableItemsMap, ...paramsItemsMap, ...ignoreItemsMap };
     const modalHtml = `
       <div class="swal2-tabs">
           <!-- Tabs 标题栏 -->
@@ -121,7 +121,7 @@ export default {
       cancelButtonText: "关闭",
       showConfirmButton: false,
       customClass: { container: "monkey-web-fullscreen" },
-      didOpen: (popup) => {
+      didOpen(popup) {
         // 为Tabs绑定切换事件
         Tools.querys(".swal2-tab", popup).forEach((tab) => {
           tab.addEventListener("click", () => {
@@ -134,15 +134,13 @@ export default {
         // 为input、textarea绑定事件
         Tools.querys(".__menu input, textarea", popup).forEach((ele) => {
           ele.addEventListener("input", function () {
-            Tools.log(this, this.value);
             const isCheckbox = this.type === "checkbox";
             this.dataset.send && Tools.postMessage(window, { [`disable_${this.name}`]: this.checked });
             setTimeout(() => {
               const host = this.dataset.host;
-              const cache = configMap[this.name];
+              const cache = cacheMap[this.name];
               const value = isCheckbox ? this.checked : this.value;
               host ? cache.set(host, value) : cache.set(value);
-              isCheckbox && Tools.notyf("修改成功！");
             }, 50);
           });
         });
@@ -171,7 +169,7 @@ export default {
         </label>`;
     });
 
-    return { html, configMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
+    return { html, cacheMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
   },
   genParamsItems() {
     const configs = [
@@ -192,14 +190,14 @@ export default {
         </label>`;
     });
 
-    return { html, configMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
+    return { html, cacheMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
   },
   genIgnoreItems() {
     const host = location.host;
     const configs = [
       { name: "custom", text: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), host },
       { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号分割）", cache: Storage.NEXT_EPISODE_IGNORE_SITE },
-      { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号分割）", cache: Storage.AUTO_WEB_IGNORE_SITE },
+      { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号分割）", cache: Storage.AUTO_FIT_IGNORE_SITE },
     ].filter(({ isHidden }) => !isHidden);
 
     const html = configs.map(({ name, text, cache, host }) => {
@@ -210,13 +208,13 @@ export default {
         </div>`;
     });
 
-    return { html, configMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
+    return { html, cacheMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
   },
   setDefaultIgnoreUrls() {
     // 「自动网页全屏」功能的内置默认忽略URL
     const defaultWebFul = ["https://www.youtube.com/", "https://www.youtube.com/shorts/"];
-    const ignoreWebFulUrls = [...new Set([...defaultWebFul, ...this.splitUrls(Storage.AUTO_WEB_IGNORE_SITE.get())])];
-    Storage.AUTO_WEB_IGNORE_SITE.set(ignoreWebFulUrls.join(";\n"));
+    const ignoreWebFulUrls = [...new Set([...defaultWebFul, ...this.splitUrls(Storage.AUTO_FIT_IGNORE_SITE.get())])];
+    Storage.AUTO_FIT_IGNORE_SITE.set(ignoreWebFulUrls.join(";\n"));
 
     // 「自动下集」功能的内置默认忽略URL
     const defaultAutoNext = ["https://www.bilibili.com/video/", "https://www.bilibili.com/list/"];

@@ -17,7 +17,7 @@ export default class URLBlacklist {
             pathname: this.normalizePath(parsedUrl.pathname),
           };
         } catch (e) {
-          console.error(`Invalid URL in blacklist: ${url}`, e);
+          console.error(`无效的URL: ${url}`, e);
           return null;
         }
       })
