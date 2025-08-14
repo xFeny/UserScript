@@ -34,7 +34,6 @@ export default {
     const isEnable = this.isEnableSiteAuto();
     const siteFun = ({ cache }) => cache.set(host, !cache.get(host));
     const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
-    const customWebFullscreen = ({ cache, title }) => cache.set(host, prompt(title, cache.get(host)) ?? cache.get(host));
 
     // 菜单配置项
     const configs = [
@@ -132,7 +131,7 @@ export default {
           });
         });
 
-        // 为input绑定事件
+        // 为input、textarea绑定事件
         Tools.querys(".__menu input, textarea", popup).forEach((ele) => {
           ele.addEventListener("input", function () {
             Tools.log(this, this.value);
@@ -152,12 +151,12 @@ export default {
   },
   genDisableItems() {
     const configs = [
-      { name: "cut", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT },
+      { name: "pic", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT },
       { name: "zoom", text: "禁用缩放与移动", cache: Storage.DISABLE_ZOOM_MOVE },
-      { name: "rate", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true, isHidden: this.isLive() },
+      { name: "speed", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true, isHidden: this.isLive() },
       { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, isHidden: this.isLive() },
-      { name: "auto", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, isHidden: !Site.isMatched() },
-      { name: "pause", text: "禁用标签页隐藏暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
+      { name: "fit", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, isHidden: !Site.isMatched() },
+      { name: "tabs", text: "禁用标签页隐藏暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
       { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
     ].filter(({ isHidden }) => !isHidden);
@@ -178,11 +177,11 @@ export default {
     const configs = [
       { name: "step", text: "倍速步进", cache: Storage.PLAY_RATE_STEP },
       { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
-      { name: "zeroKey", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL },
+      { name: "zeroSkip", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL },
       { name: "advance", text: "自动下集提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC },
       { name: "days", text: "播放进度保存天数", cache: Storage.STORAGE_DAYS },
       { name: "percent", text: "缩放百分比", cache: Storage.PERCENT_OF_ZOOM },
-      { name: "translate", text: "移动距离", cache: Storage.MOVING_DISTANCE },
+      { name: "move", text: "移动距离", cache: Storage.MOVING_DISTANCE },
     ];
 
     const html = configs.map(({ name, text, cache, host }) => {
@@ -200,7 +199,7 @@ export default {
     const configs = [
       { name: "custom", text: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), host },
       { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号分割）", cache: Storage.NEXT_EPISODE_IGNORE_SITE },
-      { name: "fullIgnore", text: "自动网页全屏时忽略的网址列表（分号分割）", cache: Storage.AUTO_WEB_IGNORE_SITE },
+      { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号分割）", cache: Storage.AUTO_WEB_IGNORE_SITE },
     ].filter(({ isHidden }) => !isHidden);
 
     const html = configs.map(({ name, text, cache, host }) => {
