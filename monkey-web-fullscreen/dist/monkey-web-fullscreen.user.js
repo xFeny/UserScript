@@ -33,10 +33,10 @@
 // @match        *://v.qq.com/wasm-kernel/*/fake-video*
 // @require      https://unpkg.com/notyf@3.10.0/notyf.min.js
 // @require      data:application/javascript,%3Bwindow.notyf%3D%7BNotyf%7D%3B
-// @require      https://unpkg.com/sweetalert2@11.22.3/dist/sweetalert2.min.js
+// @require      https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.js
 // @require      data:application/javascript,%3Bwindow.sweetalert2%3DSwal%3B
 // @resource     notyf/notyf.min.css  https://unpkg.com/notyf@3.10.0/notyf.min.css
-// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.22.3/dist/sweetalert2.min.css
+// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.css
 // @grant        GM_addStyle
 // @grant        GM_addValueChangeListener
 // @grant        GM_deleteValue
@@ -892,7 +892,7 @@
       this.setCurrentTime(time);
       this.hasAppliedCachedTime = true;
       this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
-        el.style.setProperty("transform", `translateY(${ -5 - el.offsetHeight}px)`);
+        el.style.setProperty("transform", `translateY(${-5 - el.offsetHeight}px)`);
       });
     },
     clearCachedTime(video) {
@@ -1270,9 +1270,9 @@
     },
     pickerEpisodePopup(element, { validBtnCallback, confirmCallback }) {
       Swal.fire({
-        html: `<h4>验证能正确取到集数，再确定保存</h4>
+        html: Tools.safeHTML(`<h4>验证能正确取到集数，再确定保存</h4>
       <textarea id="__picker" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
-      <p>编辑元素选择器，确保能正确获取到集数</p>`,
+      <p>编辑元素选择器，确保能正确获取到集数</p>`),
         customClass: { container: "monkey-web-fullscreen" },
         title: "拾取剧集元素选择器",
         confirmButtonText: "保存",
