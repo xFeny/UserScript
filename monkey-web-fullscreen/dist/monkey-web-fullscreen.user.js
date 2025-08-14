@@ -370,9 +370,9 @@
     MOVING_DISTANCE: new StorageItem("MOVING_DISTANCE", 10, false, (value) => parseInt(value, 10)),
     DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
     NEXT_EPISODE_IGNORE_SITE: new StorageItem("NEXT_EPISODE_IGNORE_SITE", null, false),
+    AUTO_FIT_IGNORE_SITE: new StorageItem("AUTO_FIT_IGNORE_SITE", null, false),
     CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
     REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
-    AUTO_WEB_IGNORE_SITE: new StorageItem("AUTO_WEB_IGNORE_SITE", null, false),
     STORAGE_DAYS: new StorageItem("STORAGE_DAYS", 7, false, parseFloat),
     CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", "", false),
     PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat)
@@ -697,10 +697,10 @@
       });
     },
     settingPopup() {
-      const { html: disableItemsHtml, configMap: disableItemsMap } = this.genDisableItems();
-      const { html: paramsItemsHtml, configMap: paramsItemsMap } = this.genParamsItems();
-      const { html: ignoreItemsHtml, configMap: ignoreItemsMap } = this.genIgnoreItems();
-      const configMap = { ...disableItemsMap, ...paramsItemsMap, ...ignoreItemsMap };
+      const { html: disableItemsHtml, cacheMap: disableItemsMap } = this.genDisableItems();
+      const { html: paramsItemsHtml, cacheMap: paramsItemsMap } = this.genParamsItems();
+      const { html: ignoreItemsHtml, cacheMap: ignoreItemsMap } = this.genIgnoreItems();
+      const cacheMap = { ...disableItemsMap, ...paramsItemsMap, ...ignoreItemsMap };
       const modalHtml = `
       <div class="swal2-tabs">
           <!-- Tabs 标题栏 -->
@@ -724,7 +724,7 @@
         cancelButtonText: "关闭",
         showConfirmButton: false,
         customClass: { container: "monkey-web-fullscreen" },
-        didOpen: (popup) => {
+        didOpen(popup) {
           Tools.querys(".swal2-tab", popup).forEach((tab) => {
             tab.addEventListener("click", () => {
               Tools.querys(".swal2-tab, .swal2-tab-panel", popup).forEach((el) => el.classList.remove("active"));
@@ -734,15 +734,13 @@
           });
           Tools.querys(".__menu input, textarea", popup).forEach((ele) => {
             ele.addEventListener("input", function() {
-              Tools.log(this, this.value);
               const isCheckbox = this.type === "checkbox";
               this.dataset.send && Tools.postMessage(window, { [`disable_${this.name}`]: this.checked });
               setTimeout(() => {
                 const host = this.dataset.host;
-                const cache = configMap[this.name];
+                const cache = cacheMap[this.name];
                 const value = isCheckbox ? this.checked : this.value;
                 host ? cache.set(host, value) : cache.set(value);
-                isCheckbox && Tools.notyf("修改成功！");
               }, 50);
             });
           });
@@ -767,7 +765,7 @@
           <span class="toggle-track"></span>
         </label>`;
       });
-      return { html, configMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
+      return { html, cacheMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
     },
     genParamsItems() {
       const configs = [
@@ -786,14 +784,14 @@
           <input  ${host ? `data-host="${host}"` : ""} value="${value}" name="${name}" type="text" autocomplete="off"/>
         </label>`;
       });
-      return { html, configMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
+      return { html, cacheMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
     },
     genIgnoreItems() {
       const host = location.host;
       const configs = [
         { name: "custom", text: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), host },
         { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号分割）", cache: Storage.NEXT_EPISODE_IGNORE_SITE },
-        { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号分割）", cache: Storage.AUTO_WEB_IGNORE_SITE }
+        { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号分割）", cache: Storage.AUTO_FIT_IGNORE_SITE }
       ].filter(({ isHidden }) => !isHidden);
       const html = configs.map(({ name, text, cache, host: host2 }) => {
         const value = host2 ? cache.get(host2) : cache.get();
@@ -802,12 +800,12 @@
           <textarea ${host2 ? `data-host="${host2}"` : ""} name="${name}" type="text" autocomplete="off">${value}</textarea>
         </div>`;
       });
-      return { html, configMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
+      return { html, cacheMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
     },
     setDefaultIgnoreUrls() {
       const defaultWebFul = ["https://www.youtube.com/", "https://www.youtube.com/shorts/"];
-      const ignoreWebFulUrls = [.../* @__PURE__ */ new Set([...defaultWebFul, ...this.splitUrls(Storage.AUTO_WEB_IGNORE_SITE.get())])];
-      Storage.AUTO_WEB_IGNORE_SITE.set(ignoreWebFulUrls.join(";\n"));
+      const ignoreWebFulUrls = [.../* @__PURE__ */ new Set([...defaultWebFul, ...this.splitUrls(Storage.AUTO_FIT_IGNORE_SITE.get())])];
+      Storage.AUTO_FIT_IGNORE_SITE.set(ignoreWebFulUrls.join(";\n"));
       const defaultAutoNext = ["https://www.bilibili.com/video/", "https://www.bilibili.com/list/"];
       const ignoreAutoNextUrls = [.../* @__PURE__ */ new Set([...defaultAutoNext, ...this.splitUrls(Storage.NEXT_EPISODE_IGNORE_SITE.get())])];
       Storage.NEXT_EPISODE_IGNORE_SITE.set(ignoreAutoNextUrls.join(";\n"));
@@ -1040,7 +1038,7 @@
             pathname: this.normalizePath(parsedUrl.pathname)
           };
         } catch (e) {
-          console.error(`Invalid URL in blacklist: ${url}`, e);
+          console.error(`无效的URL: ${url}`, e);
           return null;
         }
       }).filter(Boolean);
@@ -1073,7 +1071,7 @@
       if (!Storage.ENABLE_AUTO_NEXT_EPISODE.get()) return;
       if (Tools.isFrequent("autoNext", Consts.THREE_SEC, true)) return;
       if (this.getRemainingTime(video) > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return;
-      if (this.isBlocked(Storage.NEXT_EPISODE_IGNORE_SITE.get())) return video.hasTriedAutoNext = true;
+      if (this.isIgnoreUrl(Storage.NEXT_EPISODE_IGNORE_SITE.get())) return video.hasTriedAutoNext = true;
       Tools.postMessage(window.top, { key: "N" });
       video.hasTriedAutoNext = true;
     },
@@ -1082,7 +1080,7 @@
       if (Tools.isFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
       if (video.hasWebFull || !this.topWin || !video.offsetWidth) return;
       if (Site.isMatched() && this.isDisableAuto() || !Site.isMatched() && !this.isEnableSiteAuto()) return;
-      if (this.isBlocked(Storage.AUTO_WEB_IGNORE_SITE.get())) return video.hasWebFull = true;
+      if (this.isIgnoreUrl(Storage.AUTO_FIT_IGNORE_SITE.get())) return video.hasWebFull = true;
       if (Tools.isOverLimit("autoWebFull")) return video.hasWebFull = true;
       const { offsetWidth, offsetHeight } = video;
       const { viewWidth, viewHeight } = this.topWin;
@@ -1114,7 +1112,7 @@
       Tools.triggerMousemove(this.getVideo());
       return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
     },
-    isBlocked(ignoreStr) {
+    isIgnoreUrl(ignoreStr) {
       if (!ignoreStr || !this.topWin) return false;
       const urlFilter = new URLBlacklist(this.splitUrls(ignoreStr));
       return urlFilter.isBlocked(this.topWin.url);
