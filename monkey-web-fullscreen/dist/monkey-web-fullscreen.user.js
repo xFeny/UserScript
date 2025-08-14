@@ -53,7 +53,7 @@
 // @note         *://*/*
 // ==/UserScript==
 
-(o=>{const t=document.createElement("style");t.textContent=o,document.addEventListener("shadow-attached",e=>{requestAnimationFrame(()=>e.detail.shadowRoot.prepend(t.cloneNode(!0)))}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(o)})(' @charset "UTF-8";.monkey-toast{line-height:normal;left:10px!important;bottom:16%!important;color:#fff!important;font-size:13px!important;padding:6px 10px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.monkey-toast span{display:inline!important}::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen] .vjs-control-bar,[part*=webFullscreen] .ytp-chrome-bottom,[part*=webFullscreen] .ytp-chapter-hover-container{left:0!important;width:100vw!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important;transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc{cursor:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .__menu{margin:0 0 10px!important;padding:0 0 10px!important;float:none!important;color:#666!important;display:flex!important;cursor:pointer!important;font-size:20px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:hover{color:#2196f3!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:40px!important;height:20px!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:13px!important;height:13px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th{font-weight:600!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,#buffer,#install,#a1 #tips,#player #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,#player #loading-box,.dplayer-comment-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}} ');
+(e=>{const t=document.createElement("style");t.textContent=e,document.addEventListener("shadow-attached",o=>{requestAnimationFrame(()=>o.detail.shadowRoot.prepend(t.cloneNode(!0)))}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(e)})(' @charset "UTF-8";.monkey-toast{line-height:normal;left:10px!important;bottom:16%!important;color:#fff!important;font-size:13px!important;padding:6px 10px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.monkey-toast span{display:inline!important}::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen] .vjs-control-bar,[part*=webFullscreen] .ytp-chrome-bottom,[part*=webFullscreen] .ytp-chapter-hover-container{left:0!important;width:100vw!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important;transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc{cursor:none!important}.monkey-web-fullscreen{z-index:9999999999!important}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-tabs-header{display:flex;margin-bottom:20px;position:relative;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;cursor:pointer;color:#64748b;font-weight:500;text-align:center;padding:0 12px 10px;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;background-color:#3b82f6;border-radius:2px 2px 0 0}.monkey-web-fullscreen .swal2-tab:hover:not(.active){color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%}.monkey-web-fullscreen .swal2-tab-panel{display:none;animation:fadeIn .3s ease}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 10px!important;padding:0 0 10px!important;float:none!important;color:#666!important;display:flex!important;font-size:20px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text],.monkey-web-fullscreen .__menu input[type=number]{border:1px solid #cbd5e1!important;text-align:center!important;font-size:14px!important;width:50px!important;height:24px!important}.monkey-web-fullscreen .__menu input[type=text]:focus,.monkey-web-fullscreen .__menu input[type=number]:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:40px!important;height:20px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:13px!important;height:13px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th{font-weight:600!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:9999999999!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,#buffer,#install,#a1 #tips,#player #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,#player #loading-box,.dplayer-comment-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}} ');
 
 (function (notyf, Swal) {
   'use strict';
@@ -63,9 +63,7 @@
   var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   const Consts = Object.freeze({
     EMPTY: "",
-    MIN_ZOOM: 50,
-    MOVE_STEP: 10,
-    ZOOM_STEP: 10,
+    MIN_ZOOM: 25,
     MAX_ZOOM: 400,
     HALF_SEC: 500,
     ONE_SEC: 1e3,
@@ -368,6 +366,8 @@
     ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
     DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
     DISABLE_ZOOM_MOVE: new StorageItem("DISABLE_ZOOM_MOVE", true, false, (value) => Boolean(value)),
+    PERCENT_OF_ZOOM: new StorageItem("PERCENT_OF_ZOOM", 10, false, (value) => parseInt(value, 10)),
+    MOVING_DISTANCE: new StorageItem("MOVING_DISTANCE", 10, false, (value) => parseInt(value, 10)),
     DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
     CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
     REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
@@ -634,32 +634,22 @@
     },
     setupMenuChangeListener() {
       const host = location.host;
-      [
-        ENABLE_THIS.name + host,
-        Storage.CLOSE_PLAY_RATE.name,
-        EPISODE_SELECTOR.name + host,
-        Storage.OVERRIDE_KEYBOARD.name,
-        Storage.DISABLE_MEMORY_TIME.name,
-        Storage.ENABLE_AUTO_NEXT_EPISODE.name
-      ].forEach((key) => _GM_addValueChangeListener(key, () => this.registMenuCommand()));
+      [ENABLE_THIS.name + host, EPISODE_SELECTOR.name + host].forEach(
+        (key) => _GM_addValueChangeListener(key, () => this.registMenuCommand())
+      );
     },
     registMenuCommand() {
       const host = location.host;
       const isEnable = this.isEnableSiteAuto();
-      const siteFun = ({ cache }) => cache.set(host, !isEnable);
+      const siteFun = ({ cache }) => cache.set(host, !cache.get(host));
       const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
       const customWebFullscreen = ({ cache, title }) => cache.set(host, prompt(title, cache.get(host)) ?? cache.get(host));
       const configs = [
-        { title: "设置零键秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL, isHidden: false },
-        { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isHidden: this.isDisablePlaybackRate() },
-        { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isHidden: !this.isOverrideKeyboard() },
-        // { title: "设置进度保存天数", cache: Storage.STORAGE_DAYS, isHidden: Storage.DISABLE_MEMORY_TIME.get() },
         { title: `此站${isEnable ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatched(), fn: siteFun },
-        { title: "设置此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), fn: customWebFullscreen },
-        // { title: "设置自动下集提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC, isHidden: !Storage.ENABLE_AUTO_NEXT_EPISODE.get() },
+        { title: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), fn: customWebFullscreen },
         { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
-        { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isHidden: false, fn: () => this.shortcutKeysPopup() },
-        { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isHidden: false, fn: () => this.moreSettPopup() }
+        { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
+        { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() }
       ];
       configs.forEach(({ title, cache, isHidden, fn }) => {
         const id = `${cache.name}_MENU_ID`;
@@ -670,46 +660,6 @@
           const input = prompt(title, cache.get());
           if (!isNaN(input) && cache.parser(input)) cache.set(input);
         });
-      });
-    },
-    moreSettPopup() {
-      const configs = [
-        { name: "cut", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT },
-        { name: "zoom", text: "禁用缩放与移动", cache: Storage.DISABLE_ZOOM_MOVE },
-        { name: "rate", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true, isHidden: this.isLive() },
-        { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, isHidden: this.isLive() },
-        { name: "auto", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, isHidden: !Site.isMatched() },
-        { name: "pause", text: "禁用标签页隐藏暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
-        // { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
-        { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD }
-      ];
-      const configMap = Object.fromEntries(configs.map((item) => [item.name, item.cache]));
-      const html = configs.map(({ name, text, isHidden, sendMsg }) => {
-        if (isHidden) return Consts.EMPTY;
-        const sendAttr = sendMsg ? 'data-send="true"' : Consts.EMPTY;
-        return `
-        <label class="__menu">
-          ${text}<input ${sendAttr} name="${name}" type="checkbox"/>
-          <span class="toggle-track"></span>
-        </label>`;
-      });
-      Swal.fire({
-        width: 350,
-        title: "更多设置",
-        showCancelButton: true,
-        cancelButtonText: "关闭",
-        showConfirmButton: false,
-        html: html.join(Consts.EMPTY),
-        customClass: { container: "monkey-web-fullscreen" },
-        didOpen(popup) {
-          Tools.querys(".__menu input", popup).forEach((ele) => {
-            ele.checked = configMap[ele.name].get();
-            ele.addEventListener("click", function() {
-              this.dataset.send && Tools.postMessage(window, { [`disable_${this.name}`]: this.checked });
-              setTimeout(() => configMap[this.name].set(this.checked), 100), Tools.notyf("修改成功！");
-            });
-          });
-        }
       });
     },
     shortcutKeysPopup() {
@@ -744,6 +694,94 @@
         customClass: { container: "monkey-web-fullscreen" },
         html: `<table><tr><th>快捷键</th><th>说明</th></tr>${rows}</table>`
       });
+    },
+    settingPopup() {
+      const { html: disableItemsHtml, configMap: disableItemsMap } = this.genDisableItems();
+      const { html: paramsItemsHtml, configMap: paramsItemsMap } = this.genParamsItems();
+      const configMap = { ...disableItemsMap, ...paramsItemsMap };
+      const modalHtml = `
+      <div class="swal2-tabs">
+          <!-- Tabs 标题栏 -->
+          <div class="swal2-tabs-header">
+              <div class="swal2-tab active" data-tab="tab1">禁用设置</div>
+              <div class="swal2-tab" data-tab="tab2">参数设置</div>
+          </div>
+          <!-- Tabs 内容区 -->
+          <div class="swal2-tabs-content">
+            <div class="swal2-tab-panel active" id="tab1">${disableItemsHtml.join(Consts.EMPTY)}</div>
+            <div class="swal2-tab-panel" id="tab2">${paramsItemsHtml.join(Consts.EMPTY)}</div>
+          </div>
+      </div>`;
+      Swal.fire({
+        width: 400,
+        title: "设置",
+        html: modalHtml,
+        showCancelButton: true,
+        cancelButtonText: "关闭",
+        showConfirmButton: false,
+        customClass: { container: "monkey-web-fullscreen" },
+        didOpen: (popup) => {
+          Tools.querys(".swal2-tab", popup).forEach((tab) => {
+            tab.addEventListener("click", () => {
+              Tools.querys(".swal2-tab, .swal2-tab-panel", popup).forEach((el) => el.classList.remove("active"));
+              Tools.query(`#${tab.dataset.tab}`, popup).classList.add("active");
+              tab.classList.add("active");
+            });
+          });
+          Tools.querys(".__menu input", popup).forEach((ele) => {
+            ele.addEventListener("input", function() {
+              const isCheckbox = this.type === "checkbox";
+              this.dataset.send && Tools.postMessage(window, { [`disable_${this.name}`]: this.checked });
+              setTimeout(() => {
+                const host = this.dataset.host;
+                const cache = configMap[this.name];
+                const value = isCheckbox ? this.checked : this.value;
+                host ? cache.set(host, value) : cache.set(value);
+                isCheckbox && Tools.notyf("修改成功！");
+              }, 50);
+            });
+          });
+        }
+      });
+    },
+    genDisableItems() {
+      const configs = [
+        { name: "cut", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT },
+        { name: "zoom", text: "禁用缩放与移动", cache: Storage.DISABLE_ZOOM_MOVE },
+        { name: "rate", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true, isHidden: this.isLive() },
+        { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, isHidden: this.isLive() },
+        { name: "auto", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, isHidden: !Site.isMatched() },
+        { name: "pause", text: "禁用标签页隐藏暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
+        { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
+        { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD }
+      ].filter(({ isHidden }) => !isHidden);
+      const html = configs.map(({ name, text, cache, sendMsg }) => {
+        return `
+        <label class="__menu">${text}
+          <input ${sendMsg ? 'data-send="true"' : ""} ${cache.get() ? "checked" : ""} name="${name}" type="checkbox"/>
+          <span class="toggle-track"></span>
+        </label>`;
+      });
+      return { html, configMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
+    },
+    genParamsItems() {
+      const configs = [
+        { name: "step", text: "倍速步进", cache: Storage.PLAY_RATE_STEP },
+        { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
+        { name: "zeroKey", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL },
+        { name: "advance", text: "自动下集提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC },
+        { name: "days", text: "播放进度保存天数", cache: Storage.STORAGE_DAYS },
+        { name: "percent", text: "缩放百分比", cache: Storage.PERCENT_OF_ZOOM },
+        { name: "translate", text: "移动距离", cache: Storage.MOVING_DISTANCE }
+      ];
+      const html = configs.map(({ name, text, cache, host }) => {
+        const value = host ? cache.get(host) : cache.get();
+        return `
+        <label class="__menu">${text}
+          <input  ${host ? `data-host="${host}"` : ""} value="${value}" name="${name}" type="text" autocomplete="off"/>
+        </label>`;
+      });
+      return { html, configMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
     }
   };
   const VideoControl = {
@@ -867,7 +905,8 @@
     zoomVideo(isDown) {
       if (!this.player || this.isDisableZoom()) return;
       const tsr = this.player.tsr;
-      const zoom = tsr.zoom + (isDown ? -Consts.ZOOM_STEP : Consts.ZOOM_STEP);
+      const step = Storage.PERCENT_OF_ZOOM.get();
+      const zoom = tsr.zoom + (isDown ? -step : step);
       if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
       tsr.zoom = zoom;
       this.setVideoTsr("--zoom", zoom / 100);
@@ -876,11 +915,12 @@
     moveVideoPosition(direction) {
       if (!this.player || this.isDisableZoom()) return;
       const tsr = this.player.tsr;
+      const step = Storage.MOVING_DISTANCE.get();
       const { x, y, desc } = {
-        ALT_UP: { y: -Consts.MOVE_STEP, desc: "垂直移动" },
-        ALT_DOWN: { y: Consts.MOVE_STEP, desc: "垂直移动" },
-        ALT_LEFT: { x: -Consts.MOVE_STEP, desc: "水平移动" },
-        ALT_RIGHT: { x: Consts.MOVE_STEP, desc: "水平移动" }
+        ALT_UP: { y: -step, desc: "垂直移动" },
+        ALT_DOWN: { y: step, desc: "垂直移动" },
+        ALT_LEFT: { x: -step, desc: "水平移动" },
+        ALT_RIGHT: { x: step, desc: "水平移动" }
       }[direction];
       ((tx = 0, ty = 0) => (tsr.moveX += tx, tsr.moveY += ty))(x, y);
       this.setVideoTsr("--moveX", `${tsr.moveX}px`).setVideoTsr("--moveY", `${tsr.moveY}px`);
@@ -1263,6 +1303,7 @@
     timeupdate() {
       if (isNaN(this.duration)) return;
       App.autoWebFullscreen(this);
+      App.autoNextEpisode(this);
       App.cachePlayTime(this);
     },
     canplay() {
