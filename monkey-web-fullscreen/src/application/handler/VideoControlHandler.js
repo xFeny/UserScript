@@ -144,7 +144,8 @@ export default {
     if (!this.player || this.isDisableZoom()) return;
 
     const tsr = this.player.tsr;
-    const zoom = tsr.zoom + (isDown ? -Consts.ZOOM_STEP : Consts.ZOOM_STEP);
+    const step = Storage.PERCENT_OF_ZOOM.get();
+    const zoom = tsr.zoom + (isDown ? -step : step);
     if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
 
     tsr.zoom = zoom;
@@ -155,11 +156,12 @@ export default {
     if (!this.player || this.isDisableZoom()) return;
 
     const tsr = this.player.tsr;
+    const step = Storage.MOVING_DISTANCE.get();
     const { x, y, desc } = {
-      ALT_UP: { y: -Consts.MOVE_STEP, desc: "垂直移动" },
-      ALT_DOWN: { y: Consts.MOVE_STEP, desc: "垂直移动" },
-      ALT_LEFT: { x: -Consts.MOVE_STEP, desc: "水平移动" },
-      ALT_RIGHT: { x: Consts.MOVE_STEP, desc: "水平移动" },
+      ALT_UP: { y: -step, desc: "垂直移动" },
+      ALT_DOWN: { y: step, desc: "垂直移动" },
+      ALT_LEFT: { x: -step, desc: "水平移动" },
+      ALT_RIGHT: { x: step, desc: "水平移动" },
     }[direction];
 
     ((tx = 0, ty = 0) => ((tsr.moveX += tx), (tsr.moveY += ty)))(x, y);

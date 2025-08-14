@@ -15,7 +15,7 @@ export default {
   isOverrideKeyboard: () => Storage.OVERRIDE_KEYBOARD.get(),
   isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
   isDisableScreenshot: () => Storage.DISABLE_SCREENSHOT.get(),
-  isEnbleSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
+  isEnableSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
     this.setupMenuChangeListener();
@@ -24,34 +24,24 @@ export default {
   },
   setupMenuChangeListener() {
     const host = location.host;
-    [
-      ENABLE_THIS.name + host,
-      Storage.CLOSE_PLAY_RATE.name,
-      EPISODE_SELECTOR.name + host,
-      Storage.OVERRIDE_KEYBOARD.name,
-      Storage.DISABLE_MEMORY_TIME.name,
-      Storage.ENABLE_AUTO_NEXT_EPISODE.name,
-    ].forEach((key) => GM_addValueChangeListener(key, () => this.registMenuCommand()));
+    [ENABLE_THIS.name + host, EPISODE_SELECTOR.name + host].forEach((key) =>
+      GM_addValueChangeListener(key, () => this.registMenuCommand())
+    );
   },
   registMenuCommand() {
     const host = location.host;
-    const isEnble = this.isEnbleSiteAuto();
-    const siteFun = ({ cache }) => cache.set(host, !isEnble);
+    const isEnable = this.isEnableSiteAuto();
+    const siteFun = ({ cache }) => cache.set(host, !cache.get(host));
     const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
     const customWebFullscreen = ({ cache, title }) => cache.set(host, prompt(title, cache.get(host)) ?? cache.get(host));
 
     // 菜单配置项
     const configs = [
-      { title: "设置零键秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL, isHidden: false },
-      { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isHidden: this.isDisablePlaybackRate() },
-      { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isHidden: !this.isOverrideKeyboard() },
-      // { title: "设置进度保存天数", cache: Storage.STORAGE_DAYS, isHidden: Storage.DISABLE_MEMORY_TIME.get() },
-      { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatched(), fn: siteFun },
-      { title: "设置此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), fn: customWebFullscreen },
-      // { title: "设置自动下集提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC, isHidden: !Storage.ENABLE_AUTO_NEXT_EPISODE.get() },
+      { title: `此站${isEnable ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatched(), fn: siteFun },
+      { title: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), fn: customWebFullscreen },
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
-      { title: "快捷键说明", cache: Storage.DISABLE_AUTO, isHidden: false, fn: () => this.shortcutKeysPopup() },
-      { title: "更多设置", cache: Storage.OVERRIDE_KEYBOARD, isHidden: false, fn: () => this.moreSettPopup() },
+      { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
+      { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() },
     ];
 
     // 注册菜单项
@@ -66,53 +56,6 @@ export default {
         const input = prompt(title, cache.get());
         if (!isNaN(input) && cache.parser(input)) cache.set(input);
       });
-    });
-  },
-  moreSettPopup() {
-    // 更多设置弹窗中的配置项
-    const configs = [
-      { name: "cut", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT },
-      { name: "zoom", text: "禁用缩放与移动", cache: Storage.DISABLE_ZOOM_MOVE },
-      { name: "rate", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true, isHidden: this.isLive() },
-      { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, isHidden: this.isLive() },
-      { name: "auto", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, isHidden: !Site.isMatched() },
-      { name: "pause", text: "禁用标签页隐藏暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
-      // { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
-      { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
-    ];
-
-    // 创建name到cache的映射
-    const configMap = Object.fromEntries(configs.map((item) => [item.name, item.cache]));
-
-    // 将配置项数组转换为HTML字符串数组
-    // 每个配置项生成一个带复选框的标签元素
-    const html = configs.map(({ name, text, isHidden, sendMsg }) => {
-      if (isHidden) return Consts.EMPTY;
-      const sendAttr = sendMsg ? 'data-send="true"' : Consts.EMPTY;
-      return `
-        <label class="__menu">
-          ${text}<input ${sendAttr} name="${name}" type="checkbox"/>
-          <span class="toggle-track"></span>
-        </label>`;
-    });
-
-    Swal.fire({
-      width: 350,
-      title: "更多设置",
-      showCancelButton: true,
-      cancelButtonText: "关闭",
-      showConfirmButton: false,
-      html: html.join(Consts.EMPTY),
-      customClass: { container: "monkey-web-fullscreen" },
-      didOpen(popup) {
-        Tools.querys(".__menu input", popup).forEach((ele) => {
-          ele.checked = configMap[ele.name].get();
-          ele.addEventListener("click", function () {
-            this.dataset.send && Tools.postMessage(window, { [`disable_${this.name}`]: this.checked });
-            setTimeout(() => configMap[this.name].set(this.checked), 100), Tools.notyf("修改成功！");
-          });
-        });
-      },
     });
   },
   shortcutKeysPopup() {
@@ -149,5 +92,103 @@ export default {
       customClass: { container: "monkey-web-fullscreen" },
       html: `<table><tr><th>快捷键</th><th>说明</th></tr>${rows}</table>`,
     });
+  },
+  settingPopup() {
+    const { html: disableItemsHtml, configMap: disableItemsMap } = this.genDisableItems();
+    const { html: paramsItemsHtml, configMap: paramsItemsMap } = this.genParamsItems();
+    const configMap = { ...disableItemsMap, ...paramsItemsMap };
+    const modalHtml = `
+      <div class="swal2-tabs">
+          <!-- Tabs 标题栏 -->
+          <div class="swal2-tabs-header">
+              <div class="swal2-tab active" data-tab="tab1">禁用设置</div>
+              <div class="swal2-tab" data-tab="tab2">参数设置</div>
+          </div>
+          <!-- Tabs 内容区 -->
+          <div class="swal2-tabs-content">
+            <div class="swal2-tab-panel active" id="tab1">${disableItemsHtml.join(Consts.EMPTY)}</div>
+            <div class="swal2-tab-panel" id="tab2">${paramsItemsHtml.join(Consts.EMPTY)}</div>
+          </div>
+      </div>`;
+
+    Swal.fire({
+      width: 400,
+      title: "设置",
+      html: modalHtml,
+      showCancelButton: true,
+      cancelButtonText: "关闭",
+      showConfirmButton: false,
+      customClass: { container: "monkey-web-fullscreen" },
+      didOpen: (popup) => {
+        // 为Tabs绑定切换事件
+        Tools.querys(".swal2-tab", popup).forEach((tab) => {
+          tab.addEventListener("click", () => {
+            Tools.querys(".swal2-tab, .swal2-tab-panel", popup).forEach((el) => el.classList.remove("active"));
+            Tools.query(`#${tab.dataset.tab}`, popup).classList.add("active");
+            tab.classList.add("active");
+          });
+        });
+
+        // 为input绑定事件
+        Tools.querys(".__menu input", popup).forEach((ele) => {
+          ele.addEventListener("input", function () {
+            const isCheckbox = this.type === "checkbox";
+            this.dataset.send && Tools.postMessage(window, { [`disable_${this.name}`]: this.checked });
+            setTimeout(() => {
+              const host = this.dataset.host;
+              const cache = configMap[this.name];
+              const value = isCheckbox ? this.checked : this.value;
+              host ? cache.set(host, value) : cache.set(value);
+              isCheckbox && Tools.notyf("修改成功！");
+            }, 50);
+          });
+        });
+      },
+    });
+  },
+  genDisableItems() {
+    const configs = [
+      { name: "cut", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT },
+      { name: "zoom", text: "禁用缩放与移动", cache: Storage.DISABLE_ZOOM_MOVE },
+      { name: "rate", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true, isHidden: this.isLive() },
+      { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, isHidden: this.isLive() },
+      { name: "auto", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, isHidden: !Site.isMatched() },
+      { name: "pause", text: "禁用标签页隐藏暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
+      { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
+      { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
+    ].filter(({ isHidden }) => !isHidden);
+
+    // 将配置项数组转换为HTML字符串数组
+    // 每个配置项生成一个带复选框的标签元素
+    const html = configs.map(({ name, text, cache, sendMsg }) => {
+      return `
+        <label class="__menu">${text}
+          <input ${sendMsg ? 'data-send="true"' : ""} ${cache.get() ? "checked" : ""} name="${name}" type="checkbox"/>
+          <span class="toggle-track"></span>
+        </label>`;
+    });
+
+    return { html, configMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
+  },
+  genParamsItems() {
+    const configs = [
+      { name: "step", text: "倍速步进", cache: Storage.PLAY_RATE_STEP },
+      { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
+      { name: "zeroKey", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL },
+      { name: "advance", text: "自动下集提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC },
+      { name: "days", text: "播放进度保存天数", cache: Storage.STORAGE_DAYS },
+      { name: "percent", text: "缩放百分比", cache: Storage.PERCENT_OF_ZOOM },
+      { name: "translate", text: "移动距离", cache: Storage.MOVING_DISTANCE },
+    ];
+
+    const html = configs.map(({ name, text, cache, host }) => {
+      const value = host ? cache.get(host) : cache.get();
+      return `
+        <label class="__menu">${text}
+          <input  ${host ? `data-host="${host}"` : ""} value="${value}" name="${name}" type="text" autocomplete="off"/>
+        </label>`;
+    });
+
+    return { html, configMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
   },
 };

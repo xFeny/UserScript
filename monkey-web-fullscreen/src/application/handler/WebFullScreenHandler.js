@@ -21,7 +21,7 @@ export default {
     if (this.player !== video) return;
     if (Tools.isFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
     if (video.hasWebFull || !this.topWin || !video.offsetWidth) return;
-    if ((Site.isMatched() && this.isDisableAuto()) || (!Site.isMatched() && !this.isEnbleSiteAuto())) return;
+    if ((Site.isMatched() && this.isDisableAuto()) || (!Site.isMatched() && !this.isEnableSiteAuto())) return;
     if (Tools.isOverLimit("autoWebFull")) return (video.hasWebFull = true);
 
     // 视频元素宽高 >= 浏览器视窗宽高，认为已网页全屏

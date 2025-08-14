@@ -625,7 +625,7 @@
     isOverrideKeyboard: () => Storage.OVERRIDE_KEYBOARD.get(),
     isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
     isDisableScreenshot: () => Storage.DISABLE_SCREENSHOT.get(),
-    isEnbleSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
+    isEnableSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
     setupScriptMenuCommand() {
       if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
       this.setupMenuChangeListener();
@@ -645,8 +645,8 @@
     },
     registMenuCommand() {
       const host = location.host;
-      const isEnble = this.isEnbleSiteAuto();
-      const siteFun = ({ cache }) => cache.set(host, !isEnble);
+      const isEnable = this.isEnableSiteAuto();
+      const siteFun = ({ cache }) => cache.set(host, !isEnable);
       const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
       const customWebFullscreen = ({ cache, title }) => cache.set(host, prompt(title, cache.get(host)) ?? cache.get(host));
       const configs = [
@@ -654,7 +654,7 @@
         { title: "设置倍速步长", cache: Storage.PLAY_RATE_STEP, isHidden: this.isDisablePlaybackRate() },
         { title: "设置快进/退秒数", cache: Storage.SKIP_INTERVAL, isHidden: !this.isOverrideKeyboard() },
         // { title: "设置进度保存天数", cache: Storage.STORAGE_DAYS, isHidden: Storage.DISABLE_MEMORY_TIME.get() },
-        { title: `此站${isEnble ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatched(), fn: siteFun },
+        { title: `此站${isEnable ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatched(), fn: siteFun },
         { title: "设置此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), fn: customWebFullscreen },
         // { title: "设置自动下集提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC, isHidden: !Storage.ENABLE_AUTO_NEXT_EPISODE.get() },
         { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
@@ -970,7 +970,7 @@
       if (this.player !== video) return;
       if (Tools.isFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
       if (video.hasWebFull || !this.topWin || !video.offsetWidth) return;
-      if (Site.isMatched() && this.isDisableAuto() || !Site.isMatched() && !this.isEnbleSiteAuto()) return;
+      if (Site.isMatched() && this.isDisableAuto() || !Site.isMatched() && !this.isEnableSiteAuto()) return;
       if (Tools.isOverLimit("autoWebFull")) return video.hasWebFull = true;
       const { offsetWidth, offsetHeight } = video;
       const { viewWidth, viewHeight } = this.topWin;
