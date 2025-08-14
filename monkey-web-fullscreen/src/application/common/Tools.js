@@ -154,4 +154,12 @@ export default unsafeWindow.Tools = {
     const parts = (node?.getAttribute("part")?.split(/\s+/) ?? []).filter((v) => v !== value);
     node?.setAttribute("part", parts.join(" ").trim());
   },
+  safeHTML(htmlStr) {
+    if (!window.trustedTypes || !trustedTypes.createPolicy) return htmlStr;
+    const policy = trustedTypes.createPolicy("default", {
+      createHTML: (input) => input,
+    });
+
+    return policy.createHTML(htmlStr);
+  },
 };

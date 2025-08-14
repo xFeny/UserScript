@@ -81,9 +81,9 @@ export default {
   },
   pickerEpisodePopup(element, { validBtnCallback, confirmCallback }) {
     Swal.fire({
-      html: `<h4>验证能正确取到集数，再确定保存</h4>
+      html: Tools.safeHTML(`<h4>验证能正确取到集数，再确定保存</h4>
       <textarea id="__picker" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
-      <p>编辑元素选择器，确保能正确获取到集数</p>`,
+      <p>编辑元素选择器，确保能正确获取到集数</p>`),
       customClass: { container: "monkey-web-fullscreen" },
       title: "拾取剧集元素选择器",
       confirmButtonText: "保存",

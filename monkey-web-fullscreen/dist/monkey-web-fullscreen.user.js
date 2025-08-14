@@ -33,10 +33,10 @@
 // @match        *://v.qq.com/wasm-kernel/*/fake-video*
 // @require      https://unpkg.com/notyf@3.10.0/notyf.min.js
 // @require      data:application/javascript,%3Bwindow.notyf%3D%7BNotyf%7D%3B
-// @require      https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.js
+// @require      https://unpkg.com/sweetalert2@11.22.3/dist/sweetalert2.min.js
 // @require      data:application/javascript,%3Bwindow.sweetalert2%3DSwal%3B
 // @resource     notyf/notyf.min.css  https://unpkg.com/notyf@3.10.0/notyf.min.css
-// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.css
+// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.22.3/dist/sweetalert2.min.css
 // @grant        GM_addStyle
 // @grant        GM_addValueChangeListener
 // @grant        GM_deleteValue
@@ -276,6 +276,13 @@
     delPart(node, value) {
       const parts = (node?.getAttribute("part")?.split(/\s+/) ?? []).filter((v) => v !== value);
       node?.setAttribute("part", parts.join(" ").trim());
+    },
+    safeHTML(htmlStr) {
+      if (!window.trustedTypes || !trustedTypes.createPolicy) return htmlStr;
+      const policy = trustedTypes.createPolicy("default", {
+        createHTML: (input) => input
+      });
+      return policy.createHTML(htmlStr);
     }
   };
   class StorageItem {
@@ -693,7 +700,7 @@
         cancelButtonText: "关闭",
         showConfirmButton: false,
         customClass: { container: "monkey-web-fullscreen" },
-        html: `<table><tr><th>快捷键</th><th>说明</th></tr>${rows}</table>`
+        html: Tools.safeHTML(`<table><tr><th>快捷键</th><th>说明</th></tr>${rows}</table>`)
       });
     },
     settingPopup() {
@@ -719,10 +726,10 @@
       Swal.fire({
         width: 400,
         title: "设置",
-        html: modalHtml,
         showCancelButton: true,
         cancelButtonText: "关闭",
         showConfirmButton: false,
+        html: Tools.safeHTML(modalHtml),
         customClass: { container: "monkey-web-fullscreen" },
         didOpen(popup) {
           Tools.querys(".swal2-tab", popup).forEach((tab) => {
@@ -885,7 +892,7 @@
       this.setCurrentTime(time);
       this.hasAppliedCachedTime = true;
       this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
-        el.style.setProperty("transform", `translateY(${-5 - el.offsetHeight}px)`);
+        el.style.setProperty("transform", `translateY(${ -5 - el.offsetHeight}px)`);
       });
     },
     clearCachedTime(video) {

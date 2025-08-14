@@ -89,7 +89,7 @@ export default {
       cancelButtonText: "关闭",
       showConfirmButton: false,
       customClass: { container: "monkey-web-fullscreen" },
-      html: `<table><tr><th>快捷键</th><th>说明</th></tr>${rows}</table>`,
+      html: Tools.safeHTML(`<table><tr><th>快捷键</th><th>说明</th></tr>${rows}</table>`),
     });
   },
   settingPopup() {
@@ -116,10 +116,10 @@ export default {
     Swal.fire({
       width: 400,
       title: "设置",
-      html: modalHtml,
       showCancelButton: true,
       cancelButtonText: "关闭",
       showConfirmButton: false,
+      html: Tools.safeHTML(modalHtml),
       customClass: { container: "monkey-web-fullscreen" },
       didOpen(popup) {
         // 为Tabs绑定切换事件
