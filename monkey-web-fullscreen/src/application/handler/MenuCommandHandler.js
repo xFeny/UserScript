@@ -19,6 +19,7 @@ export default {
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
     this.setupMenuChangeListener();
+    this.setDefaultIgnoreUrls();
     this.registMenuCommand();
     this.hasMenu = true;
   },
@@ -38,7 +39,6 @@ export default {
     // 菜单配置项
     const configs = [
       { title: `此站${isEnable ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatched(), fn: siteFun },
-      { title: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), fn: customWebFullscreen },
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() },
@@ -96,18 +96,21 @@ export default {
   settingPopup() {
     const { html: disableItemsHtml, configMap: disableItemsMap } = this.genDisableItems();
     const { html: paramsItemsHtml, configMap: paramsItemsMap } = this.genParamsItems();
-    const configMap = { ...disableItemsMap, ...paramsItemsMap };
+    const { html: ignoreItemsHtml, configMap: ignoreItemsMap } = this.genIgnoreItems();
+    const configMap = { ...disableItemsMap, ...paramsItemsMap, ...ignoreItemsMap };
     const modalHtml = `
       <div class="swal2-tabs">
           <!-- Tabs 标题栏 -->
           <div class="swal2-tabs-header">
               <div class="swal2-tab active" data-tab="tab1">禁用设置</div>
               <div class="swal2-tab" data-tab="tab2">参数设置</div>
+              <div class="swal2-tab" data-tab="tab3">其他设置</div>
           </div>
           <!-- Tabs 内容区 -->
           <div class="swal2-tabs-content">
             <div class="swal2-tab-panel active" id="tab1">${disableItemsHtml.join(Consts.EMPTY)}</div>
             <div class="swal2-tab-panel" id="tab2">${paramsItemsHtml.join(Consts.EMPTY)}</div>
+            <div class="swal2-tab-panel" id="tab3">${ignoreItemsHtml.join(Consts.EMPTY)}</div>
           </div>
       </div>`;
 
@@ -130,8 +133,9 @@ export default {
         });
 
         // 为input绑定事件
-        Tools.querys(".__menu input", popup).forEach((ele) => {
+        Tools.querys(".__menu input, textarea", popup).forEach((ele) => {
           ele.addEventListener("input", function () {
+            Tools.log(this, this.value);
             const isCheckbox = this.type === "checkbox";
             this.dataset.send && Tools.postMessage(window, { [`disable_${this.name}`]: this.checked });
             setTimeout(() => {
@@ -191,4 +195,34 @@ export default {
 
     return { html, configMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
   },
+  genIgnoreItems() {
+    const host = location.host;
+    const configs = [
+      { name: "custom", text: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), host },
+      { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号分割）", cache: Storage.NEXT_EPISODE_IGNORE_SITE },
+      { name: "fullIgnore", text: "自动网页全屏时忽略的网址列表（分号分割）", cache: Storage.AUTO_WEB_IGNORE_SITE },
+    ].filter(({ isHidden }) => !isHidden);
+
+    const html = configs.map(({ name, text, cache, host }) => {
+      const value = host ? cache.get(host) : cache.get();
+      return `
+        <div class="others-sett"><p>${text}</p>
+          <textarea ${host ? `data-host="${host}"` : ""} name="${name}" type="text" autocomplete="off">${value}</textarea>
+        </div>`;
+    });
+
+    return { html, configMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
+  },
+  setDefaultIgnoreUrls() {
+    // 「自动网页全屏」功能的内置默认忽略URL
+    const defaultWebFul = ["https://www.youtube.com/", "https://www.youtube.com/shorts/"];
+    const ignoreWebFulUrls = [...new Set([...defaultWebFul, ...this.splitUrls(Storage.AUTO_WEB_IGNORE_SITE.get())])];
+    Storage.AUTO_WEB_IGNORE_SITE.set(ignoreWebFulUrls.join(";\n"));
+
+    // 「自动下集」功能的内置默认忽略URL
+    const defaultAutoNext = ["https://www.bilibili.com/video/", "https://www.bilibili.com/list/"];
+    const ignoreAutoNextUrls = [...new Set([...defaultAutoNext, ...this.splitUrls(Storage.NEXT_EPISODE_IGNORE_SITE.get())])];
+    Storage.NEXT_EPISODE_IGNORE_SITE.set(ignoreAutoNextUrls.join(";\n"));
+  },
+  splitUrls: (str) => str.split(/[，；,;\n]/).filter((e) => e.trim()),
 };

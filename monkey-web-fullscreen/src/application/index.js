@@ -75,7 +75,7 @@ export default window.App = {
     // 向iframe传递顶级窗口信息
     const { host, href: url } = location;
     const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
-    const topWin = { host, viewWidth, viewHeight, urlHash: Tools.hashCode(url) };
+    const topWin = { url, host, viewWidth, viewHeight, urlHash: Tools.hashCode(url) };
     window.topWin = this.topWin = topWin;
     Tools.sendToIFrames({ topWin });
   },

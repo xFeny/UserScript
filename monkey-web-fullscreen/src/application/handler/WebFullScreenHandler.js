@@ -3,6 +3,7 @@ import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
 import SiteIcons from "../common/SiteIcons";
+import URLBlacklist from "../common/URLBlacklist";
 
 /**
  * 网页全屏逻辑处理
@@ -13,6 +14,7 @@ export default {
     if (!Storage.ENABLE_AUTO_NEXT_EPISODE.get()) return;
     if (Tools.isFrequent("autoNext", Consts.THREE_SEC, true)) return;
     if (this.getRemainingTime(video) > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return; // 距离结束还剩多少秒切换下集
+    if (this.isBlocked(Storage.NEXT_EPISODE_IGNORE_SITE.get())) return (video.hasTriedAutoNext = true);
 
     Tools.postMessage(window.top, { key: "N" });
     video.hasTriedAutoNext = true;
@@ -22,6 +24,7 @@ export default {
     if (Tools.isFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
     if (video.hasWebFull || !this.topWin || !video.offsetWidth) return;
     if ((Site.isMatched() && this.isDisableAuto()) || (!Site.isMatched() && !this.isEnableSiteAuto())) return;
+    if (this.isBlocked(Storage.AUTO_WEB_IGNORE_SITE.get())) return (video.hasWebFull = true);
     if (Tools.isOverLimit("autoWebFull")) return (video.hasWebFull = true);
 
     // 视频元素宽高 >= 浏览器视窗宽高，认为已网页全屏
@@ -64,5 +67,10 @@ export default {
     // 图标从右到左：全屏、网页全屏、弹幕设置、弹幕开关、小窗模式，即下标[0]是全屏图标
     Tools.triggerMousemove(this.getVideo());
     return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
+  },
+  isBlocked(ignoreStr) {
+    if (!ignoreStr || !this.topWin) return false;
+    const urlFilter = new URLBlacklist(this.splitUrls(ignoreStr));
+    return urlFilter.isBlocked(this.topWin.url);
   },
 };
