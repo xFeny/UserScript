@@ -188,8 +188,8 @@ export default {
     const host = location.host;
     const configs = [
       { name: "customFit", text: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), host },
-      { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: Storage.NEXT_EPISODE_IGNORE_SITE },
-      { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: Storage.AUTO_FIT_IGNORE_SITE },
+      { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: Storage.NEXT_IGNORE_URLS },
+      { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: Storage.FULL_IGNORE_URLS },
     ];
 
     const renderItem = ({ text, host, name, value }) => `

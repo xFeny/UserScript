@@ -112,11 +112,11 @@ class TimedStorage extends StorageItem {
  * PERCENT_OF_ZOOM    缩放百分比
  * MOVING_DISTANCE    移动距离
  * DISABLE_SCREENSHOT  禁用视频截图
- * NEXT_EPISODE_IGNORE_SITE  自动切换下集时忽略的网址列表
- * AUTO_FIT_IGNORE_SITE   自动网页全屏时忽略的网址列表
  * CURR_EPISODE_SELECTOR  通用切换下集—当前播放集数 拾取的CSS选择器
  * REL_EPISODE_SELECTOR   通用切换下集—集数列表中的任意一集 拾取的CSS选择器
  * STORAGE_DAYS   设置播放进度保存天数
+ * NEXT_IGNORE_URLS  自动切换下集时忽略的网址列表
+ * FULL_IGNORE_URLS   自动网页全屏时忽略的网址列表
  * CUSTOM_WEB_FULL    自定义此站网页全屏容器
  * PLAY_TIME  记录的播放进度
  */
@@ -137,11 +137,11 @@ export default {
   PERCENT_OF_ZOOM: new StorageItem("PERCENT_OF_ZOOM", 10, false, (value) => parseInt(value, 10)),
   MOVING_DISTANCE: new StorageItem("MOVING_DISTANCE", 10, false, (value) => parseInt(value, 10)),
   DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
-  NEXT_EPISODE_IGNORE_SITE: new StorageItem("NEXT_EPISODE_IGNORE_SITE", "", false),
-  AUTO_FIT_IGNORE_SITE: new StorageItem("AUTO_FIT_IGNORE_SITE", "", false),
   CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
   REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
   STORAGE_DAYS: new StorageItem("STORAGE_DAYS", 7, false, parseFloat),
+  NEXT_IGNORE_URLS: new StorageItem("NEXT_IGNORE_URLS", "", false),
+  FULL_IGNORE_URLS: new StorageItem("FULL_IGNORE_URLS", "", false),
   CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", "", false),
   PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat),
 };

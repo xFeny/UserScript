@@ -55,27 +55,3 @@ export default class URLBlacklist {
     }
   }
 }
-
-// // 使用示例
-// const blacklist = ["https://www.bilibili.com/", "https://www.bilibili.com/video", "https://www.bilibili.com/guochuang"];
-
-// const urlFilter = new URLBlacklist(blacklist);
-
-// // 测试一些URL
-// const testUrls = [
-//   "https://www.bilibili.com/", // 应被阻止（首页）
-//   "https://www.bilibili.com/video", // 应被阻止
-//   "https://www.bilibili.com/video/12345", // 应被阻止（子路径）
-//   "https://www.bilibili.com/guochuang", // 应被阻止
-//   "https://www.bilibili.com/guochuang/6789", // 应被阻止（子路径）
-//   "https://www.bilibili.com/bangumi/", // 不应被阻止
-//   "https://www.bilibili.com/bangumi/123", // 不应被阻止
-//   "https://www.otherdomain.com/", // 不应被阻止
-//   "https://www.bilibili.com/otherpath", // 不应被阻止
-// ];
-
-// // 输出测试结果
-// testUrls.forEach((url) => {
-//   const isBlocked = urlFilter.isBlocked(url);
-//   console.log(`${url}: ${isBlocked ? "被阻止" : "允许访问"}`);
-// });

@@ -374,8 +374,8 @@
     PERCENT_OF_ZOOM: new StorageItem("PERCENT_OF_ZOOM", 10, false, (value) => parseInt(value, 10)),
     MOVING_DISTANCE: new StorageItem("MOVING_DISTANCE", 10, false, (value) => parseInt(value, 10)),
     DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
-    NEXT_EPISODE_IGNORE_SITE: new StorageItem("NEXT_EPISODE_IGNORE_SITE", "", false),
-    AUTO_FIT_IGNORE_SITE: new StorageItem("AUTO_FIT_IGNORE_SITE", "", false),
+    NEXT_IGNORE_URLS: new StorageItem("NEXT_IGNORE_URLS", "", false),
+    FULL_IGNORE_URLS: new StorageItem("FULL_IGNORE_URLS", "", false),
     CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
     REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
     STORAGE_DAYS: new StorageItem("STORAGE_DAYS", 7, false, parseFloat),
@@ -497,8 +497,8 @@
           const mergedUrls = [.../* @__PURE__ */ new Set([...defaultUrls, ...existingUrls])];
           storageKey.set(mergedUrls.join(";\n"));
         };
-        processIgnoreUrls(Storage.AUTO_FIT_IGNORE_SITE, ["https://www.youtube.com/", "https://www.youtube.com/shorts/"]);
-        processIgnoreUrls(Storage.NEXT_EPISODE_IGNORE_SITE, [
+        processIgnoreUrls(Storage.FULL_IGNORE_URLS, ["https://www.youtube.com/", "https://www.youtube.com/shorts/"]);
+        processIgnoreUrls(Storage.NEXT_IGNORE_URLS, [
           "https://www.youtube.com/watch/",
           "https://www.bilibili.com/video/",
           "https://www.bilibili.com/list/"
@@ -806,8 +806,8 @@
       const host = location.host;
       const configs = [
         { name: "customFit", text: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), host },
-        { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: Storage.NEXT_EPISODE_IGNORE_SITE },
-        { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: Storage.AUTO_FIT_IGNORE_SITE }
+        { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: Storage.NEXT_IGNORE_URLS },
+        { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: Storage.FULL_IGNORE_URLS }
       ];
       const renderItem = ({ text, host: host2, name, value }) => `
         <div class="others-sett"><p>${text}</p>
@@ -1085,7 +1085,7 @@
       if (!Storage.ENABLE_AUTO_NEXT_EPISODE.get()) return;
       if (Tools.isFrequent("autoNext", Consts.THREE_SEC, true)) return;
       if (this.getRemainingTime(video) > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return;
-      if (this.isIgnoreUrl(Storage.NEXT_EPISODE_IGNORE_SITE.get())) return video.hasTriedAutoNext = true;
+      if (this.isIgnoreUrl(Storage.NEXT_IGNORE_URLS.get())) return video.hasTriedAutoNext = true;
       Tools.postMessage(window.top, { key: "N" });
       video.hasTriedAutoNext = true;
     },
@@ -1094,7 +1094,7 @@
       if (Tools.isFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
       if (video.hasWebFull || !this.topWin || !video.offsetWidth) return;
       if (Site.isMatched() && this.isDisableAuto() || !Site.isMatched() && !this.isEnableSiteAuto()) return;
-      if (this.isIgnoreUrl(Storage.AUTO_FIT_IGNORE_SITE.get())) return video.hasWebFull = true;
+      if (this.isIgnoreUrl(Storage.FULL_IGNORE_URLS.get())) return video.hasWebFull = true;
       if (Tools.isOverLimit("autoWebFull")) return video.hasWebFull = true;
       const { offsetWidth, offsetHeight } = video;
       const { viewWidth, viewHeight } = this.topWin;
