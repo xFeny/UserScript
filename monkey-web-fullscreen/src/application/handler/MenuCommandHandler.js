@@ -19,7 +19,6 @@ export default {
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
     this.setupMenuChangeListener();
-    this.setDefaultIgnoreUrls();
     this.registMenuCommand();
     this.hasMenu = true;
   },
@@ -93,12 +92,12 @@ export default {
     });
   },
   settingPopup() {
-    const { html: disableItemsHtml, cacheMap: disableItemsMap } = this.genDisableItems();
-    const { html: paramsItemsHtml, cacheMap: paramsItemsMap } = this.genParamsItems();
-    const { html: ignoreItemsHtml, cacheMap: ignoreItemsMap } = this.genIgnoreItems();
-    const cacheMap = { ...disableItemsMap, ...paramsItemsMap, ...ignoreItemsMap };
+    const { html: disableHtml, cacheMap: disableMap } = this.genDisableItems();
+    const { html: paramsHtml, cacheMap: paramsMap } = this.genParamsItems();
+    const { html: ignoreHtml, cacheMap: ignoreMap } = this.genIgnoreItems();
+    const cacheMap = { ...disableMap, ...paramsMap, ...ignoreMap };
     const modalHtml = `
-      <div class="swal2-tabs">
+        <div class="swal2-tabs">
           <!-- Tabs 标题栏 -->
           <div class="swal2-tabs-header">
               <div class="swal2-tab active" data-tab="tab1">禁用设置</div>
@@ -107,11 +106,11 @@ export default {
           </div>
           <!-- Tabs 内容区 -->
           <div class="swal2-tabs-content">
-            <div class="swal2-tab-panel active" id="tab1">${disableItemsHtml.join(Consts.EMPTY)}</div>
-            <div class="swal2-tab-panel" id="tab2">${paramsItemsHtml.join(Consts.EMPTY)}</div>
-            <div class="swal2-tab-panel" id="tab3">${ignoreItemsHtml.join(Consts.EMPTY)}</div>
+            <div class="swal2-tab-panel active" id="tab1">${disableHtml}</div>
+            <div class="swal2-tab-panel" id="tab2">${paramsHtml}</div>
+            <div class="swal2-tab-panel" id="tab3">${ignoreHtml}</div>
           </div>
-      </div>`;
+        </div>`;
 
     Swal.fire({
       width: 400,
@@ -159,17 +158,13 @@ export default {
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
     ].filter(({ isHidden }) => !isHidden);
 
-    // 将配置项数组转换为HTML字符串数组
-    // 每个配置项生成一个带复选框的标签元素
-    const html = configs.map(({ name, text, cache, sendMsg }) => {
-      return `
+    const renderItem = ({ text, sendMsg, name, value }) => `
         <label class="__menu">${text}
-          <input ${sendMsg ? 'data-send="true"' : ""} ${cache.get() ? "checked" : ""} name="${name}" type="checkbox"/>
+          <input ${sendMsg ? 'data-send="true"' : ""} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
-    });
 
-    return { html, cacheMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
+    return this.generateCommonItems(configs, renderItem);
   },
   genParamsItems() {
     const configs = [
@@ -182,44 +177,44 @@ export default {
       { name: "move", text: "移动距离", cache: Storage.MOVING_DISTANCE },
     ];
 
-    const html = configs.map(({ name, text, cache, host }) => {
-      const value = host ? cache.get(host) : cache.get();
-      return `
+    const renderItem = ({ text, host, name, value }) => `
         <label class="__menu">${text}
           <input  ${host ? `data-host="${host}"` : ""} value="${value}" name="${name}" type="text" autocomplete="off"/>
         </label>`;
-    });
 
-    return { html, cacheMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
+    return this.generateCommonItems(configs, renderItem);
   },
   genIgnoreItems() {
     const host = location.host;
     const configs = [
-      { name: "custom", text: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), host },
-      { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号分割）", cache: Storage.NEXT_EPISODE_IGNORE_SITE },
-      { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号分割）", cache: Storage.AUTO_FIT_IGNORE_SITE },
-    ].filter(({ isHidden }) => !isHidden);
+      { name: "customFit", text: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), host },
+      { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: Storage.NEXT_EPISODE_IGNORE_SITE },
+      { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: Storage.AUTO_FIT_IGNORE_SITE },
+    ];
 
-    const html = configs.map(({ name, text, cache, host }) => {
-      const value = host ? cache.get(host) : cache.get();
-      return `
+    const renderItem = ({ text, host, name, value }) => `
         <div class="others-sett"><p>${text}</p>
           <textarea ${host ? `data-host="${host}"` : ""} name="${name}" type="text" autocomplete="off">${value}</textarea>
         </div>`;
-    });
 
-    return { html, cacheMap: Object.fromEntries(configs.map((item) => [item.name, item.cache])) };
+    return this.generateCommonItems(configs, renderItem);
   },
-  setDefaultIgnoreUrls() {
-    // 「自动网页全屏」功能的内置默认忽略URL
-    const defaultWebFul = ["https://www.youtube.com/", "https://www.youtube.com/shorts/"];
-    const ignoreWebFulUrls = [...new Set([...defaultWebFul, ...this.splitUrls(Storage.AUTO_FIT_IGNORE_SITE.get())])];
-    Storage.AUTO_FIT_IGNORE_SITE.set(ignoreWebFulUrls.join(";\n"));
+  generateCommonItems(baseConfigs, renderItem) {
+    // 过滤要隐藏的项
+    const filteredConfigs = baseConfigs.filter(({ isHidden }) => !isHidden);
 
-    // 「自动下集」功能的内置默认忽略URL
-    const defaultAutoNext = ["https://www.bilibili.com/video/", "https://www.bilibili.com/list/"];
-    const ignoreAutoNextUrls = [...new Set([...defaultAutoNext, ...this.splitUrls(Storage.NEXT_EPISODE_IGNORE_SITE.get())])];
-    Storage.NEXT_EPISODE_IGNORE_SITE.set(ignoreAutoNextUrls.join(";\n"));
+    // 处理缓存值，有`host`取`host`的缓存
+    const processedConfigs = filteredConfigs.map((config) => ({
+      value: config.host ? config.cache.get(config.host) : config.cache.get(),
+      ...config,
+    }));
+
+    // 生成HTML字符串
+    const html = processedConfigs.map((config) => renderItem(config)).join(Consts.EMPTY);
+
+    // name-cache 关系映射
+    const cacheMap = Object.fromEntries(processedConfigs.map((item) => [item.name, item.cache]));
+
+    return { html, cacheMap };
   },
-  splitUrls: (str) => str.split(/[，；,;\n]/).filter((e) => e.trim()),
 };

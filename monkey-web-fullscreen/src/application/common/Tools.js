@@ -155,11 +155,8 @@ export default unsafeWindow.Tools = {
     node?.setAttribute("part", parts.join(" ").trim());
   },
   safeHTML(htmlStr) {
-    if (!window.trustedTypes || !trustedTypes.createPolicy) return htmlStr;
-    const policy = trustedTypes.createPolicy("default", {
-      createHTML: (input) => input,
-    });
-
+    if (!window.trustedTypes?.createPolicy) return htmlStr;
+    const policy = trustedTypes.defaultPolicy ?? trustedTypes.createPolicy("default", { createHTML: (input) => input });
     return policy.createHTML(htmlStr);
   },
 };

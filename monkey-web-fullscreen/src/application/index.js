@@ -4,6 +4,7 @@ import Storage from "./common/Storage";
 
 export default window.App = {
   init() {
+    this.setDefaultIgnoreUrls();
     this.setupDocBodyObserver();
     this.setupVisibleListener();
     this.setupKeydownListener();
@@ -121,4 +122,24 @@ export default window.App = {
       el?.blur(), Tools.addCls(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
     });
   },
+  setDefaultIgnoreUrls() {
+    Promise.resolve().then(() => {
+      const processIgnoreUrls = (storageKey, defaultUrls) => {
+        const existingUrls = this.splitUrls(storageKey.get());
+        const mergedUrls = [...new Set([...defaultUrls, ...existingUrls])];
+        storageKey.set(mergedUrls.join(";\n"));
+      };
+
+      // 「自动网页全屏」功能的内置默认忽略 URL
+      processIgnoreUrls(Storage.AUTO_FIT_IGNORE_SITE, ["https://www.youtube.com/", "https://www.youtube.com/shorts/"]);
+
+      // 「自动下集」功能的内置默认忽略 URL
+      processIgnoreUrls(Storage.NEXT_EPISODE_IGNORE_SITE, [
+        "https://www.youtube.com/watch/",
+        "https://www.bilibili.com/video/",
+        "https://www.bilibili.com/list/",
+      ]);
+    });
+  },
+  splitUrls: (str) => str.split(/[，；,;\n]/).filter((e) => e.trim()),
 };

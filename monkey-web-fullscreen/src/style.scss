@@ -300,7 +300,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
       font-size: 12px !important;
       height: 100px !important;
 
-      &[name="custom"] {
+      &[name="customFit"] {
         height: 40px !important;
       }
     }

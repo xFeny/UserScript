@@ -67,12 +67,11 @@ class StorageItem {
 class TimedStorage extends StorageItem {
   constructor(name, defaultValue, useLocalStorage, valueParser) {
     super(name, defaultValue, useLocalStorage, valueParser);
-    this.cleanupExpiredData();
+    requestIdleCallback(() => this.cleanupExpiredData());
   }
 
   set(suffix, value, expires) {
     const key = this.name + suffix;
-    // if (expires) expires = Date.now() + expires * 1000; // 转换为毫秒 单位：秒
     if (expires) expires = Date.now() + expires * 864e5; // 转换为毫秒 单位：天
     expires ? this.setItem(key, JSON.stringify({ value, expires })) : this.setItem(key, value);
   }
