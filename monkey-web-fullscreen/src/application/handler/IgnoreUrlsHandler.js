@@ -7,8 +7,8 @@ import Storage from "../common/Storage";
  * 自动网页全屏时忽略的网址
  */
 export default {
-  defNextIgnore: ["https://www.youtube.com/watch/", "https://www.bilibili.com/video/", "https://www.bilibili.com/list/"],
-  defFullIgnore: ["https://www.youtube.com/shorts/", "https://www.youtube.com/"],
+  defNextIgnore: ["https://www.youtube.com/watch", "https://www.bilibili.com/video", "https://www.bilibili.com/list"],
+  defFullIgnore: ["https://www.youtube.com/shorts", "https://www.youtube.com"],
   setupIgnoreUrlsChangeListener() {
     this.initializeIgnoreUrls();
     [Storage.FULL_IGNORE_URLS.name, Storage.NEXT_IGNORE_URLS.name].forEach((key) =>
