@@ -177,9 +177,9 @@ export default {
       { name: "move", text: "移动距离", cache: Storage.MOVING_DISTANCE },
     ];
 
-    const renderItem = ({ text, host, name, value }) => `
+    const renderItem = ({ text, name, value }) => `
         <label class="__menu">${text}
-          <input  ${host ? `data-host="${host}"` : ""} value="${value}" name="${name}" type="text" autocomplete="off"/>
+          <input value="${value}" name="${name}" type="text" autocomplete="off"/>
         </label>`;
 
     return this.generateCommonItems(configs, renderItem);
