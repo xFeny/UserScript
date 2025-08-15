@@ -374,22 +374,22 @@
     PERCENT_OF_ZOOM: new StorageItem("PERCENT_OF_ZOOM", 10, false, (value) => parseInt(value, 10)),
     MOVING_DISTANCE: new StorageItem("MOVING_DISTANCE", 10, false, (value) => parseInt(value, 10)),
     DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
-    NEXT_IGNORE_URLS: new StorageItem("NEXT_IGNORE_URLS", "", false),
-    FULL_IGNORE_URLS: new StorageItem("FULL_IGNORE_URLS", "", false),
     CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
     REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
     STORAGE_DAYS: new StorageItem("STORAGE_DAYS", 7, false, parseFloat),
+    NEXT_IGNORE_URLS: new StorageItem("NEXT_IGNORE_URLS", "", false),
+    FULL_IGNORE_URLS: new StorageItem("FULL_IGNORE_URLS", "", false),
     CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", "", false),
     PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat)
   };
   const App$1 = window.App = {
     init() {
-      this.setDefaultIgnoreUrls();
       this.setupDocBodyObserver();
       this.setupVisibleListener();
       this.setupKeydownListener();
       this.setupUrlChangeListener();
       this.setupMouseMoveListener();
+      this.setupIgnoreUrlsChangeListener();
       document.addEventListener("load", () => this.triggerStartElement(), true);
     },
     isNormalSite: () => !window?.videoInfo && !window?.topWin,
@@ -489,23 +489,7 @@
       [...Tools.getParents(this.player, true, 3), ...Tools.getIFrames()].forEach((el) => {
         el?.blur(), Tools.addCls(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
       });
-    },
-    setDefaultIgnoreUrls() {
-      Promise.resolve().then(() => {
-        const processIgnoreUrls = (storageKey, defaultUrls) => {
-          const existingUrls = this.splitUrls(storageKey.get());
-          const mergedUrls = [.../* @__PURE__ */ new Set([...defaultUrls, ...existingUrls])];
-          storageKey.set(mergedUrls.join(";\n"));
-        };
-        processIgnoreUrls(Storage.FULL_IGNORE_URLS, ["https://www.youtube.com/", "https://www.youtube.com/shorts/"]);
-        processIgnoreUrls(Storage.NEXT_IGNORE_URLS, [
-          "https://www.youtube.com/watch/",
-          "https://www.bilibili.com/video/",
-          "https://www.bilibili.com/list/"
-        ]);
-      });
-    },
-    splitUrls: (str) => str.split(/[，；,;\n]/).filter((e) => e.trim())
+    }
   };
   const { matches, includes: excluded } = _GM_info.script;
   const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
@@ -1039,53 +1023,13 @@
       return this;
     }
   };
-  class URLBlacklist {
-    constructor(blacklist) {
-      this.blacklist = this.normalizeBlacklist(blacklist);
-    }
-    normalizeBlacklist(urls) {
-      return urls.map((url) => {
-        try {
-          const parsedUrl = new URL(url);
-          return {
-            hostname: parsedUrl.hostname,
-            pathname: this.normalizePath(parsedUrl.pathname)
-          };
-        } catch (e) {
-          console.error(`无效的URL: ${url}`, e);
-          return null;
-        }
-      }).filter(Boolean);
-    }
-    normalizePath(path) {
-      if (path.length > 1 && path.endsWith("/")) return path.slice(0, -1);
-      return path;
-    }
-    isBlocked(url) {
-      try {
-        const parsedUrl = new URL(url);
-        const normalizedPath = this.normalizePath(parsedUrl.pathname);
-        return this.blacklist.some((entry) => {
-          if (parsedUrl.hostname !== entry.hostname) return false;
-          if (entry.pathname === "/") {
-            return normalizedPath === "/";
-          } else {
-            return normalizedPath === entry.pathname || normalizedPath.startsWith(`${entry.pathname}/`);
-          }
-        });
-      } catch (e) {
-        console.error(`Invalid URL to check: ${url}`, e);
-        return false;
-      }
-    }
-  }
   const WebFullScreen = {
     autoNextEpisode(video) {
       if (video.hasTriedAutoNext) return;
       if (!Storage.ENABLE_AUTO_NEXT_EPISODE.get()) return;
       if (Tools.isFrequent("autoNext", Consts.THREE_SEC, true)) return;
       if (this.getRemainingTime(video) > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return;
-      if (this.isIgnoreUrl(Storage.NEXT_IGNORE_URLS.get())) return video.hasTriedAutoNext = true;
+      if (this.isNextIgnoreUrl()) return video.hasTriedAutoNext = true;
       Tools.postMessage(window.top, { key: "N" });
       video.hasTriedAutoNext = true;
     },
@@ -1094,8 +1038,7 @@
       if (Tools.isFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
       if (video.hasWebFull || !this.topWin || !video.offsetWidth) return;
       if (Site.isMatched() && this.isDisableAuto() || !Site.isMatched() && !this.isEnableSiteAuto()) return;
-      if (this.isIgnoreUrl(Storage.FULL_IGNORE_URLS.get())) return video.hasWebFull = true;
-      if (Tools.isOverLimit("autoWebFull")) return video.hasWebFull = true;
+      if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWebFull")) return video.hasWebFull = true;
       const { offsetWidth, offsetHeight } = video;
       const { viewWidth, viewHeight } = this.topWin;
       if (offsetWidth >= viewWidth || offsetHeight >= viewHeight) return video.hasWebFull = true;
@@ -1125,11 +1068,6 @@
     getBiliLiveIcons() {
       Tools.triggerMousemove(this.getVideo());
       return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
-    },
-    isIgnoreUrl(ignoreStr) {
-      if (!ignoreStr || !this.topWin) return false;
-      const urlFilter = new URLBlacklist(this.splitUrls(ignoreStr));
-      return urlFilter.isBlocked(this.topWin.url);
     }
   };
   const SwitchEpisode = {
@@ -1380,6 +1318,83 @@
       }
     }
   };
+  class URLBlacklist {
+    constructor(blacklist) {
+      this.blacklist = this.normalizeBlacklist(blacklist);
+    }
+    normalizeBlacklist(urls) {
+      return urls.map((url) => {
+        try {
+          const parsedUrl = new URL(url);
+          return {
+            hostname: parsedUrl.hostname,
+            pathname: this.normalizePath(parsedUrl.pathname)
+          };
+        } catch (e) {
+          console.error(`无效的URL: ${url}`, e);
+          return null;
+        }
+      }).filter(Boolean);
+    }
+    normalizePath(path) {
+      if (path.length > 1 && path.endsWith("/")) return path.slice(0, -1);
+      return path;
+    }
+    isBlocked(url) {
+      try {
+        const parsedUrl = new URL(url);
+        const normalizedPath = this.normalizePath(parsedUrl.pathname);
+        return this.blacklist.some((entry) => {
+          if (parsedUrl.hostname !== entry.hostname) return false;
+          if (entry.pathname === "/") {
+            return normalizedPath === "/";
+          } else {
+            return normalizedPath === entry.pathname || normalizedPath.startsWith(`${entry.pathname}/`);
+          }
+        });
+      } catch (e) {
+        console.error(`Invalid URL to check: ${url}`, e);
+        return false;
+      }
+    }
+  }
+  const IgnoreUrls = {
+    setupIgnoreUrlsChangeListener() {
+      this.initializeIgnoreUrls();
+      [Storage.FULL_IGNORE_URLS.name, Storage.NEXT_IGNORE_URLS.name].forEach(
+        (key) => _GM_addValueChangeListener(key, (_, oldVal, newVal) => {
+          if (oldVal === newVal) return;
+          this.initializeIgnoreUrls();
+        })
+      );
+    },
+    initializeIgnoreUrls() {
+      const nextUrls = this.processIgnoreUrls(Storage.NEXT_IGNORE_URLS, [
+        "https://www.youtube.com/watch/",
+        "https://www.bilibili.com/video/",
+        "https://www.bilibili.com/list/"
+      ]);
+      this.nextUrlFilter = new URLBlacklist(nextUrls);
+      const fullUrls = this.processIgnoreUrls(Storage.FULL_IGNORE_URLS, [
+        "https://www.youtube.com/shorts/",
+        "https://www.youtube.com/"
+      ]);
+      this.fullUrlFilter = new URLBlacklist(fullUrls);
+    },
+    isNextIgnoreUrl() {
+      return this.topWin ? this.nextUrlFilter.isBlocked(this.topWin.url) : false;
+    },
+    isFullIgnoreUrl() {
+      return this.topWin ? this.fullUrlFilter.isBlocked(this.topWin.url) : false;
+    },
+    processIgnoreUrls(cache, defaultUrls) {
+      const urlsStr = cache.get() ?? "";
+      const existUrls = urlsStr.split(/[;\n]/).filter((e) => e.trim());
+      if (existUrls.length) return existUrls;
+      cache.set(defaultUrls.join(";\n"));
+      return defaultUrls;
+    }
+  };
   const VideoEvents = {
     loadedmetadata() {
       App.autoWebFullscreen(this);
@@ -1541,11 +1556,13 @@
   };
   cssLoader("sweetalert2");
   cssLoader("notyf/notyf.min.css");
-  [Keydown, WebLogin, MenuCommand, VideoControl, WebFullScreen, WebFullEnhance, SwitchEpisode, PickerEpisode].forEach((handler) => {
-    Object.entries(handler).forEach(([key, value]) => {
-      App$1[key] = value instanceof Function ? value.bind(App$1) : value;
-    });
-  });
+  [Keydown, WebLogin, MenuCommand, IgnoreUrls, VideoControl, WebFullScreen, WebFullEnhance, SwitchEpisode, PickerEpisode].forEach(
+    (handler) => {
+      Object.entries(handler).forEach(([key, value]) => {
+        App$1[key] = value instanceof Function ? value.bind(App$1) : value;
+      });
+    }
+  );
   window.videoEnhance = new VideoEnhancer();
   _unsafeWindow.AUTO_WEB_FULLSCREEN = App$1;
   App$1.init();
