@@ -1,11 +1,14 @@
 import URLBlacklist from "../common/URLBlacklist";
 import Storage from "../common/Storage";
-import Tools from "../common/Tools";
 
 /**
- * 忽略网址处理逻辑
+ * 处理：
+ * 自动切换下集时忽略的网址
+ * 自动网页全屏时忽略的网址
  */
 export default {
+  defNextIgnore: ["https://www.youtube.com/watch/", "https://www.bilibili.com/video/", "https://www.bilibili.com/list/"],
+  defFullIgnore: ["https://www.youtube.com/shorts/", "https://www.youtube.com/"],
   setupIgnoreUrlsChangeListener() {
     this.initializeIgnoreUrls();
     [Storage.FULL_IGNORE_URLS.name, Storage.NEXT_IGNORE_URLS.name].forEach((key) =>
@@ -17,18 +20,11 @@ export default {
   },
   initializeIgnoreUrls() {
     // 「自动下集」忽略URL处理
-    const nextUrls = this.processIgnoreUrls(Storage.NEXT_IGNORE_URLS, [
-      "https://www.youtube.com/watch/",
-      "https://www.bilibili.com/video/",
-      "https://www.bilibili.com/list/",
-    ]);
+    const nextUrls = this.processIgnoreUrls(Storage.NEXT_IGNORE_URLS, this.defNextIgnore);
     this.nextUrlFilter = new URLBlacklist(nextUrls);
 
     // 「自动网页全屏」忽略URL处理
-    const fullUrls = this.processIgnoreUrls(Storage.FULL_IGNORE_URLS, [
-      "https://www.youtube.com/shorts/",
-      "https://www.youtube.com/",
-    ]);
+    const fullUrls = this.processIgnoreUrls(Storage.FULL_IGNORE_URLS, this.defFullIgnore);
     this.fullUrlFilter = new URLBlacklist(fullUrls);
   },
   isNextIgnoreUrl() {
