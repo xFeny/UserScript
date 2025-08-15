@@ -28,10 +28,10 @@ export default {
     this.fullUrlFilter = new URLBlacklist(fullUrls);
   },
   isNextIgnoreUrl() {
-    return this.topWin ? this.nextUrlFilter.isBlocked(this.topWin.url) : false;
+    return this.topWin ? this.nextUrlFilter?.isBlocked(this.topWin.url) : false;
   },
   isFullIgnoreUrl() {
-    return this.topWin ? this.fullUrlFilter.isBlocked(this.topWin.url) : false;
+    return this.topWin ? this.fullUrlFilter?.isBlocked(this.topWin.url) : false;
   },
   processIgnoreUrls(cache, defaultUrls) {
     const urlsStr = cache.get() ?? "";
