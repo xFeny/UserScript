@@ -1359,6 +1359,8 @@
     }
   }
   const IgnoreUrls = {
+    defNextIgnore: ["https://www.youtube.com/watch/", "https://www.bilibili.com/video/", "https://www.bilibili.com/list/"],
+    defFullIgnore: ["https://www.youtube.com/shorts/", "https://www.youtube.com/"],
     setupIgnoreUrlsChangeListener() {
       this.initializeIgnoreUrls();
       [Storage.FULL_IGNORE_URLS.name, Storage.NEXT_IGNORE_URLS.name].forEach(
@@ -1369,16 +1371,9 @@
       );
     },
     initializeIgnoreUrls() {
-      const nextUrls = this.processIgnoreUrls(Storage.NEXT_IGNORE_URLS, [
-        "https://www.youtube.com/watch/",
-        "https://www.bilibili.com/video/",
-        "https://www.bilibili.com/list/"
-      ]);
+      const nextUrls = this.processIgnoreUrls(Storage.NEXT_IGNORE_URLS, this.defNextIgnore);
       this.nextUrlFilter = new URLBlacklist(nextUrls);
-      const fullUrls = this.processIgnoreUrls(Storage.FULL_IGNORE_URLS, [
-        "https://www.youtube.com/shorts/",
-        "https://www.youtube.com/"
-      ]);
+      const fullUrls = this.processIgnoreUrls(Storage.FULL_IGNORE_URLS, this.defFullIgnore);
       this.fullUrlFilter = new URLBlacklist(fullUrls);
     },
     isNextIgnoreUrl() {
