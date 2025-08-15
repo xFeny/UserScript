@@ -31,6 +31,7 @@ export default {
       if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
       if (data?.topWin) window.topWin = this.topWin = data.topWin;
       if (data?.disable_speed) this.resetToDefaultPlayRate();
+      if (data?.disable_zoom) this.resetVideoTransform();
       this.processEvent(data);
     });
   },
