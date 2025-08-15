@@ -57,7 +57,7 @@ export default {
   },
   getVideoContainer() {
     // 自定义网页全屏元素
-    const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin.host);
+    const selector = Storage.CUSTOM_WEB_FULL.get(this?.topWin?.host);
     if (selector) return Tools.query(selector);
 
     // 查找相关元素

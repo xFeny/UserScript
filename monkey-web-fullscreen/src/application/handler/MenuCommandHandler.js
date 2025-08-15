@@ -194,7 +194,9 @@ export default {
 
     const renderItem = ({ text, host, name, value }) => `
         <div class="others-sett"><p>${text}</p>
-          <textarea ${host ? `data-host="${host}"` : ""} name="${name}" type="text" autocomplete="off">${value}</textarea>
+          <textarea ${
+            host ? `data-host="${host}"` : ""
+          } name="${name}" type="text" spellcheck="false" autocomplete="off">${value}</textarea>
         </div>`;
 
     return this.generateCommonItems(configs, renderItem);
