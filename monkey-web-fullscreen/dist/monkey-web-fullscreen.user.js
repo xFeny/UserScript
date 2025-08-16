@@ -1041,9 +1041,7 @@
       if (video.hasWebFull || !this.topWin || !video.offsetWidth) return;
       if (Site.isMatched() && this.isDisableAuto() || !Site.isMatched() && !this.isEnableSiteAuto()) return;
       if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWebFull")) return video.hasWebFull = true;
-      const { offsetWidth, offsetHeight } = video;
-      const { viewWidth, viewHeight } = this.topWin;
-      if (offsetWidth >= viewWidth || offsetHeight >= viewHeight) return video.hasWebFull = true;
+      if (video.offsetWidth >= this.topWin.viewWidth) return video.hasWebFull = true;
       Tools.postMessage(window.top, { key: "P" });
     },
     liveWebFullscreen() {
@@ -1242,7 +1240,7 @@
       if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
       if (this.fullscreenWrapper) return this.exitWebFullEnhance();
       const container = this.getVideoHostContainer();
-      if (!container || container.matches(":is(html, body)")) return;
+      if (!container || container.matches(":is(html, body)")) return this.ensureWebFullscreen();
       this.fullscreenWrapper = container;
       container.top = container.top ?? Tools.getElementRect(container).top;
       container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
