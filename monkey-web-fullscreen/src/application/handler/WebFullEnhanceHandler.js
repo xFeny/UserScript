@@ -14,7 +14,7 @@ export default {
 
     // video的宿主容器元素
     const container = this.getVideoHostContainer();
-    if (!container || container.matches(":is(html, body)")) return;
+    if (!container || container.matches(":is(html, body)")) return this.ensureWebFullscreen();
 
     // 进入网页全屏
     this.fullscreenWrapper = container;

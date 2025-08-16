@@ -24,11 +24,7 @@ export default {
     if (video.hasWebFull || !this.topWin || !video.offsetWidth) return;
     if ((Site.isMatched() && this.isDisableAuto()) || (!Site.isMatched() && !this.isEnableSiteAuto())) return;
     if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWebFull")) return (video.hasWebFull = true);
-
-    // 视频元素宽高 >= 浏览器视窗宽高，认为已网页全屏
-    const { offsetWidth, offsetHeight } = video;
-    const { viewWidth, viewHeight } = this.topWin;
-    if (offsetWidth >= viewWidth || offsetHeight >= viewHeight) return (video.hasWebFull = true);
+    if (video.offsetWidth >= this.topWin.viewWidth) return (video.hasWebFull = true);
 
     // 发送网页全屏消息
     Tools.postMessage(window.top, { key: "P" });

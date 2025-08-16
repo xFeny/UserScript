@@ -221,19 +221,13 @@
    
    #### 示例
    
-   **示例一：** http://www.dyttbtw.com/vodplay/135284/1/1.html
+   **示例一：** https://www.douyin.com/?recommend=1
    
-   效果对比图：https://pic1.imgdb.cn/item/68998b0c58cb8da5c8190353.png
+   CSS 选择器：`#slidelist > div` ，能正常看下一个视频
    
-   CSS 选择器：`#player_2086920243` ，显示控制栏
+   **示例二：** https://www.huya.com
    
-   **示例二：** https://www.douyin.com/?recommend=1
-   
-   CSS 选择器：`#slidelist > div` ，切换到下一个视频还支持网页全屏
-   
-   **示例三：** https://www.huya.com
-   
-   CSS 选择器：`#player-wrap` ，隐藏底部礼物栏
+   CSS 选择器：`#player-wrap` ，不显示底部礼物栏
 
 ### 其他功能
 
