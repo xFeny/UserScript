@@ -49,7 +49,7 @@ export default {
   adjustPlaybackRate(step = Storage.PLAY_RATE_STEP.get()) {
     if (!this.player) return;
 
-    const playRate = Math.max(Storage.PLAY_RATE_STEP.get(), Number(this.player.playbackRate) + step);
+    const playRate = Math.max(Consts.MIN_PLAY_RATE, Number(this.player.playbackRate) + step);
     this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
   },
   resetToDefaultPlayRate() {

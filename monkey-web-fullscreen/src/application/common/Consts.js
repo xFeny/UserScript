@@ -10,6 +10,7 @@ export default Object.freeze({
   THREE_SEC: 3000,
   DEF_PLAY_RATE: 1,
   MAX_PLAY_RATE: 16,
+  MIN_PLAY_RATE: 0.0625,
   webFull: "webFullscreen",
   MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN",
 });
