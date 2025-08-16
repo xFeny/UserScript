@@ -1239,9 +1239,8 @@
     webFullEnhance() {
       if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
       if (this.fullscreenWrapper) return this.exitWebFullEnhance();
-      const container = this.getVideoHostContainer();
+      const container = this.fullscreenWrapper = this.getVideoHostContainer();
       if (!container || container.matches(":is(html, body)")) return this.ensureWebFullscreen();
-      this.fullscreenWrapper = container;
       container.top = container.top ?? Tools.getElementRect(container).top;
       container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
       Tools.getParents(container, true).forEach((el) => Tools.setPart(el, Consts.webFull));
