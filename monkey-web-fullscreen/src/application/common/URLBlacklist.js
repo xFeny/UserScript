@@ -12,10 +12,7 @@ export default class URLBlacklist {
       .map((url) => {
         try {
           const parsedUrl = new URL(url);
-          return {
-            hostname: parsedUrl.hostname,
-            pathname: this.normalizePath(parsedUrl.pathname),
-          };
+          return { hostname: parsedUrl.hostname, pathname: this.normalizePath(parsedUrl.pathname) };
         } catch (e) {
           console.error(`无效的URL: ${url}`, e);
           return null;
@@ -50,7 +47,7 @@ export default class URLBlacklist {
         }
       });
     } catch (e) {
-      console.error(`Invalid URL to check: ${url}`, e);
+      console.error(`要检查的URL无效: ${url}`, e);
       return false;
     }
   }

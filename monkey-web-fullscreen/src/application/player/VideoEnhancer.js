@@ -56,7 +56,6 @@ export default class VideoEnhancer {
 
   enhanced(video) {
     if (video.hasAttribute(this.attr)) return;
-    video.__ctrl = video.controls;
     this.setupEventListeners(video);
     video.tsr = { ...this.defaultTsr };
   }
@@ -80,15 +79,8 @@ export default class VideoEnhancer {
 
   /**
    * 绕过视频播放器的播放速率限制
-   * 支持标准HTML5视频元素和特殊实现(如腾讯视频的fake-video)
-   *
-   * 实现原理:
-   * 1. 对于标准HTMLMediaElement，直接设置playbackRate属性
-   * 2. 对于特殊实现(如fake-video)，拦截setter并调用其内部方法
-   * 3. 保留原始功能的同时覆盖速率限制逻辑
-   *
-   * @param {HTMLMediaElement|Object} video - 视频元素或fake-video实例
-   * @see 腾讯视频fake-video实现 https://v.qq.com/wasm-kernel/1.0.49/fake-video-element-iframe.js
+   * @param video - 视频元素
+   * @see 腾讯视频fake-video https://v.qq.com/wasm-kernel/1.0.49/fake-video-element-iframe.js
    */
   bypassPlaybackRateLimit(video) {
     this.defineProperty(video, "playbackRate", {
