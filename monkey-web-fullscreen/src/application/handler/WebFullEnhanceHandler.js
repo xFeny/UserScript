@@ -13,11 +13,10 @@ export default {
     if (this.fullscreenWrapper) return this.exitWebFullEnhance();
 
     // video的宿主容器元素
-    const container = this.getVideoHostContainer();
+    const container = (this.fullscreenWrapper = this.getVideoHostContainer());
     if (!container || container.matches(":is(html, body)")) return this.ensureWebFullscreen();
 
     // 进入网页全屏
-    this.fullscreenWrapper = container;
     container.top = container.top ?? Tools.getElementRect(container).top;
     container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
     Tools.getParents(container, true).forEach((el) => Tools.setPart(el, Consts.webFull));
