@@ -140,7 +140,7 @@ export default {
               const cache = cacheMap[this.name];
               const value = isCheckbox ? this.checked : this.value;
               host ? cache.set(host, value) : cache.set(value);
-            }, 50);
+            }, 100);
           });
         });
       },
