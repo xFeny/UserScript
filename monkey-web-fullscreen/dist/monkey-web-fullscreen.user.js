@@ -70,6 +70,7 @@
     THREE_SEC: 3e3,
     DEF_PLAY_RATE: 1,
     MAX_PLAY_RATE: 16,
+    MIN_PLAY_RATE: 0.0625,
     webFull: "webFullscreen",
     MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN"
   });
@@ -850,7 +851,7 @@
     },
     adjustPlaybackRate(step = Storage.PLAY_RATE_STEP.get()) {
       if (!this.player) return;
-      const playRate = Math.max(Storage.PLAY_RATE_STEP.get(), Number(this.player.playbackRate) + step);
+      const playRate = Math.max(Consts.MIN_PLAY_RATE, Number(this.player.playbackRate) + step);
       this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
     },
     resetToDefaultPlayRate() {
@@ -1272,8 +1273,8 @@
       return Tools.query(`iframe[src*="${pathname + partial}"]`) ?? Tools.query(`iframe[src*="${pathname}"]`);
     },
     getVideoContainer() {
-      const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin?.host);
-      if (selector) return Tools.query(selector);
+      const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin?.host)?.trim();
+      if (selector) return Tools.query(selector.replace(/\n/g, Consts.EMPTY));
       const ctrlContainer = this.findControlBarContainer();
       return ctrlContainer ? this.findVideoParentContainer(ctrlContainer) : this.findVideoParentContainer();
     },
