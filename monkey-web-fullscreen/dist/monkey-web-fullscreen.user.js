@@ -484,7 +484,7 @@
       this.setVideoInfo(video);
       this.setupVideoObserver(video);
       window.videoEnhance.enhanced(video);
-      this.createClock("stop");
+      this.createClock();
     },
     setVideoInfo(video) {
       const isLive = Object.is(video.duration, Infinity);
@@ -541,14 +541,16 @@
     setupFullscreenListener() {
       document.addEventListener("fullscreenchange", () => {
         const isFull = !!document.fullscreenElement;
-        Tools.postMessage(window.top, { toggleClock: isFull ? "start" : "stop" });
+        Tools.postMessage(window.top, { clockState: isFull ? "start" : "stop" });
       });
     },
-    createClock(event) {
-      if (!this.player) return;
-      this.Clock?.destroy();
-      this.Clock = new Clock(this.player.parentElement);
-      this.Clock[event]();
+    createClock(state = "stop") {
+      Promise.resolve().then(() => {
+        this.Clock?.destroy();
+        if (!this.player?.parentNode) return this.Clock = null;
+        this.Clock = new Clock(this.player.parentNode);
+        this.Clock[state]?.();
+      });
     }
   };
   const { matches, includes: excluded } = _GM_info.script;
@@ -618,7 +620,7 @@
       if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
       if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
       if (data?.topWin) window.topWin = this.topWin = data.topWin;
-      if (data?.toggleClock) this.createClock(data.toggleClock);
+      if (data?.clockState) this.createClock(data.clockState);
       if (data?.disable_speed) this.resetToDefaultPlayRate();
       if (data?.disable_zoom) this.resetVideoTransform();
       this.processEvent(data);
@@ -1307,11 +1309,8 @@
   };
   const WebFullEnhance = {
     toggleFullscreen() {
-      if ((this.player || !this.player) && !Tools.isTopWin()) return;
-      const isFull = !!document.fullscreenElement;
-      if (isFull) return document.exitFullscreen();
-      const container = this.getVideoHostContainer();
-      container.requestFullscreen();
+      if (!Tools.isTopWin()) return;
+      document.fullscreenElement ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
     },
     webFullEnhance() {
       if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
