@@ -33,10 +33,10 @@
 // @match        *://v.qq.com/wasm-kernel/*/fake-video*
 // @require      https://unpkg.com/notyf@3.10.0/notyf.min.js
 // @require      data:application/javascript,%3Bwindow.notyf%3D%7BNotyf%7D%3B
-// @require      https://unpkg.com/sweetalert2@11.22.3/dist/sweetalert2.min.js
+// @require      https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.js
 // @require      data:application/javascript,%3Bwindow.sweetalert2%3DSwal%3B
 // @resource     notyf/notyf.min.css  https://unpkg.com/notyf@3.10.0/notyf.min.css
-// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.22.3/dist/sweetalert2.min.css
+// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.css
 // @grant        GM_addStyle
 // @grant        GM_addValueChangeListener
 // @grant        GM_deleteValue
@@ -392,11 +392,7 @@
       this.isRunning = false;
       if (container.querySelector("clock")) return;
       this.clock = document.createElement("div");
-<<<<<<< HEAD
-      this.clock.style = "top:20px;right:50px;font-size:18px;color:#FFF;position:absolute;";
-=======
       this.clock.style = "top:20px;right:50px;font-size:18px;color:#FFF;position:absolute;z-index:10;";
->>>>>>> dev
       this.container.append(this.clock);
       this.start();
     }
@@ -414,7 +410,7 @@
     }
     start() {
       if (this.isRunning) return;
-      this.clock.style.setProperty("display", "unset");
+      this.clock.style.setProperty("display", "inline-block");
       this.update();
     }
     stop() {
@@ -488,7 +484,7 @@
       this.setVideoInfo(video);
       this.setupVideoObserver(video);
       window.videoEnhance.enhanced(video);
-      this.createClock(video);
+      this.createClock("stop");
     },
     setVideoInfo(video) {
       const isLive = Object.is(video.duration, Infinity);
@@ -543,23 +539,16 @@
       });
     },
     setupFullscreenListener() {
-      ["fullscreenchange", "webkitfullscreenchange"].forEach(
-        (event) => document.addEventListener(event, () => {
-<<<<<<< HEAD
-          this.isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
-=======
-          this.isFullscreen = !!document.fullscreenElement;
->>>>>>> dev
-          this.isFullscreen ? this.Clock?.start() : this.Clock?.stop();
-        })
-      );
-    },
-    createClock(video) {
-      Promise.resolve().then(() => {
-        this.Clock?.destroy();
-        this.Clock = new Clock(video.parentElement);
-        !this.isFullscreen && this.Clock.stop();
+      document.addEventListener("fullscreenchange", () => {
+        const isFull = !!document.fullscreenElement;
+        Tools.postMessage(window.top, { toggleClock: isFull ? "start" : "stop" });
       });
+    },
+    createClock(event) {
+      if (!this.player) return;
+      this.Clock?.destroy();
+      this.Clock = new Clock(this.player.parentElement);
+      this.Clock[event]();
     }
   };
   const { matches, includes: excluded } = _GM_info.script;
@@ -595,7 +584,6 @@
     Space: "Space"
   });
   const SiteIcons = {
-    "live.bilibili.com": { webFull: "#businessContainerElement" },
     "live.acfun.cn": { full: ".fullscreen-screen", webFull: ".fullscreen-web", danmaku: ".danmaku-enabled" },
     "www.bilibili.com": { full: ".bpx-player-ctrl-full", webFull: ".bpx-player-ctrl-web", next: ".bpx-player-ctrl-next" },
     "v.youku.com": { full: "#fullscreen-icon", webFull: "#webfullscreen-icon", danmaku: "#barrage-switch", next: ".kui-next-icon-0" },
@@ -612,7 +600,7 @@
       const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
       const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
       const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
-      const preventKeys = [Keyboard.F, Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
+      const preventKeys = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
       const zoomKeys = !this.isDisableZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
       if (isNumberKey || isOverrideKey || preventKeys || altKey && zoomKeys) Tools.preventDefault(event);
     },
@@ -623,24 +611,26 @@
     },
     setupKeydownListener() {
       window.addEventListener("keyup", (event) => this.preventDefault(event), true);
-      window.addEventListener("keydown", (event) => this.keydownHandler.call(this, event), true);
-      window.addEventListener("message", ({ data }) => {
-        if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
-        if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
-        if (data?.topWin) window.topWin = this.topWin = data.topWin;
-        if (data?.disable_speed) this.resetToDefaultPlayRate();
-        if (data?.disable_zoom) this.resetVideoTransform();
-        this.processEvent(data);
-      });
+      window.addEventListener("keydown", (event) => this.handleKeydown.call(this, event), true);
+      window.addEventListener("message", ({ data }) => this.handleMessage.call(this, data, true));
     },
-    keydownHandler(event, { key, code } = event) {
+    handleMessage(data) {
+      if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
+      if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
+      if (data?.topWin) window.topWin = this.topWin = data.topWin;
+      if (data?.toggleClock) this.createClock(data.toggleClock);
+      if (data?.disable_speed) this.resetToDefaultPlayRate();
+      if (data?.disable_zoom) this.resetVideoTransform();
+      this.processEvent(data);
+    },
+    handleKeydown(event, { key, code } = event) {
       const target = event.composedPath()[0];
       const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
       if (this.isNormalSite() || isInput || target?.isContentEditable) return;
       if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
       this.preventDefault(event);
       key = this.processKeystrokes(event);
-      if ([Keyboard.N, Keyboard.P].includes(code)) return Tools.postMessage(window.top, { key });
+      if ([Keyboard.F, Keyboard.N, Keyboard.P].includes(code)) return Tools.postMessage(window.top, { key });
       this.processEvent({ key });
     },
     processEvent(data) {
@@ -744,35 +734,42 @@
     },
     shortcutKeysPopup() {
       const shortcutKeys = [
-        { key: "P", desc: "切换网页全屏" },
-        { key: "N", desc: "切换下集视频" },
+        { key: "F", desc: "全屏切换" },
+        { key: "P", desc: "网页全屏" },
+        { key: "N", desc: "切换下集" },
+        { key: "R", desc: "旋转 90°" },
+        { key: "M", desc: "静音切换" },
+        { key: "D", desc: "弹幕显/隐" },
         { key: "Z", desc: "恢复正常倍速" },
-        { key: "R", desc: "画面旋转 90 度" },
-        { key: "M", desc: "静音 / 取消静音" },
-        { key: "D", desc: "显示 / 隐藏 弹幕" },
-        { key: "L / K", desc: "下一帧 / 上一帧" },
-        { key: "Ctrl Z", desc: "复位缩放与移动" },
-        { key: "Shift L", desc: "显示原生控制栏" },
-        { key: "Shift R", desc: "视频水平镜像翻转" },
-        { key: "Shift P", desc: "进入 / 退出 画中画" },
-        { key: "Ctrl Alt A", desc: "视频截图 (默认禁用)" },
-        { key: "Alt ➕ / ➖", desc: "视频缩放 (默认禁用)" },
-        { key: "A / S 或 ➕ / ➖", desc: "播放倍速 ±0.25" },
-        { key: "Alt ◀️🔼🔽▶️", desc: "移动视频画面 (默认禁用)" },
-        { key: "◀️▶️", desc: "快退 / 快进 5秒 (默认禁用)" },
-        { key: "空格", desc: "播放 / 暂停 (默认禁用)" },
-        { key: "1️ 至 9️", desc: "1️ 至 9️ 倍速" },
+        { key: "L / K", desc: "下一帧/上一帧" },
+        { key: "Shift L", desc: "显示原生控件" },
+        { key: "Shift R", desc: "水平镜像" },
+        { key: "Shift P", desc: "画中画切换" },
+        { key: "Ctrl Z", desc: "复位缩放移动" },
+        { key: "Ctrl Alt A", desc: "截图 (默认禁用)" },
+        { key: "Alt ➕ / ➖", desc: "缩放 (默认禁用)" },
+        { key: "A / S 或 ➕ / ➖", desc: "倍速 ±0.25" },
+        { key: "Alt ◀️🔼🔽▶️", desc: "移动画面 (默认禁用)" },
+        { key: "◀️▶️", desc: "快退/进 (默认禁用)" },
+        { key: "空格", desc: "播放/暂停 (默认禁用)" },
+        { key: "1️ - 9️", desc: "1️ - 9️ 倍速" },
         { key: "数字 0️", desc: "快进 30 秒" }
       ];
-      const rows = shortcutKeys.map(({ key, desc }) => `<tr><td>${key}</td><td>${desc}</td></tr>`).join(Consts.EMPTY);
+      const rows = shortcutKeys.reduce((acc, item, i) => {
+        if (i % 2 === 0) {
+          const next = shortcutKeys[i + 1] || { key: Consts.EMPTY, desc: Consts.EMPTY };
+          return acc + `<tr><td>${item.key}</td><td>${item.desc}</td><td>${next.key}</td><td>${next.desc}</td></tr>`;
+        }
+        return acc;
+      }, Consts.EMPTY);
       Swal.fire({
-        width: 600,
+        width: 650,
         title: "快捷键说明",
         showCancelButton: true,
         cancelButtonText: "关闭",
         showConfirmButton: false,
         customClass: { container: "monkey-web-fullscreen" },
-        html: Tools.safeHTML(`<table><tr><th>快捷键</th><th>说明</th></tr>${rows}</table>`)
+        html: Tools.safeHTML(`<table><tr><th>快捷键</th><th>说明</th><th>快捷键</th><th>说明</th></tr>${rows}</table>`)
       });
     },
     settingPopup() {
@@ -958,7 +955,7 @@
       this.setCurrentTime(time);
       this.hasAppliedCachedTime = true;
       this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
-        el.style.setProperty("transform", `translateY(${ -5 - el.offsetHeight}px)`);
+        el.style.setProperty("transform", `translateY(${-5 - el.offsetHeight}px)`);
       });
     },
     clearCachedTime(video) {
@@ -1310,12 +1307,11 @@
   };
   const WebFullEnhance = {
     toggleFullscreen() {
-      Tools.alert("接收到消息的地址", location.href);
-      if (!this.player) return;
+      if ((this.player || !this.player) && !Tools.isTopWin()) return;
       const isFull = !!document.fullscreenElement;
       if (isFull) return document.exitFullscreen();
-      const videoContainer = this.getVideoContainer();
-      videoContainer.requestFullscreen();
+      const container = this.getVideoHostContainer();
+      container.requestFullscreen();
     },
     webFullEnhance() {
       if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
