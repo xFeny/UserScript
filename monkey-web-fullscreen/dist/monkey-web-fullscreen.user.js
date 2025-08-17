@@ -384,6 +384,50 @@
     CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", "", false),
     PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat)
   };
+  class Clock {
+    constructor(container) {
+      if (!container) return;
+      this.container = container;
+      this.animationId = null;
+      this.isRunning = false;
+      if (container.querySelector("clock")) return;
+      this.clock = document.createElement("div");
+      this.clock.style = "top:20px;right:50px;font-size:18px;color:#FFF;position:absolute;";
+      this.container.append(this.clock);
+      this.start();
+    }
+    formatTime(date) {
+      const h = date.getHours();
+      const m = date.getMinutes();
+      const s = date.getSeconds();
+      return [h, m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
+    }
+    update() {
+      this.isRunning = true;
+      const now = /* @__PURE__ */ new Date();
+      this.clock.textContent = this.formatTime(now);
+      this.animationId = requestAnimationFrame(() => this.update());
+    }
+    start() {
+      if (this.isRunning) return;
+      this.clock.style.setProperty("display", "unset");
+      this.update();
+    }
+    stop() {
+      if (this.animationId) {
+        cancelAnimationFrame(this.animationId);
+        this.animationId = null;
+      }
+      this.isRunning = false;
+      this.clock.style.display = "none";
+    }
+    destroy() {
+      this.stop();
+      this.clock?.remove();
+      this.container = null;
+      this.clock = null;
+    }
+  }
   const App$1 = window.App = {
     init() {
       this.setupDocBodyObserver();
@@ -391,6 +435,7 @@
       this.setupKeydownListener();
       this.setupUrlChangeListener();
       this.setupMouseMoveListener();
+      this.setupFullscreenListener();
       this.setupIgnoreUrlsChangeListener();
       document.addEventListener("load", () => this.triggerStartElement(), true);
     },
@@ -439,6 +484,7 @@
       this.setVideoInfo(video);
       this.setupVideoObserver(video);
       window.videoEnhance.enhanced(video);
+      this.createClock(video);
     },
     setVideoInfo(video) {
       const isLive = Object.is(video.duration, Infinity);
@@ -490,6 +536,21 @@
       if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
       [...Tools.getParents(this.player, true, 3), ...Tools.getIFrames()].forEach((el) => {
         el?.blur(), Tools.addCls(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
+      });
+    },
+    setupFullscreenListener() {
+      ["fullscreenchange", "webkitfullscreenchange"].forEach(
+        (event) => document.addEventListener(event, () => {
+          this.isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+          this.isFullscreen ? this.Clock?.start() : this.Clock?.stop();
+        })
+      );
+    },
+    createClock(video) {
+      Promise.resolve().then(() => {
+        this.Clock?.destroy();
+        this.Clock = new Clock(video.parentElement);
+        !this.isFullscreen && this.Clock.stop();
       });
     }
   };
