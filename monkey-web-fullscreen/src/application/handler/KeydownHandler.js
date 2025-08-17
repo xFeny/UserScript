@@ -24,18 +24,20 @@ export default {
   },
   setupKeydownListener() {
     window.addEventListener("keyup", (event) => this.preventDefault(event), true); // 腾讯视频
-    window.addEventListener("keydown", (event) => this.keydownHandler.call(this, event), true);
-    window.addEventListener("message", ({ data }) => {
-      // Tools.log(location.href, "接收到消息：", data);
-      if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
-      if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
-      if (data?.topWin) window.topWin = this.topWin = data.topWin;
-      if (data?.disable_speed) this.resetToDefaultPlayRate();
-      if (data?.disable_zoom) this.resetVideoTransform();
-      this.processEvent(data);
-    });
+    window.addEventListener("keydown", (event) => this.handleKeydown.call(this, event), true);
+    window.addEventListener("message", ({ data }) => this.handleMessage.call(this, data, true));
   },
-  keydownHandler(event, { key, code } = event) {
+  handleMessage(data) {
+    // Tools.log(location.href, "接收到消息：", data);
+    if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
+    if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
+    if (data?.topWin) window.topWin = this.topWin = data.topWin;
+    if (data?.toggleClock) this.createClock(data.toggleClock);
+    if (data?.disable_speed) this.resetToDefaultPlayRate();
+    if (data?.disable_zoom) this.resetVideoTransform();
+    this.processEvent(data);
+  },
+  handleKeydown(event, { key, code } = event) {
     // Tools.log("键盘事件：", { key, code });
     const target = event.composedPath()[0];
     const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
@@ -44,7 +46,7 @@ export default {
 
     this.preventDefault(event);
     key = this.processKeystrokes(event);
-    if ([Keyboard.N, Keyboard.P].includes(code)) return Tools.postMessage(window.top, { key });
+    if ([Keyboard.F, Keyboard.N, Keyboard.P].includes(code)) return Tools.postMessage(window.top, { key });
     this.processEvent({ key });
   },
   processEvent(data) {
@@ -62,6 +64,7 @@ export default {
       Z: () => this.resetToDefaultPlayRate(),
       D: () => Site.isMatched() && this.triggerIconElement(SiteIcons.name.danmaku),
       N: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
+      F: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen()),
       P: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance()),
       LEFT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(-Storage.SKIP_INTERVAL.get()),
       RIGHT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(Storage.SKIP_INTERVAL.get()),

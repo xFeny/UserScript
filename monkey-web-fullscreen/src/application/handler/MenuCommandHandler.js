@@ -58,37 +58,45 @@ export default {
   },
   shortcutKeysPopup() {
     const shortcutKeys = [
-      { key: "P", desc: "切换网页全屏" },
-      { key: "N", desc: "切换下集视频" },
+      { key: "F", desc: "全屏切换" },
+      { key: "P", desc: "网页全屏" },
+      { key: "N", desc: "切换下集" },
+      { key: "R", desc: "旋转 90°" },
+      { key: "M", desc: "静音切换" },
+      { key: "D", desc: "弹幕显/隐" },
       { key: "Z", desc: "恢复正常倍速" },
-      { key: "R", desc: "画面旋转 90 度" },
-      { key: "M", desc: "静音 / 取消静音" },
-      { key: "D", desc: "显示 / 隐藏 弹幕" },
-      { key: "L / K", desc: "下一帧 / 上一帧" },
-      { key: "Ctrl Z", desc: "复位缩放与移动" },
-      { key: "Shift L", desc: "显示原生控制栏" },
-      { key: "Shift R", desc: "视频水平镜像翻转" },
-      { key: "Shift P", desc: "进入 / 退出 画中画" },
-      { key: "Ctrl Alt A", desc: "视频截图 (默认禁用)" },
-      { key: "Alt ➕ / ➖", desc: "视频缩放 (默认禁用)" },
-      { key: "A / S 或 ➕ / ➖", desc: "播放倍速 ±0.25" },
-      { key: "Alt ◀️🔼🔽▶️", desc: "移动视频画面 (默认禁用)" },
-      { key: "◀️▶️", desc: "快退 / 快进 5秒 (默认禁用)" },
-      { key: "空格", desc: "播放 / 暂停 (默认禁用)" },
-      { key: "1️ 至 9️", desc: "1️ 至 9️ 倍速" },
+      { key: "L / K", desc: "下一帧/上一帧" },
+      { key: "Shift L", desc: "显示原生控件" },
+      { key: "Shift R", desc: "水平镜像" },
+      { key: "Shift P", desc: "画中画切换" },
+      { key: "Ctrl Z", desc: "复位缩放移动" },
+      { key: "Ctrl Alt A", desc: "截图 (默认禁用)" },
+      { key: "Alt ➕ / ➖", desc: "缩放 (默认禁用)" },
+      { key: "A / S 或 ➕ / ➖", desc: "倍速 ±0.25" },
+      { key: "Alt ◀️🔼🔽▶️", desc: "移动画面 (默认禁用)" },
+      { key: "◀️▶️", desc: "快退/进 (默认禁用)" },
+      { key: "空格", desc: "播放/暂停 (默认禁用)" },
+      { key: "1️ - 9️", desc: "1️ - 9️ 倍速" },
       { key: "数字 0️", desc: "快进 30 秒" },
     ];
 
-    const rows = shortcutKeys.map(({ key, desc }) => `<tr><td>${key}</td><td>${desc}</td></tr>`).join(Consts.EMPTY);
+    // 偶数索引时创建新行，奇数索引时补充到上一行
+    const rows = shortcutKeys.reduce((acc, item, i) => {
+      if (i % 2 === 0) {
+        const next = shortcutKeys[i + 1] || { key: Consts.EMPTY, desc: Consts.EMPTY };
+        return acc + `<tr><td>${item.key}</td><td>${item.desc}</td><td>${next.key}</td><td>${next.desc}</td></tr>`;
+      }
+      return acc;
+    }, Consts.EMPTY);
 
     Swal.fire({
-      width: 600,
+      width: 650,
       title: "快捷键说明",
       showCancelButton: true,
       cancelButtonText: "关闭",
       showConfirmButton: false,
       customClass: { container: "monkey-web-fullscreen" },
-      html: Tools.safeHTML(`<table><tr><th>快捷键</th><th>说明</th></tr>${rows}</table>`),
+      html: Tools.safeHTML(`<table><tr><th>快捷键</th><th>说明</th><th>快捷键</th><th>说明</th></tr>${rows}</table>`),
     });
   },
   settingPopup() {

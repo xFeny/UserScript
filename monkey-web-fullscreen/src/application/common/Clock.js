@@ -11,7 +11,7 @@ export default class Clock {
 
     if (container.querySelector("clock")) return;
     this.clock = document.createElement("div");
-    this.clock.style = "top:20px;right:50px;font-size:18px;color:#FFF;position:absolute;";
+    this.clock.style = "top:20px;right:50px;font-size:18px;color:#FFF;position:absolute;z-index:10;";
     this.container.append(this.clock);
     this.start(); // 初始化时启动时钟
   }
@@ -32,7 +32,7 @@ export default class Clock {
 
   start() {
     if (this.isRunning) return;
-    this.clock.style.setProperty("display", "unset");
+    this.clock.style.setProperty("display", "inline-block");
     this.update();
   }
 
