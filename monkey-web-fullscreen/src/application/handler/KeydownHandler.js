@@ -32,7 +32,7 @@ export default {
     if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
     if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
     if (data?.topWin) window.topWin = this.topWin = data.topWin;
-    if (data?.toggleClock) this.createClock(data.toggleClock);
+    if (data?.clockState) this.createClock(data.clockState);
     if (data?.disable_speed) this.resetToDefaultPlayRate();
     if (data?.disable_zoom) this.resetVideoTransform();
     this.processEvent(data);

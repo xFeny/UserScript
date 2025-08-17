@@ -62,7 +62,7 @@ export default window.App = {
     this.setVideoInfo(video);
     this.setupVideoObserver(video);
     window.videoEnhance.enhanced(video);
-    this.createClock("stop");
+    this.createClock();
   },
   setVideoInfo(video) {
     const isLive = Object.is(video.duration, Infinity);
@@ -128,13 +128,15 @@ export default window.App = {
   setupFullscreenListener() {
     document.addEventListener("fullscreenchange", () => {
       const isFull = !!document.fullscreenElement;
-      Tools.postMessage(window.top, { toggleClock: isFull ? "start" : "stop" });
+      Tools.postMessage(window.top, { clockState: isFull ? "start" : "stop" });
     });
   },
-  createClock(event) {
-    if (!this.player) return;
-    this.Clock?.destroy(); // 先销毁再创建
-    this.Clock = new Clock(this.player.parentElement);
-    this.Clock[event](); // 不是全屏时停止
+  createClock(state = "stop") {
+    Promise.resolve().then(() => {
+      this.Clock?.destroy(); // 先销毁再创建
+      if (!this.player?.parentNode) return (this.Clock = null);
+      this.Clock = new Clock(this.player.parentNode);
+      this.Clock[state]?.(); // 不是全屏时停止
+    });
   },
 };

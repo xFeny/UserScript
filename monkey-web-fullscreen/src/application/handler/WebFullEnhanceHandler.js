@@ -7,15 +7,8 @@ import Storage from "../common/Storage";
  */
 export default {
   toggleFullscreen() {
-    // 如果video在iframe中，只对顶级窗口的iframe父元素进行全屏
-    if ((this.player || !this.player) && !Tools.isTopWin()) return;
-
-    const isFull = !!document.fullscreenElement;
-
-    if (isFull) return document.exitFullscreen();
-
-    const container = this.getVideoHostContainer();
-    container.requestFullscreen();
+    if (!Tools.isTopWin()) return; // 只对顶级窗口的视频容器进行全屏
+    document.fullscreenElement ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
   },
   webFullEnhance() {
     if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
