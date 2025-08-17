@@ -1,6 +1,7 @@
 import Tools from "./common/Tools";
 import Consts from "./common/Consts";
 import Storage from "./common/Storage";
+import Clock from "./common/Clock";
 
 export default window.App = {
   init() {
@@ -9,6 +10,7 @@ export default window.App = {
     this.setupKeydownListener();
     this.setupUrlChangeListener();
     this.setupMouseMoveListener();
+    this.setupFullscreenListener();
     this.setupIgnoreUrlsChangeListener();
     document.addEventListener("load", () => this.triggerStartElement(), true);
   },
@@ -60,6 +62,7 @@ export default window.App = {
     this.setVideoInfo(video);
     this.setupVideoObserver(video);
     window.videoEnhance.enhanced(video);
+    this.createClock(video);
   },
   setVideoInfo(video) {
     const isLive = Object.is(video.duration, Infinity);
@@ -120,6 +123,21 @@ export default window.App = {
 
     [...Tools.getParents(this.player, true, 3), ...Tools.getIFrames()].forEach((el) => {
       el?.blur(), Tools.addCls(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
+    });
+  },
+  setupFullscreenListener() {
+    ["fullscreenchange", "webkitfullscreenchange"].forEach((event) =>
+      document.addEventListener(event, () => {
+        this.isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+        this.isFullscreen ? this.Clock?.start() : this.Clock?.stop();
+      })
+    );
+  },
+  createClock(video) {
+    Promise.resolve().then(() => {
+      this.Clock?.destroy(); // 先销毁再创建
+      this.Clock = new Clock(video.parentElement);
+      !this.isFullscreen && this.Clock.stop(); // 不是全屏时停止
     });
   },
 };
