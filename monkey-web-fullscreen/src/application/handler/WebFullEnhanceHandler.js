@@ -6,6 +6,17 @@ import Storage from "../common/Storage";
  * 通用网页全屏
  */
 export default {
+  toggleFullscreen() {
+    // 如果video在iframe中，只对顶级窗口的iframe父元素进行全屏
+    if ((this.player || !this.player) && !Tools.isTopWin()) return;
+
+    const isFull = !!document.fullscreenElement;
+
+    if (isFull) return document.exitFullscreen();
+
+    const container = this.getVideoHostContainer();
+    container.requestFullscreen();
+  },
   webFullEnhance() {
     if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
 

@@ -33,10 +33,10 @@
 // @match        *://v.qq.com/wasm-kernel/*/fake-video*
 // @require      https://unpkg.com/notyf@3.10.0/notyf.min.js
 // @require      data:application/javascript,%3Bwindow.notyf%3D%7BNotyf%7D%3B
-// @require      https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.js
+// @require      https://unpkg.com/sweetalert2@11.22.3/dist/sweetalert2.min.js
 // @require      data:application/javascript,%3Bwindow.sweetalert2%3DSwal%3B
 // @resource     notyf/notyf.min.css  https://unpkg.com/notyf@3.10.0/notyf.min.css
-// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.css
+// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.22.3/dist/sweetalert2.min.css
 // @grant        GM_addStyle
 // @grant        GM_addValueChangeListener
 // @grant        GM_deleteValue
@@ -392,7 +392,11 @@
       this.isRunning = false;
       if (container.querySelector("clock")) return;
       this.clock = document.createElement("div");
+<<<<<<< HEAD
       this.clock.style = "top:20px;right:50px;font-size:18px;color:#FFF;position:absolute;";
+=======
+      this.clock.style = "top:20px;right:50px;font-size:18px;color:#FFF;position:absolute;z-index:10;";
+>>>>>>> dev
       this.container.append(this.clock);
       this.start();
     }
@@ -541,7 +545,11 @@
     setupFullscreenListener() {
       ["fullscreenchange", "webkitfullscreenchange"].forEach(
         (event) => document.addEventListener(event, () => {
+<<<<<<< HEAD
           this.isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+=======
+          this.isFullscreen = !!document.fullscreenElement;
+>>>>>>> dev
           this.isFullscreen ? this.Clock?.start() : this.Clock?.stop();
         })
       );
@@ -569,6 +577,7 @@
   const Keyboard = Object.freeze({
     A: "KeyA",
     D: "KeyD",
+    F: "KeyF",
     K: "KeyK",
     L: "KeyL",
     M: "KeyM",
@@ -587,15 +596,15 @@
   });
   const SiteIcons = {
     "live.bilibili.com": { webFull: "#businessContainerElement" },
-    "live.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled" },
-    "www.bilibili.com": { webFull: ".bpx-player-ctrl-web", next: ".bpx-player-ctrl-next" },
-    "v.douyu.com": { webFull: ".ControllerBar-PageFull-Icon", danmaku: ".BarrageSwitch-icon" },
-    "www.iqiyi.com": { webFull: "[class*=videofullBtn]", danmaku: "[class*=danmuBtnSet] div", next: "[class*=buttons_playNext]" },
-    "v.youku.com": { webFull: "#webfullscreen-icon", danmaku: "#barrage-switch", next: ".kui-next-icon-0" },
-    "www.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled", next: ".btn-next-part div" },
-    "www.mgtv.com": { webFull: ".webfullscreenBtn i", danmaku: "div[class*='danmuSwitch']", next: ".icon-next" },
-    "v.qq.com": { webFull: ".txp_btn_fake", danmaku: ".barrage-switch", next: ".txp_btn_next_u" },
-    "tv.sohu.com": { webFull: ".x-pagefs-btn", danmaku: ".tm-tmbtn", next: ".x-next-btn" },
+    "live.acfun.cn": { full: ".fullscreen-screen", webFull: ".fullscreen-web", danmaku: ".danmaku-enabled" },
+    "www.bilibili.com": { full: ".bpx-player-ctrl-full", webFull: ".bpx-player-ctrl-web", next: ".bpx-player-ctrl-next" },
+    "v.youku.com": { full: "#fullscreen-icon", webFull: "#webfullscreen-icon", danmaku: "#barrage-switch", next: ".kui-next-icon-0" },
+    "v.douyu.com": { full: ".ControllerBar-WindowFull-Icon", webFull: ".ControllerBar-PageFull-Icon", danmaku: ".BarrageSwitch-icon" },
+    "www.acfun.cn": { full: ".fullscreen-screen", webFull: ".fullscreen-web", danmaku: ".danmaku-enabled", next: ".btn-next-part div" },
+    "www.mgtv.com": { full: ".fullscreenBtn i", webFull: ".webfullscreenBtn i", danmaku: "div[class*='danmuSwitch']", next: ".icon-next" },
+    "www.iqiyi.com": { full: "[class*=fullScreenBtn]", webFull: "[class*=videofullBtn]", danmaku: "[class*=danmuBtnSet] div", next: "[class*=buttons_playNext]" },
+    "v.qq.com": { full: ".txp_btn_fullscreen", webFull: ".txp_btn_fake", danmaku: ".barrage-switch", next: ".txp_btn_next_u" },
+    "tv.sohu.com": { full: ".x-fullscreen-btn", webFull: ".x-pagefs-btn", danmaku: ".tm-tmbtn", next: ".x-next-btn" },
     name: { full: "full", webFull: "webFull", next: "next", danmaku: "danmaku" }
   };
   const Keydown = {
@@ -603,7 +612,7 @@
       const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
       const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
       const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
-      const preventKeys = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
+      const preventKeys = [Keyboard.F, Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
       const zoomKeys = !this.isDisableZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
       if (isNumberKey || isOverrideKey || preventKeys || altKey && zoomKeys) Tools.preventDefault(event);
     },
@@ -647,6 +656,7 @@
         Z: () => this.resetToDefaultPlayRate(),
         D: () => Site.isMatched() && this.triggerIconElement(SiteIcons.name.danmaku),
         N: () => Site.isMatched() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode(),
+        F: () => Site.isMatched() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen(),
         P: () => Site.isMatched() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance(),
         LEFT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(-Storage.SKIP_INTERVAL.get()),
         RIGHT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(Storage.SKIP_INTERVAL.get()),
@@ -948,7 +958,7 @@
       this.setCurrentTime(time);
       this.hasAppliedCachedTime = true;
       this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
-        el.style.setProperty("transform", `translateY(${-5 - el.offsetHeight}px)`);
+        el.style.setProperty("transform", `translateY(${ -5 - el.offsetHeight}px)`);
       });
     },
     clearCachedTime(video) {
@@ -1299,6 +1309,14 @@
     }
   };
   const WebFullEnhance = {
+    toggleFullscreen() {
+      Tools.alert("接收到消息的地址", location.href);
+      if (!this.player) return;
+      const isFull = !!document.fullscreenElement;
+      if (isFull) return document.exitFullscreen();
+      const videoContainer = this.getVideoContainer();
+      videoContainer.requestFullscreen();
+    },
     webFullEnhance() {
       if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
       if (this.fullscreenWrapper) return this.exitWebFullEnhance();
