@@ -25,12 +25,12 @@ export default {
     return Math.floor(video.duration) > Math.floor(video.__duration);
   },
   initVideoProps(video) {
-    video.volume = 1;
     video.hasWebFull = false;
     video.hasTriedAutoNext = false;
     video.hasApplyCachedRate = false;
     video.__duration = video.duration;
     Tools.resetLimitCounter("autoWebFull");
+    if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
   },
   getRemainingTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
   togglePlayPause: (video) => (Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause()),

@@ -107,6 +107,7 @@ class TimedStorage extends StorageItem {
  * ENABLE_AUTO_NEXT_EPISODE   启用自动切换至下集
  * AUTO_NEXT_ADVANCE_SEC  设置自动下集的提前秒数
  * ENABLE_THIS_SITE_AUTO  此站启/禁用自动网页全屏
+ * DISABLE_DEF_MAX_VOLUME  禁用音量默认百分百
  * DISABLE_MEMORY_TIME  禁用播放进度记录
  * DISABLE_ZOOM_MOVE  禁用缩放和移动
  * PERCENT_OF_ZOOM    缩放百分比
@@ -132,6 +133,7 @@ export default {
   ENABLE_AUTO_NEXT_EPISODE: new StorageItem("ENABLE_AUTO_NEXT_EPISODE", false, false, (value) => Boolean(value)),
   AUTO_NEXT_ADVANCE_SEC: new StorageItem("AUTO_NEXT_ADVANCE_SECONDS", 75, false, (value) => parseInt(value, 10)),
   ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
+  DISABLE_DEF_MAX_VOLUME: new StorageItem("DISABLE_DEF_MAX_VOLUME", false, false, (value) => Boolean(value)),
   DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
   DISABLE_ZOOM_MOVE: new StorageItem("DISABLE_ZOOM_MOVE", true, false, (value) => Boolean(value)),
   PERCENT_OF_ZOOM: new StorageItem("PERCENT_OF_ZOOM", 10, false, (value) => parseInt(value, 10)),

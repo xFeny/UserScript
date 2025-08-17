@@ -206,7 +206,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     float: none !important;
     color: #666 !important;
     display: flex !important;
-    font-size: 18px !important;
+    font-size: 16px !important;
     font-weight: normal !important;
     align-items: center !important;
     margin-bottom: 10px !important;
@@ -225,9 +225,9 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
       border-radius: 3px;
       border: 1px solid #cbd5e1 !important;
       text-align: center !important;
-      font-size: 14px !important;
-      height: 24px !important;
-      width: 50px !important;
+      font-size: 13px !important;
+      height: 20px !important;
+      width: 45px !important;
 
       &:focus {
         outline: none !important;
