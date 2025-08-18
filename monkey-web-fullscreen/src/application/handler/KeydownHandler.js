@@ -46,7 +46,7 @@ export default {
 
     this.preventDefault(event);
     key = this.processKeystrokes(event);
-    if ([Keyboard.F, Keyboard.N, Keyboard.P].includes(code)) return Tools.postMessage(window.top, { key });
+    if ([Keyboard.N, Keyboard.P].includes(code)) return Tools.postMessage(window.top, { key });
     this.processEvent({ key });
   },
   processEvent(data) {
