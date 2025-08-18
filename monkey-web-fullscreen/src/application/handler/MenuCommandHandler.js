@@ -58,7 +58,6 @@ export default {
   },
   shortcutKeysPopup() {
     const shortcutKeys = [
-      { key: "F", desc: "全屏切换" },
       { key: "P", desc: "网页全屏" },
       { key: "N", desc: "切换下集" },
       { key: "R", desc: "旋转 90°" },
@@ -66,7 +65,6 @@ export default {
       { key: "D", desc: "弹幕显/隐" },
       { key: "Z", desc: "恢复正常倍速" },
       { key: "L / K", desc: "下一帧/上一帧" },
-      { key: "Shift L", desc: "显示原生控件" },
       { key: "Shift R", desc: "水平镜像" },
       { key: "Shift P", desc: "画中画切换" },
       { key: "Ctrl Z", desc: "复位缩放移动" },

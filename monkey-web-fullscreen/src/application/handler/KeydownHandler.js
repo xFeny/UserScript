@@ -64,14 +64,12 @@ export default {
       Z: () => this.resetToDefaultPlayRate(),
       D: () => Site.isMatched() && this.triggerIconElement(SiteIcons.name.danmaku),
       N: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
-      F: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen()),
       P: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance()),
       LEFT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(-Storage.SKIP_INTERVAL.get()),
       RIGHT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(Storage.SKIP_INTERVAL.get()),
       0: () => this.adjustPlayProgress(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
       SPACE: () => this.isOverrideKeyboard() && this.togglePlayPause(this.player),
       SHIFT_P: () => this.togglePictureInPicture(),
-      SHIFT_L: () => this.toggleNativeControls(),
       CTRL_ALT_A: () => this.captureScreenshot(),
       CTRL_Z: () => this.resetVideoTransform(),
       SHIFT_R: () => this.toggleMirrorFlip(),
@@ -83,9 +81,6 @@ export default {
     const step = Storage.PLAY_RATE_STEP.get();
     ["A", "ADD"].forEach((k) => (dict[k] = () => this.adjustPlaybackRate(step)));
     ["S", "SUB"].forEach((k) => (dict[k] = () => this.adjustPlaybackRate(-step)));
-
-    // CTRL_[0-6] 设置10-16x倍速
-    Array.from({ length: 7 }, (_, i) => (dict[`CTRL_${i}`] = () => this.setPlaybackRate(10 + i)));
 
     // 视频移动
     ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => (dict[k] = () => this.moveVideoPosition(k)));
