@@ -27,7 +27,7 @@ export default {
     const { duration, __duration, currentTime, seekable } = video;
     const isDynamic = Math.floor(duration) > Math.floor(__duration);
 
-    // 距离直播点﹤10秒
+    // 距离直播点﹤10秒（会误判短视频）
     const isNearLive = duration < 10 && seekable.length && seekable.end(0) - currentTime < 10;
     return isDynamic || isNearLive;
   },

@@ -394,3 +394,15 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     display: none !important;
   }
 }
+
+/** 全屏时钟样式 **/
+.Clock {
+  top: 20px;
+  right: 50px;
+  color: #fff;
+  z-index: 10;
+  font-size: 18px;
+  font-weight: bold;
+  position: absolute;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
