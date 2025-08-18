@@ -588,16 +588,16 @@
     Space: "Space"
   });
   const SiteIcons = {
-    "live.acfun.cn": { full: ".fullscreen-screen", webFull: ".fullscreen-web", danmaku: ".danmaku-enabled" },
-    "www.bilibili.com": { full: ".bpx-player-ctrl-full", webFull: ".bpx-player-ctrl-web", next: ".bpx-player-ctrl-next" },
-    "v.youku.com": { full: "#fullscreen-icon", webFull: "#webfullscreen-icon", danmaku: "#barrage-switch", next: ".kui-next-icon-0" },
-    "v.douyu.com": { full: ".ControllerBar-WindowFull-Icon", webFull: ".ControllerBar-PageFull-Icon", danmaku: ".BarrageSwitch-icon" },
-    "www.acfun.cn": { full: ".fullscreen-screen", webFull: ".fullscreen-web", danmaku: ".danmaku-enabled", next: ".btn-next-part div" },
-    "www.mgtv.com": { full: ".fullscreenBtn i", webFull: ".webfullscreenBtn i", danmaku: "div[class*='danmuSwitch']", next: ".icon-next" },
-    "www.iqiyi.com": { full: "[class*=fullScreenBtn]", webFull: "[class*=videofullBtn]", danmaku: "[class*=danmuBtnSet] div", next: "[class*=buttons_playNext]" },
-    "v.qq.com": { full: ".txp_btn_fullscreen", webFull: ".txp_btn_fake", danmaku: ".barrage-switch", next: ".txp_btn_next_u" },
-    "tv.sohu.com": { full: ".x-fullscreen-btn", webFull: ".x-pagefs-btn", danmaku: ".tm-tmbtn", next: ".x-next-btn" },
-    name: { full: "full", webFull: "webFull", next: "next", danmaku: "danmaku" }
+    name: { full: "full", webFull: "webFull", next: "next", danmaku: "danmaku" },
+    "live.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled" },
+    "www.bilibili.com": { webFull: ".bpx-player-ctrl-web", next: ".bpx-player-ctrl-next" },
+    "tv.sohu.com": { webFull: ".x-pagefs-btn", danmaku: ".tm-tmbtn", next: ".x-next-btn" },
+    "v.douyu.com": { webFull: ".ControllerBar-PageFull-Icon", danmaku: ".BarrageSwitch-icon" },
+    "v.qq.com": { webFull: ".txp_btn_fake", danmaku: ".barrage-switch", next: ".txp_btn_next_u" },
+    "v.youku.com": { webFull: "#webfullscreen-icon", danmaku: "#barrage-switch", next: ".kui-next-icon-0" },
+    "www.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled", next: ".btn-next-part div" },
+    "www.mgtv.com": { webFull: ".webfullscreenBtn i", danmaku: "div[class*='danmuSwitch']", next: ".icon-next" },
+    "www.iqiyi.com": { webFull: "[class*=videofullBtn]", danmaku: "[class*=danmuBtnSet] div", next: "[class*=playNext]" }
   };
   const Keydown = {
     preventDefault(event, { code, altKey } = event) {
@@ -650,14 +650,12 @@
         Z: () => this.resetToDefaultPlayRate(),
         D: () => Site.isMatched() && this.triggerIconElement(SiteIcons.name.danmaku),
         N: () => Site.isMatched() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode(),
-        F: () => Site.isMatched() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen(),
         P: () => Site.isMatched() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance(),
         LEFT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(-Storage.SKIP_INTERVAL.get()),
         RIGHT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(Storage.SKIP_INTERVAL.get()),
         0: () => this.adjustPlayProgress(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
         SPACE: () => this.isOverrideKeyboard() && this.togglePlayPause(this.player),
         SHIFT_P: () => this.togglePictureInPicture(),
-        SHIFT_L: () => this.toggleNativeControls(),
         CTRL_ALT_A: () => this.captureScreenshot(),
         CTRL_Z: () => this.resetVideoTransform(),
         SHIFT_R: () => this.toggleMirrorFlip(),
@@ -667,7 +665,6 @@
       const step = Storage.PLAY_RATE_STEP.get();
       ["A", "ADD"].forEach((k) => dict[k] = () => this.adjustPlaybackRate(step));
       ["S", "SUB"].forEach((k) => dict[k] = () => this.adjustPlaybackRate(-step));
-      Array.from({ length: 7 }, (_, i) => dict[`CTRL_${i}`] = () => this.setPlaybackRate(10 + i));
       ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => dict[k] = () => this.moveVideoPosition(k));
       dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
     },
@@ -738,7 +735,6 @@
     },
     shortcutKeysPopup() {
       const shortcutKeys = [
-        { key: "F", desc: "全屏切换" },
         { key: "P", desc: "网页全屏" },
         { key: "N", desc: "切换下集" },
         { key: "R", desc: "旋转 90°" },
@@ -746,7 +742,6 @@
         { key: "D", desc: "弹幕显/隐" },
         { key: "Z", desc: "恢复正常倍速" },
         { key: "L / K", desc: "下一帧/上一帧" },
-        { key: "Shift L", desc: "显示原生控件" },
         { key: "Shift R", desc: "水平镜像" },
         { key: "Shift P", desc: "画中画切换" },
         { key: "Ctrl Z", desc: "复位缩放移动" },
@@ -1059,10 +1054,6 @@
       !this.player.paused && this.player.pause();
       this.player.currentTime += (isPrev ? -1 : 1) / 24;
     },
-    toggleNativeControls() {
-      if (!this.player) return;
-      this.player.controls = !this.player.controls;
-    },
     customToast(startText, colorText, endText, duration, isRemove) {
       const span = document.createElement("span");
       span.appendChild(document.createTextNode(startText));
@@ -1313,10 +1304,6 @@
     }
   };
   const WebFullEnhance = {
-    toggleFullscreen() {
-      if (!Tools.isTopWin()) return;
-      document.fullscreenElement ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-    },
     webFullEnhance() {
       if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
       if (this.fullscreenWrapper) return this.exitWebFullEnhance();
