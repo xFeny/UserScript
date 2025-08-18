@@ -21,12 +21,15 @@ export default {
   },
   isDynamicDuration(video) {
     if (!video) return false;
-    if (!video?.__duration) return (video.__duration = video.duration), false;
 
+    // 记录默认时长，用于判断是否为动态时长
+    if (!video.__duration) video.__duration = video.duration;
     const { duration, __duration, currentTime, seekable } = video;
     const isDynamic = Math.floor(duration) > Math.floor(__duration);
-    const isNearLive = seekable.length && seekable.end(0) - currentTime < 10; // 距离直播点<10秒
-    return isDynamic || (duration < 10 && isNearLive);
+
+    // 距离直播点﹤10秒
+    const isNearLive = duration < 10 && seekable.length && seekable.end(0) - currentTime < 10;
+    return isDynamic || isNearLive;
   },
   initVideoProps(video) {
     video.hasWebFull = false;
