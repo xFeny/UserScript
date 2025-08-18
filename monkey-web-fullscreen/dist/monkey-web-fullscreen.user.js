@@ -410,7 +410,7 @@
     }
     start() {
       if (this.isRunning) return;
-      this.clock.style.setProperty("display", "inline-block");
+      this.clock.style.setProperty("display", "unset");
       this.update();
     }
     stop() {
@@ -428,6 +428,7 @@
       this.clock = null;
     }
   }
+  __publicField(Clock, "state", { start: "start", stop: "stop" });
   const App$1 = window.App = {
     init() {
       this.setupDocBodyObserver();
@@ -541,13 +542,14 @@
     setupFullscreenListener() {
       document.addEventListener("fullscreenchange", () => {
         const isFull = !!document.fullscreenElement;
-        Tools.postMessage(window.top, { clockState: isFull ? "start" : "stop" });
+        Tools.postMessage(window.top, { clockState: isFull ? Clock.state.start : Clock.state.stop });
       });
     },
-    createClock(state = "stop") {
+    createClock(state = Clock.state.stop) {
       Promise.resolve().then(() => {
         this.Clock?.destroy();
         if (!this.player?.parentNode) return this.Clock = null;
+        if (Tools.isTopWin() && document.fullscreenElement) state = Clock.state.start;
         this.Clock = new Clock(this.player.parentNode);
         this.Clock[state]?.();
       });
@@ -894,12 +896,15 @@
     },
     isLive() {
       if (!this.videoInfo && !this.player) return false;
-      return this.videoInfo.isLive || this?.player?.duration === Infinity || this.isDynamicDuration(this.player);
+      return this.videoInfo.isLive || this.player?.duration === Infinity || this.isDynamicDuration(this.player);
     },
     isDynamicDuration(video) {
       if (!video) return false;
-      if (!video?.__duration) return (video.__duration = video.duration) || false;
-      return Math.floor(video.duration) > Math.floor(video.__duration);
+      if (!video?.__duration) return video.__duration = video.duration, false;
+      const { duration, __duration, currentTime, seekable } = video;
+      const isDynamic = Math.floor(duration) > Math.floor(__duration);
+      const isNearLive = seekable.length && seekable.end(0) - currentTime < 10;
+      return isDynamic || duration < 10 && isNearLive;
     },
     initVideoProps(video) {
       video.hasWebFull = false;
