@@ -570,7 +570,6 @@
   const Keyboard = Object.freeze({
     A: "KeyA",
     D: "KeyD",
-    F: "KeyF",
     K: "KeyK",
     L: "KeyL",
     M: "KeyM",
@@ -634,7 +633,7 @@
       if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
       this.preventDefault(event);
       key = this.processKeystrokes(event);
-      if ([Keyboard.F, Keyboard.N, Keyboard.P].includes(code)) return Tools.postMessage(window.top, { key });
+      if ([Keyboard.N, Keyboard.P].includes(code)) return Tools.postMessage(window.top, { key });
       this.processEvent({ key });
     },
     processEvent(data) {
