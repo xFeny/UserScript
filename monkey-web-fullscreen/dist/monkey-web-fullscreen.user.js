@@ -900,11 +900,11 @@
     },
     isDynamicDuration(video) {
       if (!video) return false;
-      if (!video?.__duration) return video.__duration = video.duration, false;
+      if (!video.__duration) video.__duration = video.duration;
       const { duration, __duration, currentTime, seekable } = video;
       const isDynamic = Math.floor(duration) > Math.floor(__duration);
-      const isNearLive = seekable.length && seekable.end(0) - currentTime < 10;
-      return isDynamic || duration < 10 && isNearLive;
+      const isNearLive = duration < 10 && seekable.length && seekable.end(0) - currentTime < 10;
+      return isDynamic || isNearLive;
     },
     initVideoProps(video) {
       video.hasWebFull = false;
