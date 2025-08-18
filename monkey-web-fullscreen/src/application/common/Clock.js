@@ -2,6 +2,8 @@
  * 实时显示当前时间
  */
 export default class Clock {
+  static state = { start: "start", stop: "stop" };
+
   constructor(container) {
     if (!container) return;
 
@@ -32,7 +34,7 @@ export default class Clock {
 
   start() {
     if (this.isRunning) return;
-    this.clock.style.setProperty("display", "inline-block");
+    this.clock.style.setProperty("display", "unset");
     this.update();
   }
 

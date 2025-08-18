@@ -128,13 +128,15 @@ export default window.App = {
   setupFullscreenListener() {
     document.addEventListener("fullscreenchange", () => {
       const isFull = !!document.fullscreenElement;
-      Tools.postMessage(window.top, { clockState: isFull ? "start" : "stop" });
+      Tools.postMessage(window.top, { clockState: isFull ? Clock.state.start : Clock.state.stop });
     });
   },
-  createClock(state = "stop") {
+  createClock(state = Clock.state.stop) {
     Promise.resolve().then(() => {
       this.Clock?.destroy(); // 先销毁再创建
       if (!this.player?.parentNode) return (this.Clock = null);
+
+      if (Tools.isTopWin() && document.fullscreenElement) state = Clock.state.start;
       this.Clock = new Clock(this.player.parentNode);
       this.Clock[state]?.(); // 不是全屏时停止
     });

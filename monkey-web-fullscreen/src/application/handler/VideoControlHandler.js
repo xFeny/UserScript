@@ -17,12 +17,16 @@ export default {
   },
   isLive() {
     if (!this.videoInfo && !this.player) return false;
-    return this.videoInfo.isLive || this?.player?.duration === Infinity || this.isDynamicDuration(this.player);
+    return this.videoInfo.isLive || this.player?.duration === Infinity || this.isDynamicDuration(this.player);
   },
   isDynamicDuration(video) {
     if (!video) return false;
-    if (!video?.__duration) return (video.__duration = video.duration) || false;
-    return Math.floor(video.duration) > Math.floor(video.__duration);
+    if (!video?.__duration) return (video.__duration = video.duration), false;
+
+    const { duration, __duration, currentTime, seekable } = video;
+    const isDynamic = Math.floor(duration) > Math.floor(__duration);
+    const isNearLive = seekable.length && seekable.end(0) - currentTime < 10; // 距离直播点<10秒
+    return isDynamic || (duration < 10 && isNearLive);
   },
   initVideoProps(video) {
     video.hasWebFull = false;
