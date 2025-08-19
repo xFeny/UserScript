@@ -33,6 +33,7 @@ export default {
     const isEnable = this.isEnableSiteAuto();
     const siteFun = ({ cache }) => cache.set(host, !cache.get(host));
     const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
+    const restoreSetting = () => GM_listValues().forEach((key) => GM_deleteValue(key));
 
     // 菜单配置项
     const configs = [
@@ -40,6 +41,7 @@ export default {
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() },
+      { title: "还原设置", cache: { name: "RESTORE" }, isHidden: false, fn: restoreSetting },
     ];
 
     // 注册菜单项
@@ -58,6 +60,7 @@ export default {
   },
   shortcutKeysPopup() {
     const shortcutKeys = [
+      { key: "Enter", desc: "全屏" },
       { key: "P", desc: "网页全屏" },
       { key: "N", desc: "切换下集" },
       { key: "R", desc: "旋转 90°" },
@@ -155,8 +158,9 @@ export default {
   genDisableItems() {
     const configs = [
       { name: "pic", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT },
-      { name: "zoom", text: "禁用缩放与移动", cache: Storage.DISABLE_ZOOM_MOVE, sendMsg: true },
-      { name: "speed", text: "禁用视频倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true, isHidden: this.isLive() },
+      { name: "zoom", text: "禁用缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, sendMsg: true },
+      { name: "speed", text: "禁用倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true, isHidden: this.isLive() },
+      { name: "memory", text: "禁用记忆倍速", cache: Storage.DISABLE_MEMORY_SPEED, sendMsg: true, isHidden: this.isLive() },
       { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, isHidden: this.isLive() },
       { name: "fit", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, isHidden: !Site.isMatched() },
       { name: "tabs", text: "禁用不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },

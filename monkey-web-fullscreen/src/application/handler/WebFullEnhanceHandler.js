@@ -6,6 +6,12 @@ import Storage from "../common/Storage";
  * 通用网页全屏
  */
 export default {
+  toggleFullscreen() {
+    if (!Tools.isTopWin()) return;
+    const isFull = !!document.fullscreenElement;
+    isFull ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
+    Tools.postMessage(window.top, { key: "P" });
+  },
   webFullEnhance() {
     if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
 

@@ -39,6 +39,7 @@ export default {
     Tools.resetLimitCounter("autoWebFull");
     if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
   },
+  deleteCachedPlayRate: () => Storage.CACHED_PLAY_RATE.del(),
   getRemainingTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
   togglePlayPause: (video) => (Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause()),
   tryAutoPlay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),
@@ -50,6 +51,8 @@ export default {
     // 设置倍速
     window.videoEnhance.setPlaybackRate(this.player, playRate);
     if (show) this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
+    if (Storage.DISABLE_MEMORY_SPEED.get()) return Promise.resolve(); // 禁用记忆
+
     Storage.CACHED_PLAY_RATE.set(this.player.playbackRate);
     return Promise.resolve();
   },
@@ -64,6 +67,8 @@ export default {
   },
   applyCachedPlayRate(video) {
     if (video.hasApplyCachedRate) return;
+    if (Storage.DISABLE_MEMORY_SPEED.get()) return this.deleteCachedPlayRate();
+
     const playRate = Storage.CACHED_PLAY_RATE.get();
     if (Consts.DEF_PLAY_RATE === playRate || Number(video.playbackRate) === playRate) return;
     this.setPlaybackRate(playRate, !video.hasApplyCachedRate)?.then(() => (video.hasApplyCachedRate = true));

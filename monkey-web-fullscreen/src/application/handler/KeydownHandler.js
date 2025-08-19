@@ -34,11 +34,12 @@ export default {
     if (data?.topWin) window.topWin = this.topWin = data.topWin;
     if (data?.clockState) this.createClock(data.clockState);
     if (data?.disable_speed) this.resetToDefaultPlayRate();
+    if (data?.disable_memory) this.deleteCachedPlayRate();
     if (data?.disable_zoom) this.resetVideoTransform();
     this.processEvent(data);
   },
   handleKeydown(event, { key, code } = event) {
-    // Tools.log("键盘事件：", { key, code });
+    Tools.log("键盘事件：", { key, code });
     const target = event.composedPath()[0];
     const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
     if (this.isNormalSite() || isInput || target?.isContentEditable) return;
@@ -46,7 +47,7 @@ export default {
 
     this.preventDefault(event);
     key = this.processKeystrokes(event);
-    if ([Keyboard.N, Keyboard.P].includes(code)) return Tools.postMessage(window.top, { key });
+    if ([Keyboard.N, Keyboard.P, Keyboard.Enter].includes(code)) return Tools.postMessage(window.top, { key });
     this.processEvent({ key });
   },
   processEvent(data) {
@@ -61,6 +62,7 @@ export default {
       R: () => this.rotateVideo(),
       L: () => this.freezeVideoFrame(),
       K: () => this.freezeVideoFrame(true),
+      ENTER: () => this.toggleFullscreen(),
       Z: () => this.resetToDefaultPlayRate(),
       D: () => Site.isMatched() && this.triggerIconElement(SiteIcons.name.danmaku),
       N: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),

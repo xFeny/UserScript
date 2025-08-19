@@ -21,4 +21,5 @@ export default Object.freeze({
   Sub: "NumpadSubtract",
   Add: "NumpadAdd",
   Space: "Space",
+  Enter: "Enter",
 });
