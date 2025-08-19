@@ -630,7 +630,6 @@
       this.processEvent(data);
     },
     handleKeydown(event, { key, code } = event) {
-      Tools.log("键盘事件：", { key, code });
       const target = event.composedPath()[0];
       const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
       if (this.isNormalSite() || isInput || target?.isContentEditable) return;
@@ -720,13 +719,13 @@
       const isEnable = this.isEnableSiteAuto();
       const siteFun = ({ cache }) => cache.set(host, !cache.get(host));
       const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
-      const restoreSetting = () => _GM_listValues().forEach((key) => _GM_deleteValue(key));
+      const resetSetting = () => _GM_listValues().forEach((key) => _GM_deleteValue(key));
       const configs = [
         { title: `此站${isEnable ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatched(), fn: siteFun },
         { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
         { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
         { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() },
-        { title: "还原设置", cache: { name: "RESTORE" }, isHidden: false, fn: restoreSetting }
+        { title: "重置设置", cache: { name: "RESET" }, isHidden: false, fn: resetSetting }
       ];
       configs.forEach(({ title, cache, isHidden, fn }) => {
         const id = `${cache.name}_MENU_ID`;
