@@ -586,7 +586,8 @@
     Sub: "NumpadSubtract",
     Add: "NumpadAdd",
     Space: "Space",
-    Enter: "Enter"
+    Enter: "Enter",
+    NumEnter: "NumpadEnter"
   });
   const SiteIcons = {
     name: { full: "full", webFull: "webFull", next: "next", danmaku: "danmaku" },
