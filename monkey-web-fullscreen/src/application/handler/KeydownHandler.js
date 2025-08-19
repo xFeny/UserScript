@@ -39,7 +39,7 @@ export default {
     this.processEvent(data);
   },
   handleKeydown(event, { key, code } = event) {
-    Tools.log("键盘事件：", { key, code });
+    // Tools.log("键盘事件：", { key, code });
     const target = event.composedPath()[0];
     const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
     if (this.isNormalSite() || isInput || target?.isContentEditable) return;
