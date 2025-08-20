@@ -33,10 +33,10 @@
 // @match        *://v.qq.com/wasm-kernel/*/fake-video*
 // @require      https://unpkg.com/notyf@3.10.0/notyf.min.js
 // @require      data:application/javascript,%3Bwindow.notyf%3D%7BNotyf%7D%3B
-// @require      https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.js
+// @require      https://unpkg.com/sweetalert2@11.22.3/dist/sweetalert2.min.js
 // @require      data:application/javascript,%3Bwindow.sweetalert2%3DSwal%3B
 // @resource     notyf/notyf.min.css  https://unpkg.com/notyf@3.10.0/notyf.min.css
-// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.css
+// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.22.3/dist/sweetalert2.min.css
 // @grant        GM_addStyle
 // @grant        GM_addValueChangeListener
 // @grant        GM_deleteValue
@@ -637,7 +637,8 @@
       if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
       this.preventDefault(event);
       key = this.processKeystrokes(event);
-      if ([Keyboard.N, Keyboard.P, Keyboard.Enter].includes(code)) return Tools.postMessage(window.top, { key });
+      const specialKeys = [Keyboard.N, Keyboard.P, Keyboard.Enter, Keyboard.NumEnter];
+      if (specialKeys.includes(code)) return Tools.postMessage(window.top, { key });
       this.processEvent({ key });
     },
     processEvent(data) {
@@ -968,7 +969,7 @@
       this.setCurrentTime(time);
       this.hasAppliedCachedTime = true;
       this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
-        el.style.setProperty("transform", `translateY(${-5 - el.offsetHeight}px)`);
+        el.style.setProperty("transform", `translateY(${ -5 - el.offsetHeight}px)`);
       });
     },
     clearCachedTime(video) {

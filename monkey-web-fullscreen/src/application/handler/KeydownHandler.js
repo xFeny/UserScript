@@ -47,7 +47,8 @@ export default {
 
     this.preventDefault(event);
     key = this.processKeystrokes(event);
-    if ([Keyboard.N, Keyboard.P, Keyboard.Enter].includes(code)) return Tools.postMessage(window.top, { key });
+    const specialKeys = [Keyboard.N, Keyboard.P, Keyboard.Enter, Keyboard.NumEnter];
+    if (specialKeys.includes(code)) return Tools.postMessage(window.top, { key });
     this.processEvent({ key });
   },
   processEvent(data) {
