@@ -157,15 +157,15 @@ export default {
   },
   genDisableItems() {
     const configs = [
-      { name: "pic", text: "禁用视频截图", cache: Storage.DISABLE_SCREENSHOT },
-      { name: "zoom", text: "禁用缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, sendMsg: true },
-      { name: "speed", text: "禁用倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true, isHidden: this.isLive() },
-      { name: "memory", text: "禁用记忆倍速", cache: Storage.DISABLE_MEMORY_SPEED, sendMsg: true, isHidden: this.isLive() },
-      { name: "time", text: "禁用播放进度记录", cache: Storage.DISABLE_MEMORY_TIME, isHidden: this.isLive() },
-      { name: "fit", text: "禁用自动网页全屏", cache: Storage.DISABLE_AUTO, isHidden: !Site.isMatched() },
-      { name: "tabs", text: "禁用不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
-      { name: "volume", text: "禁用音量默认百分百", cache: Storage.DISABLE_DEF_MAX_VOLUME },
-      { name: "next", text: "启用自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
+      { name: "pic", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
+      { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, sendMsg: true },
+      { name: "speed", text: "禁用 倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true, isHidden: this.isLive() },
+      { name: "memory", text: "禁用 记忆倍速", cache: Storage.DISABLE_MEMORY_SPEED, sendMsg: true, isHidden: this.isLive() },
+      { name: "time", text: "禁用 记忆播放位置", cache: Storage.DISABLE_MEMORY_TIME, isHidden: this.isLive() },
+      { name: "fit", text: "禁用 自动网页全屏", cache: Storage.DISABLE_AUTO, isHidden: !Site.isMatched() },
+      { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
+      { name: "volume", text: "禁用 音量默认百分百", cache: Storage.DISABLE_DEF_MAX_VOLUME },
+      { name: "next", text: "启用 自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
     ].filter(({ isHidden }) => !isHidden);
 
