@@ -2,6 +2,8 @@
  * 一些常量
  */
 export default Object.freeze({
+  N: "N",
+  P: "P",
   EMPTY: "",
   MIN_ZOOM: 25,
   MAX_ZOOM: 400,

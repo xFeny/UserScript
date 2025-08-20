@@ -15,7 +15,7 @@ export default {
     if (this.getRemainingTime(video) > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return; // 距离结束还剩多少秒切换下集
     if (this.isNextIgnoreUrl()) return (video.hasTriedAutoNext = true);
 
-    Tools.postMessage(window.top, { key: "N" });
+    Tools.postMessage(window.top, { key: Consts.N });
     video.hasTriedAutoNext = true;
   },
   autoWebFullscreen(video) {
@@ -27,7 +27,7 @@ export default {
     if (video.offsetWidth >= this.topWin.viewWidth) return (video.hasWebFull = true);
 
     // 发送网页全屏消息
-    Tools.postMessage(window.top, { key: "P" });
+    Tools.postMessage(window.top, { key: Consts.P });
   },
   liveWebFullscreen() {
     unsafeWindow.top.scrollTo({ top: 70 });

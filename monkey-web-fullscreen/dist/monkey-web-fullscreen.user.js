@@ -62,6 +62,8 @@
   var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
   var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   const Consts = Object.freeze({
+    N: "N",
+    P: "P",
     EMPTY: "",
     MIN_ZOOM: 25,
     MAX_ZOOM: 400,
@@ -1112,7 +1114,7 @@
       if (Tools.isFrequent("autoNext", Consts.THREE_SEC, true)) return;
       if (this.getRemainingTime(video) > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return;
       if (this.isNextIgnoreUrl()) return video.hasTriedAutoNext = true;
-      Tools.postMessage(window.top, { key: "N" });
+      Tools.postMessage(window.top, { key: Consts.N });
       video.hasTriedAutoNext = true;
     },
     autoWebFullscreen(video) {
@@ -1122,7 +1124,7 @@
       if (Site.isMatched() && this.isDisableAuto() || !Site.isMatched() && !this.isEnableSiteAuto()) return;
       if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWebFull")) return video.hasWebFull = true;
       if (video.offsetWidth >= this.topWin.viewWidth) return video.hasWebFull = true;
-      Tools.postMessage(window.top, { key: "P" });
+      Tools.postMessage(window.top, { key: Consts.P });
     },
     liveWebFullscreen() {
       _unsafeWindow.top.scrollTo({ top: 70 });
@@ -1320,7 +1322,7 @@
       if (!Tools.isTopWin()) return;
       const isFull = !!document.fullscreenElement;
       isFull ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-      Tools.postMessage(window.top, { key: "P" });
+      Tools.postMessage(window.top, { key: Consts.P });
     },
     webFullEnhance() {
       if (this.isNormalSite() || Tools.isFrequent("enhance")) return;

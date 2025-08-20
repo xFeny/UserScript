@@ -10,7 +10,7 @@ export default {
     if (!Tools.isTopWin()) return;
     const isFull = !!document.fullscreenElement;
     isFull ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-    Tools.postMessage(window.top, { key: "P" });
+    Tools.postMessage(window.top, { key: Consts.P });
   },
   webFullEnhance() {
     if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
