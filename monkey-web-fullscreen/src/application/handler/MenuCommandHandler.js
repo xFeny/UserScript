@@ -41,7 +41,7 @@ export default {
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() },
-      { title: "重置设置", cache: { name: "RESET" }, isHidden: false, fn: resetSetting },
+      // { title: "重置设置", cache: { name: "RESET" }, isHidden: false, fn: resetSetting },
     ];
 
     // 注册菜单项
