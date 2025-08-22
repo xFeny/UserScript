@@ -19,7 +19,7 @@ export default await (async () => {
   try {
     const url = "https://gitee.com/xfeny/UserScript/raw/dev/monkey-web-fullscreen/src/IconsSelector.json";
     const res = await GM.xmlHttpRequest({ url });
-    remoteSelector = JSON.parse(res.responseText);
+    remoteSelector = JSON.parse(res.responseText ?? "{}");
   } catch (e) {
     console.error("加载远程配置失败", e);
   }
