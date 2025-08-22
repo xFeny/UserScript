@@ -45,7 +45,7 @@ export default class Clock {
     }
 
     this.isRunning = false;
-    this.clock.style.display = "none";
+    this.clock.style.setProperty("display", "none");
   }
 
   destroy() {
