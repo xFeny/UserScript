@@ -34,7 +34,7 @@
   },
   "www.iqiyi.com": {
     "full": ":is([class*=fullScreenBtn], [class*=closeFullBtn])",
-    "webFull": ":is([class*=videofullBtn], [class*=quitvideofullBtn])",
+    "webFull": "[class*=videofullBtn]",
     "danmaku": "[class*=danmuBtnSet] div",
     "next": "[class*=playNext]"
   },
