@@ -9,23 +9,24 @@
 
 | 快捷键      | 功能说明                     |
 | ----------- | ---------------------------- |
-| P | 切换网页全屏      |
-| N | 切换下集视频               |
+| Enter | 全屏 |
+| P | 网页全屏      |
+| N | 切换下集               |
 | Z | 恢复正常倍速           |
-| R | 画面旋转 90° |
-| M | 静音 / 取消静音 |
-| D | 显示 / 隐藏 弹幕           |
-| L / K | 视频 下一帧 / 上一帧 |
-| Ctrl <b style='color:#bbb'>+</b> Z | 复位缩放与移动 |
-| Shift <b style='color:#bbb'>+</b> R | 视频水平镜像翻转             |
-| Shift <b style='color:#bbb'>+</b> P | 进入 / 退出 画中画 |
-| Ctrl <b style='color:#bbb'>+</b> Alt <b style='color:#bbb'>+</b> A | 视频截图 (默认禁用) |
-| Alt <b style='color:#bbb'>+</b> <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 视频缩放 10% (默认禁用)  |
-| A / S  或  <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 播放倍速 ±0.25               |
-| Alt <b style='color:#bbb'>+</b> ◀️🔼🔽▶️ | 移动视频画面 (默认禁用) |
-| ◀️▶️           | 快退 / 快进 5秒 (默认禁用)      |
-| 空格      | 播放 / 暂停 (默认禁用)         |
-| 1️⃣ 至 9️⃣  | 1️⃣ 至 9️⃣ 倍速 |
+| R | 旋转 90° |
+| M | 静音切换 |
+| D | 弹幕显/隐      |
+| L / K | 下一帧 / 上一帧 |
+| Ctrl <b style='color:#bbb'>+</b> Z | 复位缩放移动 |
+| Shift <b style='color:#bbb'>+</b> R | 水平镜像             |
+| Shift <b style='color:#bbb'>+</b> P | 画中画切换 |
+| Ctrl <b style='color:#bbb'>+</b> Alt <b style='color:#bbb'>+</b> A | 截图 (默认禁用) |
+| Alt <b style='color:#bbb'>+</b> <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 缩放 (默认禁用)  |
+| A / S  或  <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 倍速 ±0.25               |
+| Alt <b style='color:#bbb'>+</b> ◀️🔼🔽▶️ | 移动画面 (默认禁用) |
+| ◀️▶️           | 快退/进 (默认禁用)      |
+| 空格      | 播放/暂停 (默认禁用)         |
+| 1️⃣ - 9️⃣  | 1️⃣ - 9️⃣ 倍速 |
 | 数字 0️⃣   | 快进 30 秒                   |
 
 ### 自动网页全屏
@@ -223,7 +224,7 @@
    
    **示例一：** https://www.douyin.com/?recommend=1
    
-   CSS 选择器：`#slidelist > div` ，能正常看下一个视频
+   CSS 选择器：`#slidelist > div` ，使网页全屏后，支持滚动看下一个视频
    
    **示例二：** https://www.huya.com
    
@@ -246,11 +247,11 @@
 ```js
 App.autoExitWebFullscreen();
 ```
-#### 播放进度记录
+#### 记忆播放位置
 
-脚本默认启用「播放进度记录」功能，自动记录视频的播放位置。下次进入同一视频时，将自动恢复到上次离开时的进度。
+脚本默认启用「记忆播放位置」功能，自动记录视频的播放位置。下次进入同一视频时，将自动恢复到上次离开时的播放位置。
 
-如果不需要该功能可在脚本菜单更多设置中「禁用播放进度记录」设置禁用。
+如果不需要该功能可在脚本菜单更多设置中「禁用记忆播放位置」设置禁用。
 
 > 时长小于两分钟不记录播放进度
 
