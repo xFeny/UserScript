@@ -11,7 +11,7 @@ export default class Clock {
     this.animationId = null;
     this.isRunning = false;
 
-    if (container.querySelector("clock")) return;
+    if (container.querySelector(".Clock")) this.destroy();
     this.clock = document.createElement("div");
     this.clock.classList.add("Clock");
     this.container.append(this.clock);
