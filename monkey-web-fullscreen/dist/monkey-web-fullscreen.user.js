@@ -484,10 +484,10 @@
       });
       this.observerTimeout = setTimeout(() => this.bodyObserver?.disconnect(), Consts.ONE_SEC * 10);
     },
-    setCurrentVideo(video) {
+    setCurrentVideo(video, ignoreWidth = false) {
       if (!video || this.player === video) return;
       if (this.player && !this.player.paused && !isNaN(this.player.duration)) return;
-      if (video.offsetWidth < 200 || this.isBackgroundVideo(video)) return;
+      if (!ignoreWidth && video.offsetWidth < 200 || this.isBackgroundVideo(video)) return;
       this.player = video;
       this.setVideoInfo(video);
       this.setupVideoObserver(video);
@@ -1514,7 +1514,7 @@
     playing() {
       this.isEnded = false;
       if (this.duration < 5) return;
-      App.setCurrentVideo(this);
+      App.setCurrentVideo(this, true);
       App.applyCachedPlayRate(this);
       setTimeout(() => App.applyCachedTime(this), 20);
       App.removeLoginPopups();
