@@ -97,24 +97,38 @@ export default unsafeWindow.Tools = {
     }
     return null;
   },
-  getParentChain(element) {
+  getParentChain(element, nth = false) {
     const parents = [];
     for (let current = element; current && current !== document.body; current = current.parentElement) {
-      parents.unshift(this.getTagInfo(current));
+      parents.unshift(this.getTagInfo(current, nth));
       if (current.id && this.noNumber(current.id)) break;
     }
     return parents.join(" > ");
   },
-  getTagInfo(ele) {
-    if (ele.id && this.noNumber(ele.id)) return `#${ele.id}`;
-    let tagInfo = ele.tagName.toLowerCase();
-    const classList = Array.from(ele.classList);
-    if (classList.length === 0) return tagInfo;
-    // 检查是否包含特殊字符
-    if (/[:[\]]/.test(ele.className)) return `${tagInfo}[class="${ele.className}"]`;
-    // 过滤数字类名
-    const classes = classList.filter((cls) => this.noNumber(cls));
-    return classes.length ? `${tagInfo}.${classes.join(".")}` : tagInfo;
+  getTagInfo(ele, nth = false) {
+    // id不是数字和中文
+    if (ele.id && this.noNumber(ele.id) && !/[\u4e00-\u9fa5]/.test(ele.id)) return `#${ele.id}`;
+    let selector = ele.tagName.toLowerCase();
+    const classes = Array.from(ele.classList);
+
+    // 处理类选择器
+    if (classes.length) {
+      const validClasses = classes.filter(this.noNumber, this);
+      selector += /[:[\]]/.test(ele.className)
+        ? `[class="${ele.className}"]`
+        : validClasses.length
+        ? `.${validClasses.join(".")}`
+        : Consts.EMPTY;
+    }
+
+    // 非首个同类型元素添加nth-of-type
+    if (nth && ele.parentElement) {
+      const siblings = Array.from(ele.parentElement.children).filter((sib) => sib.tagName === ele.tagName);
+      const index = siblings.indexOf(ele);
+      if (index > 0) selector += `:nth-of-type(${index + 1})`;
+    }
+
+    return selector;
   },
   getParents(element, withSelf = false, maxLevel = Infinity) {
     const parents = withSelf && element ? [element] : [];

@@ -67,7 +67,8 @@ export default window.App = {
   },
   setVideoInfo(video) {
     const isLive = Object.is(video.duration, Infinity);
-    const videoInfo = { ...Tools.getCenterPoint(video), src: video.currentSrc, isLive };
+    const selector = Tools.getParentChain(video, true);
+    const videoInfo = { ...Tools.getCenterPoint(video), src: video.currentSrc, isLive, selector };
     this.setParentWinVideoInfo(videoInfo);
   },
   setParentWinVideoInfo(videoInfo) {
