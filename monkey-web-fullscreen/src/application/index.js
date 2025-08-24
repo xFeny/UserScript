@@ -53,10 +53,10 @@ export default window.App = {
     });
     this.observerTimeout = setTimeout(() => this.bodyObserver?.disconnect(), Consts.ONE_SEC * 10);
   },
-  setCurrentVideo(video) {
+  setCurrentVideo(video, ignoreWidth = false) {
     if (!video || this.player === video) return;
     if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // player播放中
-    if (video.offsetWidth < 200 || this.isBackgroundVideo(video)) return;
+    if ((!ignoreWidth && video.offsetWidth < 200) || this.isBackgroundVideo(video)) return;
 
     this.player = video;
     this.setVideoInfo(video);
