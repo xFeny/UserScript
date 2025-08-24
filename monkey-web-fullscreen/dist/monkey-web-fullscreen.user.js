@@ -436,6 +436,19 @@
     }
   }
   __publicField(Clock, "state", { start: "start", stop: "stop" });
+  const { matches, includes: excluded } = _GM_info.script;
+  const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
+  const siteRegExp = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
+  const Site = {
+    isAcFun: () => /acfun.cn\/v/.test(location.href),
+    isTencent: () => /v.qq.com\/x/.test(location.href),
+    isQiyi: () => /iqiyi.com\/v_*/.test(location.href),
+    isMgtv: () => /www.mgtv.com\/b/.test(location.href),
+    isDouyu: () => /v.douyu.com\/show/.test(location.href),
+    isBili: () => /bilibili.com\/video/.test(location.href),
+    isBiliLive: () => location.host === "live.bilibili.com",
+    isMatched: () => siteRegExp.some((match) => match.test(location.href.replace(location.search, Consts.EMPTY)))
+  };
   const App$1 = window.App = {
     init() {
       this.setupDocBodyObserver();
@@ -484,10 +497,10 @@
       });
       this.observerTimeout = setTimeout(() => this.bodyObserver?.disconnect(), Consts.ONE_SEC * 10);
     },
-    setCurrentVideo(video, ignoreWidth = false) {
+    setCurrentVideo(video) {
       if (!video || this.player === video) return;
       if (this.player && !this.player.paused && !isNaN(this.player.duration)) return;
-      if (!ignoreWidth && video.offsetWidth < 200 || this.isBackgroundVideo(video)) return;
+      if (!Site.isMgtv() && video.offsetWidth < 200 || this.isBackgroundVideo(video)) return;
       this.player = video;
       this.setVideoInfo(video);
       this.setupVideoObserver(video);
@@ -561,18 +574,6 @@
         this.Clock[state]?.();
       });
     }
-  };
-  const { matches, includes: excluded } = _GM_info.script;
-  const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
-  const siteRegExp = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
-  const Site = {
-    isAcFun: () => /acfun.cn\/v/.test(location.href),
-    isTencent: () => /v.qq.com\/x/.test(location.href),
-    isQiyi: () => /iqiyi.com\/v_*/.test(location.href),
-    isDouyu: () => /v.douyu.com\/show/.test(location.href),
-    isBili: () => /bilibili.com\/video/.test(location.href),
-    isBiliLive: () => location.host === "live.bilibili.com",
-    isMatched: () => siteRegExp.some((match) => match.test(location.href.replace(location.search, Consts.EMPTY)))
   };
   const Keyboard = Object.freeze({
     A: "KeyA",
@@ -1514,7 +1515,7 @@
     playing() {
       this.isEnded = false;
       if (this.duration < 5) return;
-      App.setCurrentVideo(this, true);
+      App.setCurrentVideo(this);
       App.applyCachedPlayRate(this);
       setTimeout(() => App.applyCachedTime(this), 20);
       App.removeLoginPopups();
