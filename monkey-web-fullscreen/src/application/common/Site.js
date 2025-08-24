@@ -12,6 +12,7 @@ export default {
   isAcFun: () => /acfun.cn\/v/.test(location.href),
   isTencent: () => /v.qq.com\/x/.test(location.href),
   isQiyi: () => /iqiyi.com\/v_*/.test(location.href),
+  isMgtv: () => /www.mgtv.com\/b/.test(location.href),
   isDouyu: () => /v.douyu.com\/show/.test(location.href),
   isBili: () => /bilibili.com\/video/.test(location.href),
   isBiliLive: () => location.host === "live.bilibili.com",

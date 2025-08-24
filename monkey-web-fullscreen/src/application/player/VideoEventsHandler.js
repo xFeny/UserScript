@@ -26,7 +26,7 @@ export default {
   playing() {
     this.isEnded = false;
     if (this.duration < 5) return; // 超短的视频不操作
-    App.setCurrentVideo(this, true);
+    App.setCurrentVideo(this);
     App.applyCachedPlayRate(this);
     setTimeout(() => App.applyCachedTime(this), 20); // 确保topWin信息的即时性和可靠性
     App.removeLoginPopups();

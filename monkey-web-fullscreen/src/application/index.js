@@ -2,6 +2,7 @@ import Tools from "./common/Tools";
 import Consts from "./common/Consts";
 import Storage from "./common/Storage";
 import Clock from "./common/Clock";
+import Site from "./common/Site";
 
 export default window.App = {
   init() {
@@ -53,10 +54,10 @@ export default window.App = {
     });
     this.observerTimeout = setTimeout(() => this.bodyObserver?.disconnect(), Consts.ONE_SEC * 10);
   },
-  setCurrentVideo(video, ignoreWidth = false) {
+  setCurrentVideo(video) {
     if (!video || this.player === video) return;
     if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // player播放中
-    if ((!ignoreWidth && video.offsetWidth < 200) || this.isBackgroundVideo(video)) return;
+    if ((!Site.isMgtv() && video.offsetWidth < 200) || this.isBackgroundVideo(video)) return;
 
     this.player = video;
     this.setVideoInfo(video);
