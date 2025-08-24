@@ -33,7 +33,8 @@ export default {
     const isEnable = this.isEnableSiteAuto();
     const siteFun = ({ cache }) => cache.set(host, !cache.get(host));
     const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
-    const resetSetting = () => GM_listValues().forEach((key) => GM_deleteValue(key));
+    // const resetSetting = () => GM_listValues().forEach((key) => GM_deleteValue(key));
+    // { title: "重置设置", cache: { name: "RESET" }, isHidden: false, fn: resetSetting },
 
     // 菜单配置项
     const configs = [
@@ -41,7 +42,6 @@ export default {
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() },
-      // { title: "重置设置", cache: { name: "RESET" }, isHidden: false, fn: resetSetting },
     ];
 
     // 注册菜单项

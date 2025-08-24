@@ -59,7 +59,7 @@ export default defineConfig({
         match,
         include,
         author: "Feny",
-        version: "3.2.2",
+        version: "3.2.3",
         connect: "gitee.com",
         license: "GPL-3.0-only",
         description: description.join("；"),
