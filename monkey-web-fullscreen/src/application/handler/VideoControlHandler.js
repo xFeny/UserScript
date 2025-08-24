@@ -46,7 +46,7 @@ export default {
   setPlaybackRate(playRate, show = true) {
     if (!this.player || isNaN(this.player.duration) || this.isDisablePlaybackRate()) return;
     if (this.isLive() || this.isEnded() || this.isBackgroundVideo(this.player)) return;
-    if (Number(this.player.playbackRate) === playRate) return;
+    if (!playRate || Number(this.player.playbackRate) === playRate) return;
 
     // 设置倍速
     window.videoEnhance.setPlaybackRate(this.player, playRate);

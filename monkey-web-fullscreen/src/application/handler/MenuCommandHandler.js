@@ -71,6 +71,7 @@ export default {
       { key: "Shift R", desc: "水平镜像" },
       { key: "Shift P", desc: "画中画切换" },
       { key: "Ctrl Z", desc: "复位缩放移动" },
+      { key: "Ctrl 0-9", desc: "预设常用倍速" },
       { key: "Ctrl Alt A", desc: "截图 (默认禁用)" },
       { key: "Alt ➕ / ➖", desc: "缩放 (默认禁用)" },
       { key: "A / S 或 ➕ / ➖", desc: "倍速 ±0.25" },
@@ -186,6 +187,7 @@ export default {
       { name: "days", text: "播放进度保存天数", cache: Storage.STORAGE_DAYS },
       { name: "percent", text: "缩放百分比", cache: Storage.PERCENT_OF_ZOOM },
       { name: "move", text: "移动距离", cache: Storage.MOVING_DISTANCE },
+      { name: "preset", text: "常用倍速", cache: Storage.PRESET_SPEED },
     ];
 
     const renderItem = ({ text, name, value }) => `

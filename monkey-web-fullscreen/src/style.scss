@@ -226,8 +226,8 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
       border: 1px solid #cbd5e1 !important;
       text-align: center !important;
       font-size: 13px !important;
-      height: 20px !important;
-      width: 45px !important;
+      height: 21px !important;
+      width: 50px !important;
 
       &:focus {
         outline: none !important;
@@ -239,6 +239,11 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     input[type="checkbox"] {
       position: absolute !important;
       opacity: 0 !important;
+    }
+
+    /* 预设倍速 */
+    input[name="preset"] {
+      width: 100px !important;
     }
 
     /* 开关轨道 */
