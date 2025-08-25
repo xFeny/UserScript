@@ -404,10 +404,11 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 .Clock {
   top: 20px;
   right: 50px;
-  color: #fff;
+  color: #eee;
   z-index: 100;
   font-size: 19px;
   font-weight: bold;
   position: absolute;
   text-shadow: 0 0 2px #000;
+  font-family: Arial, Helvetica, sans-serif !important;
 }
