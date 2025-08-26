@@ -31,7 +31,7 @@ export default {
     // Tools.log(location.href, "接收到消息：", data);
     if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
     if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
-    if (data?.isFullscreen !== undefined) this.isFullscreen = data.isFullscreen;
+    if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
     if (data?.topWin) window.topWin = this.topWin = data.topWin;
     if (data?.clockState) this.createClock(data.clockState);
     if (data?.disable_speed) this.resetToDefaultPlayRate();
@@ -58,7 +58,7 @@ export default {
     if (data?.key) this.execHotKeyActions(data);
   },
   execHotKeyActions({ key, isTrusted }) {
-    Tools.log("按下的键：", { key, isTrusted });
+    // Tools.log("按下的键：", { key, isTrusted });
     const dict = {
       M: () => this.toggleMute(),
       R: () => this.rotateVideo(),
