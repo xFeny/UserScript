@@ -129,8 +129,8 @@ export default window.App = {
   },
   setupFullscreenListener() {
     document.addEventListener("fullscreenchange", () => {
-      const isFull = !!document.fullscreenElement;
-      Tools.postMessage(window.top, { clockState: isFull ? Clock.state.start : Clock.state.stop });
+      const isFullscreen = !!document.fullscreenElement;
+      Tools.postMessage(window.top, { isFullscreen, clockState: isFullscreen ? Clock.state.start : Clock.state.stop });
     });
   },
   createClock(state = Clock.state.stop) {

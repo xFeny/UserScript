@@ -20,7 +20,7 @@ export default {
   processKeystrokes({ key, code, ctrlKey, shiftKey, altKey }) {
     code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
     const keys = [ctrlKey && "ctrl", shiftKey && "shift", altKey && "alt", /[0-9]/.test(key) ? key : code];
-    return keys.filter(Boolean).join("_");
+    return keys.filter(Boolean).join("_").toUpperCase();
   },
   setupKeydownListener() {
     window.addEventListener("keyup", (event) => this.preventDefault(event), true); // 腾讯视频
@@ -31,6 +31,7 @@ export default {
     // Tools.log(location.href, "接收到消息：", data);
     if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
     if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
+    if (data?.isFullscreen !== undefined) this.isFullscreen = data.isFullscreen;
     if (data?.topWin) window.topWin = this.topWin = data.topWin;
     if (data?.clockState) this.createClock(data.clockState);
     if (data?.disable_speed) this.resetToDefaultPlayRate();
@@ -38,7 +39,7 @@ export default {
     if (data?.disable_zoom) this.resetVideoTransform();
     this.processEvent(data);
   },
-  handleKeydown(event, { key, code } = event) {
+  handleKeydown(event, { key, code, isTrusted } = event) {
     // Tools.log("键盘事件：", { key, code });
     const target = event.composedPath()[0];
     const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
@@ -48,16 +49,16 @@ export default {
     this.preventDefault(event);
     key = this.processKeystrokes(event);
     const specialKeys = [Keyboard.N, Keyboard.P, Keyboard.Enter, Keyboard.NumEnter];
-    if (specialKeys.includes(code)) return Tools.postMessage(window.top, { key });
-    this.processEvent({ key });
+    if (specialKeys.includes(code)) return Tools.postMessage(window.top, { key, isTrusted });
+    this.processEvent({ key, isTrusted });
   },
   processEvent(data) {
     // video在iframe中，向iframe传递事件
     if (!this.player) Tools.sendToIFrames(data);
-    if (data?.key) this.execHotKeyActions(data.key.toUpperCase());
+    if (data?.key) this.execHotKeyActions(data);
   },
-  execHotKeyActions(key) {
-    // Tools.log("按下的键：", { key });
+  execHotKeyActions({ key, isTrusted }) {
+    Tools.log("按下的键：", { key, isTrusted });
     const dict = {
       M: () => this.toggleMute(),
       R: () => this.rotateVideo(),
@@ -67,7 +68,7 @@ export default {
       D: () => Site.isMatched() && this.triggerIconElement(SiteIcons.name.danmaku),
       N: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
       ENTER: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen()),
-      P: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance()),
+      P: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance(isTrusted)),
       LEFT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(-Storage.SKIP_INTERVAL.get()),
       RIGHT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(Storage.SKIP_INTERVAL.get()),
       0: () => this.adjustPlayProgress(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,

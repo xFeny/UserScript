@@ -11,10 +11,11 @@ export default {
     if (!Tools.isTopWin()) return;
     const isFull = !!document.fullscreenElement;
     isFull ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-    if (isFull || !this.fullscreenWrapper) Tools.postMessage(window.top, { key: Consts.P });
+    if (isFull || !this.fullscreenWrapper) Tools.postMessage(window.top, { key: Consts.P }); // 全屏或非网页全屏模式下
   },
-  webFullEnhance() {
+  webFullEnhance(isTrusted) {
     if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
+    if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
 
     // 退出网页全屏
     if (this.fullscreenWrapper) return this.exitWebFullEnhance();
