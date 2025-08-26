@@ -17,7 +17,7 @@ export default {
   },
   isLive() {
     if (!this.videoInfo && !this.player) return false;
-    return this.videoInfo.isLive || this.player.duration > 864e3 || this.isDynamicDuration(this.player);
+    return this.videoInfo.isLive || this.player?.duration > 864e3 || this.isDynamicDuration(this.player);
   },
   isDynamicDuration(video) {
     if (!video) return false;
