@@ -17,7 +17,11 @@ export default {
     const zoomKeys = !this.isDisableZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
     if (isNumberKey || isOverrideKey || preventKeys || (altKey && zoomKeys)) Tools.preventDefault(event);
   },
-  processKeystrokes({ key, code, ctrlKey, shiftKey, altKey }) {
+  dispatchShortcutKey(code) {
+    const key = this.processShortcutKey({ code });
+    Tools.postMessage(window.top, { key });
+  },
+  processShortcutKey({ key, code, ctrlKey, shiftKey, altKey }) {
     code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
     const keys = [ctrlKey && "ctrl", shiftKey && "shift", altKey && "alt", /[0-9]/.test(key) ? key : code];
     return keys.filter(Boolean).join("_").toUpperCase();
@@ -47,7 +51,7 @@ export default {
     if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
 
     this.preventDefault(event);
-    key = this.processKeystrokes(event);
+    key = this.processShortcutKey(event);
     const specialKeys = [Keyboard.N, Keyboard.P, Keyboard.Enter, Keyboard.NumEnter];
     if (specialKeys.includes(code)) return Tools.postMessage(window.top, { key, isTrusted });
     this.processEvent({ key, isTrusted });

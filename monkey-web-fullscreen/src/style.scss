@@ -403,11 +403,11 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 /** 全屏时钟样式 **/
 .Clock {
   top: 20px;
-  right: 50px;
+  right: 40px;
   color: #eee;
   z-index: 100;
-  font-size: 19px;
-  line-height: 19px;
+  font-size: 20px;
+  line-height: 20px;
   font-weight: bold;
   position: absolute;
   text-shadow: 0 0 2px #000;

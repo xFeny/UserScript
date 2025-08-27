@@ -3,6 +3,7 @@ import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
 import SiteIcons from "../common/SiteIcons";
+import Keyboard from "../common/Keyboard";
 
 /**
  * 网页全屏逻辑处理
@@ -15,7 +16,7 @@ export default {
     if (this.getRemainingTime(video) > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return; // 距离结束还剩多少秒切换下集
     if (this.isNextIgnoreUrl()) return (video.hasTriedAutoNext = true);
 
-    Tools.postMessage(window.top, { key: Consts.N });
+    this.dispatchShortcutKey(Keyboard.N);
     video.hasTriedAutoNext = true;
   },
   autoWebFullscreen(video) {
@@ -27,7 +28,7 @@ export default {
     if (video.offsetWidth >= this.topWin.viewWidth) return (video.hasWebFull = true);
 
     // 发送网页全屏消息
-    Tools.postMessage(window.top, { key: Consts.P });
+    this.dispatchShortcutKey(Keyboard.P);
   },
   liveWebFullscreen() {
     unsafeWindow.top.scrollTo({ top: 70 });

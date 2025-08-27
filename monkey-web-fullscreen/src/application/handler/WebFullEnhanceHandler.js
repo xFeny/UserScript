@@ -1,7 +1,7 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
-import Site from "../common/Site";
+import Keyboard from "../common/Keyboard";
 
 /**
  * 通用网页全屏
@@ -11,7 +11,7 @@ export default {
     if (!Tools.isTopWin()) return;
     const isFull = !!document.fullscreenElement;
     isFull ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-    if (isFull || !this.fullscreenWrapper) Tools.postMessage(window.top, { key: Consts.P }); // 全屏或非网页全屏模式下
+    if (isFull || !this.fullscreenWrapper) this.dispatchShortcutKey(Keyboard.P); // 全屏或非网页全屏模式下
   },
   webFullEnhance(isTrusted) {
     if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
