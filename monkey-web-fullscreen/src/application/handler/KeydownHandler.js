@@ -37,7 +37,6 @@ export default {
     if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
     if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
     if (data?.topWin) window.topWin = this.topWin = data.topWin;
-    if (data?.clockState) this.createClock(data.clockState);
     if (data?.disable_speed) this.resetToDefaultPlayRate();
     if (data?.disable_memory) this.deleteCachedPlayRate();
     if (data?.disable_zoom) this.resetVideoTransform();

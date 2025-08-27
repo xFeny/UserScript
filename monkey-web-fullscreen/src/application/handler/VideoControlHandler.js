@@ -260,4 +260,11 @@ export default {
     this.player?.style?.setProperty(name, value);
     return this;
   },
+  videoProgress(video) {
+    if (this.isLive() || !this.isFullscreen) return this.progressElement?.remove();
+    this.progressElement = this.progressElement ?? document.createElement("div");
+    this.progressElement.textContent = `${this.formatTime(video.currentTime)} / ${this.formatTime(video.duration)}`;
+    this.progressElement.classList.add("__time-progress");
+    video.parentNode.prepend(this.progressElement);
+  },
 };

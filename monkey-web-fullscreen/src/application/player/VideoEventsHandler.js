@@ -17,6 +17,7 @@ export default {
     App.autoWebFullscreen(this);
     App.autoNextEpisode(this);
     App.cachePlayTime(this);
+    App.videoProgress(this);
   },
   canplay() {
     if (this.hasTryAutoPlay || Tools.isMultiVideo()) return;

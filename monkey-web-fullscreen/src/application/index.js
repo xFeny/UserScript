@@ -12,6 +12,7 @@ export default window.App = {
     this.setupUrlChangeListener();
     this.setupMouseMoveListener();
     this.setupFullscreenListener();
+    this.observeFullscreenChange();
     this.setupIgnoreUrlsChangeListener();
     document.addEventListener("load", () => this.triggerStartElement(), true);
   },
@@ -130,7 +131,7 @@ export default window.App = {
   setupFullscreenListener() {
     document.addEventListener("fullscreenchange", () => {
       const isFullscreen = !!document.fullscreenElement;
-      Tools.postMessage(window.top, { isFullscreen, clockState: isFullscreen ? Clock.state.start : Clock.state.stop });
+      Tools.postMessage(window.top, { isFullscreen });
     });
   },
   createClock(state = Clock.state.stop) {
@@ -142,5 +143,25 @@ export default window.App = {
       this.Clock = new Clock(this.player.parentNode);
       this.Clock[state]?.(); // 不是全屏时停止
     });
+  },
+  observeFullscreenChange() {
+    let _isFullscreen = false;
+    Object.defineProperty(this, "isFullscreen", {
+      get: () => _isFullscreen,
+      set: (value) => {
+        if (value === _isFullscreen) return;
+        this.handleFullscreenChange(value);
+        _isFullscreen = value;
+      },
+    });
+  },
+  handleFullscreenChange(isFullscreen) {
+    if (!this.player) return;
+
+    // 不是全屏模式，移除全屏播放进度元素
+    !isFullscreen && this.progressElement?.remove();
+
+    // 处理时钟显示或隐藏
+    this.Clock[isFullscreen ? Clock.state.start : Clock.state.stop]?.();
   },
 };
