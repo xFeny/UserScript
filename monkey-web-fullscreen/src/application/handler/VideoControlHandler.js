@@ -37,6 +37,7 @@ export default {
   },
   initVideoProps(video) {
     video.hasWebFull = false;
+    video.__isDynamic = false;
     video.hasTriedAutoNext = false;
     video.hasApplyCachedRate = false;
     video.__duration = video.duration;
