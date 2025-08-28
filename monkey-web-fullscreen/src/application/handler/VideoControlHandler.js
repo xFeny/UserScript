@@ -276,7 +276,7 @@ export default {
 
     const percent = ((video.currentTime / video.duration) * 100).toFixed(1);
     const timeLeft = this.formatTime(video.duration - video.currentTime);
-    this.progressElement.innerHTML = `${timeLeft} / ${percent}<i>%</i>`;
+    this.progressElement.innerHTML = `${timeLeft} / ${percent}<b>%</b>`;
   },
   removeVideoProgress() {
     this.progressElement?.remove();

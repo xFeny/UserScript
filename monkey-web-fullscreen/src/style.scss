@@ -440,7 +440,12 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   font-size: 13.5px;
   line-height: 13.5px;
 
-  & i {
-    font-size: 9px;
+  & b {
+    font-size: 12px;
+    line-height: 12px;
+    display: inline-block;
+    transform: scale(0.75);
+    vertical-align: middle;
+    transform-origin: left center;
   }
 }
