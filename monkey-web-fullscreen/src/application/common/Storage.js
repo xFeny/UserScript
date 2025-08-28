@@ -18,7 +18,6 @@ class StorageItem {
   }
 
   get() {
-    console.log("日志--获取缓存", { key: this.name, value: this.getItem(this.name) ?? this.defaultValue });
     return this.parser(this.getItem(this.name) ?? this.defaultValue);
   }
 

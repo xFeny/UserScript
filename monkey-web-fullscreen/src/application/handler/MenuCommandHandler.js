@@ -148,7 +148,6 @@ export default {
             setTimeout(() => {
               const host = this.dataset.host;
               const cache = cacheMap[this.name];
-              Tools.log(this.name, cache.set);
               const value = isCheckbox ? this.checked : this.value;
               host ? cache.set(host, value) : cache.set(value);
             }, 100);
