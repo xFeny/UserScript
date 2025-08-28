@@ -162,7 +162,7 @@ export default window.App = {
       this.Clock?.destroy(), (this.Clock = null); // 先销毁再创建
       if (!this.player?.parentNode) return;
 
-      if (this.isFullscreen) state = Clock.state.start;
+      if (this.isFullscreen && !Storage.DISABLE_CLOCK.get()) state = Clock.state.start;
       this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
       this.Clock[state]?.(); // 不是全屏时停止
     });
