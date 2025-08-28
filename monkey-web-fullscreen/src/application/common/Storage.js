@@ -18,6 +18,7 @@ class StorageItem {
   }
 
   get() {
+    console.log("日志--获取缓存", { key: this.name, value: this.getItem(this.name) ?? this.defaultValue });
     return this.parser(this.getItem(this.name) ?? this.defaultValue);
   }
 
@@ -111,9 +112,10 @@ class TimedStorage extends StorageItem {
  * DISABLE_MEMORY_TIME  禁用播放进度记录
  * PRESET_SPEED   预设倍速数组
  * DISABLE_ZOOM_MOVE  禁用缩放和移动
- * PERCENT_OF_ZOOM    缩放百分比
  * MOVING_DISTANCE    移动距离
  * DISABLE_SCREENSHOT  禁用视频截图
+ * ZOOM_PERCENT   缩放百分比
+ * DISABLE_CLOCK  禁用全屏时钟显示
  * CURR_EPISODE_SELECTOR  通用切换下集—当前播放集数 拾取的CSS选择器
  * REL_EPISODE_SELECTOR   通用切换下集—集数列表中的任意一集 拾取的CSS选择器
  * STORAGE_DAYS   设置播放进度保存天数
@@ -139,14 +141,16 @@ export default {
   DISABLE_MEMORY_SPEED: new StorageItem("DISABLE_MEMORY_SPEED", false, false, (value) => Boolean(value)),
   DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
   DISABLE_ZOOM_MOVE: new StorageItem("DISABLE_ZOOM_MOVE", true, false, (value) => Boolean(value)),
-  PERCENT_OF_ZOOM: new StorageItem("PERCENT_OF_ZOOM", 10, false, (value) => parseInt(value, 10)),
   MOVING_DISTANCE: new StorageItem("MOVING_DISTANCE", 10, false, (value) => parseInt(value, 10)),
   DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
+  ZOOM_PERCENT: new StorageItem("ZOOM_PERCENT", 10, false, (value) => parseInt(value, 10)),
+  DISABLE_CLOCK: new StorageItem("DISABLE_CLOCK", false, false, (value) => Boolean(value)),
   CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
   REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
   STORAGE_DAYS: new StorageItem("STORAGE_DAYS", 7, false, parseFloat),
   NEXT_IGNORE_URLS: new StorageItem("NEXT_IGNORE_URLS", "", false),
   FULL_IGNORE_URLS: new StorageItem("FULL_IGNORE_URLS", "", false),
   CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", "", false),
+  CLOCK_COLOR: new StorageItem("CLOCK_COLOR", "#efefef", false),
   PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat),
 };

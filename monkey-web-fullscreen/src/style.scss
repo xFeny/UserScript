@@ -227,7 +227,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
       text-align: center !important;
       font-size: 13px !important;
       height: 21px !important;
-      width: 50px !important;
+      width: 60px !important;
 
       &:focus {
         outline: none !important;
@@ -404,7 +404,6 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 .__time-progress {
   right: 40px;
   color: #efefef;
-  font-weight: bold;
   position: absolute;
   text-shadow: 0 0 2px #000;
   font-family: Arial, Helvetica, sans-serif !important;
@@ -419,6 +418,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   top: 15px;
   font-size: 20px;
   line-height: 20px;
+  font-weight: bold;
 
   /** 防止被隐藏 **/
   &::after {
@@ -437,6 +437,10 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 /** 全屏模式下的播放进度 **/
 .__time-progress {
   top: 35px;
-  font-size: 13px;
-  line-height: 13px;
+  font-size: 13.5px;
+  line-height: 13.5px;
+
+  & i {
+    font-size: 9px;
+  }
 }

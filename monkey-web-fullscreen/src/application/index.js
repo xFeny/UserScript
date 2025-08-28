@@ -152,7 +152,10 @@ export default window.App = {
     !isFullscreen && this.removeVideoProgress();
 
     // 处理时钟显示或隐藏
+    if (Storage.DISABLE_CLOCK.get()) return;
+    const color = Storage.CLOCK_COLOR.get();
     this.Clock[isFullscreen ? Clock.state.start : Clock.state.stop]?.();
+    if (color) this.Clock.clock.style.setProperty("color", color);
   },
   createClock(state = Clock.state.stop) {
     Promise.resolve().then(() => {
@@ -160,7 +163,7 @@ export default window.App = {
       if (!this.player?.parentNode) return;
 
       if (this.isFullscreen) state = Clock.state.start;
-      this.Clock = new Clock(this.player.parentNode);
+      this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
       this.Clock[state]?.(); // 不是全屏时停止
     });
   },

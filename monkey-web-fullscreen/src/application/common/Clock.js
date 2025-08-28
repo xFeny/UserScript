@@ -3,16 +3,20 @@
  */
 export default class Clock {
   static state = { start: "start", stop: "stop" };
+  options = { color: null };
 
-  constructor(container) {
+  constructor(container, options) {
     if (!container) return;
+    this.options = Object.assign(this.options, options);
 
+    const { color } = this.options;
     this.container = container;
     this.animationId = null;
     this.isRunning = false;
 
     if (container.querySelector(".Clock")) this.destroy();
     this.clock = document.createElement("div");
+    if (color) this.clock.style.setProperty("color", color);
     this.clock.classList.add("Clock");
     this.container.prepend(this.clock);
     this.start(); // 初始化时启动时钟

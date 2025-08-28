@@ -157,7 +157,7 @@ export default {
     if (!this.player || this.isDisableZoom()) return;
 
     const tsr = this.player.tsr;
-    const step = Storage.PERCENT_OF_ZOOM.get();
+    const step = Storage.ZOOM_PERCENT.get();
     const zoom = tsr.zoom + (isDown ? -step : step);
     if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
 
@@ -262,18 +262,21 @@ export default {
     return this;
   },
   videoProgress(video) {
+    if (Storage.DISABLE_CLOCK.get()) return;
     if (this.isLive() || !this.isFullscreen) return this.removeVideoProgress();
 
     // 确保只创建一个元素
     if (!this.progressElement) {
+      const color = Storage.CLOCK_COLOR.get();
       this.progressElement = document.createElement("div");
       this.progressElement.classList.add("__time-progress");
+      if (color) this.progressElement.style.setProperty("color", color);
       video.parentNode.prepend(this.progressElement);
     }
 
     const percent = ((video.currentTime / video.duration) * 100).toFixed(1);
     const timeLeft = this.formatTime(video.duration - video.currentTime);
-    this.progressElement.textContent = `${timeLeft} / ${percent}%`;
+    this.progressElement.innerHTML = `${timeLeft} / ${percent}<i>%</i>`;
   },
   removeVideoProgress() {
     this.progressElement?.remove();

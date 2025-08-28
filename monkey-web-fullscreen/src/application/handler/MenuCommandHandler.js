@@ -148,6 +148,7 @@ export default {
             setTimeout(() => {
               const host = this.dataset.host;
               const cache = cacheMap[this.name];
+              Tools.log(this.name, cache.set);
               const value = isCheckbox ? this.checked : this.value;
               host ? cache.set(host, value) : cache.set(value);
             }, 100);
@@ -166,6 +167,7 @@ export default {
       { name: "fit", text: "禁用 自动网页全屏", cache: Storage.DISABLE_AUTO, isHidden: !Site.isMatched() },
       { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
       { name: "volume", text: "禁用 音量默认百分百", cache: Storage.DISABLE_DEF_MAX_VOLUME },
+      { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK },
       { name: "next", text: "启用 自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
     ].filter(({ isHidden }) => !isHidden);
@@ -185,8 +187,9 @@ export default {
       { name: "zeroSkip", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL },
       { name: "advance", text: "自动下集提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC },
       { name: "days", text: "播放进度保存天数", cache: Storage.STORAGE_DAYS },
-      { name: "percent", text: "缩放百分比", cache: Storage.PERCENT_OF_ZOOM },
+      { name: "percent", text: "缩放百分比", cache: Storage.ZOOM_PERCENT },
       { name: "move", text: "移动距离", cache: Storage.MOVING_DISTANCE },
+      { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR },
       { name: "preset", text: "常用倍速", cache: Storage.PRESET_SPEED },
     ];
 
