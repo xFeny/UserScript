@@ -36,10 +36,10 @@ export default {
     return result;
   },
   initVideoProps(video) {
-    video.hasWebFull = false;
-    video.__isDynamic = false;
-    video.hasTriedAutoNext = false;
-    video.hasApplyCachedRate = false;
+    delete video.hasWebFull;
+    delete video.__isDynamic;
+    delete video.hasTriedAutoNext;
+    delete video.hasApplyCachedRate;
     video.__duration = video.duration;
     Tools.resetLimitCounter("autoWebFull");
     if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
