@@ -14,7 +14,7 @@ export default class Clock {
     if (container.querySelector(".Clock")) this.destroy();
     this.clock = document.createElement("div");
     this.clock.classList.add("Clock");
-    this.container.append(this.clock);
+    this.container.prepend(this.clock);
     this.start(); // 初始化时启动时钟
   }
 

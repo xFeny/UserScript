@@ -134,16 +134,6 @@ export default window.App = {
       Tools.postMessage(window.top, { isFullscreen });
     });
   },
-  createClock(state = Clock.state.stop) {
-    Promise.resolve().then(() => {
-      this.Clock?.destroy(); // 先销毁再创建
-      if (!this.player?.parentNode) return (this.Clock = null);
-
-      if (Tools.isTopWin() && document.fullscreenElement) state = Clock.state.start;
-      this.Clock = new Clock(this.player.parentNode);
-      this.Clock[state]?.(); // 不是全屏时停止
-    });
-  },
   observeFullscreenChange() {
     let _isFullscreen = false;
     Object.defineProperty(this, "isFullscreen", {
@@ -159,9 +149,19 @@ export default window.App = {
     if (!this.player) return;
 
     // 不是全屏模式，移除全屏播放进度元素
-    !isFullscreen && this.progressElement?.remove();
+    !isFullscreen && this.removeVideoProgress();
 
     // 处理时钟显示或隐藏
     this.Clock[isFullscreen ? Clock.state.start : Clock.state.stop]?.();
+  },
+  createClock(state = Clock.state.stop) {
+    Promise.resolve().then(() => {
+      this.Clock?.destroy(), (this.Clock = null); // 先销毁再创建
+      if (!this.player?.parentNode) return;
+
+      if (this.isFullscreen) state = Clock.state.start;
+      this.Clock = new Clock(this.player.parentNode);
+      this.Clock[state]?.(); // 不是全屏时停止
+    });
   },
 };

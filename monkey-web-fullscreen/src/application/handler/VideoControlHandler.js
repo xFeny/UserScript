@@ -38,6 +38,7 @@ export default {
     video.__duration = video.duration;
     Tools.resetLimitCounter("autoWebFull");
     if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
+    this.removeVideoProgress();
   },
   deleteCachedPlayRate: () => Storage.CACHED_PLAY_RATE.del(),
   getRemainingTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
@@ -261,10 +262,21 @@ export default {
     return this;
   },
   videoProgress(video) {
-    if (this.isLive() || !this.isFullscreen) return this.progressElement?.remove();
-    this.progressElement = this.progressElement ?? document.createElement("div");
-    this.progressElement.textContent = `${this.formatTime(video.currentTime)} / ${this.formatTime(video.duration)}`;
-    this.progressElement.classList.add("__time-progress");
-    video.parentNode.prepend(this.progressElement);
+    if (this.isLive() || !this.isFullscreen) return this.removeVideoProgress();
+
+    // 确保只创建一个元素
+    if (!this.progressElement) {
+      this.progressElement = document.createElement("div");
+      this.progressElement.classList.add("__time-progress");
+      video.parentNode.prepend(this.progressElement);
+    }
+
+    const percent = ((video.currentTime / video.duration) * 100).toFixed(1);
+    const timeLeft = this.formatTime(video.duration - video.currentTime);
+    this.progressElement.textContent = `${timeLeft} / ${percent}%`;
+  },
+  removeVideoProgress() {
+    this.progressElement?.remove();
+    this.progressElement = null;
   },
 };
