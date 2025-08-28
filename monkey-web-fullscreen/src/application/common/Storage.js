@@ -150,6 +150,6 @@ export default {
   NEXT_IGNORE_URLS: new StorageItem("NEXT_IGNORE_URLS", "", false),
   FULL_IGNORE_URLS: new StorageItem("FULL_IGNORE_URLS", "", false),
   CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", "", false),
-  CLOCK_COLOR: new StorageItem("CLOCK_COLOR", "#e3e3e3", false),
+  CLOCK_COLOR: new StorageItem("CLOCK_COLOR", "#d3d3d3", false),
   PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat),
 };
