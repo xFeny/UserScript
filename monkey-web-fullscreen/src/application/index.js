@@ -148,14 +148,14 @@ export default window.App = {
   handleFullscreenChange(isFullscreen) {
     if (!this.player) return;
 
-    // 不是全屏模式，移除全屏播放进度元素
+    // 退出全屏模式时，移除播放进度元素
     !isFullscreen && this.removeVideoProgress();
 
-    // 处理时钟显示或隐藏
+    // 处理时钟显藏，全屏时显示，退出全屏时隐藏
     if (Storage.DISABLE_CLOCK.get()) return;
     const color = Storage.CLOCK_COLOR.get();
     this.Clock[isFullscreen ? Clock.state.start : Clock.state.stop]?.();
-    if (color) this.Clock.clock.style.setProperty("color", color);
+    if (color) this.Clock?.clock.style.setProperty("color", color);
   },
   createClock(state = Clock.state.stop) {
     Promise.resolve().then(() => {
