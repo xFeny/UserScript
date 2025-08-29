@@ -179,6 +179,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     height: 2px;
     bottom: -1px;
     position: absolute;
+    visibility: visible;
     background-color: #3b82f6;
     border-radius: 2px 2px 0 0;
   }
