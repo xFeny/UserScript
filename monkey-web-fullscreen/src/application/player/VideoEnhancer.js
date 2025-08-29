@@ -1,4 +1,3 @@
-import Consts from "../common/Consts";
 import Tools from "../common/Tools";
 import VideoEvents from "./VideoEventsHandler";
 

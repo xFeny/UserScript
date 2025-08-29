@@ -53,11 +53,13 @@ class StorageItem {
   }
 
   fuzzyMatch(pattern, callback) {
+    const keys = this.syncFuzzyMatch(pattern);
+    keys.forEach((key) => callback.call(this, key));
+  }
+
+  syncFuzzyMatch(pattern) {
     const keys = this.useLocalStorage ? Object.keys(localStorage) : GM_listValues();
-    keys.forEach((key) => {
-      const isMatch = pattern instanceof RegExp ? pattern.test(key) : key.includes(pattern);
-      if (isMatch) callback.call(this, key);
-    });
+    return keys.filter((key) => (pattern instanceof RegExp ? pattern.test(key) : key.includes(pattern)));
   }
 }
 
