@@ -416,21 +416,25 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 /** 全屏时钟样式 **/
 .Clock {
   top: 15px;
+  width: auto;
+  height: auto;
   font-size: 20px;
+  text-align: right;
   line-height: 20px;
   font-weight: bold;
   letter-spacing: 0.6px;
+  background-color: transparent !important;
 
   /** 防止被隐藏 **/
   &::after {
     top: 50%;
+    left: 50%;
     content: "-";
     position: fixed;
     text-shadow: none;
     color: transparent;
     pointer-events: none;
     display: inline-block;
-    transform: translateX(-50%);
     background-color: transparent;
   }
 }
