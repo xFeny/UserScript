@@ -71,7 +71,7 @@ export default {
       { key: "Shift R", desc: "水平镜像" },
       { key: "Shift P", desc: "画中画切换" },
       { key: "Ctrl Z", desc: "复位缩放移动" },
-      { key: "Ctrl 0-9", desc: "预设常用倍速" },
+      { key: "Ctrl 1-5", desc: "预设常用倍速" },
       { key: "Ctrl Alt A", desc: "截图 (默认禁用)" },
       { key: "Alt ➕ / ➖", desc: "缩放 (默认禁用)" },
       { key: "A / S 或 ➕ / ➖", desc: "倍速 ±0.25" },
