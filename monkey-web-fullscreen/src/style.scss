@@ -402,10 +402,10 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 
 .Clock,
 .__time-progress {
-  right: 40px;
   color: #e0e0e0;
-  position: absolute;
+  right: 40px !important;
   text-shadow: 0 0 2px #000;
+  position: absolute !important;
   font-family: Arial, Helvetica, sans-serif !important;
   /** 防止被隐藏 **/
   z-index: 2147483647 !important;
@@ -415,41 +415,41 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 
 /** 全屏时钟样式 **/
 .Clock {
-  top: 15px;
-  width: auto;
-  height: auto;
-  font-size: 20px;
-  text-align: right;
-  line-height: 20px;
-  font-weight: bold;
-  letter-spacing: 0.6px;
+  top: 15px !important;
+  width: auto !important;
+  height: auto !important;
+  font-size: 20px !important;
+  line-height: 20px !important;
+  font-weight: bold !important;
+  text-align: right !important;
+  letter-spacing: 0.6px !important;
   background-color: transparent !important;
 
   /** 防止被隐藏 **/
   &::after {
-    top: 50%;
-    left: 50%;
-    content: "-";
-    position: fixed;
-    text-shadow: none;
-    color: transparent;
-    pointer-events: none;
-    display: inline-block;
-    background-color: transparent;
+    top: 50% !important;
+    left: 50% !important;
+    content: "-" !important;
+    position: fixed !important;
+    text-shadow: none !important;
+    color: transparent !important;
+    pointer-events: none !important;
+    display: inline-block !important;
+    background-color: transparent !important;
   }
 }
 
 /** 全屏模式下的播放进度 **/
 .__time-progress {
-  top: 35px;
-  font-size: 13.5px;
-  line-height: 13.5px;
+  top: 35px !important;
+  font-size: 13.5px !important;
+  line-height: 13.5px !important;
 
   & b {
-    font-size: 12px;
-    line-height: 12px;
-    display: inline-block;
-    transform: scale(0.75);
-    vertical-align: middle;
+    font-size: 12px !important;
+    line-height: 12px !important;
+    display: inline-block !important;
+    transform: scale(0.75) !important;
+    vertical-align: middle !important;
   }
 }
