@@ -419,7 +419,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   font-size: 20px;
   line-height: 20px;
   font-weight: bold;
-  letter-spacing: 0.7px;
+  letter-spacing: 0.6px;
 
   /** 防止被隐藏 **/
   &::after {
@@ -447,6 +447,5 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     display: inline-block;
     transform: scale(0.75);
     vertical-align: middle;
-    transform-origin: left center;
   }
 }
