@@ -146,6 +146,7 @@ export default {
   DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
   ZOOM_PERCENT: new StorageItem("ZOOM_PERCENT", 10, false, (value) => parseInt(value, 10)),
   DISABLE_CLOCK: new StorageItem("DISABLE_CLOCK", false, false, (value) => Boolean(value)),
+  UNFULL_CLOCK: new StorageItem("UNFULL_CLOCK", false, false, (value) => Boolean(value)),
   CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
   REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
   STORAGE_DAYS: new StorageItem("STORAGE_DAYS", 7, false, parseFloat),

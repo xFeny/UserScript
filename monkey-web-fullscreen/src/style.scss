@@ -208,7 +208,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     float: none !important;
     color: #666 !important;
     display: flex !important;
-    font-size: 16px !important;
+    font-size: 14px !important;
     font-weight: normal !important;
     align-items: center !important;
     margin-bottom: 8px !important;
@@ -231,7 +231,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
       line-height: 13px !important;
       font-size: 13px !important;
       padding: 0 3px !important;
-      height: 23px !important;
+      height: 22px !important;
       width: 75px !important;
 
       &:focus {
@@ -248,8 +248,8 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 
     /* 开关轨道 */
     .toggle-track {
-      width: 38px !important;
-      height: 18px !important;
+      width: 36px !important;
+      height: 16px !important;
       cursor: pointer !important;
       position: relative !important;
       border-radius: 13px !important;
@@ -259,11 +259,11 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 
     /* 开关按钮 */
     .toggle-track::after {
-      top: 3px !important;
+      top: 2px !important;
       left: 3px !important;
       content: "" !important;
-      width: 12px !important;
-      height: 12px !important;
+      width: 11px !important;
+      height: 11px !important;
       position: absolute !important;
       border-radius: 50% !important;
       background-color: white !important;
@@ -302,6 +302,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     textarea {
       color: #333;
       border-radius: 3px;
+      box-sizing: border-box;
       width: 100% !important;
       padding: 5px !important;
       resize: none !important;

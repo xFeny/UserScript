@@ -167,6 +167,7 @@ export default {
       { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
       { name: "volume", text: "禁用 音量默认百分百", cache: Storage.DISABLE_DEF_MAX_VOLUME },
       { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK },
+      { name: "always", text: "启用 非全屏显示时间", cache: Storage.UNFULL_CLOCK, sendMsg: true },
       { name: "next", text: "启用 自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
     ].filter(({ isHidden }) => !isHidden);

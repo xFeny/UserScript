@@ -267,8 +267,9 @@ export default {
     return this;
   },
   videoProgress(video) {
-    if (Storage.DISABLE_CLOCK.get()) return;
-    if (this.isLive() || !this.isFullscreen) return this.removeVideoProgress();
+    const isFull = this.isFullscreen;
+    const shouldDestroy = (isFull && Storage.DISABLE_CLOCK.get()) || (!isFull && !Storage.UNFULL_CLOCK.get());
+    if (shouldDestroy || this.isLive()) return this.removeVideoProgress();
 
     // 确保只创建一个元素
     if (!this.progressElement) {
