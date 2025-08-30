@@ -33,8 +33,7 @@ export default {
     const isEnable = this.isEnableSiteAuto();
     const siteFun = ({ cache }) => cache.set(host, !cache.get(host));
     const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
-    // const resetSetting = () => GM_listValues().forEach((key) => GM_deleteValue(key));
-    // { title: "重置设置", cache: { name: "RESET" }, isHidden: false, fn: resetSetting },
+    const resetSetting = () => GM_listValues().forEach((key) => GM_deleteValue(key));
 
     // 菜单配置项
     const configs = [
@@ -42,6 +41,7 @@ export default {
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() },
+      // { title: "重置设置", cache: { name: "RESET" }, isHidden: false, fn: resetSetting },
     ];
 
     // 注册菜单项
@@ -102,11 +102,11 @@ export default {
     });
   },
   settingPopup() {
-    const { html: playHtml, cacheMap: playMap } = this.genPlayItems();
+    const { html: basicsHtml, cacheMap: basicsMap } = this.genBasicsItems();
     const { html: assistHtml, cacheMap: assistMap } = this.genAssistItems();
     const { html: paramsHtml, cacheMap: paramsMap } = this.genParamsItems();
     const { html: ignoreHtml, cacheMap: ignoreMap } = this.genIgnoreItems();
-    const cacheMap = { ...playMap, ...assistMap, ...paramsMap, ...ignoreMap };
+    const cacheMap = { ...basicsMap, ...assistMap, ...paramsMap, ...ignoreMap };
     const modalHtml = `
         <div class="swal2-tabs">
           <!-- Tabs 标题栏 -->
@@ -118,7 +118,7 @@ export default {
           </div>
           <!-- Tabs 内容区 -->
           <div class="swal2-tabs-content">
-            <div class="swal2-tab-panel active" id="tab1">${playHtml}</div>
+            <div class="swal2-tab-panel active" id="tab1">${basicsHtml}</div>
             <div class="swal2-tab-panel" id="tab2">${assistHtml}</div>
             <div class="swal2-tab-panel" id="tab3">${paramsHtml}</div>
             <div class="swal2-tab-panel" id="tab4">${ignoreHtml}</div>
@@ -159,15 +159,14 @@ export default {
       },
     });
   },
-  genPlayItems() {
+  genBasicsItems() {
     const configs = [
-      { name: "speed", text: "禁用 倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true, isHidden: this.isLive() },
-      { name: "memory", text: "禁用 记忆倍速", cache: Storage.DISABLE_MEMORY_SPEED, sendMsg: true, isHidden: this.isLive() },
-      { name: "time", text: "禁用 记忆播放位置", cache: Storage.DISABLE_MEMORY_TIME, isHidden: this.isLive() },
+      { name: "speed", text: "禁用 倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true },
+      { name: "memory", text: "禁用 记忆倍速", cache: Storage.DISABLE_MEMORY_SPEED, sendMsg: true },
+      { name: "time", text: "禁用 记忆播放位置", cache: Storage.DISABLE_MEMORY_TIME, sendMsg: false },
       { name: "fit", text: "禁用 自动网页全屏", cache: Storage.DISABLE_AUTO, isHidden: !Site.isMatched() },
       { name: "volume", text: "禁用 音量默认百分百", cache: Storage.DISABLE_DEF_MAX_VOLUME },
       { name: "next", text: "启用 自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
-      { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
     ].filter(({ isHidden }) => !isHidden);
 
     const renderItem = ({ text, sendMsg, name, value }) => `
@@ -182,9 +181,10 @@ export default {
     const configs = [
       { name: "pic", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
       { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, sendMsg: true },
-      { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
-      { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK },
+      { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE, sendMsg: false },
+      { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK, sendMsg: false },
       { name: "always", text: "启用 非全屏显示时间", cache: Storage.UNFULL_CLOCK, sendMsg: true },
+      { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
     ].filter(({ isHidden }) => !isHidden);
 
     const renderItem = ({ text, sendMsg, name, value }) => `

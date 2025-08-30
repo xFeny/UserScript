@@ -88,6 +88,10 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   z-index: 2147483647 !important;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 
+  * {
+    box-sizing: border-box !important;
+  }
+
   .hide {
     display: none !important;
   }
@@ -162,7 +166,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     flex: 1;
     cursor: pointer;
     color: #64748b;
-    font-weight: 600;
+    font-weight: 500;
     text-align: center;
     padding: 12px 10px;
     position: relative;
@@ -193,7 +197,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   .swal2-tabs-content {
     width: 100%;
     padding: 0 5px;
-    box-sizing: border-box;
+    min-height: 325px;
   }
 
   .swal2-tab-panel {
@@ -209,17 +213,20 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     margin: 0 !important;
     padding: 0 !important;
     float: none !important;
+    height: 30px !important;
     color: #666 !important;
     display: flex !important;
     font-size: 14px !important;
+    line-height: 30px !important;
     font-weight: normal !important;
     align-items: center !important;
-    margin-bottom: 8px !important;
-    padding-bottom: 8px !important;
+    margin-bottom: 5px !important;
+    padding-bottom: 5px !important;
     justify-content: space-between !important;
     border-bottom: 1px solid #f5f5f5 !important;
 
     &:last-of-type {
+      margin-bottom: 0 !important;
       padding-bottom: 0 !important;
       border-bottom: none !important;
     }
@@ -228,13 +235,12 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     input[type="number"] {
       color: #333;
       border-radius: 3px;
-      box-sizing: border-box;
       border: 1px solid #cbd5e1 !important;
       text-align: center !important;
       line-height: 13px !important;
       font-size: 13px !important;
       padding: 0 3px !important;
-      height: 22px !important;
+      height: 23px !important;
       width: 75px !important;
 
       &:focus {
@@ -251,8 +257,8 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 
     /* 开关轨道 */
     .toggle-track {
-      width: 36px !important;
-      height: 16px !important;
+      width: 38px !important;
+      height: 18px !important;
       cursor: pointer !important;
       position: relative !important;
       border-radius: 13px !important;
@@ -262,11 +268,11 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 
     /* 开关按钮 */
     .toggle-track::after {
-      top: 2px !important;
+      top: 3px !important;
       left: 3px !important;
       content: "" !important;
-      width: 11px !important;
-      height: 11px !important;
+      width: 12px !important;
+      height: 12px !important;
       position: absolute !important;
       border-radius: 50% !important;
       background-color: white !important;
@@ -305,7 +311,6 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     textarea {
       color: #333;
       border-radius: 3px;
-      box-sizing: border-box;
       width: 100% !important;
       padding: 5px !important;
       resize: none !important;

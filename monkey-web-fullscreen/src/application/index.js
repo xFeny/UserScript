@@ -147,31 +147,34 @@ export default window.App = {
   handleFullscreenChange(isFullscreen) {
     if (!this.player) return;
 
-    // 时钟显示或隐藏
-    this.toggleClock(isFullscreen);
-
     // 退出全屏模式时，移除播放进度元素
     !isFullscreen && this.removeVideoProgress();
+
+    // 时钟显示或隐藏
+    this.toggleClock();
   },
   createClock(state = Clock.state.stop) {
     Promise.resolve().then(() => {
       this.Clock?.destroy(), (this.Clock = null); // 先销毁再创建
       if (!this.player?.parentNode) return;
 
-      // 全屏显示时间或非全屏显示时间
-      const isFull = this.isFullscreen;
-      const should = (isFull && !Storage.DISABLE_CLOCK.get()) || (!isFull && Storage.UNFULL_CLOCK.get());
+      // 全屏或非全屏显示时间
+      const shouldDestroy = this.shouldDestroyTimeEl();
       this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
-      this.Clock[should ? Clock.state.start : state]?.();
+      this.Clock[shouldDestroy ? state : Clock.state.start]?.();
     });
   },
-  toggleClock(isFull) {
-    // 全屏禁用显示或非全屏未启用显示，销毁时间显示
-    const shouldDestroy = (isFull && Storage.DISABLE_CLOCK.get()) || (!isFull && !Storage.UNFULL_CLOCK.get());
-    if (shouldDestroy) return this.Clock?.destroy();
+  toggleClock() {
+    // 隐藏时钟
+    if (this.shouldDestroyTimeEl()) return this.Clock?.destroy();
 
+    // 显示时钟
     const state = Clock.state.start;
     this.Clock?.isInDOM() ? this.Clock[state]() : this.createClock(state);
     this.Clock?.setCustomColor(Storage.CLOCK_COLOR.get());
+  },
+  shouldDestroyTimeEl() {
+    const isFull = this.isFullscreen;
+    return (isFull && Storage.DISABLE_CLOCK.get()) || (!isFull && !Storage.UNFULL_CLOCK.get());
   },
 };
