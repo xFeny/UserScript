@@ -154,6 +154,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     display: flex;
     position: relative;
     margin-bottom: 15px;
+    font-size: 15px !important;
     border-bottom: 1px solid #e2e8f0;
   }
 
@@ -161,7 +162,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     flex: 1;
     cursor: pointer;
     color: #64748b;
-    font-weight: 500;
+    font-weight: 600;
     text-align: center;
     padding: 12px 10px;
     position: relative;
@@ -191,6 +192,8 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   /* Tabs 内容区 */
   .swal2-tabs-content {
     width: 100%;
+    padding: 0 5px;
+    box-sizing: border-box;
   }
 
   .swal2-tab-panel {
