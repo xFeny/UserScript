@@ -147,6 +147,7 @@ export default window.App = {
   handleFullscreenChange(isFullscreen) {
     if (!this.player) return;
 
+    // 时钟显示或隐藏
     this.toggleClock(isFullscreen);
 
     // 退出全屏模式时，移除播放进度元素
@@ -158,14 +159,15 @@ export default window.App = {
       if (!this.player?.parentNode) return;
 
       // 全屏显示时间或非全屏显示时间
-      const should = (this.isFullscreen && !Storage.DISABLE_CLOCK.get()) || (!this.isFullscreen && Storage.UNFULL_CLOCK.get());
+      const isFull = this.isFullscreen;
+      const should = (isFull && !Storage.DISABLE_CLOCK.get()) || (!isFull && Storage.UNFULL_CLOCK.get());
       this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
       this.Clock[should ? Clock.state.start : state]?.();
     });
   },
-  toggleClock(isFullscreen) {
+  toggleClock(isFull) {
     // 全屏禁用显示或非全屏未启用显示，销毁时间显示
-    const shouldDestroy = (isFullscreen && Storage.DISABLE_CLOCK.get()) || (!isFullscreen && !Storage.UNFULL_CLOCK.get());
+    const shouldDestroy = (isFull && Storage.DISABLE_CLOCK.get()) || (!isFull && !Storage.UNFULL_CLOCK.get());
     if (shouldDestroy) return this.Clock?.destroy();
 
     const state = Clock.state.start;
