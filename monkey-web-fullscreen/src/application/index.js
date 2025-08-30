@@ -139,7 +139,6 @@ export default window.App = {
     Object.defineProperty(this, "isFullscreen", {
       get: () => _isFullscreen,
       set: (value) => {
-        if (value === _isFullscreen) return;
         this.handleFullscreenChange(value);
         _isFullscreen = value;
       },
@@ -151,11 +150,11 @@ export default window.App = {
     // 退出全屏模式时，移除播放进度元素
     !isFullscreen && this.removeVideoProgress();
 
-    // 处理时钟显藏，全屏时显示，退出全屏时隐藏
-    if (Storage.DISABLE_CLOCK.get()) return;
-    const color = Storage.CLOCK_COLOR.get();
-    this.Clock[isFullscreen ? Clock.state.start : Clock.state.stop]?.();
-    if (color) this.Clock?.clock.style.setProperty("color", color);
+    // 全屏时显示或隐藏时钟
+    if (Storage.DISABLE_CLOCK.get()) return this.Clock?.destroy();
+    const state = isFullscreen ? Clock.state.start : Clock.state.stop;
+    this.Clock?.isInDOM() ? this.Clock[state]() : this.createClock(state);
+    this.Clock?.setCustomColor(Storage.CLOCK_COLOR.get());
   },
   createClock(state = Clock.state.stop) {
     Promise.resolve().then(() => {

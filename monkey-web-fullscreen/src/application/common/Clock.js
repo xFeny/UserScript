@@ -3,23 +3,36 @@
  */
 export default class Clock {
   static state = { start: "start", stop: "stop" };
-  options = { color: null };
+  options = { color: null, clss: "Clock", coexist: false };
 
   constructor(container, options) {
     if (!container) return;
     this.options = Object.assign(this.options, options);
 
-    const { color } = this.options;
     this.container = container;
     this.animationId = null;
     this.isRunning = false;
 
-    if (container.querySelector(".Clock")) this.destroy();
-    this.clock = document.createElement("div");
-    if (color) this.clock.style.setProperty("color", color);
-    this.clock.classList.add("Clock");
-    this.container.prepend(this.clock);
-    this.start(); // 初始化时启动时钟
+    this.initClockElement();
+    this.start();
+  }
+
+  initClockElement() {
+    const { color, clss, coexist } = this.options;
+    if (!coexist && this.isInDOM()) this.destroy();
+    this.element = document.createElement("div");
+    if (color) this.element.style.setProperty("color", color);
+    this.element.classList.add(clss);
+    this.container.prepend(this.element);
+  }
+
+  isInDOM() {
+    return document.contains(this.element);
+  }
+
+  setCustomColor(color) {
+    if (!color) return this.element.style.removeProperty("color");
+    this.element.style.setProperty("color", color);
   }
 
   formatTime(date) {
@@ -32,13 +45,13 @@ export default class Clock {
   update() {
     this.isRunning = true;
     const now = new Date();
-    this.clock.textContent = this.formatTime(now);
+    this.element.textContent = this.formatTime(now);
     this.animationId = requestAnimationFrame(() => this.update());
   }
 
   start() {
     if (this.isRunning) return;
-    this.clock.style.setProperty("display", "unset");
+    this.element.style.setProperty("display", "unset");
     this.update();
   }
 
@@ -49,13 +62,13 @@ export default class Clock {
     }
 
     this.isRunning = false;
-    this.clock?.style.setProperty("display", "none");
+    this.element?.style.setProperty("display", "none");
   }
 
   destroy() {
     this.stop();
-    this.clock?.remove();
+    this.element?.remove();
     this.container = null;
-    this.clock = null;
+    this.element = null;
   }
 }
