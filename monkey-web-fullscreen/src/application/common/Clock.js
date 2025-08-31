@@ -31,8 +31,8 @@ export default class Clock {
   }
 
   setCustomColor(color) {
-    if (!color) return this.element.style.removeProperty("color");
-    this.element.style.setProperty("color", color);
+    if (!color) return this.element?.style.removeProperty("color");
+    this.element?.style.setProperty("color", color);
   }
 
   formatTime(date) {

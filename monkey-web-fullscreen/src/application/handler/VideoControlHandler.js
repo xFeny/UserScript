@@ -276,6 +276,7 @@ export default {
     unsafeWindow.player.requestQuality(80); // 清晰度设置为 1080P
   },
   videoProgress(video) {
+    if (!video) return;
     const shouldDestroy = this.shouldDestroyTimeEl();
     if (shouldDestroy || this.isLive() || video.duration <= 15) return this.removeVideoProgress();
 
