@@ -115,8 +115,10 @@ class TimedStorage extends StorageItem {
  * DISABLE_ZOOM_MOVE  禁用缩放和移动
  * MOVING_DISTANCE    移动距离
  * DISABLE_SCREENSHOT  禁用视频截图
+ * RATE_KEEP_SHOW 启用左上角常显倍速
  * ZOOM_PERCENT   缩放百分比
  * DISABLE_CLOCK  禁用全屏时钟显示
+ * UNFULL_CLOCK   启用非全屏模式下显示时中和播放剩余时间
  * CURR_EPISODE_SELECTOR  通用切换下集—当前播放集数 拾取的CSS选择器
  * REL_EPISODE_SELECTOR   通用切换下集—集数列表中的任意一集 拾取的CSS选择器
  * STORAGE_DAYS   设置播放进度保存天数

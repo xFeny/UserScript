@@ -277,7 +277,7 @@ export default {
   },
   videoProgress(video) {
     const shouldDestroy = this.shouldDestroyTimeEl();
-    if (shouldDestroy || this.isLive()) return this.removeVideoProgress();
+    if (shouldDestroy || this.isLive() || video.duration <= 15) return this.removeVideoProgress();
 
     // 确保只创建一个元素
     if (!this.progressElement) this.progressElement = this.prependElement("__time-progress", Storage.CLOCK_COLOR.get());
@@ -291,7 +291,7 @@ export default {
     this.progressElement = null;
   },
   playbackRateKeepDisplay() {
-    if (!this.player) return;
+    if (!this.player || this.isLive()) return;
 
     // 未启用左上角常显倍速
     const show = Storage.RATE_KEEP_SHOW.get();
