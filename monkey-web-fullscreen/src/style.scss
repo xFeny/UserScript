@@ -410,9 +410,9 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 }
 
 .Clock,
-.__time-progress {
+.__time-progress,
+.__rate-keep-show {
   color: #e0e0e0;
-  right: 40px !important;
   text-shadow: 0 0 2px #000;
   position: absolute !important;
   font-family: Arial, Helvetica, sans-serif !important;
@@ -420,19 +420,6 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   z-index: 2147483647 !important;
   transform: none !important;
   opacity: 1 !important;
-}
-
-/** 全屏时钟样式 **/
-.Clock {
-  top: 15px !important;
-  width: auto !important;
-  height: auto !important;
-  font-size: 20px !important;
-  line-height: 20px !important;
-  font-weight: bold !important;
-  text-align: right !important;
-  letter-spacing: 0.6px !important;
-  background-color: transparent !important;
 
   /** 防止被隐藏 **/
   &::after {
@@ -448,9 +435,24 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   }
 }
 
+/** 全屏时钟样式 **/
+.Clock {
+  top: 15px !important;
+  right: 40px !important;
+  width: auto !important;
+  height: auto !important;
+  font-size: 20px !important;
+  line-height: 20px !important;
+  font-weight: bold !important;
+  text-align: right !important;
+  letter-spacing: 0.6px !important;
+  background-color: transparent !important;
+}
+
 /** 全屏模式下的播放进度 **/
 .__time-progress {
   top: 35px !important;
+  right: 40px !important;
   font-size: 13.5px !important;
   line-height: 13.5px !important;
 
@@ -461,4 +463,13 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     transform: scale(0.75) !important;
     vertical-align: middle !important;
   }
+}
+
+/** 视频左上角此终显示倍速 **/
+.__rate-keep-show {
+  color: #cfcfcf;
+  top: 5px !important;
+  left: 5px !important;
+  font-size: 12px !important;
+  box-shadow: none !important;
 }

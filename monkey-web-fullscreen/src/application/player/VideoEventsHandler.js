@@ -30,6 +30,7 @@ export default {
     App.setCurrentVideo(this);
     App.applyCachedPlayRate(this);
     setTimeout(() => App.applyCachedTime(this), 20); // 确保topWin信息的即时性和可靠性
+    App.playbackRateKeepDisplay();
     App.setBiliQuality();
   },
   pause() {

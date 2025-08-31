@@ -144,6 +144,7 @@ export default {
   DISABLE_ZOOM_MOVE: new StorageItem("DISABLE_ZOOM_MOVE", true, false, (value) => Boolean(value)),
   MOVING_DISTANCE: new StorageItem("MOVING_DISTANCE", 10, false, (value) => parseInt(value, 10)),
   DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
+  RATE_KEEP_SHOW: new StorageItem("RATE_KEEP_SHOW", false, false, (value) => Boolean(value)),
   ZOOM_PERCENT: new StorageItem("ZOOM_PERCENT", 10, false, (value) => parseInt(value, 10)),
   DISABLE_CLOCK: new StorageItem("DISABLE_CLOCK", false, false, (value) => Boolean(value)),
   UNFULL_CLOCK: new StorageItem("UNFULL_CLOCK", false, false, (value) => Boolean(value)),

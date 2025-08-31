@@ -147,7 +147,7 @@ export default {
         Tools.querys(".__menu input, textarea", popup).forEach((ele) => {
           ele.addEventListener("input", function () {
             const isCheckbox = this.type === "checkbox";
-            this.dataset.send && Tools.postMessage(window, { [`disable_${this.name}`]: this.checked });
+            this.dataset.send && Tools.postMessage(window, { [`toggle_${this.name}`]: this.checked });
             setTimeout(() => {
               const host = this.dataset.host;
               const cache = cacheMap[this.name];
@@ -183,7 +183,8 @@ export default {
       { name: "pic", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
       { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, sendMsg: true },
       { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK, sendMsg: false },
-      { name: "always", text: "启用 非全屏显示时间", cache: Storage.UNFULL_CLOCK, sendMsg: true },
+      { name: "clockAlways", text: "启用 非全屏显示时间", cache: Storage.UNFULL_CLOCK, sendMsg: true },
+      { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, sendMsg: true },
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
     ].filter(({ isHidden }) => !isHidden);
 

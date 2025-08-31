@@ -43,6 +43,7 @@ export default {
     video.__duration = video.duration;
     Tools.resetLimitCounter("autoWebFull");
     if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
+    this.removeRateKeepDisplay();
     this.removeVideoProgress();
   },
   deleteCachedPlayRate: () => Storage.CACHED_PLAY_RATE.del(),
@@ -57,7 +58,10 @@ export default {
     // 设置倍速
     window.videoEnhance.setPlaybackRate(this.player, playRate);
     if (show) this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
-    if (Storage.DISABLE_MEMORY_SPEED.get()) return Promise.resolve(); // 禁用记忆
+    this.playbackRateKeepDisplay(); // 倍速始终显示
+
+    // 禁止记忆倍速
+    if (Storage.DISABLE_MEMORY_SPEED.get()) return Promise.resolve();
 
     Storage.CACHED_PLAY_RATE.set(this.player.playbackRate);
     return Promise.resolve();
@@ -276,13 +280,7 @@ export default {
     if (shouldDestroy || this.isLive()) return this.removeVideoProgress();
 
     // 确保只创建一个元素
-    if (!this.progressElement) {
-      const color = Storage.CLOCK_COLOR.get();
-      this.progressElement = document.createElement("div");
-      this.progressElement.classList.add("__time-progress");
-      if (color) this.progressElement.style.setProperty("color", color);
-      video.parentNode.prepend(this.progressElement);
-    }
+    if (!this.progressElement) this.progressElement = this.prependElement("__time-progress", Storage.CLOCK_COLOR.get());
 
     const percent = ((video.currentTime / video.duration) * 100).toFixed(1);
     const timeLeft = this.formatTime(video.duration - video.currentTime);
@@ -291,5 +289,27 @@ export default {
   removeVideoProgress() {
     this.progressElement?.remove();
     this.progressElement = null;
+  },
+  playbackRateKeepDisplay() {
+    if (!this.player) return;
+
+    // 未启用左上角常显倍速
+    const show = Storage.RATE_KEEP_SHOW.get();
+    if (!show) return this.removeRateKeepDisplay();
+
+    // 确保只创建一个元素
+    if (!this.rateKeepElement) this.rateKeepElement = this.prependElement("__rate-keep-show");
+    this.rateKeepElement.textContent = `倍速: ${this.player.playbackRate}`;
+  },
+  removeRateKeepDisplay() {
+    this.rateKeepElement?.remove();
+    this.rateKeepElement = null;
+  },
+  prependElement(clss, color) {
+    const element = document.createElement("div");
+    if (color) element.style.setProperty("color", color);
+    this.player.parentNode.prepend(element);
+    element.classList.add(clss);
+    return element;
   },
 };

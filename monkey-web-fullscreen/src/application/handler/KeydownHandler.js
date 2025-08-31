@@ -35,12 +35,13 @@ export default {
     // Tools.log(location.href, "接收到消息：", data);
     if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
     if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
-    if ("disable_always" in data) setTimeout(() => this.createClock(), 100);
+    if ("toggle_rateKeep" in data) setTimeout(() => this.playbackRateKeepDisplay(), 120);
+    if ("toggle_clockAlways" in data) setTimeout(() => this.createClock(), 120);
     if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
     if (data?.topWin) window.topWin = this.topWin = data.topWin;
-    if (data?.disable_speed) this.resetToDefaultPlayRate();
-    if (data?.disable_memory) this.deleteCachedPlayRate();
-    if (data?.disable_zoom) this.resetVideoTransform();
+    if (data?.toggle_speed) this.resetToDefaultPlayRate();
+    if (data?.toggle_memory) this.deleteCachedPlayRate();
+    if (data?.toggle_zoom) this.resetVideoTransform();
     this.processEvent(data);
   },
   handleKeydown(event, { key, code, isTrusted } = event) {
