@@ -266,6 +266,11 @@ export default {
     this.player?.style?.setProperty(name, value);
     return this;
   },
+  setBiliQuality() {
+    if (!Site.isBili()) return;
+    if (!document.cookie.includes("DedeUserID") || !unsafeWindow.player) return;
+    unsafeWindow.player.requestQuality(80); // 清晰度设置为 1080P
+  },
   videoProgress(video) {
     const shouldDestroy = this.shouldDestroyTimeEl();
     if (shouldDestroy || this.isLive()) return this.removeVideoProgress();
