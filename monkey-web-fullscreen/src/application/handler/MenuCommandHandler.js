@@ -16,6 +16,7 @@ export default {
   isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
   isDisableScreenshot: () => Storage.DISABLE_SCREENSHOT.get(),
   isEnableSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
+  restoreDefaultSetting: () => GM_listValues().forEach((key) => GM_deleteValue(key)) & location.reload(),
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
     this.setupMenuChangeListener();
@@ -33,7 +34,6 @@ export default {
     const isEnable = this.isEnableSiteAuto();
     const siteFun = ({ cache }) => cache.set(host, !cache.get(host));
     const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
-    const resetSetting = () => GM_listValues().forEach((key) => GM_deleteValue(key));
 
     // 菜单配置项
     const configs = [
@@ -41,7 +41,7 @@ export default {
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() },
-      // { title: "重置设置", cache: { name: "RESET" }, isHidden: false, fn: resetSetting },
+      // { title: "还原默认", cache: { name: "RESET" }, isHidden: false, fn: this.restoreDefaultSetting },
     ];
 
     // 注册菜单项
