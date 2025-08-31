@@ -38,12 +38,8 @@ export default {
     if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
     if (data?.topWin) window.topWin = this.topWin = data.topWin;
 
-    // 处理在 “更多设置” 中操作功能切换（启用/禁用）时发来的消息
-    if ("toggle_rateKeep" in data) setTimeout(() => this.playbackRateKeepDisplay(), 120);
-    if ("toggle_clockAlways" in data) setTimeout(() => (this.toggleClock(), this.videoProgress(this.player)), 120);
-    if (data?.toggle_speed) this.resetToDefaultPlayRate();
-    if (data?.toggle_memory) this.deleteCachedPlayRate();
-    if (data?.toggle_zoom) this.resetVideoTransform();
+    // 处理设置消息
+    this.handleSettMessage(data);
 
     // 处理键盘按键消息和继续分发消息
     this.processEvent(data);

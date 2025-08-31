@@ -307,6 +307,7 @@ export default {
     this.rateKeepElement = null;
   },
   prependElement(clss, color) {
+    if (!this.player) return;
     const element = document.createElement("div");
     if (color) element.style.setProperty("color", color);
     this.player.parentNode.prepend(element);

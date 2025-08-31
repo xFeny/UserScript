@@ -147,11 +147,11 @@ export default {
         Tools.querys(".__menu input, textarea", popup).forEach((ele) => {
           ele.addEventListener("input", function () {
             const isCheckbox = this.type === "checkbox";
-            this.dataset.send && Tools.postMessage(window, { [`toggle_${this.name}`]: this.checked });
+            const value = isCheckbox ? this.checked : this.value;
+            this.dataset.send && Tools.postMessage(window, { [`toggle_${this.name}`]: value });
             setTimeout(() => {
               const host = this.dataset.host;
               const cache = cacheMap[this.name];
-              const value = isCheckbox ? this.checked : this.value;
               host ? cache.set(host, value) : cache.set(value);
             }, 100);
           });
@@ -205,13 +205,13 @@ export default {
       { name: "days", text: "播放进度保存天数", cache: Storage.STORAGE_DAYS },
       { name: "percent", text: "缩放百分比", cache: Storage.ZOOM_PERCENT },
       { name: "move", text: "移动距离", cache: Storage.MOVING_DISTANCE },
-      { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR },
+      { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR, sendMsg: true },
       { name: "preset", text: "常用倍速", cache: Storage.PRESET_SPEED },
     ];
 
-    const renderItem = ({ text, name, value }) => `
+    const renderItem = ({ text, sendMsg, name, value }) => `
         <label class="__menu">${text}
-          <input value="${value}" name="${name}" type="text" autocomplete="off"/>
+          <input ${sendMsg ? 'data-send="true"' : ""} value="${value}" name="${name}" type="text" autocomplete="off"/>
         </label>`;
 
     return this.generateCommonItems(configs, renderItem);
