@@ -444,16 +444,20 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   line-height: 20px !important;
   font-weight: bold !important;
   text-align: right !important;
-  letter-spacing: 0.6px !important;
   background-color: transparent !important;
+
+  &.smaller {
+    font-size: 16px !important;
+    line-height: 16px !important;
+  }
 }
 
 /** 全屏模式下的播放进度 **/
 .__time-progress {
   top: 30px !important;
   right: 20px !important;
-  font-size: 13.5px !important;
-  line-height: 13.5px !important;
+  font-size: 12.5px !important;
+  line-height: 12.5px !important;
 
   & b {
     font-size: 12px !important;
@@ -462,11 +466,17 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     transform: scale(0.75) !important;
     vertical-align: middle !important;
   }
+
+  &.smaller {
+    top: 26px !important;
+    transform: scale(0.817) !important;
+    transform-origin: top right;
+  }
 }
 
 /** 视频左上角此终显示倍速 **/
 .__rate-keep-show {
-  color: #cfcfcf;
+  color: #c9c9c9;
   top: 5px !important;
   left: 5px !important;
   font-size: 12px !important;

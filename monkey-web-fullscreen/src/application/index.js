@@ -163,6 +163,7 @@ export default window.App = {
       const shouldDestroy = this.shouldDestroyTimeEl();
       this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
       this.Clock[shouldDestroy ? state : Clock.state.start]?.();
+      this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
     });
   },
   toggleClock() {

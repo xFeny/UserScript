@@ -114,6 +114,7 @@ class TimedStorage extends StorageItem {
  * PRESET_SPEED   预设倍速数组
  * DISABLE_ZOOM_MOVE  禁用缩放和移动
  * MOVING_DISTANCE    移动距离
+ * USE_SMALLER_FONT   启用小字号显示时间
  * DISABLE_SCREENSHOT  禁用视频截图
  * RATE_KEEP_SHOW 启用左上角常显倍速
  * ZOOM_PERCENT   缩放百分比
@@ -145,6 +146,7 @@ export default {
   PRESET_SPEED: new StorageItem("PRESET_SPEED", "1.15,1.45,1.75", false, (value) => value.split(",")),
   DISABLE_ZOOM_MOVE: new StorageItem("DISABLE_ZOOM_MOVE", true, false, (value) => Boolean(value)),
   MOVING_DISTANCE: new StorageItem("MOVING_DISTANCE", 10, false, (value) => parseInt(value, 10)),
+  USE_SMALLER_FONT: new StorageItem("USE_SMALLER_FONT", false, false, (value) => Boolean(value)),
   DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
   RATE_KEEP_SHOW: new StorageItem("RATE_KEEP_SHOW", false, false, (value) => Boolean(value)),
   ZOOM_PERCENT: new StorageItem("ZOOM_PERCENT", 10, false, (value) => parseInt(value, 10)),

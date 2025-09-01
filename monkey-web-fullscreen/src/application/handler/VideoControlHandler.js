@@ -281,7 +281,10 @@ export default {
     if (shouldDestroy || this.isLive() || video.duration <= 15) return this.removeVideoProgress();
 
     // 确保只创建一个元素
-    if (!this.progressElement) this.progressElement = this.prependElement("__time-progress", Storage.CLOCK_COLOR.get());
+    if (!this.progressElement) {
+      this.progressElement = this.prependElement("__time-progress", Storage.CLOCK_COLOR.get());
+      this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
+    }
 
     const percent = ((video.currentTime / video.duration) * 100).toFixed(1);
     const timeLeft = this.formatTime(video.duration - video.currentTime);
