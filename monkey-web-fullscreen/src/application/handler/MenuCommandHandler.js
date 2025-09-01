@@ -16,7 +16,7 @@ export default {
   isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
   isDisableScreenshot: () => Storage.DISABLE_SCREENSHOT.get(),
   isEnableSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
-  restoreDefaultSetting: () => GM_listValues().forEach((key) => GM_deleteValue(key)) & location.reload(),
+  restoreDefaultSetting: () => GM_listValues().forEach((key) => GM_deleteValue(key)),
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
     this.setupMenuChangeListener();
