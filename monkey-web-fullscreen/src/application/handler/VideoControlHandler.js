@@ -179,14 +179,21 @@ export default {
 
     const tsr = this.player.tsr;
     const step = Storage.MOVING_DISTANCE.get();
-    const { x, y, desc } = {
-      ALT_UP: { y: -step, desc: "垂直移动" },
-      ALT_DOWN: { y: step, desc: "垂直移动" },
-      ALT_LEFT: { x: -step, desc: "水平移动" },
-      ALT_RIGHT: { x: step, desc: "水平移动" },
-    }[direction];
+    const dirs = {
+      ALT_UP: { x: 0, y: -step, desc: "向上移动" },
+      ALT_DOWN: { x: 0, y: step, desc: "向下移动" },
+      ALT_LEFT: { y: 0, x: -step, desc: "向左移动" },
+      ALT_RIGHT: { y: 0, x: step, desc: "向右移动" },
+    };
+    let { x, y, x: _x, desc } = dirs[direction];
 
-    ((tx = 0, ty = 0) => ((tsr.moveX += tx), (tsr.moveY += ty)))(x, y);
+    // 修正翻转后的移动方向
+    if (tsr.isMirrored) (x = -x), (_x = x);
+    // 修正旋转后的移动方向
+    ({ 90: () => ((x = y), (y = -_x)), 180: () => ((x = -x), (y = -y)), 270: () => ((x = -y), (y = _x)) })[tsr.rotation]?.();
+
+    // 赋值
+    (tsr.moveX += x), (tsr.moveY += y);
     this.setVideoTsr("--moveX", `${tsr.moveX}px`).setVideoTsr("--moveY", `${tsr.moveY}px`);
     this.showToast(`${desc}：${x ? tsr.moveX : tsr.moveY}px`, Consts.ONE_SEC);
   },
