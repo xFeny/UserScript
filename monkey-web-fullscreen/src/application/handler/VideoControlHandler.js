@@ -17,7 +17,7 @@ export default {
   },
   isLive() {
     if (!this.videoInfo && !this.player) return false;
-    return this.videoInfo.isLive || this.player?.duration > 864e3 || this.isDynamicDuration(this.player);
+    return this.videoInfo.isLive || this.player?.duration === Infinity || this.isDynamicDuration(this.player);
   },
   isDynamicDuration(video) {
     if (!video) return false;
@@ -282,6 +282,10 @@ export default {
     if (!document.cookie.includes("DedeUserID") || !unsafeWindow.player) return;
     unsafeWindow.player.requestQuality(80); // 清晰度设置为 1080P
   },
+  getRealDuration(video) {
+    if (!Site.isQiyi()) return video.duration;
+    return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
+  },
   videoProgress(video) {
     if (!video) return;
     const shouldDestroy = this.shouldDestroyTimeEl();
@@ -293,8 +297,11 @@ export default {
       this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
     }
 
-    const percent = ((video.currentTime / video.duration) * 100).toFixed(1);
-    const timeLeft = this.formatTime(video.duration - video.currentTime);
+    const duration = this.getRealDuration(video);
+    if (duration > 864e2) return this.removeVideoProgress();
+
+    const percent = ((video.currentTime / duration) * 100).toFixed(1);
+    const timeLeft = this.formatTime(duration - video.currentTime);
     this.progressElement.innerHTML = `${timeLeft} / ${percent}<b>%</b>`;
   },
   removeVideoProgress() {
