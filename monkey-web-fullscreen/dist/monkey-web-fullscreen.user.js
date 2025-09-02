@@ -1568,21 +1568,18 @@
       if (data?.toggle_memory) this.deleteCachedPlayRate();
       if (data?.toggle_zoom) this.resetVideoTransform();
     },
-    changeTimeElementDisplay() {
-      setTimeout(() => {
-        this.toggleClock();
-        this.videoProgress(this.player);
-      }, 120);
+    toggleSmallerFont(useSmallerFont) {
+      const clss = "smaller";
+      if (useSmallerFont) return Tools.addCls(this.Clock?.element, clss), Tools.addCls(this.progressElement, clss);
+      Tools.delCls(this.Clock?.element, clss), Tools.delCls(this.progressElement, clss);
     },
     setTimeElementColor(color) {
       const progressStyle = this.progressElement?.style;
       color ? progressStyle?.setProperty("color", color) : progressStyle?.removeProperty("color");
       this.Clock?.setCustomColor(color);
     },
-    toggleSmallerFont(useSmallerFont) {
-      const clss = "smaller";
-      if (useSmallerFont) return Tools.addCls(this.Clock?.element, clss), Tools.addCls(this.progressElement, clss);
-      Tools.delCls(this.Clock?.element, clss), Tools.delCls(this.progressElement, clss);
+    changeTimeElementDisplay() {
+      setTimeout(() => (this.toggleClock(), this.videoProgress(this.player)), 120);
     }
   };
   class URLBlacklist {
