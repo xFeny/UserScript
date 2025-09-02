@@ -14,11 +14,10 @@ export default {
     if (data?.toggle_memory) this.deleteCachedPlayRate();
     if (data?.toggle_zoom) this.resetVideoTransform();
   },
-  changeTimeElementDisplay() {
-    setTimeout(() => {
-      this.toggleClock();
-      this.videoProgress(this.player);
-    }, 120);
+  toggleSmallerFont(useSmallerFont) {
+    const clss = "smaller";
+    if (useSmallerFont) return Tools.addCls(this.Clock?.element, clss), Tools.addCls(this.progressElement, clss);
+    Tools.delCls(this.Clock?.element, clss), Tools.delCls(this.progressElement, clss);
   },
   setTimeElementColor(color) {
     // 设置播放剩余时间颜色
@@ -28,9 +27,7 @@ export default {
     // 设置时钟颜色
     this.Clock?.setCustomColor(color);
   },
-  toggleSmallerFont(useSmallerFont) {
-    const clss = "smaller";
-    if (useSmallerFont) return Tools.addCls(this.Clock?.element, clss), Tools.addCls(this.progressElement, clss);
-    Tools.delCls(this.Clock?.element, clss), Tools.delCls(this.progressElement, clss);
+  changeTimeElementDisplay() {
+    setTimeout(() => (this.toggleClock(), this.videoProgress(this.player)), 120);
   },
 };
