@@ -1,3 +1,4 @@
+import EventTypes from "../common/EventTypes";
 import Storage from "../common/Storage";
 import Tools from "../common/Tools";
 import Site from "../common/Site";
@@ -18,7 +19,7 @@ export default {
     if (Site.isMatched() || this.hasPickerListener) return;
     this.hasPickerListener = true;
     document.body.addEventListener(
-      "click",
+      EventTypes.CLICK,
       (event, { target, ctrlKey, altKey, isTrusted } = event) => {
         if (!ctrlKey || !altKey || !isTrusted || this.isLive()) return;
         if (!Tools.isTopWin()) return Tools.notyf("此页面不能抓取 (•ิ_•ิ)?", true);

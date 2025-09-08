@@ -79,6 +79,7 @@ export default {
       0: () => this.adjustPlayProgress(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
       SPACE: () => this.isOverrideKeyboard() && this.togglePlayPause(this.player),
       SHIFT_P: () => this.togglePictureInPicture(),
+      SHIFT_L: () => this.toggleNativeControls(),
       CTRL_ALT_A: () => this.captureScreenshot(),
       CTRL_Z: () => this.resetVideoTransform(),
       SHIFT_R: () => this.toggleMirrorFlip(),

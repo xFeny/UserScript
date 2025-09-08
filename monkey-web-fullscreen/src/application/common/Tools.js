@@ -1,5 +1,6 @@
 import { Notyf } from "notyf";
 import Consts from "./Consts";
+import EventTypes from "./EventTypes";
 import { querySelector, querySelectorAll } from "./shadow-dom-utils";
 
 export default unsafeWindow.Tools = {
@@ -63,13 +64,16 @@ export default unsafeWindow.Tools = {
     return pointX >= left && pointX <= right && pointY >= top && pointY <= bottom;
   },
   triggerMousemove(element) {
-    if (!element) return;
-    const { centerY } = this.getCenterPoint(element);
-    for (let x = 0; x < element.offsetWidth; x += 10) this.dispatchMousemove(element, x, centerY);
+    const { centerX, centerY } = this.getCenterPoint(element);
+    for (let y = 0; y < centerY; y += 10) this.dispatchMouseEvent(element, EventTypes.MOUSE_MOVE, centerX, y);
   },
-  dispatchMousemove(element, clientX, clientY) {
+  triggerMouseHover(element) {
+    const { centerX, centerY } = this.getCenterPoint(element);
+    this.dispatchMouseEvent(element, EventTypes.MOUSE_OVER, centerX, centerY);
+  },
+  dispatchMouseEvent(element, event, clientX, clientY) {
     const dict = { clientX, clientY, bubbles: true };
-    element.dispatchEvent(new MouseEvent("mousemove", dict));
+    element?.dispatchEvent(new MouseEvent(event, dict));
   },
   createObserver(target, callback, options) {
     const observer = new MutationObserver(callback);

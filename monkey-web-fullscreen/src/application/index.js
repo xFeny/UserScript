@@ -1,6 +1,7 @@
-import Tools from "./common/Tools";
-import Consts from "./common/Consts";
+import EventTypes from "./common/EventTypes";
 import Storage from "./common/Storage";
+import Consts from "./common/Consts";
+import Tools from "./common/Tools";
 import Clock from "./common/Clock";
 import Site from "./common/Site";
 
@@ -116,8 +117,8 @@ export default window.App = {
       if (target instanceof HTMLVideoElement) this.setCurrentVideo(target);
     };
 
-    document.addEventListener("mousemove", (e) => handleMouseEvent(e));
-    document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
+    document.addEventListener(EventTypes.MOUSE_MOVE, (e) => handleMouseEvent(e));
+    document.addEventListener(EventTypes.MOUSE_OVER, (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
   },
   toggleCursor(hide = false) {
     if (this.isNormalSite() || Tools.isFrequent("cursor", undefined, true)) return;
