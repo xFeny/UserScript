@@ -71,9 +71,9 @@ export default unsafeWindow.Tools = {
     const { centerX, centerY } = this.getCenterPoint(element);
     this.dispatchMouseEvent(element, EventTypes.MOUSE_OVER, centerX, centerY);
   },
-  dispatchMouseEvent(element, event, clientX, clientY) {
+  dispatchMouseEvent(element, eventType, clientX, clientY) {
     const dict = { clientX, clientY, bubbles: true };
-    element?.dispatchEvent(new MouseEvent(event, dict));
+    element?.dispatchEvent(new MouseEvent(eventType, dict));
   },
   createObserver(target, callback, options) {
     const observer = new MutationObserver(callback);

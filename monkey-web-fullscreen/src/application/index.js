@@ -161,7 +161,7 @@ export default window.App = {
       if (!this.player?.parentNode) return;
 
       // 全屏或非全屏显示时间
-      const shouldDestroy = this.shouldDestroyTimeEl();
+      const shouldDestroy = this.shouldDestroyTimeElement();
       this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
       this.Clock[shouldDestroy ? state : Clock.state.start]?.();
       this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
@@ -169,14 +169,14 @@ export default window.App = {
   },
   toggleClock() {
     // 隐藏时钟
-    if (this.shouldDestroyTimeEl()) return this.Clock?.destroy();
+    if (this.shouldDestroyTimeElement()) return this.Clock?.destroy();
 
     // 显示时钟
     const state = Clock.state.start;
     this.Clock?.isInDOM() ? this.Clock[state]() : this.createClock(state);
     this.Clock?.setCustomColor(Storage.CLOCK_COLOR.get());
   },
-  shouldDestroyTimeEl() {
+  shouldDestroyTimeElement() {
     const isFull = this.isFullscreen;
     return (isFull && Storage.DISABLE_CLOCK.get()) || (!isFull && !Storage.UNFULL_CLOCK.get());
   },

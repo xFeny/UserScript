@@ -22,7 +22,7 @@ export default {
   isDynamicDuration(video) {
     if (!video) return false;
     if (video.__isDynamic) return true;
-    if (Tools.isOverLimit("isDynamic", 20)) return false;
+    if (Tools.isOverLimit("isDynamic", 10)) return false;
 
     // 记录默认时长，用于判断是否为动态时长
     if (!video.__duration) video.__duration = video.duration;
@@ -291,8 +291,10 @@ export default {
     return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
   },
   videoProgress(video) {
-    if (!video) return;
-    const shouldDestroy = this.shouldDestroyTimeEl();
+    if (!video || Tools.isFrequent("progress", Consts.HALF_SEC, true)) return;
+
+    // 是否需要销毁
+    const shouldDestroy = this.shouldDestroyTimeElement();
     if (shouldDestroy || this.isLive() || video.duration <= 15) return this.removeVideoProgress();
 
     // 确保只创建一个元素
