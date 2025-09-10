@@ -415,6 +415,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   color: #e0e0e0;
   text-shadow: 0 0 2px #000;
   position: absolute !important;
+  pointer-events: none !important;
   font-family: Arial, Helvetica, sans-serif !important;
   /** 防止被隐藏 **/
   z-index: 2147483647 !important;

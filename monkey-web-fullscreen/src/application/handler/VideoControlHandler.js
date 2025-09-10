@@ -22,7 +22,7 @@ export default {
   isDynamicDuration(video) {
     if (!video) return false;
     if (video.__isDynamic) return true;
-    if (Tools.isOverLimit("isDynamic", 10)) return false;
+    if (video.currentTime > 5 || Tools.isOverLimit("isDynamic", 10)) return false;
 
     // 记录默认时长，用于判断是否为动态时长
     if (!video.__duration) video.__duration = video.duration;
@@ -120,7 +120,7 @@ export default {
     Storage.PLAY_TIME.del(this.getCacheTimeKey(video));
   },
   getCacheTimeKey(video) {
-    return `${this.topWin.urlHash}_${Math.floor(video.duration)}`;
+    return `${this.topWin.urlHash}_${Math.floor(video.__duration ?? video.duration)}`;
   },
   clearMultiVideoCacheTime() {
     Promise.resolve().then(() => {
@@ -297,9 +297,12 @@ export default {
     const shouldDestroy = this.shouldDestroyTimeElement();
     if (shouldDestroy || this.isLive() || video.duration <= 15) return this.removeVideoProgress();
 
-    // 确保只创建一个元素
     if (!this.progressElement) {
       this.progressElement = this.prependElement("__time-progress", Storage.CLOCK_COLOR.get());
+      this.progressTextNode = document.createTextNode("00:00");
+      const percentElement = document.createElement("b");
+      percentElement.textContent = "%";
+      this.progressElement.append(this.progressTextNode, percentElement);
       this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
     }
 
@@ -308,10 +311,11 @@ export default {
 
     const percent = ((video.currentTime / duration) * 100).toFixed(1);
     const timeLeft = this.formatTime(duration - video.currentTime);
-    this.progressElement.innerHTML = `${timeLeft} / ${percent}<b>%</b>`;
+    this.progressTextNode.textContent = `${timeLeft} / ${percent}`;
   },
   removeVideoProgress() {
     this.progressElement?.remove();
+    this.progressTextNode = null;
     this.progressElement = null;
   },
   playbackRateKeepDisplay() {
