@@ -10,6 +10,7 @@ import Keyboard from "../common/Keyboard";
  */
 export default {
   autoNextEpisode(video) {
+    if (video.duration < 300) return;
     if (video.hasTriedAutoNext) return;
     if (!Storage.ENABLE_AUTO_NEXT_EPISODE.get()) return;
     if (Tools.isFrequent("autoNext", Consts.THREE_SEC, true)) return;

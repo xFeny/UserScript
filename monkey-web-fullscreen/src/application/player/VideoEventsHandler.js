@@ -32,6 +32,7 @@ export default {
     setTimeout(() => App.applyCachedTime(this), 20); // 确保topWin信息的即时性和可靠性
     App.playbackRateKeepDisplay();
     App.setBiliQuality();
+    App.createClock();
   },
   pause() {
     // https://www.mcydh.com、https://dick.xfani.com

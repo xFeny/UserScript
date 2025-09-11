@@ -66,7 +66,6 @@ export default window.App = {
     this.setVideoInfo(video);
     this.setupVideoObserver(video);
     window.videoEnhance.enhanced(video);
-    this.createClock();
   },
   setVideoInfo(video) {
     const isLive = Object.is(video.duration, Infinity);
@@ -168,10 +167,8 @@ export default window.App = {
     });
   },
   toggleClock() {
-    // 隐藏时钟
-    if (this.shouldDestroyTimeElement()) return this.Clock?.destroy();
+    if (this.shouldDestroyTimeElement()) return this.Clock?.stop();
 
-    // 显示时钟
     const state = Clock.state.start;
     this.Clock?.isInDOM() ? this.Clock[state]() : this.createClock(state);
     this.Clock?.setCustomColor(Storage.CLOCK_COLOR.get());
