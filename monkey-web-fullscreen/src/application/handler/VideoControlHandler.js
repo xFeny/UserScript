@@ -22,7 +22,7 @@ export default {
   isDynamicDuration(video) {
     if (!video) return false;
     if (video.__isDynamic) return true;
-    if (video.currentTime > 6 || Tools.isOverLimit("isDynamic", 10)) return false;
+    if (video.currentTime > 5 || Tools.isOverLimit("isDynamic", 10)) return false;
 
     // 记录默认时长，用于判断是否为动态时长
     if (!video.__duration) video.__duration = video.duration;
@@ -40,11 +40,20 @@ export default {
     delete video.__isDynamic;
     delete video.hasTriedAutoNext;
     delete video.hasApplyCachedRate;
+    delete video.hasInitPlaySettings;
     video.__duration = video.duration;
     Tools.resetLimitCounter("autoWebFull");
     if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
     this.removeRateKeepDisplay();
     this.removeVideoProgress();
+  },
+  initPlaySettings(video) {
+    video.hasInitPlaySettings = true;
+    setTimeout(() => this.applyCachedTime(video), 50); // 确保topWin信息的即时性和可靠性
+    this.applyCachedPlayRate(video);
+    this.playbackRateKeepDisplay();
+    this.setBiliQuality();
+    this.createClock();
   },
   deleteCachedPlayRate: () => Storage.CACHED_PLAY_RATE.del(),
   getRemainingTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
@@ -292,10 +301,7 @@ export default {
   },
   videoProgress(video) {
     if (!video || Tools.isFrequent("progress", Consts.HALF_SEC, true)) return;
-
-    // 是否需要销毁
-    const shouldDestroy = this.shouldDestroyTimeElement();
-    if (shouldDestroy || this.isLive() || video.duration <= 15) return this.removeVideoProgress();
+    if (video.duration <= 30 || this.isLive() || this.shouldDestroyTimeElement()) return this.removeVideoProgress();
 
     if (!this.progressElement) {
       this.progressElement = this.prependElement("__time-progress", Storage.CLOCK_COLOR.get());

@@ -14,6 +14,7 @@ export default {
   },
   timeupdate() {
     if (isNaN(this.duration)) return;
+    if (!this.hasInitPlaySettings) App.initPlaySettings(this);
     App.autoWebFullscreen(this);
     App.autoNextEpisode(this);
     App.cachePlayTime(this);
@@ -28,11 +29,7 @@ export default {
     this.isEnded = false;
     if (this.duration <= 7) return; // 超短的视频不操作
     App.setCurrentVideo(this);
-    App.applyCachedPlayRate(this);
-    setTimeout(() => App.applyCachedTime(this), 20); // 确保topWin信息的即时性和可靠性
-    App.playbackRateKeepDisplay();
-    App.setBiliQuality();
-    App.createClock();
+    App.initPlaySettings(this);
   },
   pause() {
     // https://www.mcydh.com、https://dick.xfani.com
