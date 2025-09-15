@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.3.1
+// @version      3.3.2
 // @author       Feny
 // @description  通用自动网页全屏，默认支持哔哩哔哩（含直播）、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持倍速调节、视频截图、画面镜像翻转、缩放与移动、记忆播放进度等功能；配备通用下集切换功能，适配所有视频网站剧集，实现一键续播。
 // @license      GPL-3.0-only
@@ -55,7 +55,7 @@
 // @note         *://*/*
 // ==/UserScript==
 
-(o=>{const t=document.createElement("style");t.textContent=o,document.addEventListener("shadow-attached",e=>{requestAnimationFrame(()=>e.detail.shadowRoot.prepend(t.cloneNode(!0)))}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(o)})(' @charset "UTF-8";.monkey-toast{line-height:normal;left:10px!important;bottom:16%!important;color:#fff!important;font-size:13px!important;padding:6px 10px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.monkey-toast span{display:inline!important}::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen] .vjs-control-bar,[part*=webFullscreen] .ytp-chrome-bottom,[part*=webFullscreen] .ytp-chapter-hover-container{left:0!important;width:100vw!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important;transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc{cursor:none!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-tabs-header{display:flex;position:relative;margin-bottom:15px;font-size:15px!important;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;cursor:pointer;color:#64748b;font-weight:500;text-align:center;padding:12px 10px;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;visibility:visible;background-color:#3b82f6;border-radius:2px 2px 0 0}.monkey-web-fullscreen .swal2-tab:hover:not(.active){color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%;padding:0 5px;min-height:325px}.monkey-web-fullscreen .swal2-tab-panel{display:none}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 5px!important;padding:0 0 5px!important;float:none!important;height:30px!important;color:#666!important;display:flex!important;font-size:14px!important;line-height:30px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text],.monkey-web-fullscreen .__menu input[type=number]{color:#333;border-radius:3px;border:1px solid #cbd5e1!important;text-align:center!important;line-height:12px!important;font-size:12px!important;padding:0 3px!important;height:23px!important;width:75px!important}.monkey-web-fullscreen .__menu input[type=text]:focus,.monkey-web-fullscreen .__menu input[type=number]:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:38px!important;height:18px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:12px!important;height:12px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen .others-sett{margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f5f5f5}.monkey-web-fullscreen .others-sett:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .others-sett p{margin-bottom:3px;color:#333!important;font-size:13px!important;text-align:left!important}.monkey-web-fullscreen .others-sett textarea{color:#333;border-radius:3px;width:100%!important;padding:5px!important;resize:none!important;height:90px!important;font-size:12px!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen .others-sett textarea:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen .others-sett textarea[name=customFit]{height:40px!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th{font-weight:600!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:2147483647!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,#buffer,#install,#a1 #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,[id*=player] #tips,#player #loading-box,.dplayer-comment-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}}.Clock,.__time-progress,.__rate-keep-show{color:#e0e0e0;text-shadow:0 0 2px #000;position:absolute!important;font-family:Arial,Helvetica,sans-serif!important;z-index:2147483647!important;opacity:1!important}.Clock:after,.__time-progress:after,.__rate-keep-show:after{top:50%!important;left:50%!important;content:"-"!important;position:fixed!important;text-shadow:none!important;color:transparent!important;pointer-events:none!important;display:inline-block!important;background-color:transparent!important}.Clock{top:10px!important;right:20px!important;width:auto!important;height:auto!important;font-size:20px!important;line-height:20px!important;font-weight:700!important;text-align:right!important;background-color:transparent!important}.Clock.smaller{font-size:16px!important;line-height:16px!important}.__time-progress{top:30px!important;right:20px!important;font-size:12.5px!important;line-height:12.5px!important}.__time-progress b{font-size:12px!important;line-height:12px!important;display:inline-block!important;transform:scale(.75)!important;vertical-align:middle!important}.__time-progress.smaller{top:26px!important;transform:scale(.817)!important;transform-origin:top right}.__rate-keep-show{color:#c9c9c9;top:5px!important;left:5px!important;font-size:12px!important;box-shadow:none!important;display:inline-block!important;transform:scale(.917)!important;transform-origin:top} ');
+(o=>{const t=document.createElement("style");t.textContent=o,document.addEventListener("shadow-attached",e=>{requestAnimationFrame(()=>e.detail.shadowRoot.prepend(t.cloneNode(!0)))}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(o)})(' @charset "UTF-8";.monkey-toast{line-height:normal;left:10px!important;bottom:16%!important;color:#fff!important;font-size:13px!important;padding:6px 10px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.monkey-toast span{display:inline!important}::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen] .vjs-control-bar,[part*=webFullscreen] .ytp-chrome-bottom,[part*=webFullscreen] .ytp-chapter-hover-container{left:0!important;width:100vw!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important;transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc{cursor:none!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-tabs-header{display:flex;position:relative;margin-bottom:15px;font-size:15px!important;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;cursor:pointer;color:#64748b;font-weight:500;text-align:center;padding:12px 10px;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;visibility:visible;background-color:#3b82f6;border-radius:2px 2px 0 0}.monkey-web-fullscreen .swal2-tab:hover:not(.active){color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%;padding:0 5px;min-height:325px}.monkey-web-fullscreen .swal2-tab-panel{display:none}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 5px!important;padding:0 0 5px!important;float:none!important;height:30px!important;color:#666!important;display:flex!important;font-size:14px!important;line-height:30px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text],.monkey-web-fullscreen .__menu input[type=number]{color:#333;border-radius:3px;border:1px solid #cbd5e1!important;text-align:center!important;line-height:12px!important;font-size:12px!important;padding:0 3px!important;height:23px!important;width:75px!important}.monkey-web-fullscreen .__menu input[type=text]:focus,.monkey-web-fullscreen .__menu input[type=number]:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:38px!important;height:18px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:12px!important;height:12px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen .others-sett{margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f5f5f5}.monkey-web-fullscreen .others-sett:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .others-sett p{margin-bottom:3px;color:#333!important;font-size:13px!important;text-align:left!important}.monkey-web-fullscreen .others-sett textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;height:70px!important;font-size:12px!important;padding:3px 5px!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen .others-sett textarea:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th{font-weight:600!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:2147483647!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,#buffer,#install,#a1 #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,[id*=player] #tips,#player #loading-box,.dplayer-comment-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}}.Clock,.__time-progress,.__rate-keep-show{color:#e0e0e0;text-shadow:0 0 2px #000;position:absolute!important;pointer-events:none!important;font-family:Arial,Helvetica,sans-serif!important;z-index:2147483647!important;opacity:1!important}.Clock:after,.__time-progress:after,.__rate-keep-show:after{top:50%!important;left:50%!important;content:"-"!important;position:fixed!important;text-shadow:none!important;color:transparent!important;pointer-events:none!important;display:inline-block!important;background-color:transparent!important}.Clock{top:10px!important;right:20px!important;width:auto!important;height:auto!important;font-size:20px!important;line-height:20px!important;font-weight:700!important;text-align:right!important;background-color:transparent!important}.Clock.smaller{font-size:16px!important;line-height:16px!important}.__time-progress{top:30px!important;right:20px!important;font-size:12.5px!important;line-height:12.5px!important}.__time-progress b{font-size:12px!important;line-height:12px!important;display:inline-block!important;transform:scale(.75)!important;vertical-align:middle!important}.__time-progress.smaller{top:26px!important;transform:scale(.817)!important;transform-origin:top right}.__rate-keep-show{color:#c9c9c9;top:5px!important;left:5px!important;font-size:12px!important;box-shadow:none!important;display:inline-block!important;transform:scale(.917)!important;transform-origin:top} ');
 
 (async function (notyf, Swal) {
   'use strict';
@@ -63,69 +63,11 @@
   var __defProp = Object.defineProperty;
   var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
   var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-  const Consts = Object.freeze({
-    EMPTY: "",
-    MIN_ZOOM: 25,
-    MAX_ZOOM: 400,
-    HALF_SEC: 500,
-    ONE_SEC: 1e3,
-    THREE_SEC: 3e3,
-    DEF_PLAY_RATE: 1,
-    MAX_PLAY_RATE: 16,
-    MIN_PLAY_RATE: 0.0625,
-    webFull: "webFullscreen",
-    MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN"
-  });
-  function isElement(node) {
-    return node instanceof Element;
-  }
-  function isDocument(node) {
-    return node instanceof Document;
-  }
-  function* getShadowRoots(node, deep = false) {
-    if (!node || !isElement(node) && !isDocument(node)) return;
-    if (isElement(node) && node._shadowRoot) {
-      yield node._shadowRoot;
-    }
-    const doc = isDocument(node) ? node : node.getRootNode({ composed: true });
-    if (!doc.createTreeWalker) return;
-    let currentNode;
-    const toWalk = [node];
-    while (currentNode = toWalk.pop()) {
-      const walker = doc.createTreeWalker(currentNode, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_DOCUMENT_FRAGMENT, {
-        acceptNode: (child) => isElement(child) && child._shadowRoot ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
-      });
-      let walkerNode = walker.nextNode();
-      while (walkerNode) {
-        if (isElement(walkerNode) && walkerNode._shadowRoot) {
-          if (deep) {
-            toWalk.push(walkerNode._shadowRoot);
-          }
-          yield walkerNode._shadowRoot;
-        }
-        walkerNode = walker.nextNode();
-      }
-    }
-    return;
-  }
-  function querySelector(selector, subject = document) {
-    const immediate = subject.querySelector(selector);
-    if (immediate) return immediate;
-    const shadowRoots = [...getShadowRoots(subject, true)];
-    for (const root of shadowRoots) {
-      const match = root.querySelector(selector);
-      if (match) return match;
-    }
-    return null;
-  }
-  function querySelectorAll(selector, subject = document) {
-    const results = [...subject.querySelectorAll(selector)];
-    const shadowRoots = [...getShadowRoots(subject, true)];
-    for (const root of shadowRoots) {
-      results.push(...root.querySelectorAll(selector));
-    }
-    return results;
-  }
+  const EventTypes = {
+    CLICK: "click",
+    MOUSE_MOVE: "mousemove",
+    MOUSE_OVER: "mouseover"
+  };
   var _GM = /* @__PURE__ */ (() => typeof GM != "undefined" ? GM : void 0)();
   var _GM_addValueChangeListener = /* @__PURE__ */ (() => typeof GM_addValueChangeListener != "undefined" ? GM_addValueChangeListener : void 0)();
   var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
@@ -137,162 +79,6 @@
   var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
   var _GM_unregisterMenuCommand = /* @__PURE__ */ (() => typeof GM_unregisterMenuCommand != "undefined" ? GM_unregisterMenuCommand : void 0)();
   var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
-  const Tools = _unsafeWindow.Tools = {
-    noNumber: (str) => !/\d/.test(str),
-    isTopWin: () => window.top === window,
-    isNumber: (str) => /^[0-9]$/.test(str),
-    scrollTop: (top2) => window.scrollTo({ top: top2 }),
-    alert: (...data) => window.alert(data.join(" ")),
-    getElementRect: (el) => el?.getBoundingClientRect(),
-    isMultiVideo: () => querySelectorAll("video").length > 1,
-    query: (selector, context) => querySelector(selector, context),
-    querys: (selector, context) => querySelectorAll(selector, context),
-    triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
-    toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, Consts.EMPTY),
-    postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
-    isVisible: (el) => !!(el?.offsetWidth || el?.offsetHeight || el?.getClientRects().length),
-    getNumbers: (str) => typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : [],
-    log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
-    getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
-    preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
-    hasCls: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
-    delCls: (el, ...classes) => el?.classList.remove(...classes),
-    addCls: (el, ...classes) => el?.classList.add(...classes),
-    notyf(msg, isError = false) {
-      const notyf$1 = new notyf.Notyf({ duration: Consts.THREE_SEC, position: { x: "center", y: "top" } });
-      isError ? notyf$1.error(msg) : notyf$1.success(msg);
-      return false;
-    },
-    sendToIFrames(data) {
-      this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
-    },
-    freqTimes: /* @__PURE__ */ new Map(),
-    isFrequent(key = "default", gap = 300, isThrottle = false) {
-      const now = Date.now();
-      const last = this.freqTimes.get(key) ?? 0;
-      const delta = now - last;
-      if (!isThrottle) return this.freqTimes.set(key, now) && delta < gap;
-      return delta >= gap ? this.freqTimes.set(key, now) && false : true;
-    },
-    limitCountMap: /* @__PURE__ */ new Map(),
-    isOverLimit(key = "default", maxCount = 5) {
-      const count = this.limitCountMap.get(key) ?? 0;
-      if (count < maxCount) return this.limitCountMap.set(key, count + 1) && false;
-      return true;
-    },
-    resetLimitCounter(key = "default") {
-      this.limitCountMap.set(key, 0);
-    },
-    getCenterPoint(element) {
-      if (!element) return { centerX: 0, centerY: 0 };
-      const { top: top2, left, width, height } = this.getElementRect(element);
-      return { centerX: left + width / 2, centerY: top2 + height / 2 };
-    },
-    pointInElement(pointX, pointY, element) {
-      if (!element) return false;
-      const { top: top2, left, right, bottom } = this.getElementRect(element);
-      return pointX >= left && pointX <= right && pointY >= top2 && pointY <= bottom;
-    },
-    triggerMousemove(element) {
-      if (!element) return;
-      const { centerY } = this.getCenterPoint(element);
-      for (let x = 0; x < element.offsetWidth; x += 10) this.dispatchMousemove(element, x, centerY);
-    },
-    dispatchMousemove(element, clientX, clientY) {
-      const dict = { clientX, clientY, bubbles: true };
-      element.dispatchEvent(new MouseEvent("mousemove", dict));
-    },
-    createObserver(target, callback, options) {
-      const observer = new MutationObserver(callback);
-      target = target instanceof Element ? target : this.query(target);
-      observer.observe(target, { childList: true, subtree: true, ...options });
-      return observer;
-    },
-    closest(element, selector, maxLevel = 3) {
-      for (let level = 0; element && level < maxLevel; level++, element = element.parentElement) {
-        if (element.matches(selector)) return element;
-      }
-      return null;
-    },
-    findParentWithChild(element, selector, maxLevel = 8) {
-      for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
-        if (this.query(selector, parent)) return parent;
-      }
-      return null;
-    },
-    findSibling(element, selector, maxLevel = 3) {
-      for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
-        for (const child of parent.children) {
-          if (child !== element && child.matches(selector)) return child;
-        }
-      }
-      return null;
-    },
-    getParentChain(element, nth = false) {
-      const parents = [];
-      for (let current = element; current && current !== document.body; current = current.parentElement) {
-        parents.unshift(this.getTagInfo(current, nth));
-        if (current.id && this.noNumber(current.id)) break;
-      }
-      return parents.join(" > ");
-    },
-    getTagInfo(ele, nth = false) {
-      if (ele.id && this.noNumber(ele.id) && !/[\u4e00-\u9fa5]/.test(ele.id)) return `#${ele.id}`;
-      let selector = ele.tagName.toLowerCase();
-      const classes = Array.from(ele.classList);
-      if (classes.length) {
-        const validClasses = classes.filter(this.noNumber, this);
-        selector += /[:[\]]/.test(ele.className) ? `[class="${ele.className}"]` : validClasses.length ? `.${validClasses.join(".")}` : Consts.EMPTY;
-      }
-      if (nth && ele.parentElement) {
-        const siblings = Array.from(ele.parentElement.children).filter((sib) => sib.tagName === ele.tagName);
-        const index = siblings.indexOf(ele);
-        if (index > 0) selector += `:nth-of-type(${index + 1})`;
-      }
-      return selector;
-    },
-    getParents(element, withSelf = false, maxLevel = Infinity) {
-      const parents = withSelf && element ? [element] : [];
-      for (let current = element, level = 0; current && level < maxLevel; level++) {
-        current = current.parentNode instanceof ShadowRoot ? current?.getRootNode()?.host : current?.parentElement;
-        current && parents.unshift(current);
-      }
-      return parents;
-    },
-    hashCode(str) {
-      let hash = 2166136261;
-      for (let i = 0; i < str.length; i++) {
-        hash ^= str.charCodeAt(i);
-        hash = hash * 16777619 >>> 0;
-      }
-      return hash;
-    },
-    /**
-     * 通过 XPath 查找元素，支持文本内容或属性值匹配
-     * @param {'text'|'attr'} mode - 匹配模式：'text' 匹配文本内容，'attr' 匹配任意属性
-     * @param {...string|string[]} texts - 要匹配的文本（可嵌套数组）
-     * @returns {Element[]} 匹配的元素数组
-     */
-    findByText(mode, ...texts) {
-      const flatTexts = texts.flat();
-      const expr = Object.is(mode, "text") ? `.//*[${flatTexts.map((t) => `contains(text(), '${t.replace(/'/g, "\\'")}')`).join(" or ")}]` : `.//*[${flatTexts.map((t) => `@*[contains(., '${t.replace(/'/g, "\\'")}')]`).join(" or ")}]`;
-      const nodes = document.evaluate(expr, document.body, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-      return Array.from({ length: nodes.snapshotLength }, (_, i) => nodes.snapshotItem(i)).filter((el) => !el.matches("script"));
-    },
-    setPart(node, value) {
-      const parts = node?.getAttribute("part")?.split(/\s+/) ?? [];
-      node?.setAttribute("part", [.../* @__PURE__ */ new Set([...parts, value])].join(" ").trim());
-    },
-    delPart(node, value) {
-      const parts = (node?.getAttribute("part")?.split(/\s+/) ?? []).filter((v) => v !== value);
-      node?.setAttribute("part", parts.join(" ").trim());
-    },
-    safeHTML(htmlStr) {
-      if (!window.trustedTypes?.createPolicy) return htmlStr;
-      const policy = trustedTypes.defaultPolicy ?? trustedTypes.createPolicy("default", { createHTML: (input) => input });
-      return policy.createHTML(htmlStr);
-    }
-  };
   class StorageItem {
     constructor(name, defaultValue, useLocalStorage = false, valueParser = null) {
       this.name = name;
@@ -400,6 +186,228 @@
     CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", "", false),
     CLOCK_COLOR: new StorageItem("CLOCK_COLOR", "#e0e0e0", false),
     PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat)
+  };
+  const Consts = Object.freeze({
+    EMPTY: "",
+    MIN_ZOOM: 25,
+    MAX_ZOOM: 400,
+    HALF_SEC: 500,
+    ONE_SEC: 1e3,
+    THREE_SEC: 3e3,
+    DEF_PLAY_RATE: 1,
+    MAX_PLAY_RATE: 16,
+    MIN_PLAY_RATE: 0.0625,
+    webFull: "webFullscreen",
+    MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN"
+  });
+  function isElement(node) {
+    return node instanceof Element;
+  }
+  function isDocument(node) {
+    return node instanceof Document;
+  }
+  function* getShadowRoots(node, deep = false) {
+    if (!node || !isElement(node) && !isDocument(node)) return;
+    if (isElement(node) && node._shadowRoot) {
+      yield node._shadowRoot;
+    }
+    const doc = isDocument(node) ? node : node.getRootNode({ composed: true });
+    if (!doc.createTreeWalker) return;
+    let currentNode;
+    const toWalk = [node];
+    while (currentNode = toWalk.pop()) {
+      const walker = doc.createTreeWalker(currentNode, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_DOCUMENT_FRAGMENT, {
+        acceptNode: (child) => isElement(child) && child._shadowRoot ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+      });
+      let walkerNode = walker.nextNode();
+      while (walkerNode) {
+        if (isElement(walkerNode) && walkerNode._shadowRoot) {
+          if (deep) {
+            toWalk.push(walkerNode._shadowRoot);
+          }
+          yield walkerNode._shadowRoot;
+        }
+        walkerNode = walker.nextNode();
+      }
+    }
+    return;
+  }
+  function querySelector(selector, subject = document) {
+    const immediate = subject.querySelector(selector);
+    if (immediate) return immediate;
+    const shadowRoots = [...getShadowRoots(subject, true)];
+    for (const root of shadowRoots) {
+      const match = root.querySelector(selector);
+      if (match) return match;
+    }
+    return null;
+  }
+  function querySelectorAll(selector, subject = document) {
+    const results = [...subject.querySelectorAll(selector)];
+    const shadowRoots = [...getShadowRoots(subject, true)];
+    for (const root of shadowRoots) {
+      results.push(...root.querySelectorAll(selector));
+    }
+    return results;
+  }
+  const Tools = _unsafeWindow.Tools = {
+    noNumber: (str) => !/\d/.test(str),
+    isTopWin: () => window.top === window,
+    isNumber: (str) => /^[0-9]$/.test(str),
+    scrollTop: (top2) => window.scrollTo({ top: top2 }),
+    alert: (...data) => window.alert(data.join(" ")),
+    getElementRect: (el) => el?.getBoundingClientRect(),
+    isMultiVideo: () => querySelectorAll("video").length > 1,
+    query: (selector, context) => querySelector(selector, context),
+    querys: (selector, context) => querySelectorAll(selector, context),
+    triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
+    toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, Consts.EMPTY),
+    postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
+    isVisible: (el) => !!(el?.offsetWidth || el?.offsetHeight || el?.getClientRects().length),
+    getNumbers: (str) => typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : [],
+    log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
+    getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
+    preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
+    hasCls: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
+    delCls: (el, ...classes) => el?.classList.remove(...classes),
+    addCls: (el, ...classes) => el?.classList.add(...classes),
+    notyf(msg, isError = false) {
+      const notyf$1 = new notyf.Notyf({ duration: Consts.THREE_SEC, position: { x: "center", y: "top" } });
+      isError ? notyf$1.error(msg) : notyf$1.success(msg);
+      return false;
+    },
+    sendToIFrames(data) {
+      this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
+    },
+    freqTimes: /* @__PURE__ */ new Map(),
+    isFrequent(key = "default", gap = 300, isThrottle = false) {
+      const now = Date.now();
+      const last = this.freqTimes.get(key) ?? 0;
+      const delta = now - last;
+      if (!isThrottle) return this.freqTimes.set(key, now) && delta < gap;
+      return delta >= gap ? this.freqTimes.set(key, now) && false : true;
+    },
+    limitCountMap: /* @__PURE__ */ new Map(),
+    isOverLimit(key = "default", maxCount = 5) {
+      const count = this.limitCountMap.get(key) ?? 0;
+      if (count < maxCount) return this.limitCountMap.set(key, count + 1) && false;
+      return true;
+    },
+    resetLimitCounter(key = "default") {
+      this.limitCountMap.set(key, 0);
+    },
+    getCenterPoint(element) {
+      if (!element) return { centerX: 0, centerY: 0 };
+      const { top: top2, left, width, height } = this.getElementRect(element);
+      return { centerX: left + width / 2, centerY: top2 + height / 2 };
+    },
+    pointInElement(pointX, pointY, element) {
+      if (!element) return false;
+      const { top: top2, left, right, bottom } = this.getElementRect(element);
+      return pointX >= left && pointX <= right && pointY >= top2 && pointY <= bottom;
+    },
+    triggerMousemove(element) {
+      const { centerX, centerY } = this.getCenterPoint(element);
+      for (let y = 0; y < centerY; y += 10) this.dispatchMouseEvent(element, EventTypes.MOUSE_MOVE, centerX, y);
+    },
+    triggerMouseHover(element) {
+      const { centerX, centerY } = this.getCenterPoint(element);
+      this.dispatchMouseEvent(element, EventTypes.MOUSE_OVER, centerX, centerY);
+    },
+    dispatchMouseEvent(element, eventType, clientX, clientY) {
+      const dict = { clientX, clientY, bubbles: true };
+      element?.dispatchEvent(new MouseEvent(eventType, dict));
+    },
+    createObserver(target, callback, options) {
+      const observer = new MutationObserver(callback);
+      target = target instanceof Element ? target : this.query(target);
+      observer.observe(target, { childList: true, subtree: true, ...options });
+      return observer;
+    },
+    closest(element, selector, maxLevel = 3) {
+      for (let level = 0; element && level < maxLevel; level++, element = element.parentElement) {
+        if (element.matches(selector)) return element;
+      }
+      return null;
+    },
+    findParentWithChild(element, selector, maxLevel = 8) {
+      for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
+        if (this.query(selector, parent)) return parent;
+      }
+      return null;
+    },
+    findSibling(element, selector, maxLevel = 3) {
+      for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
+        for (const child of parent.children) {
+          if (child !== element && child.matches(selector)) return child;
+        }
+      }
+      return null;
+    },
+    getParentChain(element, nth = false) {
+      const parents = [];
+      for (let current = element; current && current !== document.body; current = current.parentElement) {
+        parents.unshift(this.getTagInfo(current, nth));
+        if (current.id && this.noNumber(current.id)) break;
+      }
+      return parents.join(" > ");
+    },
+    getTagInfo(ele, nth = false) {
+      if (ele.id && this.noNumber(ele.id) && !/[\u4e00-\u9fa5]/.test(ele.id)) return `#${ele.id}`;
+      let selector = ele.tagName.toLowerCase();
+      const classes = Array.from(ele.classList);
+      if (classes.length) {
+        const validClasses = classes.filter(this.noNumber, this);
+        selector += /[:[\]]/.test(ele.className) ? `[class="${ele.className}"]` : validClasses.length ? `.${validClasses.join(".")}` : Consts.EMPTY;
+      }
+      if (nth && ele.parentElement) {
+        const siblings = Array.from(ele.parentElement.children).filter((sib) => sib.tagName === ele.tagName);
+        const index = siblings.indexOf(ele);
+        if (index > 0) selector += `:nth-of-type(${index + 1})`;
+      }
+      return selector;
+    },
+    getParents(element, withSelf = false, maxLevel = Infinity) {
+      const parents = withSelf && element ? [element] : [];
+      for (let current = element, level = 0; current && level < maxLevel; level++) {
+        current = current.parentNode instanceof ShadowRoot ? current?.getRootNode()?.host : current?.parentElement;
+        current && parents.unshift(current);
+      }
+      return parents;
+    },
+    hashCode(str) {
+      let hash = 2166136261;
+      for (let i = 0; i < str.length; i++) {
+        hash ^= str.charCodeAt(i);
+        hash = hash * 16777619 >>> 0;
+      }
+      return hash;
+    },
+    /**
+     * 通过 XPath 查找元素，支持文本内容或属性值匹配
+     * @param {'text'|'attr'} mode - 匹配模式：'text' 匹配文本内容，'attr' 匹配任意属性
+     * @param {...string|string[]} texts - 要匹配的文本（可嵌套数组）
+     * @returns {Element[]} 匹配的元素数组
+     */
+    findByText(mode, ...texts) {
+      const flatTexts = texts.flat();
+      const expr = Object.is(mode, "text") ? `.//*[${flatTexts.map((t) => `contains(text(), '${t.replace(/'/g, "\\'")}')`).join(" or ")}]` : `.//*[${flatTexts.map((t) => `@*[contains(., '${t.replace(/'/g, "\\'")}')]`).join(" or ")}]`;
+      const nodes = document.evaluate(expr, document.body, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+      return Array.from({ length: nodes.snapshotLength }, (_, i) => nodes.snapshotItem(i)).filter((el) => !el.matches("script"));
+    },
+    setPart(node, value) {
+      const parts = node?.getAttribute("part")?.split(/\s+/) ?? [];
+      node?.setAttribute("part", [.../* @__PURE__ */ new Set([...parts, value])].join(" ").trim());
+    },
+    delPart(node, value) {
+      const parts = (node?.getAttribute("part")?.split(/\s+/) ?? []).filter((v) => v !== value);
+      node?.setAttribute("part", parts.join(" ").trim());
+    },
+    safeHTML(htmlStr) {
+      if (!window.trustedTypes?.createPolicy) return htmlStr;
+      const policy = trustedTypes.defaultPolicy ?? trustedTypes.createPolicy("default", { createHTML: (input) => input });
+      return policy.createHTML(htmlStr);
+    }
   };
   class Clock {
     constructor(container, options) {
@@ -531,7 +539,6 @@
       this.setVideoInfo(video);
       this.setupVideoObserver(video);
       window.videoEnhance.enhanced(video);
-      this.createClock();
     },
     setVideoInfo(video) {
       const isLive = Object.is(video.duration, Infinity);
@@ -575,8 +582,8 @@
         timer = setTimeout(() => this.toggleCursor(true), Consts.THREE_SEC);
         if (target instanceof HTMLVideoElement) this.setCurrentVideo(target);
       };
-      document.addEventListener("mousemove", (e) => handleMouseEvent(e));
-      document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
+      document.addEventListener(EventTypes.MOUSE_MOVE, (e) => handleMouseEvent(e));
+      document.addEventListener(EventTypes.MOUSE_OVER, (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
     },
     toggleCursor(hide = false) {
       if (this.isNormalSite() || Tools.isFrequent("cursor", void 0, true)) return;
@@ -611,19 +618,19 @@
       Promise.resolve().then(() => {
         this.Clock?.destroy(), this.Clock = null;
         if (!this.player?.parentNode) return;
-        const shouldDestroy = this.shouldDestroyTimeEl();
+        const shouldDestroy = this.shouldDestroyTimeElement();
         this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
         this.Clock[shouldDestroy ? state : Clock.state.start]?.();
         this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
       });
     },
     toggleClock() {
-      if (this.shouldDestroyTimeEl()) return this.Clock?.destroy();
+      if (this.shouldDestroyTimeElement()) return this.Clock?.stop();
       const state = Clock.state.start;
       this.Clock?.isInDOM() ? this.Clock[state]() : this.createClock(state);
       this.Clock?.setCustomColor(Storage.CLOCK_COLOR.get());
     },
-    shouldDestroyTimeEl() {
+    shouldDestroyTimeElement() {
       const isFull = this.isFullscreen;
       return isFull && Storage.DISABLE_CLOCK.get() || !isFull && !Storage.UNFULL_CLOCK.get();
     }
@@ -735,6 +742,7 @@
         0: () => this.adjustPlayProgress(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
         SPACE: () => this.isOverrideKeyboard() && this.togglePlayPause(this.player),
         SHIFT_P: () => this.togglePictureInPicture(),
+        SHIFT_L: () => this.toggleNativeControls(),
         CTRL_ALT_A: () => this.captureScreenshot(),
         CTRL_Z: () => this.resetVideoTransform(),
         SHIFT_R: () => this.toggleMirrorFlip(),
@@ -826,10 +834,11 @@
         { key: "M", desc: "静音切换" },
         { key: "D", desc: "弹幕显/隐" },
         { key: "Z", desc: "恢复正常倍速" },
-        { key: "L / K", desc: "下一帧/上一帧" },
         { key: "Shift R", desc: "水平镜像" },
         { key: "Shift P", desc: "画中画切换" },
+        { key: "Shift L", desc: "原生控制栏" },
         { key: "Ctrl Z", desc: "复位缩放移动" },
+        { key: "L / K", desc: "下一帧/上一帧" },
         { key: "Ctrl 1-5", desc: "预设常用倍速" },
         { key: "Ctrl Alt A", desc: "截图 (默认禁用)" },
         { key: "Alt ➕ / ➖", desc: "缩放 (默认禁用)" },
@@ -1002,7 +1011,7 @@
     isDynamicDuration(video) {
       if (!video) return false;
       if (video.__isDynamic) return true;
-      if (Tools.isOverLimit("isDynamic", 20)) return false;
+      if (video.currentTime > 5 || Tools.isOverLimit("isDynamic", 10)) return false;
       if (!video.__duration) video.__duration = video.duration;
       const { duration, __duration, currentTime, seekable } = video;
       const isDynamic = Math.floor(duration) > Math.floor(__duration);
@@ -1016,11 +1025,20 @@
       delete video.__isDynamic;
       delete video.hasTriedAutoNext;
       delete video.hasApplyCachedRate;
+      delete video.hasInitPlaySettings;
       video.__duration = video.duration;
       Tools.resetLimitCounter("autoWebFull");
       if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
       this.removeRateKeepDisplay();
       this.removeVideoProgress();
+    },
+    initPlaySettings(video) {
+      video.hasInitPlaySettings = true;
+      setTimeout(() => this.applyCachedTime(video), 50);
+      this.applyCachedPlayRate(video);
+      this.playbackRateKeepDisplay();
+      this.setBiliQuality();
+      this.createClock();
     },
     deleteCachedPlayRate: () => Storage.CACHED_PLAY_RATE.del(),
     getRemainingTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
@@ -1081,7 +1099,7 @@
       Storage.PLAY_TIME.del(this.getCacheTimeKey(video));
     },
     getCacheTimeKey(video) {
-      return `${this.topWin.urlHash}_${Math.floor(video.duration)}`;
+      return `${this.topWin.urlHash}_${Math.floor(video.__duration ?? video.duration)}`;
     },
     clearMultiVideoCacheTime() {
       Promise.resolve().then(() => {
@@ -1174,6 +1192,10 @@
       !this.player.paused && this.player.pause();
       this.player.currentTime += (isPrev ? -1 : 1) / 24;
     },
+    toggleNativeControls() {
+      if (!this.player) return;
+      this.player.controls = !this.player.controls;
+    },
     customToast(startText, colorText, endText, duration, isRemove) {
       const span = document.createElement("span");
       span.appendChild(document.createTextNode(startText));
@@ -1222,21 +1244,25 @@
       return _unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
     },
     videoProgress(video) {
-      if (!video) return;
-      const shouldDestroy = this.shouldDestroyTimeEl();
-      if (shouldDestroy || this.isLive() || video.duration <= 15) return this.removeVideoProgress();
+      if (!video || Tools.isFrequent("progress", Consts.HALF_SEC, true)) return;
+      if (video.duration <= 30 || this.isLive() || this.shouldDestroyTimeElement()) return this.removeVideoProgress();
       if (!this.progressElement) {
         this.progressElement = this.prependElement("__time-progress", Storage.CLOCK_COLOR.get());
+        this.progressTextNode = document.createTextNode("00:00");
+        const percentElement = document.createElement("b");
+        percentElement.textContent = "%";
+        this.progressElement.append(this.progressTextNode, percentElement);
         this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
       }
       const duration = this.getRealDuration(video);
       if (duration > 86400) return this.removeVideoProgress();
       const percent = (video.currentTime / duration * 100).toFixed(1);
       const timeLeft = this.formatTime(duration - video.currentTime);
-      this.progressElement.innerHTML = `${timeLeft} / ${percent}<b>%</b>`;
+      this.progressTextNode.textContent = `${timeLeft} / ${percent}`;
     },
     removeVideoProgress() {
       this.progressElement?.remove();
+      this.progressTextNode = null;
       this.progressElement = null;
     },
     playbackRateKeepDisplay() {
@@ -1261,6 +1287,7 @@
   };
   const WebFullScreen = {
     autoNextEpisode(video) {
+      if (video.duration < 300) return;
       if (video.hasTriedAutoNext) return;
       if (!Storage.ENABLE_AUTO_NEXT_EPISODE.get()) return;
       if (Tools.isFrequent("autoNext", Consts.THREE_SEC, true)) return;
@@ -1389,7 +1416,7 @@
       if (Site.isMatched() || this.hasPickerListener) return;
       this.hasPickerListener = true;
       document.body.addEventListener(
-        "click",
+        EventTypes.CLICK,
         (event, { target, ctrlKey, altKey, isTrusted } = event) => {
           if (!ctrlKey || !altKey || !isTrusted || this.isLive()) return;
           if (!Tools.isTopWin()) return Tools.notyf("此页面不能抓取 (•ิ_•ิ)?", true);
@@ -1662,6 +1689,7 @@
     },
     timeupdate() {
       if (isNaN(this.duration)) return;
+      if (!this.hasInitPlaySettings) App.initPlaySettings(this);
       App.autoWebFullscreen(this);
       App.autoNextEpisode(this);
       App.cachePlayTime(this);
@@ -1674,12 +1702,9 @@
     },
     playing() {
       this.isEnded = false;
-      if (this.duration < 5) return;
+      if (this.duration <= 7) return;
       App.setCurrentVideo(this);
-      App.applyCachedPlayRate(this);
-      setTimeout(() => App.applyCachedTime(this), 20);
-      App.playbackRateKeepDisplay();
-      App.setBiliQuality();
+      App.initPlaySettings(this);
     },
     pause() {
       Tools.query(".ec-no")?.click();
