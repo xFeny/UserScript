@@ -21,7 +21,7 @@ export default await (async () => {
 
   try {
     const url = "https://gitee.com/xfeny/UserScript/raw/dev/monkey-web-fullscreen/src/IconsSelector.json";
-    const res = await GM.xmlHttpRequest({ url });
+    const res = await GM.xmlHttpRequest({ url, timeout: 3000 });
     const remoteSelector = JSON.parse(res.responseText ?? "{}");
     return { ...IconsSelector, ...remoteSelector };
   } catch (e) {
