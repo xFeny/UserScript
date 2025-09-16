@@ -133,5 +133,7 @@ export default class VideoEnhancer {
       document.dispatchEvent(shadowEvent);
       return shadowRoot;
     };
+
+    Element.prototype.attachShadow.toString = () => Element.prototype.__attachShadow.toString();
   }
 }

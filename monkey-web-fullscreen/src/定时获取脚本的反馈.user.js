@@ -38,9 +38,16 @@ return new Promise(async (resolve) => {
     const currentNum = extractNumber(feedbackElement.innerText);
     if (GM_getValue(cacheKey, 0) === currentNum) return resolve();
 
-    GM_setValue(cacheKey, currentNum);
-    const notyfText = "视频自动网页全屏｜倍速播放脚本 有新的反馈";
-    GM_notification({ url, title: "定时脚本通知", text: notyfText, onclick: () => GM_openInTab(url) });
+    GM_notification({
+      url,
+      timeout: 3000,
+      title: "定时脚本通知",
+      text: "视频自动网页全屏｜倍速播放脚本 有新的反馈",
+      onclick: () => {
+        GM_openInTab(url);
+        GM_setValue(cacheKey, currentNum);
+      },
+    });
   } catch (e) {}
 
   resolve();
