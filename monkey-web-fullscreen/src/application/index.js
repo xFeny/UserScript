@@ -21,10 +21,12 @@ export default window.App = {
   getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
   isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
   triggerStartElement() {
-    // https://www.zhihu.com 、https://www.jumomo.cc 、https://www.jiaozi.me 、https://www.kmvod.cc
-    const element = Tools.query("._qrp4qg, .ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
-    if (!element || Tools.isFrequent("start")) return;
-    setTimeout(() => element?.click() & element?.remove(), 150);
+    setTimeout(() => {
+      // https://www.dadalv.cc 、https://www.jiaozi.me 、https://www.pipilv.cc
+      const element = Tools.query(".ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
+      if (!element || Tools.isFrequent("start")) return;
+      setTimeout(() => element?.click() & element?.remove(), 250);
+    });
   },
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
@@ -50,8 +52,8 @@ export default window.App = {
     this.bodyObserver?.disconnect();
     clearTimeout(this.observerTimeout);
     this.bodyObserver = Tools.createObserver(document.body, () => {
-      this.removeLoginPopups();
       const video = this.getVideo();
+      Promise.resolve().then(() => this.removeLoginPopups());
       if (video?.offsetWidth) this.setCurrentVideo(video);
       if (this.topWin) this.bodyObserver.disconnect();
     });
@@ -93,17 +95,16 @@ export default window.App = {
       mutations.forEach((mutation) => {
         const { attributeName, oldValue, target } = mutation;
         const newValue = target.getAttribute(attributeName);
-        if (attributeName !== "src" || oldValue === newValue || !newValue) return;
+        if (oldValue === newValue || !newValue) return;
         // Tools.log(`视频源变化: ${oldValue ?? "空"} => ${newValue ?? "空"}`);
 
         // 确保topWin信息的即时性和可靠性
         this.setVideoInfo(target);
         this.initVideoProps(target);
-        this.hasAppliedCachedTime = false;
       });
     };
 
-    const options = { attributes: true, attributeOldValue: true };
+    const options = { attributes: true, attributeOldValue: true, attributeFilter: ["src"] };
     this.playerObserver = Tools.createObserver(video, handleAttrChange, options);
   },
   setupMouseMoveListener() {
