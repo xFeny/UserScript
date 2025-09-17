@@ -44,10 +44,12 @@ export default {
     video.__duration = video.duration;
     Tools.resetLimitCounter("autoWebFull");
     if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
+    delete this.hasAppliedCachedTime;
     this.removeRateKeepDisplay();
     this.removeVideoProgress();
   },
   initPlaySettings(video) {
+    if (!this.player) return;
     video.hasInitPlaySettings = true;
     setTimeout(() => this.applyCachedTime(video), 50); // 确保topWin信息的即时性和可靠性
     this.applyCachedPlayRate(video);
