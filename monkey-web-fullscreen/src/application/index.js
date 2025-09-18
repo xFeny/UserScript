@@ -67,6 +67,7 @@ export default window.App = {
     this.player = video;
     this.setVideoInfo(video);
     this.setupVideoObserver(video);
+    this.setupFakeVideoObserver(video);
     window.videoEnhance.enhanced(video);
   },
   setVideoInfo(video) {
@@ -90,6 +91,7 @@ export default window.App = {
     Tools.sendToIFrames({ topWin });
   },
   setupVideoObserver(video) {
+    if (video.matches(Consts.FAKE_VIDEO)) return;
     this.playerObserver?.disconnect();
     const handleAttrChange = (mutations) => {
       mutations.forEach((mutation) => {
@@ -106,6 +108,21 @@ export default window.App = {
 
     const options = { attributes: true, attributeOldValue: true, attributeFilter: ["src"] };
     this.playerObserver = Tools.createObserver(video, handleAttrChange, options);
+  },
+  setupFakeVideoObserver(video) {
+    const that = this;
+    if (!video.matches(Consts.FAKE_VIDEO)) return;
+    if (video.hasAttribute("processed")) return;
+    video.setAttribute("processed", true); // 标记为已处理，避免重复定义
+    window.videoEnhance.defineProperty(video, "srcConfig", {
+      set(value) {
+        this._src = value;
+        if (!value) return;
+        delete that.player;
+        that.setVideoInfo(this);
+        that.initVideoProps(this);
+      },
+    });
   },
   setupMouseMoveListener() {
     let timer = null;

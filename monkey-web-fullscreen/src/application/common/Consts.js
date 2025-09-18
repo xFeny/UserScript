@@ -13,4 +13,5 @@ export default Object.freeze({
   MIN_PLAY_RATE: 0.0625,
   webFull: "webFullscreen",
   MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN",
+  FAKE_VIDEO: "fake-video",
 });
