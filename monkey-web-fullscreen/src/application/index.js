@@ -121,6 +121,7 @@ export default window.App = {
         delete that.player;
         that.setVideoInfo(this);
         that.initVideoProps(this);
+        Tools.log("set FakeVideoElement srcConfig", value);
       },
     });
   },
