@@ -116,12 +116,9 @@ export default window.App = {
     video.setAttribute("processed", true); // 标记为已处理，避免重复定义
     window.videoEnhance.defineProperty(video, "srcConfig", {
       set(value) {
-        this._src = value;
-        if (!value) return;
         delete that.player;
-        that.setVideoInfo(this);
         that.initVideoProps(this);
-        Tools.log("set FakeVideoElement srcConfig", value);
+        this._src = value;
       },
     });
   },
