@@ -116,8 +116,8 @@ export default window.App = {
     video.setAttribute("processed", true); // 标记为已处理，避免重复定义
     window.videoEnhance.defineProperty(video, "srcConfig", {
       set(value) {
-        delete that.player;
         that.initVideoProps(this);
+        delete that.player;
         this._src = value;
       },
     });
