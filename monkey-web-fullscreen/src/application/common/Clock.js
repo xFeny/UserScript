@@ -27,7 +27,7 @@ export default class Clock {
   }
 
   isInDOM() {
-    return document.contains(this.element);
+    return this.container?.contains(this.element) ?? false;
   }
 
   setCustomColor(color) {

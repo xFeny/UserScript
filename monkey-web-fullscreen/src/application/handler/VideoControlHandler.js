@@ -306,7 +306,7 @@ export default {
     if (video.duration <= 30 || this.isLive() || this.shouldDestroyTimeElement()) return this.removeVideoProgress();
 
     if (!this.progressElement) {
-      this.progressElement = this.prependElement("__time-progress", Storage.CLOCK_COLOR.get());
+      this.progressElement = this.createDisplayElement("__time-progress", Storage.CLOCK_COLOR.get());
       this.progressTextNode = document.createTextNode("00:00");
       const percentElement = document.createElement("b");
       percentElement.textContent = "%";
@@ -320,11 +320,12 @@ export default {
     const percent = ((video.currentTime / duration) * 100).toFixed(1);
     const timeLeft = this.formatTime(duration - video.currentTime);
     this.progressTextNode.textContent = `${timeLeft} / ${percent}`;
+    this.prependElement(this.progressElement);
   },
   removeVideoProgress() {
     this.progressElement?.remove();
-    this.progressTextNode = null;
-    this.progressElement = null;
+    delete this.progressTextNode;
+    delete this.progressElement;
   },
   playbackRateKeepDisplay() {
     if (!this.player || this.isLive()) return;
@@ -334,19 +335,24 @@ export default {
     if (!show) return this.removeRateKeepDisplay();
 
     // 确保只创建一个元素
-    if (!this.rateKeepElement) this.rateKeepElement = this.prependElement("__rate-keep-show");
+    if (!this.rateKeepElement) this.rateKeepElement = this.createDisplayElement("__rate-keep-show");
     this.rateKeepElement.textContent = `倍速: ${this.player.playbackRate}`;
+    this.prependElement(this.rateKeepElement);
   },
   removeRateKeepDisplay() {
     this.rateKeepElement?.remove();
-    this.rateKeepElement = null;
+    delete this.rateKeepElement;
   },
-  prependElement(clss, color) {
+  createDisplayElement(clss, color) {
     if (!this.player) return;
     const element = document.createElement("div");
     if (color) element.style.setProperty("color", color);
-    this.player.parentNode.prepend(element);
+    this.prependElement(element);
     element.classList.add(clss);
     return element;
+  },
+  prependElement(element, target) {
+    const container = target ?? this.player.parentNode;
+    if (!container.contains(element)) container.prepend(element);
   },
 };
