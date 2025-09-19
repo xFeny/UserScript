@@ -67,7 +67,6 @@ export default window.App = {
     this.player = video;
     this.setVideoInfo(video);
     this.setupVideoObserver(video);
-    this.setupFakeVideoObserver(video);
     window.videoEnhance.enhanced(video);
   },
   setVideoInfo(video) {
@@ -91,34 +90,14 @@ export default window.App = {
     Tools.sendToIFrames({ topWin });
   },
   setupVideoObserver(video) {
-    if (video.matches(Consts.FAKE_VIDEO)) return;
-    this.playerObserver?.disconnect();
-    const handleAttrChange = (mutations) => {
-      mutations.forEach((mutation) => {
-        const { attributeName, oldValue, target } = mutation;
-        const newValue = target.getAttribute(attributeName);
-        if (oldValue === newValue || !newValue) return;
-        // Tools.log(`视频源变化: ${oldValue ?? "空"} => ${newValue ?? "空"}`);
-
-        // 确保topWin信息的即时性和可靠性
-        this.setVideoInfo(target);
-        this.initVideoProps(target);
-      });
-    };
-
-    const options = { attributes: true, attributeOldValue: true, attributeFilter: ["src"] };
-    this.playerObserver = Tools.createObserver(video, handleAttrChange, options);
-  },
-  setupFakeVideoObserver(video) {
-    const that = this;
-    if (!video.matches(Consts.FAKE_VIDEO)) return;
     if (video.hasAttribute("processed")) return;
     video.setAttribute("processed", true); // 标记为已处理，避免重复定义
-    window.videoEnhance.defineProperty(video, "srcConfig", {
-      set(value) {
-        that.initVideoProps(this);
-        delete that.player;
-        this._src = value;
+    const isFake = video.matches(Consts.FAKE_VIDEO);
+    const handleChange = (video) => (this.initVideoProps(video), delete this.player);
+    window.videoEnhance.defineProperty(video, isFake ? "srcConfig" : "src", {
+      set(newVal, setter, oldVal) {
+        Tools.log("视频播放源发生变化：", { oldVal, newVal });
+        if (oldVal !== newVal) handleChange(this), isFake ? (this._src = newVal) : setter(newVal);
       },
     });
   },

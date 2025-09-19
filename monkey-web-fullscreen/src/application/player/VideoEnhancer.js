@@ -107,7 +107,8 @@ export default class VideoEnhancer {
           return descs.get ? descs.get.call(this, original.get.call(this)) : original.get.call(this);
         },
         set(value) {
-          descs.set ? descs.set.call(this, value, original.set.bind(this)) : original.set.call(this, value);
+          const oldVal = original.get.call(this);
+          descs.set ? descs.set.call(this, value, original.set.bind(this), oldVal) : original.set.call(this, value);
         },
         configurable: true,
       });
