@@ -90,14 +90,17 @@ export default window.App = {
     Tools.sendToIFrames({ topWin });
   },
   setupVideoObserver(video) {
+    const that = this;
     if (video.hasAttribute("processed")) return;
     video.setAttribute("processed", true); // 标记为已处理，避免重复定义
     const isFake = video.matches(Consts.FAKE_VIDEO);
-    const handleChange = (video) => (this.initVideoProps(video), delete this.player);
+    const handleChange = (video) => (that.initVideoProps(video), that.setVideoInfo(video));
     window.videoEnhance.defineProperty(video, isFake ? "srcConfig" : "src", {
-      set(newVal, setter, oldVal) {
-        Tools.log("视频播放源发生变化：", { oldVal, newVal });
-        if (oldVal !== newVal) handleChange(this), isFake ? (this._src = newVal) : setter(newVal);
+      set(value, setter) {
+        Tools.log("视频播放源发生变化：", { value, same: this === that.player });
+        if (isFake) value && handleChange(this), (this._src = value);
+        else if (this === that.player) handleChange(this), setter(value);
+        else setter(value);
       },
     });
   },
