@@ -302,7 +302,7 @@ export default {
     return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
   },
   videoProgress(video) {
-    if (!video || this.isBackgroundVideo(video) || Tools.isFrequent("progress", Consts.HALF_SEC, true)) return;
+    if (!video || this.isBackgroundVideo(video)) return;
     if (video.duration <= 30 || this.isLive() || this.shouldDestroyTimeElement()) return this.removeVideoProgress();
 
     if (!this.progressElement) {
@@ -347,8 +347,8 @@ export default {
     if (!this.player) return;
     const element = document.createElement("div");
     if (color) element.style.setProperty("color", color);
-    this.prependElement(element);
     element.classList.add(clss);
+    this.prependElement(element);
     return element;
   },
   prependElement(element, target) {
