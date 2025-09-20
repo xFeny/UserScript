@@ -310,7 +310,7 @@ export default {
       this.progressTextNode = document.createTextNode("00:00");
       const percentElement = document.createElement("b");
       percentElement.textContent = "%";
-      this.progressElement.append(this.progressTextNode, percentElement);
+      this.progressElement?.append(this.progressTextNode, percentElement);
       this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
     }
 
@@ -352,7 +352,7 @@ export default {
     return element;
   },
   prependElement(element, target) {
-    const container = target ?? this.player.parentNode;
-    if (!container.contains(element)) container.prepend(element);
+    const container = target ?? this.player?.parentNode;
+    if (!container?.contains(element)) container?.prepend(element);
   },
 };
