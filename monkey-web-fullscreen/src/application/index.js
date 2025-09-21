@@ -98,8 +98,7 @@ export default window.App = {
     window.videoEnhance.defineProperty(video, isFake ? "srcConfig" : "src", {
       set(value, setter) {
         Tools.log("视频播放源发生变化：", { value, same: this === that.player });
-        const shouldHandleChange = isFake || this === that.player;
-        if (shouldHandleChange) handleChange(this);
+        if (isFake || this === that.player) handleChange(this);
         isFake ? (this._src = value) : setter(value);
       },
     });
