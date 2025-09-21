@@ -293,9 +293,11 @@ export default {
     return this;
   },
   setBiliQuality() {
-    if (!Site.isBili()) return;
-    if (!document.cookie.includes("DedeUserID") || !unsafeWindow.player) return;
-    unsafeWindow.player.requestQuality(80); // 清晰度设置为 1080P
+    if (!Site.isBili() || !document.cookie.includes("DedeUserID") || !unsafeWindow.player) return;
+    const current = unsafeWindow.player.getQuality().realQ;
+    const list = unsafeWindow.player.getSupportedQualityList();
+    const target = list.find((quality) => quality === 80) ?? list[0];
+    if (current !== target) unsafeWindow.player.requestQuality(target);
   },
   getRealDuration(video) {
     if (!Site.isQiyi()) return video.duration;
