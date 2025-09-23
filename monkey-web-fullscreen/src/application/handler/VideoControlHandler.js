@@ -131,7 +131,7 @@ export default {
     Storage.PLAY_TIME.del(this.getCacheTimeKey(video));
   },
   getCacheTimeKey(video) {
-    return `${this.topWin.urlHash}_${Math.floor(video.__duration ?? video.duration)}`;
+    return `${this.topWin.urlHash}_${Math.floor(video.__duration || video.duration)}`;
   },
   clearMultiVideoCacheTime() {
     Promise.resolve().then(() => {

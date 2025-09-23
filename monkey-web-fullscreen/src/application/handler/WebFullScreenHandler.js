@@ -20,16 +20,22 @@ export default {
     this.dispatchShortcutKey(Keyboard.N);
     video.hasTriedAutoNext = true;
   },
-  autoWebFullscreen(video) {
+  async autoWebFullscreen(video) {
     if (this.player !== video) return;
     if (Tools.isFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
     if (video.hasWebFull || !this.topWin || !video.offsetWidth) return;
     if ((Site.isMatched() && this.isDisableAuto()) || (!Site.isMatched() && !this.isEnableSiteAuto())) return;
     if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWebFull")) return (video.hasWebFull = true);
-    if (video.offsetWidth >= this.topWin.viewWidth) return (video.hasWebFull = true);
+    if (await this.isWebFull(video)) return (video.hasWebFull = true);
 
     // 发送网页全屏消息
     this.dispatchShortcutKey(Keyboard.P);
+  },
+  async isWebFull(video) {
+    const isWebFull = video.offsetWidth >= this.topWin.viewWidth;
+    if (!isWebFull) return false;
+    await Tools.sleep(Consts.HALF_SEC);
+    return video.offsetWidth >= this.topWin.viewWidth;
   },
   liveWebFullscreen() {
     unsafeWindow.top.scrollTo({ top: 70 });

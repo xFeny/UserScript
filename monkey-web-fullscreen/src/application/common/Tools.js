@@ -13,6 +13,7 @@ export default unsafeWindow.Tools = {
   isMultiVideo: () => querySelectorAll("video").length > 1,
   query: (selector, context) => querySelector(selector, context),
   querys: (selector, context) => querySelectorAll(selector, context),
+  sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
   triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
   toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, Consts.EMPTY),
   postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),

@@ -66,7 +66,7 @@ export default window.App = {
 
     this.player = video;
     this.setVideoInfo(video);
-    this.setupVideoObserver(video);
+    this.setupVideoSrcObserver(video);
     window.videoEnhance.enhanced(video);
   },
   setVideoInfo(video) {
@@ -89,17 +89,16 @@ export default window.App = {
     window.topWin = this.topWin = topWin;
     Tools.sendToIFrames({ topWin });
   },
-  setupVideoObserver(video) {
+  setupVideoSrcObserver(video) {
     const that = this;
     if (video.hasAttribute("processed")) return;
-    video.setAttribute("processed", true); // 标记为已处理，避免重复定义
+    video.setAttribute("processed", true);
     const isFake = video.matches(Consts.FAKE_VIDEO);
-    const handleChange = (video) => (that.initVideoProps(video), that.setVideoInfo(video));
+    const handleChange = (v) => (delete that.topWin, that.initVideoProps(v), that.setVideoInfo(v));
     window.videoEnhance.defineProperty(video, isFake ? "srcConfig" : "src", {
       set(value, setter) {
-        Tools.log("视频播放源发生变化：", { value, same: this === that.player });
-        if (isFake || this === that.player) requestAnimationFrame(() => handleChange(this));
         isFake ? (this._src = value) : setter(value);
+        if ((isFake || this === that.player) && value) handleChange(this);
       },
     });
   },
