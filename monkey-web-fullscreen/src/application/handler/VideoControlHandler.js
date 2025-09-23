@@ -106,9 +106,9 @@ export default {
     if (!this.topWin || video.paused || video.duration < 120 || this.isLive()) return;
     if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return; //播放时间太短
 
-    // 禁用记忆、播放结束、距离结束30秒，清除记忆缓存
+    // 禁用记忆、播放结束、距离结束10秒，清除记忆缓存
     if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.clearCachedTime(video);
-    if (this.getRemainingTime(video) <= 30) return this.clearCachedTime(video);
+    if (this.getRemainingTime(video) <= 10) return this.clearCachedTime(video);
 
     Storage.PLAY_TIME.set(this.getCacheTimeKey(video), Number(video.currentTime) - 1, Storage.STORAGE_DAYS.get());
     this.clearMultiVideoCacheTime(); // 清除页面内多视频的播放进度存储，如：抖音网页版
