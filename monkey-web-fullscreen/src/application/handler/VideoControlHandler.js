@@ -219,7 +219,7 @@ export default {
       .setVideoTsr("--rotate", "0deg");
     window.videoEnhance.resetTsr(this.player);
   },
-  captureScreenshot() {
+  async captureScreenshot() {
     if (!this.player || this.isDisableScreenshot()) return;
 
     this.player.setAttribute("crossorigin", "anonymous");
@@ -230,7 +230,8 @@ export default {
 
     try {
       ctx.drawImage(this.player, 0, 0, canvas.width, canvas.height);
-      GM_download(canvas.toDataURL("image/png"), `视频截图_${Date.now()}.png`);
+      const url = URL.createObjectURL(await new Promise((resolve) => canvas.toBlob(resolve, "image/png")));
+      GM_download({ url, name: `视频截图_${Date.now()}.png`, onload: () => URL.revokeObjectURL(url) });
     } catch (e) {
       canvas.style.setProperty("max-width", "98vw");
       const popup = window.open(Consts.EMPTY, "_blank", "width=1000,height=570,top=130,left=270");
