@@ -66,7 +66,7 @@ export default window.App = {
 
     this.player = video;
     this.setVideoInfo(video);
-    this.setupVideoSrcObserver(video);
+    this.observeVideoSrcChange(video);
     window.videoEnhance.enhanced(video);
   },
   setVideoInfo(video) {
@@ -89,7 +89,7 @@ export default window.App = {
     window.topWin = this.topWin = topWin;
     Tools.sendToIFrames({ topWin });
   },
-  setupVideoSrcObserver(video) {
+  observeVideoSrcChange(video) {
     const that = this;
     if (video.hasAttribute("processed")) return;
     video.setAttribute("processed", true);
