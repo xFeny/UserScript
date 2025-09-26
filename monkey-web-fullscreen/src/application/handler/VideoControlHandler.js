@@ -45,7 +45,7 @@ export default {
     Tools.resetLimitCounter("autoWebFull");
     if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
     delete this.hasAppliedCachedTime;
-    this.removeRateKeepDisplay();
+    this.removeRateKeepDisplay(video);
     this.removeVideoProgress();
   },
   initPlaySettings(video) {
@@ -332,19 +332,17 @@ export default {
   },
   playbackRateKeepDisplay() {
     if (!this.player || this.isLive()) return;
+    if (!Storage.RATE_KEEP_SHOW.get()) return this.removeRateKeepDisplay();
 
-    // 未启用左上角常显倍速
-    const show = Storage.RATE_KEEP_SHOW.get();
-    if (!show) return this.removeRateKeepDisplay();
-
-    // 确保只创建一个元素
-    if (!this.rateKeepElement) this.rateKeepElement = this.createDisplayElement("__rate-keep-show");
-    this.rateKeepElement.textContent = `倍速: ${this.player.playbackRate}`;
-    this.prependElement(this.rateKeepElement);
+    const e = this.player;
+    if (!e.rateKeepElement) e.rateKeepElement = this.createDisplayElement("__rate-keep-show");
+    e.rateKeepElement.textContent = `倍速: ${e.playbackRate}`;
+    this.prependElement(e.rateKeepElement);
   },
-  removeRateKeepDisplay() {
-    this.rateKeepElement?.remove();
-    delete this.rateKeepElement;
+  removeRateKeepDisplay(video) {
+    const e = video ?? this.player;
+    e.rateKeepElement?.remove();
+    delete e.rateKeepElement;
   },
   createDisplayElement(clss, color) {
     if (!this.player) return;

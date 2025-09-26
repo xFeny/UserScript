@@ -6,7 +6,7 @@ import Tools from "../common/Tools";
 export default {
   handleSettMessage(data) {
     // 处理在 “更多设置” 中操作功能切换（启用/禁用）时发来的消息
-    if ("toggle_rateKeep" in data) setTimeout(() => this.playbackRateKeepDisplay(), 120);
+    if ("toggle_rateKeep" in data) setTimeout(() => this.playbackRateKeepDisplay(), 150);
     if ("toggle_smallerFont" in data) this.toggleSmallerFont(data.toggle_smallerFont);
     if ("toggle_color" in data) this.setTimeElementColor(data.toggle_color);
     if ("toggle_clockAlways" in data) this.changeTimeElementDisplay();
@@ -28,6 +28,6 @@ export default {
     this.Clock?.setCustomColor(color);
   },
   changeTimeElementDisplay() {
-    setTimeout(() => (this.toggleClock(), this.videoProgress(this.player)), 120);
+    setTimeout(() => (this.toggleClock(), this.videoProgress(this.player)), 150);
   },
 };
