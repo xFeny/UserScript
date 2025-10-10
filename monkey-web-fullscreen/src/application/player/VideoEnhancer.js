@@ -6,6 +6,7 @@ import VideoEvents from "./VideoEventsHandler";
  * 使得在多视频页面，切换视频播放时能更快速的应用到倍速
  */
 export default class VideoEnhancer {
+  timeout = 100;
   attr = "enhanced";
   selector = ":is(video, fake-video):not([enhanced])";
   defaultTsr = { zoom: 100, moveX: 0, moveY: 0, rotation: 0, isMirrored: false };
@@ -36,16 +37,16 @@ export default class VideoEnhancer {
    * @param {NodeList} nodes - 新增节点列表
    */
   async processAddedNodes(nodes) {
-    const { selector, danmuSelector } = this;
+    const { timeout, selector, danmuSelector } = this;
     for (const node of nodes) {
       if (!(node instanceof Element) || node.matches(danmuSelector)) continue;
 
       // 若当前节点是未增强的视频元素，直接增强
       // 使用requestIdleCallback在浏览器空闲时处理，进一步优化性能
-      if (node.matches(selector)) requestIdleCallback(() => this.enhanced(node));
+      if (node.matches(selector)) requestIdleCallback(() => this.enhanced(node), { timeout });
       // 若当前节点有子节点，查询并增强其中的视频元素
       else if (node.hasChildNodes()) {
-        Tools.querys(selector, node).forEach((video) => requestIdleCallback(() => this.enhanced(video)));
+        Tools.querys(selector, node).forEach((video) => requestIdleCallback(() => this.enhanced(video), { timeout }));
       }
 
       // 小延迟，避免一次处理过多节点
