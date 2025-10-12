@@ -320,7 +320,7 @@ export default {
     const duration = this.getRealDuration(video);
     if (duration > 864e2) return this.removeVideoProgress();
 
-    const percent = ((video.currentTime / duration) * 100).toFixed(1);
+    const percent = Tools.toFixed((video.currentTime / duration) * 100, 1);
     const timeLeft = this.formatTime(duration - video.currentTime);
     this.progressTextNode.textContent = `${timeLeft} / ${percent}`;
     this.prependElement(this.progressElement);
