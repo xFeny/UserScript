@@ -183,9 +183,9 @@
 
 可在以下导航站中的影视动漫网站测试功能：
 
-- 聚神铺导航（https://www.jspoo.com/）
-- 硬核指南（https://yinghezhinan.com/）
-- 闪电导航（https://www.shandiandh.com/）
+- 聚神铺导航（[https://www.jspoo.com/](https://www.jspoo.com/)）
+- 硬核指南（[https://yinghezhinan.com/](https://yinghezhinan.com/)）
+- 闪电导航（[https://www.shandiandh.com/](https://www.shandiandh.com/)）
 
 ### 自定义此站网页全屏规则
 
@@ -237,11 +237,11 @@
    
 #### 配置示例  
 
-| 网站                                                  | CSS 选择器                                           | 效果说明         |
-| ----------------------------------------------------- | ---------------------------------------------------- | ---------------- |
-| 抖音（https://www.douyin.com/）                       | `#slidelist > div`                                   | 支持滚动切换视频 |
-| 虎牙（[https://www.huya.com](https://www.huya.com/)） | `#player-wrap`                                       | 隐藏底部礼物栏   |
-| Lemon Live（https://lemonlive.deno.dev）              | `#app > main > div > div > div > div:nth-of-type(2)` | 保留控制栏和弹幕 |
+| 网站                                                         | CSS 选择器                                           | 效果说明         |
+| ------------------------------------------------------------ | ---------------------------------------------------- | ---------------- |
+| 抖音（[https://www.douyin.com/](https://www.douyin.com/)）   | `#slidelist > div`                                   | 支持滚动切换视频 |
+| 虎牙（[https://www.huya.com](https://www.huya.com/)）        | `#player-wrap`                                       | 隐藏底部礼物栏   |
+| Lemon Live（[https://lemonlive.deno.dev](https://lemonlive.deno.dev)） | `#app > main > div > div > div > div:nth-of-type(2)` | 保留控制栏和弹幕 |
 
 ### 其他功能
 
