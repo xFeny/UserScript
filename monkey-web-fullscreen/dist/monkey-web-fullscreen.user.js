@@ -1261,7 +1261,7 @@
       }
       const duration = this.getRealDuration(video);
       if (duration > 86400) return this.removeVideoProgress();
-      const percent = (video.currentTime / duration * 100).toFixed(1);
+      const percent = Tools.toFixed(video.currentTime / duration * 100, 1);
       const timeLeft = this.formatTime(duration - video.currentTime);
       this.progressTextNode.textContent = `${timeLeft} / ${percent}`;
       this.prependElement(this.progressElement);
@@ -1736,6 +1736,7 @@
   };
   class VideoEnhancer {
     constructor() {
+      __publicField(this, "timeout", 100);
       __publicField(this, "attr", "enhanced");
       __publicField(this, "selector", ":is(video, fake-video):not([enhanced])");
       __publicField(this, "defaultTsr", { zoom: 100, moveX: 0, moveY: 0, rotation: 0, isMirrored: false });
@@ -1760,12 +1761,12 @@
      * @param {NodeList} nodes - 新增节点列表
      */
     async processAddedNodes(nodes) {
-      const { selector, danmuSelector } = this;
+      const { timeout, selector, danmuSelector } = this;
       for (const node of nodes) {
         if (!(node instanceof Element) || node.matches(danmuSelector)) continue;
-        if (node.matches(selector)) requestIdleCallback(() => this.enhanced(node));
+        if (node.matches(selector)) requestIdleCallback(() => this.enhanced(node), { timeout });
         else if (node.hasChildNodes()) {
-          Tools.querys(selector, node).forEach((video) => requestIdleCallback(() => this.enhanced(video)));
+          Tools.querys(selector, node).forEach((video) => requestIdleCallback(() => this.enhanced(video), { timeout }));
         }
         await new Promise((resolve) => setTimeout(resolve, 0));
       }
