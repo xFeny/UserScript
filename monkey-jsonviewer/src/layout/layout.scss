@@ -343,13 +343,12 @@ textarea:focus {
 
 /** HTTP 请求弹窗样式 START **/
 .httpRequest {
-  padding: 30px 20px;
+  padding: 20px;
   width: 700px;
 
-  > div {
+  .requestbox {
     display: flex;
     height: 35px;
-    margin-bottom: 20px;
   }
 
   input,
@@ -380,6 +379,27 @@ textarea:focus {
     &:active {
       background-color: #cfcfcf;
     }
+  }
+
+  .form-group {
+    display: flex;
+    margin-top: 15px;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  label {
+    font-weight: bold;
+    font-size: 12px;
+  }
+
+  textarea {
+    min-height: 100px;
+    resize: vertical;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
   }
 }
 /** HTTP 请求弹窗样式 END **/

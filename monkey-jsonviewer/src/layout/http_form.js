@@ -9,17 +9,21 @@ export default `
       <option value="GET">GET</option>
       <option value="PUT">PUT</option>
       <option value="DELETE">DELETE</option>
+      <option value="PATCH">PATCH</option>
     </select>
     <input name="url" placeholder="请求地址" />
     <select name="contentType">
       <option value="application/x-www-form-urlencoded;charset=UTF-8">urlencoded</option>
       <option value="application/json;charset=UTF-8">application/json</option>
     </select>
-    <button type="submit">发送</button>
+    <button type="submit">发送请求</button>
   </div>
-  <div class="textarea">
-    <input name="headers" placeholder='请求头 {"token": "test"}' />
-    <input name="params" placeholder='请求参数 {"id": "test", ""name": "test"}' />
+  <div class="form-group">
+    <label for="headers">请求头</label>
+    <textarea id="headers" name="headers" placeholder='例如: {"token": "test"}'></textarea>
   </div>
-</form>
-`;
+  <div class="form-group">
+    <label for="body">请求参数</label>
+    <textarea id="body" name="params" placeholder='例如: {"name": "test"}'></textarea>
+  </div>
+</form>`;

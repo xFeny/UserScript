@@ -51,27 +51,22 @@ export default {
     return this;
   },
   async _submit(submitData) {
-    if (!submitData.url) return layer.msg("请求地址不能为空");
-    let params = submitData.params;
-    let headers = submitData.headers;
-    if (headers && !(headers.startsWith("{") && headers.endsWith("}"))) {
-      return layer.msg("请求头 格式不合法");
-    }
+    let { url, method, headers, params, contentType } = submitData;
+    if (!url) return layer.msg("请求地址不能为空");
+    if (headers && !(headers.startsWith("{") && headers.endsWith("}"))) return layer.msg("请求头 格式不合法");
+    if (params && !(params.startsWith("{") && params.endsWith("}"))) return layer.msg("请求参数 格式不合法");
 
-    if (params && !(params.startsWith("{") && params.endsWith("}"))) {
-      return layer.msg("请求参数 格式不合法");
-    }
+    headers = JSON.parse(headers || "{}");
+    params = JSON.parse(params || "{}");
 
     try {
       layer.load();
-      const response = await fetch(URL.ONLINE_REQUEST, {
-        timeout: 5000,
-        method: "POST",
-        body: Utils.stringify(submitData),
-        headers: { "Content-Type": "application/json" },
-      });
-      let result = await response.json();
-      if (Utils.isObject(result)) result = Utils.stringify(result);
+      headers["Content-Type"] = contentType;
+      if (method === "GET") url = this.buildUrlWithParams(url, this.queryParams(params));
+      if (contentType.includes("urlencoded")) params = this.queryParams(params);
+      const response = await GM.xmlHttpRequest({ method, url, headers, data: params }).catch((e) => console.error(e));
+      const result = response.responseText;
+
       const { rawText, jsonpFun } = Utils.matchJsonp(result);
       const json = Utils.parse(rawText);
       this.reload(json, rawText, jsonpFun);
@@ -87,5 +82,17 @@ export default {
     unsafeWindow.GLOBAL_JSON = json;
     unsafeWindow.GLOBAL_JSONP_FUN = jsonpFun;
     window.postMessage({ reload: true });
+  },
+  queryParams(data) {
+    const params = [];
+    for (const [key, value] of Object.entries(data)) {
+      params.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
+    }
+    return params.join("&");
+  },
+  buildUrlWithParams: function (baseUrl, queryParams) {
+    if (!queryParams) return baseUrl;
+    const separator = baseUrl.includes("?") ? "&" : "?";
+    return `${baseUrl}${separator}${queryParams}`;
   },
 };
