@@ -127,6 +127,7 @@ export default class VideoEnhancer {
   }
 
   hackAttachShadow() {
+    if (Element.prototype.__attachShadow) return;
     Element.prototype.__attachShadow = Element.prototype.attachShadow;
     Element.prototype.attachShadow = function (options) {
       if (this._shadowRoot) return this._shadowRoot;
