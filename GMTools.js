@@ -256,6 +256,20 @@
       return null;
     },
     /**
+     * 通过 XPath 查找元素，支持文本内容或属性值匹配
+     * @param {'text'|'attr'} mode - 匹配模式：'text' 匹配文本内容，'attr' 匹配任意属性
+     * @param {...string|string[]} texts - 要匹配的文本（可嵌套数组）
+     * @returns {Element[]} 匹配的元素数组
+     */
+    findByText(mode, ...texts) {
+      const flatTexts = texts.flat();
+      const expr = Object.is(mode, "text")
+        ? `.//*[${flatTexts.map((t) => `contains(text(), '${t.replace(/'/g, "\\'")}')`).join(" or ")}]`
+        : `.//*[${flatTexts.map((t) => `@*[contains(., '${t.replace(/'/g, "\\'")}')]`).join(" or ")}]`;
+      const nodes = document.evaluate(expr, document.body, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+      return Array.from({ length: nodes.snapshotLength }, (_, i) => nodes.snapshotItem(i)).filter((el) => !el.matches("script"));
+    },
+    /**
      * 获取元素的中心点坐标
      * @param {Element} element - 目标元素
      * @returns {Object} 包含centerX和centerY的坐标对象
