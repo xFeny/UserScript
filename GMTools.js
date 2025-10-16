@@ -14,6 +14,7 @@
   "use strict";
 
   const GMTools = {
+    EMPTY: "",
     /**
      * 判断字符串是否不包含数字
      * @param {string} str - 待检测的字符串
@@ -245,7 +246,7 @@
           ? `[class="${ele.className}"]`
           : validClasses.length
           ? `.${validClasses.join(".")}`
-          : Consts.EMPTY;
+          : this.EMPTY;
       }
 
       // 非首个同类型元素添加nth-of-type
