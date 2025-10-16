@@ -14,13 +14,76 @@
   "use strict";
 
   const GMTools = {
+    /**
+     * 判断字符串是否不包含数字
+     * @param {string} str - 待检测的字符串
+     * @returns {boolean} 不包含任何数字返回true，否则返回false
+     */
+    hasNoDigits: (str) => !/\d/.test(str),
+    /**
+     * 判断当前窗口是否为顶层窗口
+     * @returns {boolean} 是顶层窗口返回true，否则返回false
+     */
+    isTopWin: () => window.top === window,
+    /**
+     * 获取元素的矩形信息
+     * @param {Element} el - 目标元素
+     * @returns {DOMRect|null} 元素的边界矩形对象，元素不存在则返回null
+     */
+    getElementRect: (el) => el?.getBoundingClientRect(),
+    /**
+     * 异步等待指定毫秒数
+     * @param {number} ms - 等待时间（毫秒）
+     * @returns {Promise<void>} 等待完成的Promise
+     */
     sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+    /**
+     * 保留小数位数，移除末尾多余的0
+     * @param {number|string} value - 待格式化的值
+     * @param {number} [digits=2] - 保留的小数位数
+     * @returns {string} 格式化后的字符串
+     */
+    toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, ""),
+    /**
+     * 判断元素是否可见
+     * @param {Element} el - 目标元素
+     * @returns {boolean} 可见返回true，否则返回false
+     */
+    isVisible: (el) => !!(el?.offsetWidth || el?.offsetHeight || el?.getClientRects().length),
+    /**
+     * 阻止事件的默认行为及传播
+     * @param {Event} event - 事件对象
+     */
+    preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
+    /**
+     * 判断元素是否包含指定类名中的任意一个
+     * @param {Element} el - 目标元素
+     * @param {...string|string[]} classes - 类名列表（支持数组嵌套）
+     * @returns {boolean} 包含任意类名返回true，否则返回false
+     */
+    hasCls: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
+    /**
+     * 从元素中移除指定类名
+     * @param {Element} el - 目标元素
+     * @param {...string} classes - 要移除的类名
+     */
+    delCls: (el, ...classes) => el?.classList.remove(...classes),
+    /**
+     * 向元素添加指定类名
+     * @param {Element} el - 目标元素
+     * @param {...string} classes - 要添加的类名
+     */
+    addCls: (el, ...classes) => el?.classList.add(...classes),
     isElement(node) {
       return node instanceof Element;
     },
     isDocument(node) {
       return node instanceof Document;
     },
+    /**
+     * 重写Element的attachShadow方法，用于监听ShadowRoot的创建
+     * 为每个新创建的ShadowRoot触发"attached"事件，便于跟踪Shadow DOM
+     */
     hackAttachShadow() {
       if (Element.prototype.__attachShadow__) return;
       Element.prototype.__attachShadow__ = Element.prototype.attachShadow;
@@ -72,7 +135,7 @@
      * @param {Node} [subject=document] - 查询的起始节点（默认document）
      * @returns {Element|null} 匹配的第一个元素，无匹配返回null
      */
-    querySelector(selector, subject = document) {
+    query(selector, subject = document) {
       const immediate = subject.querySelector(selector);
       if (immediate) return immediate;
       const shadowRoots = [...this.getShadowRoots(subject, true)];
@@ -88,7 +151,7 @@
      * @param {Node} [subject=document] - 查询的起始节点（默认document）
      * @returns {Element[]} 所有匹配的元素数组（去重）
      */
-    querySelectorAll(selector, subject = document) {
+    querys(selector, subject = document) {
       const results = [...subject.querySelectorAll(selector)];
       const shadowRoots = [...this.getShadowRoots(subject, true)];
       for (const root of shadowRoots) {
@@ -118,6 +181,166 @@
       if (!window.trustedTypes?.createPolicy) return htmlStr;
       const policy = trustedTypes.defaultPolicy ?? trustedTypes.createPolicy("default", { createHTML: (input) => input });
       return policy.createHTML(htmlStr);
+    },
+    /**
+     * 获取元素的所有祖先节点（包括可能的Shadow DOM宿主）
+     * @param {Element} element - 目标元素
+     * @param {boolean} [withSelf=false] - 是否包含元素自身
+     * @param {number} [maxLevel=Infinity] - 最大遍历层级
+     * @returns {Element[]} 祖先节点数组（从顶层到当前元素）
+     */
+    getParents(element, withSelf = false, maxLevel = Infinity) {
+      const parents = withSelf && element ? [element] : [];
+      for (let current = element, level = 0; current && level < maxLevel; level++) {
+        current = current.parentNode instanceof ShadowRoot ? current?.getRootNode()?.host : current?.parentElement;
+        current && parents.unshift(current);
+      }
+      return parents;
+    },
+    /**
+     * 获取元素的父级链选择器（从元素自身到body的选择器路径）
+     * @param {Element} element - 目标元素
+     * @param {boolean} [nth=false] - 是否为同类型元素添加nth-of-type索引（用于区分同层级同标签元素）
+     * @returns {string} 由 " > " 连接的选择器链字符串（如 "div.container > p#intro > span.highlight"）
+     */
+    getParentChain(element, nth = false) {
+      const parents = [];
+      for (let current = element; current && current !== document.body; current = current.parentElement) {
+        parents.unshift(this.getTagInfo(current, nth));
+        if (current.id && this.hasNoDigits(current.id)) break;
+      }
+      return parents.join(" > ");
+    },
+    /**
+     * 获取单个元素的CSS选择器信息（优先使用ID，其次类名，最后标签名）
+     * @param {Element} ele - 目标元素
+     * @param {boolean} [nth=false] - 是否添加nth-of-type索引
+     * @returns {string} 元素的CSS选择器字符串（如 "#username"、".nav-item"、"div:nth-of-type(2)"）
+     */
+    getTagInfo(ele, nth = false) {
+      // id不是数字和中文
+      if (ele.id && this.hasNoDigits(ele.id) && !/[\u4e00-\u9fa5]/.test(ele.id)) return `#${ele.id}`;
+      let selector = ele.tagName.toLowerCase();
+      const classes = Array.from(ele.classList);
+
+      // 处理类选择器
+      if (classes.length) {
+        const validClasses = classes.filter(this.hasNoDigits, this);
+        selector += /[:[\]]/.test(ele.className)
+          ? `[class="${ele.className}"]`
+          : validClasses.length
+          ? `.${validClasses.join(".")}`
+          : Consts.EMPTY;
+      }
+
+      // 非首个同类型元素添加nth-of-type
+      if (nth && ele.parentElement) {
+        const siblings = Array.from(ele.parentElement.children).filter((sib) => sib.tagName === ele.tagName);
+        const index = siblings.indexOf(ele);
+        if (index > 0) selector += `:nth-of-type(${index + 1})`;
+      }
+
+      return selector;
+    },
+    /**
+     * 查找元素的最近匹配祖先
+     * @param {Element} element - 目标元素
+     * @param {string} selector - CSS选择器
+     * @param {number} [maxLevel=3] - 最大查找层级
+     * @returns {Element|null} 匹配的最近祖先，无匹配返回null
+     */
+    closest(element, selector, maxLevel = 3) {
+      for (let level = 0; element && level < maxLevel; level++, element = element.parentElement) {
+        if (element.matches(selector)) return element;
+      }
+      return null;
+    },
+    /**
+     * 获取元素的中心点坐标
+     * @param {Element} element - 目标元素
+     * @returns {Object} 包含centerX和centerY的坐标对象
+     */
+    getCenterPoint(element) {
+      if (!element) return { centerX: 0, centerY: 0 };
+      const { top, left, width, height } = this.getElementRect(element);
+      return { centerX: left + width / 2, centerY: top + height / 2 }; // 元素中心点
+    },
+    /**
+     * 判断坐标点是否在元素内部
+     * @param {number} pointX - 点的X坐标
+     * @param {number} pointY - 点的Y坐标
+     * @param {Element} element - 目标元素
+     * @returns {boolean} 点在元素内返回true，否则返回false
+     */
+    pointInElement(pointX, pointY, element) {
+      if (!element) return false;
+      const { top, left, right, bottom } = this.getElementRect(element);
+      return pointX >= left && pointX <= right && pointY >= top && pointY <= bottom;
+    },
+    /**
+     * 触发元素的鼠标移动事件
+     * @param {Element} element - 目标元素
+     */
+    triggerMousemove(element) {
+      const { centerX, centerY } = this.getCenterPoint(element);
+      for (let y = 0; y < centerY; y += 10) this.dispatchMouseEvent(element, EventTypes.MOUSE_MOVE, centerX, y);
+    },
+    /**
+     * 触发元素的鼠标悬停事件
+     * @param {Element} element - 目标元素
+     */
+    triggerMouseHover(element) {
+      const { centerX, centerY } = this.getCenterPoint(element);
+      this.dispatchMouseEvent(element, EventTypes.MOUSE_OVER, centerX, centerY);
+    },
+    /**
+     * 向元素派发鼠标事件
+     * @param {Element} element - 目标元素
+     * @param {string} eventType - 事件类型（如'mousemove'、'click'）
+     * @param {number} clientX - 鼠标X坐标
+     * @param {number} clientY - 鼠标Y坐标
+     */
+    dispatchMouseEvent(element, eventType, clientX, clientY) {
+      const dict = { clientX, clientY, bubbles: true };
+      element?.dispatchEvent(new MouseEvent(eventType, dict));
+    },
+    freqTimes: new Map(),
+    /**
+     * 判断操作是否过于频繁（防抖/节流）
+     * @param {string} [key="default"] - 操作标识
+     * @param {number} [gap=300] - 时间间隔（毫秒）
+     * @param {boolean} [isThrottle=false] - 是否启用节流模式（true为节流，false为防抖）
+     * @returns {boolean} 防抖模式：过于频繁返回true；节流模式：不执行返回true
+     */
+    isFrequent(key = "default", gap = 300, isThrottle = false) {
+      const now = Date.now();
+      const last = this.freqTimes.get(key) ?? 0;
+      const delta = now - last;
+
+      // 限制模式：返回是否过于频繁
+      if (!isThrottle) return this.freqTimes.set(key, now) && delta < gap;
+
+      // 节流模式：间隔满足时执行一次
+      return delta >= gap ? this.freqTimes.set(key, now) && false : true;
+    },
+    limitCountMap: new Map(),
+    /**
+     * 判断操作是否超过次数限制
+     * @param {string} [key="default"] - 操作标识
+     * @param {number} [maxCount=5] - 最大允许次数
+     * @returns {boolean} 超过限制返回true，否则返回false
+     */
+    isOverLimit(key = "default", maxCount = 5) {
+      const count = this.limitCountMap.get(key) ?? 0;
+      if (count < maxCount) return this.limitCountMap.set(key, count + 1) && false;
+      return true;
+    },
+    /**
+     * 重置指定操作的次数计数器
+     * @param {string} [key="default"] - 操作标识
+     */
+    resetLimitCounter(key = "default") {
+      this.limitCountMap.set(key, 0);
     },
   };
 
