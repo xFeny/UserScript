@@ -42,9 +42,9 @@ export default {
     const el = Tools.query(":is(.lite-room, #player-ctnr)", top.document);
     if (el) unsafeWindow.top.scrollTo({ top: Tools.getElementRect(el)?.top });
 
-    if (!Tools.hasCls(document.body, "hide-asida-area")) {
-      unsafeWindow.top?.livePlayer?.volume(100); // 声音100%
-      unsafeWindow.top?.livePlayer?.switchQuality("10000"); // 原画画质
+    if (!Tools.hasCls(document.body, "hide-asida-area") && unsafeWindow.top?.livePlayer) {
+      unsafeWindow.top.livePlayer.volume(100); // 声音100%
+      unsafeWindow.top.livePlayer.switchQuality("10000"); // 原画画质
       localStorage.setItem("FULLSCREEN-GIFT-PANEL-SHOW", 0); // 关闭全屏礼物栏
       Tools.addCls(document.body, "hide-asida-area", "hide-aside-area"); // 关闭侧边聊天栏
     }
