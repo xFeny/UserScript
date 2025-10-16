@@ -26,6 +26,21 @@
      */
     isTopWin: () => window.top === window,
     /**
+     * 向指定窗口发送跨窗口消息（支持自定义消息来源标识）
+     * @param {Window} win - 目标窗口对象（如iframe的contentWindow、父窗口等）
+     * @param {Object} data - 要发送的消息数据（示例：{ action: 'play', episode: 5 }）
+     * @param {string} [source="GM_MESSAGE"] - 消息来源标识（用于接收方验证消息合法性）
+     */
+    postMessage: (win, data, source = "GM_MESSAGE") => win?.postMessage({ source, ...data }, "*"),
+    /**
+     * 向页面中所有非空src的iframe发送消息
+     * @param {Object} data - 要发送给iframe的消息数据（示例：{ action: 'play', episode: 5 }）
+     * @param {string} source - 消息来源标识（可选，默认'GM_MESSAGE'）
+     */
+    sendToIFrames(data, source) {
+      this.querys("iframe:not([src=''], [src='#'])").forEach((iframe) => this.postMessage(iframe?.contentWindow, data, source));
+    },
+    /**
      * 获取元素的矩形信息
      * @param {Element} el - 目标元素
      * @returns {DOMRect|null} 元素的边界矩形对象，元素不存在则返回null
