@@ -13,6 +13,12 @@
 (function (window) {
   "use strict";
 
+  const EventTypes = {
+    CLICK: "click",
+    MOUSE_MOVE: "mousemove",
+    MOUSE_OVER: "mouseover",
+  };
+
   const GMTools = {
     EMPTY: "",
     /**
