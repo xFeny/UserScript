@@ -104,11 +104,13 @@ export default window.App = {
   },
   setupMouseMoveListener() {
     let timer = null;
-    const handleMouseEvent = ({ isTrusted, clientX, clientY }) => {
+    const handleMouseEvent = ({ target, isTrusted, clientX, clientY }) => {
       if (!isTrusted) return;
 
       clearTimeout(timer), this.toggleCursor();
       timer = setTimeout(() => this.toggleCursor(true), Consts.THREE_SEC);
+      if (target instanceof HTMLVideoElement) return this.setCurrentVideo(target);
+      // 若target不是视频元素（可能被其他元素遮挡），则从鼠标坐标向上查找是否存在视频元素
       const elements = document.elementsFromPoint(clientX, clientY);
       const video = elements.find((el) => el.matches("video"));
       if (video) this.setCurrentVideo(video);
