@@ -104,12 +104,14 @@ export default window.App = {
   },
   setupMouseMoveListener() {
     let timer = null;
-    const handleMouseEvent = ({ target, isTrusted }) => {
+    const handleMouseEvent = ({ isTrusted, clientX, clientY }) => {
       if (!isTrusted) return;
 
       clearTimeout(timer), this.toggleCursor();
       timer = setTimeout(() => this.toggleCursor(true), Consts.THREE_SEC);
-      if (target instanceof HTMLVideoElement) this.setCurrentVideo(target);
+      const elements = document.elementsFromPoint(clientX, clientY);
+      const video = elements.find((el) => el.matches("video"));
+      if (video) this.setCurrentVideo(video);
     };
 
     document.addEventListener(EventTypes.MOUSE_MOVE, (e) => handleMouseEvent(e));
