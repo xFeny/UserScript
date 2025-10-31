@@ -35,9 +35,9 @@ const include = [
 ];
 
 const description = [
-  "通用自动网页全屏，默认支持哔哩哔哩（含直播）、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏",
+  "通用 HTML5 视频工具：自动网页全屏 + 倍速调节 + 下集跳转，适配所有视频网站，减少手动操作，让追剧更省心、更沉浸",
+  "默认适配哔哩哔哩（含直播）、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏",
   "支持倍速调节、视频截图、画面镜像翻转、缩放与移动、记忆播放进度等功能",
-  "配备通用下集切换功能，适配所有视频网站剧集，实现一键续播。",
 ];
 
 // 开发模式下，添加全网匹配
@@ -59,7 +59,7 @@ export default defineConfig({
         match,
         include,
         author: "Feny",
-        version: "3.3.3",
+        version: "3.3.4",
         connect: "gitee.com",
         license: "GPL-3.0-only",
         description: description.join("；"),
