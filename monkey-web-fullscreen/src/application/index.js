@@ -104,8 +104,9 @@ export default window.App = {
   },
   setupMouseMoveListener() {
     let timer = null;
-    const handleMouseEvent = ({ target, isTrusted, clientX, clientY }) => {
-      if (!isTrusted) return;
+    const handleMouseEvent = ({ type, target, isTrusted, clientX, clientY }) => {
+      const gap = type === EventTypes.MOUSE_MOVE ? 150 : 50;
+      if (!isTrusted || Tools.isFrequent(type, gap, true)) return;
 
       clearTimeout(timer), this.toggleCursor();
       timer = setTimeout(() => this.toggleCursor(true), Consts.THREE_SEC);
