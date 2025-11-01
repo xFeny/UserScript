@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      1.0.0
 // @author       Feny
-// @description  DOM查询增强，支持穿透Shadow DOM获取元素
+// @description  DOM 查询增强，支持穿透 Shadow DOM 获取元素
 // @license      MIT
 // @run-at       document-start
 // @grant        unsafeWindow
@@ -22,6 +22,20 @@
   const GMTools = {
     EMPTY: "",
     /**
+     * 计算字符串的哈希值（基于FNV-1a哈希算法的32位实现）
+     * FNV（Fowler-Noll-Vo）哈希算法是一种非加密型哈希函数，适用于一般的哈希检索操作
+     * @param {string} str - 要计算哈希值的字符串
+     * @returns {number} 32位无符号整数哈希值
+     */
+    hashCode(str) {
+      let hash = 0x811c9dc5;
+      for (let i = 0; i < str.length; i++) {
+        hash ^= str.charCodeAt(i);
+        hash = (hash * 0x01000193) >>> 0; // 确保无符号32位整数运算
+      }
+      return hash;
+    },
+    /**
      * 判断字符串是否不包含数字
      * @param {string} str - 待检测的字符串
      * @returns {boolean} 不包含任何数字返回true，否则返回false
@@ -31,7 +45,13 @@
      * 判断当前窗口是否为顶层窗口
      * @returns {boolean} 是顶层窗口返回true，否则返回false
      */
-    isTopWin: () => window.top === window,
+    isTopWin: () => window.top === window.self,
+    /**
+     * 从字符串中提取所有的数字
+     * @param {string} str - 待提取数字的输入值
+     * @returns {number[]} 提取到的数字数组（无数字或输入非字符串时返回空数组）
+     */
+    getNumbers: (str) => (typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : []),
     /**
      * 向指定窗口发送跨窗口消息（支持自定义消息来源标识）
      * @param {Window} win - 目标窗口对象（如iframe的contentWindow、父窗口等）
@@ -381,5 +401,6 @@
   };
 
   GMTools.hackAttachShadow();
-  unsafeWindow.GMTools = window.GMTools = GMTools;
+  typeof unsafeWindow !== "undefined" && (unsafeWindow.GMTools = GMTools);
+  window.GMTools = GMTools;
 })(window);
