@@ -6,7 +6,7 @@ import SiteIcons from "../common/SiteIcons";
 import Keyboard from "../common/Keyboard";
 
 /**
- * 网页全屏逻辑处理
+ * 自动网页全屏、自动切换下集逻辑处理
  */
 export default {
   autoNextEpisode(video) {
@@ -54,7 +54,8 @@ export default {
   },
   autoExitWebFullscreen() {
     if (!Site.isBili() && !Site.isAcFun()) return;
-    if (this.player.offsetWidth === innerWidth) this.triggerIconElement(SiteIcons.name.webFull);
+    const isWide = this.player.offsetWidth === innerWidth;
+    if (isWide) this.triggerIconElement(this.isFullscreen ? SiteIcons.name.full : SiteIcons.name.webFull);
 
     // 取消连播触发条件：
     // - B站普通视频（非番剧）播放结束时
