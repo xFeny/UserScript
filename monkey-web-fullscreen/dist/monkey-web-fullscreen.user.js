@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.3.3
+// @version      3.3.4
 // @author       Feny
-// @description  通用自动网页全屏，默认支持哔哩哔哩（含直播）、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；支持倍速调节、视频截图、画面镜像翻转、缩放与移动、记忆播放进度等功能；配备通用下集切换功能，适配所有视频网站剧集，实现一键续播。
+// @description  通用 HTML5 视频工具：自动网页全屏 + 倍速调节 + 下集切换，减少手动操作！让追剧更省心、更沉浸；默认适配哔哩哔哩（含直播）、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @license      GPL-3.0-only
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAqdJREFUWEftl91LFFEYxp/3jB9ESZjtSl51F1RUSgRCF/kHlF1IhiFhF65dqEQkBUErdJMStBukGwQre2NZUiCRqUiURkW65mIfqGUFsW6Ii0jY7p4Tc3Rqd5zaGVldAudynve8z28e3jMzh5Dmi1R/V0vQyRRWxgWG6x22SrcnOAhQcQIbwVtXba8y1EANSpS1xzJin5c/Dz+jRDPvGWoErwRw35zuh8ChpcXXFjbwi9k/WADA9viGgovGnxtFs6EmcApMvCdBA3oIIirl4N8NNQngmRYJiwTOE7EHHLERAmXFawQ6AdCQkRbjsZIMUvIFoV0HMSsEDjCgSK8tJqAHAEDAMWLKLOexx8tiVVDEhLLVQAtzRPcwKOUANSWCw1/rsBe6PcFz8dpfAdTFgtF+EmIvBG7pID7mZNl2zkVCFQbahzqHfYerddpNhFpdsnfqauzl8ZoEuO4JXdIKOefynnZlimxXhBbqjTZL/el8pzrAVjTGmKh12Bq1ddJs974abQDXfFMuAhQ6EodwDTHWAf6/BAoK8nD0cDEKtuVhyD+OzvvLXnyWJshyApedJ1F65M9n4tlAAF5fL168fGfJWCu2DDA61GpodLvjCdp8vfjyNWQJJGUAquvMzBzafD0yEc65KZCUAmiOo4FPEqS753VSiFUB0FxbPF244en6J8SqAoTD8zhYcjZ9AP6RCVRWNacHYPD5GJqudmBi8tvaAkxNBeUuuNv5NOkAqgUpm4FIJCrfA+r0z4bnTZmvCKCv+wrsts0JBg8fvZLGY28NfoqToFhOoOJ4CS40lMu2I28mpXFP37DpJ9YXWgZQG+Tm5mBL7qakA2aGakUAZhqbrVkH0BLoB34fzcyml5K6pd/yaicRlQlgV0q6mmwitMOpyfpVKfsFya4w73cz9xQAAAAASUVORK5CYII=
 // @homepage     https://github.com/xFeny/UserScript/tree/main/monkey-web-fullscreen
@@ -578,11 +578,15 @@
     },
     setupMouseMoveListener() {
       let timer = null;
-      const handleMouseEvent = ({ target, isTrusted }) => {
-        if (!isTrusted) return;
+      const handleMouseEvent = ({ type, target, isTrusted, clientX, clientY }) => {
+        const gap = type === EventTypes.MOUSE_MOVE ? 150 : 50;
+        if (!isTrusted || Tools.isFrequent(type, gap, true)) return;
         clearTimeout(timer), this.toggleCursor();
         timer = setTimeout(() => this.toggleCursor(true), Consts.THREE_SEC);
-        if (target instanceof HTMLVideoElement) this.setCurrentVideo(target);
+        if (target instanceof HTMLVideoElement) return this.setCurrentVideo(target);
+        const elements = document.elementsFromPoint(clientX, clientY);
+        const video = elements.find((el) => el.matches("video"));
+        if (video) this.setCurrentVideo(video);
       };
       document.addEventListener(EventTypes.MOUSE_MOVE, (e) => handleMouseEvent(e));
       document.addEventListener(EventTypes.MOUSE_OVER, (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
@@ -1327,9 +1331,9 @@
       _unsafeWindow.top.scrollTo({ top: 70 });
       const el = Tools.query(":is(.lite-room, #player-ctnr)", top.document);
       if (el) _unsafeWindow.top.scrollTo({ top: Tools.getElementRect(el)?.top });
-      if (!Tools.hasCls(document.body, "hide-asida-area")) {
-        _unsafeWindow.top?.livePlayer?.volume(100);
-        _unsafeWindow.top?.livePlayer?.switchQuality("10000");
+      if (!Tools.hasCls(document.body, "hide-asida-area") && _unsafeWindow.top?.livePlayer) {
+        _unsafeWindow.top.livePlayer.volume(100);
+        _unsafeWindow.top.livePlayer.switchQualityAsync("10000");
         localStorage.setItem("FULLSCREEN-GIFT-PANEL-SHOW", 0);
         Tools.addCls(document.body, "hide-asida-area", "hide-aside-area");
       }
@@ -1338,7 +1342,8 @@
     },
     autoExitWebFullscreen() {
       if (!Site.isBili() && !Site.isAcFun()) return;
-      if (this.player.offsetWidth === innerWidth) this.triggerIconElement(SiteIcons.name.webFull);
+      const isWide = this.player.offsetWidth === innerWidth;
+      if (isWide) this.triggerIconElement(this.isFullscreen ? SiteIcons.name.full : SiteIcons.name.webFull);
       requestAnimationFrame(() => {
         const isLast = Tools.query('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
         if (!Tools.query(".video-pod") || isLast) Tools.query(".bpx-player-ending-related-item-cancel")?.click();
@@ -1835,6 +1840,7 @@
       };
     }
     hackAttachShadow() {
+      if (Element.prototype.__attachShadow) return;
       Element.prototype.__attachShadow = Element.prototype.attachShadow;
       Element.prototype.attachShadow = function(options) {
         if (this._shadowRoot) return this._shadowRoot;
