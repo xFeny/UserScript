@@ -19,6 +19,17 @@ export function isDocument(node) {
 }
 
 /**
+ * 获取节点的 ShadowRoot（影子根）
+ * 优先从自定义属性_shadowRoot 获取，若不存在则从标准 shadowRoot 属性获取
+ * @param {Element} node 要获取 ShadowRoot 的元素节点
+ * @return {ShadowRoot|null} 元素的影子根，若不存在则返回 null
+ */
+function getRoot(node) {
+  if (!node) return null;
+  return node._shadowRoot ?? node.shadowRoot;
+}
+
+/**
  * 遍历给定节点，查找所有子元素中包含的 shadow root。
  *
  * @param node 要遍历的起始节点
@@ -28,9 +39,7 @@ export function isDocument(node) {
 export function* getShadowRoots(node, deep = false) {
   if (!node || (!isElement(node) && !isDocument(node))) return;
 
-  if (isElement(node) && node._shadowRoot) {
-    yield node._shadowRoot;
-  }
+  if (isElement(node) && getRoot(node)) yield getRoot(node);
 
   const doc = isDocument(node) ? node : node.getRootNode({ composed: true });
   if (!doc.createTreeWalker) return;
@@ -39,16 +48,15 @@ export function* getShadowRoots(node, deep = false) {
   const toWalk = [node];
   while ((currentNode = toWalk.pop())) {
     const walker = doc.createTreeWalker(currentNode, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_DOCUMENT_FRAGMENT, {
-      acceptNode: (child) => (isElement(child) && child._shadowRoot ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP),
+      acceptNode: (child) => (isElement(child) && getRoot(child) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP),
     });
 
     let walkerNode = walker.nextNode();
     while (walkerNode) {
-      if (isElement(walkerNode) && walkerNode._shadowRoot) {
-        if (deep) {
-          toWalk.push(walkerNode._shadowRoot);
-        }
-        yield walkerNode._shadowRoot;
+      const shadowRoot = getRoot(walkerNode);
+      if (isElement(walkerNode) && shadowRoot) {
+        if (deep) toWalk.push(shadowRoot);
+        yield shadowRoot;
       }
       walkerNode = walker.nextNode();
     }
