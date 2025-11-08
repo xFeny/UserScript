@@ -1,4 +1,5 @@
 import App from "./application";
+import "./application/player/VideoEnhancer";
 import Keydown from "./application/handler/KeydownHandler";
 import WebLogin from "./application/handler/WebLoginHandler";
 import MenuCommand from "./application/handler/MenuCommandHandler";
@@ -9,7 +10,6 @@ import PickerEpisode from "./application/handler/PickerEpisodeHandler";
 import WebFullEnhance from "./application/handler/WebFullEnhanceHandler";
 import SettMessage from "./application/handler/SettMessageHandler";
 import IgnoreUrls from "./application/handler/IgnoreUrlsHandler";
-import VideoEnhancer from "./application/player/VideoEnhancer";
 
 import "sweetalert2/dist/sweetalert2.min.css";
 import "notyf/notyf.min.css";
@@ -33,6 +33,5 @@ import "./style.scss";
   });
 });
 
-window.videoEnhance = new VideoEnhancer();
 unsafeWindow.AUTO_WEB_FULLSCREEN = App;
 App.init();

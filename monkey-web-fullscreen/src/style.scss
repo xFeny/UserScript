@@ -419,6 +419,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 .__time-progress,
 .__rate-keep-show {
   color: #e0e0e0;
+  text-indent: 0 !important;
   text-shadow: 0 0 2px #000;
   position: absolute !important;
   pointer-events: none !important;

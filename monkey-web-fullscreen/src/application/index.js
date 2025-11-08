@@ -52,7 +52,7 @@ export default window.App = {
   setupDocBodyObserver() {
     this.bodyObserver?.disconnect();
     clearTimeout(this.observerTimeout);
-    this.bodyObserver = Tools.createObserver(document.body, () => {
+    this.bodyObserver = Tools.createObserver(document.body ?? document.documentElement, () => {
       const video = this.getVideo();
       Promise.resolve().then(() => this.removeLoginPopups());
       if (video?.offsetWidth) this.setCurrentVideo(video);

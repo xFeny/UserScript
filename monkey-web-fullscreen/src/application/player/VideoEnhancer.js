@@ -5,7 +5,7 @@ import VideoEvents from "./VideoEventsHandler";
  * 自动为页面中的video元素添加脚本的事件监听，支持动态添加的video元素
  * 使得在多视频页面，切换视频播放时能更快速的应用到倍速
  */
-export default class VideoEnhancer {
+class VideoEnhancer {
   timeout = 100;
   attr = "enhanced";
   selector = ":is(video, fake-video):not([enhanced])";
@@ -14,10 +14,10 @@ export default class VideoEnhancer {
   videoEvents = Object.entries(VideoEvents);
 
   constructor() {
-    this.setupObserver();
     this.hackAttachShadow();
     this.setupExistingVideos();
     this.hookMediaMethod("play", (video) => this.enhanced(video)); // 防止没有增强到
+    this.setupObserver();
   }
 
   setupExistingVideos() {
@@ -27,7 +27,7 @@ export default class VideoEnhancer {
   }
 
   setupObserver() {
-    Tools.createObserver(document.body, (mutations) => {
+    Tools.createObserver(document.body ?? document.documentElement, (mutations) => {
       mutations.forEach((m) => m.type === "childList" && this.processAddedNodes(m.addedNodes));
     });
   }
@@ -140,3 +140,5 @@ export default class VideoEnhancer {
     Element.prototype.attachShadow.toString = () => Element.prototype.__attachShadow.toString();
   }
 }
+
+export default window.videoEnhance = new VideoEnhancer();
