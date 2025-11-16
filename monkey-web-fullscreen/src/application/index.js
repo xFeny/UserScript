@@ -26,7 +26,7 @@ export default window.App = {
       // 如：https://www.dadalv.cc 、https://www.jiaozi.me 、https://www.pipilv.cc
       const element = Tools.query(".ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
       if (!element || Tools.isFrequent("start")) return;
-      setTimeout(() => element?.click() & element?.remove(), 250);
+      setTimeout(() => element?.click?.() & element?.remove?.(), 250);
     });
   },
   setupVisibleListener() {
