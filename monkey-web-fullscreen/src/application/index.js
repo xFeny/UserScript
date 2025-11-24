@@ -1,4 +1,4 @@
-import listen from "./handler/ListenerHandler";
+import Listen from "./handler/ListenerHandler";
 import Keydown from "./handler/KeydownHandler";
 import Control from "./handler/VideoControlHandler";
 import WebFull from "./handler/WebFullscreenHandler";
@@ -11,4 +11,4 @@ import Ignore from "./handler/IgnoreUrlsHandler";
 import Login from "./handler/WebLoginHandler";
 import Menu from "./handler/MenuHandler";
 
-export default [listen, Keydown, Control, WebFull, Automatic, Switch, Picker, Ignore, SettMsg, Menu, Extend, Login];
+export default [Listen, Keydown, Control, WebFull, Automatic, Switch, Picker, Ignore, SettMsg, Menu, Extend, Login];
