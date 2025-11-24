@@ -4,7 +4,7 @@ import Storage from "../common/Storage";
 import Keyboard from "../common/Keyboard";
 
 /**
- * 通用网页全屏
+ * 通用网页全屏处理
  */
 export default {
   toggleFullscreen() {
@@ -13,13 +13,12 @@ export default {
     isFull ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
     if (isFull || !this.fullscreenWrapper) this.dispatchShortcutKey(Keyboard.P); // 全屏或非网页全屏模式下
   },
-  webFullEnhance(isTrusted) {
+  toggleWebFullscreen(isTrusted) {
     if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
     if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
-
-    // 退出网页全屏
-    if (this.fullscreenWrapper) return this.exitWebFullEnhance();
-
+    this.fullscreenWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
+  },
+  enterWebFullscreen() {
     // video的宿主容器元素
     const container = (this.fullscreenWrapper = this.getVideoHostContainer());
     if (!container || container.matches(":is(html, body)")) return this.ensureWebFullscreen();
@@ -35,7 +34,8 @@ export default {
     // 确保网页全屏成功
     this.ensureWebFullscreen();
   },
-  exitWebFullEnhance() {
+  exitWebFullscreen() {
+    if (!this.fullscreenWrapper) return;
     const { scrollY } = this.fullscreenWrapper;
     Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
     requestAnimationFrame(() => Tools.scrollTop(scrollY)); // 滚动到原始位置

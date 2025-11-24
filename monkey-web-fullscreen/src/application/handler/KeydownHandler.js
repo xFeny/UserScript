@@ -73,7 +73,7 @@ export default {
       D: () => Site.isMatched() && this.triggerIconElement(SiteIcons.name.danmaku),
       N: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
       ENTER: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen()),
-      P: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance(isTrusted)),
+      P: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.webFull) : this.toggleWebFullscreen(isTrusted)),
       LEFT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(-Storage.SKIP_INTERVAL.get()),
       RIGHT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(Storage.SKIP_INTERVAL.get()),
       0: () => this.adjustPlayProgress(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
@@ -100,11 +100,5 @@ export default {
 
     // 执行函数
     dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
-  },
-  triggerIconElement(name) {
-    if (Tools.isFrequent("icon")) return;
-    const index = Object.values(SiteIcons.name).indexOf(name);
-    if (!Site.isBiliLive()) return Tools.query(SiteIcons[location.host]?.[name])?.click();
-    SiteIcons.name.webFull === name ? this.liveWebFullscreen() : this.getBiliLiveIcons()?.[index]?.click();
   },
 };
