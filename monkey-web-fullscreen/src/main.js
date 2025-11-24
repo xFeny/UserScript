@@ -5,7 +5,7 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import "notyf/notyf.min.css";
 import "./style.scss";
 
-const App = (window.App = {});
+unsafeWindow.AUTO_WEB_FULLSCREEN = window.App = {};
 handlers.forEach((handler) => {
   // 将Handler方法变为App的方法，内部this指向App
   Object.entries(handler).forEach(([key, value]) => {
@@ -13,5 +13,4 @@ handlers.forEach((handler) => {
   });
 });
 
-unsafeWindow.AUTO_WEB_FULLSCREEN = App;
 App.init();
