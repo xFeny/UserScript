@@ -45,16 +45,17 @@ export default {
     ];
 
     // 注册菜单项
-    configs.forEach(({ title, cache, isHidden, fn }) => {
+    configs.forEach(({ title, host, cache, isHidden, fn }) => {
       const id = `${cache.name}_MENU_ID`;
       GM_unregisterMenuCommand(this[id]);
       if (isHidden) return;
 
       this[id] = GM_registerMenuCommand(title, () => {
-        if (fn) return fn.call(this, { cache, title });
+        if (fn) return fn.call(this, { host, cache, title }); // 自定义逻辑
 
-        const input = prompt(title, cache.get());
-        if (!isNaN(input) && cache.parser(input)) cache.set(input);
+        // 弹出输入框对话框
+        const input = prompt(title, host ? cache.get(host) : cache.get());
+        if (!isNaN(input) && cache.parser(input)) host ? cache.set(host, input) : cache.set(input);
       });
     });
   },

@@ -86,8 +86,8 @@ export default {
   },
   videoParents: new Set(),
   findVideoParentContainer(container, maxLevel = 4, track = true) {
-    const video = this.player;
-    container = container ?? video.parentElement;
+    container = container ?? this.player.parentElement;
+    if (!document.contains(this.player)) return Tools.log("视频元素已被移除文档，无法获取容器");
     const { offsetWidth: cw, offsetHeight: ch } = container;
     if (track) this.videoParents.clear(); // 仅网页全屏时
 

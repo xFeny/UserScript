@@ -63,7 +63,7 @@ export default window.App = {
   setCurrentVideo(video) {
     if (!video || this.player === video) return;
     if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // player播放中
-    if ((!Site.isMgtv() && video.offsetWidth < 200) || this.isBackgroundVideo(video)) return;
+    if ((!Site.isMgtv() && video.offsetWidth < 240) || this.isBackgroundVideo(video)) return;
 
     this.player = video;
     this.setVideoInfo(video);
