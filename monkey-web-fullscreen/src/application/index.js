@@ -11,4 +11,13 @@ import Ignore from "./handler/IgnoreUrlsHandler";
 import Login from "./handler/WebLoginHandler";
 import Menu from "./handler/MenuHandler";
 
-export default [Listen, Keydown, Control, WebFull, Automatic, Switch, Picker, Ignore, SettMsg, Menu, Extend, Login];
+const handlers = [Listen, Keydown, Control, WebFull, Automatic, Switch, Picker, Ignore, SettMsg, Menu, Extend, Login];
+unsafeWindow.AUTO_WEB_FULLSCREEN = window.App = {};
+handlers.forEach((handler) => {
+  // 将Handler方法变为App的方法，内部this指向App
+  Object.entries(handler).forEach(([key, value]) => {
+    App[key] = value instanceof Function ? value.bind(App) : value;
+  });
+});
+
+App.init();
