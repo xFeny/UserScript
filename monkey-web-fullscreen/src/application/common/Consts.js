@@ -14,4 +14,5 @@ export default Object.freeze({
   webFull: "webFullscreen",
   MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN",
   FAKE_VIDEO: "fake-video",
+  WEBFULL_PARENT_DEPTH: 20,
 });

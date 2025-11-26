@@ -41,22 +41,26 @@ export default {
     if (!Tools.isTopWin()) return;
     const isFull = !!document.fullscreenElement;
     isFull ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-    if (isFull || !this.fullscreenWrapper) this.dispatchShortcutKey(Keyboard.P); // 全屏或非网页全屏模式下
+    if (isFull || !this.fsWrapper) this.dispatchShortcutKey(Keyboard.P); // 全屏或非网页全屏模式下
   },
   toggleWebFullscreen(isTrusted) {
     if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
     if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
-    this.fullscreenWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
+    this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
   },
   enterWebFullscreen() {
     // video的宿主容器元素
-    const container = (this.fullscreenWrapper = this.getVideoHostContainer());
+    const container = (this.fsWrapper = this.getVideoHostContainer());
     if (!container || container.matches(":is(html, body)")) return this.ensureWebFullscreen();
 
     // 进入网页全屏
+    const parents = Tools.getParents(container, true);
     container.top = container.top ?? Tools.getElementRect(container).top;
     container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
-    Tools.getParents(container, true).forEach((el) => Tools.setPart(el, Consts.webFull));
+    // 父元素链的长度超过预设的阈值，视频容器“脱离”其原始DOM结构
+    parents.length < Consts.WEBFULL_PARENT_DEPTH
+      ? parents.forEach((el) => Tools.setPart(el, Consts.webFull))
+      : this.detachForFullscreen();
 
     // 滚动到视频容器位置，解决微博网页全屏后，在退出时不在原始位置问题
     Tools.scrollTop(container.scrollY + container.top);
@@ -64,13 +68,25 @@ export default {
     // 确保网页全屏成功
     this.ensureWebFullscreen();
   },
+  detachForFullscreen() {
+    this.fsParent = this.fsWrapper.parentElement;
+    this.fsPlaceholder = document.createElement("div");
+    Tools.cloneStyle(this.fsWrapper, this.fsPlaceholder, ["position", "width", "height"]);
+    this.fsParent.replaceChild(this.fsPlaceholder, this.fsWrapper);
+    document.body.insertAdjacentElement("beforeend", this.fsWrapper);
+    Tools.setPart(this.fsWrapper, Consts.webFull);
+  },
   exitWebFullscreen() {
-    if (!this.fullscreenWrapper) return;
-    const { scrollY } = this.fullscreenWrapper;
+    if (!this.fsWrapper) return;
+    const { scrollY } = this.fsWrapper;
+    // 分离式网页全屏，将视频容器还原到它原来的DOM位置
+    if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
     Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
     requestAnimationFrame(() => Tools.scrollTop(scrollY)); // 滚动到原始位置
-    this.fullscreenWrapper = null;
     this.videoParents.clear();
+    this.fsPlaceholder = null;
+    this.fsWrapper = null;
+    this.fsParent = null;
   },
   getVideoHostContainer() {
     if (this.player) return this.getVideoContainer();
@@ -117,7 +133,6 @@ export default {
   videoParents: new Set(),
   findVideoParentContainer(container, maxLevel = 4, track = true) {
     container = container ?? this.player.parentElement;
-    if (!document.contains(this.player)) return Tools.log("视频元素已被移除文档，无法获取容器");
     const { offsetWidth: cw, offsetHeight: ch } = container;
     if (track) this.videoParents.clear(); // 仅网页全屏时
 

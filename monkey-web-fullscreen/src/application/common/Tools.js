@@ -178,4 +178,11 @@ export default unsafeWindow.Tools = {
     const policy = trustedTypes.defaultPolicy ?? trustedTypes.createPolicy("default", { createHTML: (input) => input });
     return policy.createHTML(htmlStr);
   },
+  cloneStyle(source, target, ...names) {
+    const computedStyle = window.getComputedStyle(source);
+    names.flat().forEach((name) => {
+      const value = computedStyle.getPropertyValue(name);
+      if (value) target.style.setProperty(name, value);
+    });
+  },
 };
