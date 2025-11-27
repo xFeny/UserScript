@@ -97,6 +97,11 @@ export default {
     this.fsParent = null;
   },
   getVideoHostContainer() {
+    // 自定义网页全屏元素
+    const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin?.host)?.trim();
+    const container = Tools.query(selector.replace(/\n/g, Consts.EMPTY) || null);
+    if (container) return container;
+
     if (this.player) return this.getVideoContainer();
 
     // video所在的iframe
@@ -117,10 +122,6 @@ export default {
     return Tools.query(`iframe[src*="${pathname + partial}"]`) ?? Tools.query(`iframe[src*="${pathname}"]`);
   },
   getVideoContainer() {
-    // 自定义网页全屏元素
-    const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin?.host)?.trim();
-    if (selector) return Tools.query(selector.replace(/\n/g, Consts.EMPTY));
-
     // 查找相关元素
     const ctrlContainer = this.findControlBarContainer();
     return ctrlContainer ? this.findVideoParentContainer(ctrlContainer) : this.findVideoParentContainer();
