@@ -58,7 +58,7 @@ export default {
     container.top = container.top ?? Tools.getElementRect(container).top;
     container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
     // 父元素链的长度超过预设的阈值，视频容器“脱离”其原始DOM结构
-    parents.length < Consts.WEBFULL_PARENT_DEPTH
+    container instanceof HTMLIFrameElement || parents.length < Consts.WEBFULL_PARENT_DEPTH
       ? parents.forEach((el) => Tools.setPart(el, Consts.webFull))
       : this.detachForFullscreen();
 
