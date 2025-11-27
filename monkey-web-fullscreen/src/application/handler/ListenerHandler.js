@@ -5,7 +5,7 @@ import Tools from "../common/Tools";
 import Site from "../common/Site";
 import Keyboard from "../common/Keyboard";
 
-const observedValue = { isFullscreen: false, fsParent: null };
+const observedValue = { isFullscreen: false, fsWrapper: null };
 export default {
   init() {
     this.setupDocBodyObserver();
@@ -15,7 +15,7 @@ export default {
     this.setupMouseMoveListener();
     this.setupFullscreenListener();
     this.observeFullscreenChange();
-    this.observeDetachForFullscreen();
+    this.observeWebFullscreenChange();
     this.setupIgnoreUrlsChangeListener();
     document.addEventListener("load", () => this.triggerStartElement(), true);
   },
@@ -152,17 +152,16 @@ export default {
     // 时钟显示或隐藏
     this.toggleClock();
   },
-  observeDetachForFullscreen() {
-    // 脱离原结构式网页全屏时禁止页面滚动
+  observeWebFullscreenChange() {
     const handle = () => Tools.scrollTop(this.fsWrapper.scrollY);
     const handleKeydown = (event, { code } = event) => {
       if (![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
       Tools.preventDefault(event), this.dispatchShortcutKey(code, true);
     };
-    Object.defineProperty(this, "fsParent", {
-      get: () => observedValue.fsParent,
+    Object.defineProperty(this, "fsWrapper", {
+      get: () => observedValue.fsWrapper,
       set: (value) => {
-        observedValue.fsParent = value;
+        observedValue.fsWrapper = value;
         if (value) return window.addEventListener("scroll", handle, true), document.addEventListener("keydown", handleKeydown);
         window.removeEventListener("scroll", handle, true), document.removeEventListener("keydown", handleKeydown);
       },
