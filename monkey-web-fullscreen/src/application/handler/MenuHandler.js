@@ -166,16 +166,16 @@ export default {
       { name: "speed", text: "禁用 倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true },
       { name: "memory", text: "禁用 记忆倍速", cache: Storage.DISABLE_MEMORY_SPEED, sendMsg: true },
       { name: "time", text: "禁用 记忆播放位置", cache: Storage.DISABLE_MEMORY_TIME, sendMsg: false },
-      { name: "fit", text: "禁用 自动网页全屏", cache: Storage.DISABLE_AUTO, isHidden: !Site.isMatched() },
+      { name: "fit", text: "禁用 自动网页全屏", cache: Storage.DISABLE_AUTO, isHide: !Site.isMatched() },
       { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE, sendMsg: false },
       { name: "volume", text: "禁用 音量默认百分百", cache: Storage.DISABLE_DEF_MAX_VOLUME },
       { name: "next", text: "启用 自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
-    ].filter(({ isHidden }) => !isHidden);
+    ];
 
-    const renderItem = ({ text, sendMsg, name, value }) => `
+    const renderItem = ({ text, dataSend, name, value }) => `
         <label class="__menu">${text}
-          <input ${sendMsg ? 'data-send="true"' : ""} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
+          <input ${dataSend} ${value && "checked"} name="${name}" type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
 
@@ -191,9 +191,9 @@ export default {
       { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, sendMsg: true },
     ].filter(({ isHidden }) => !isHidden);
 
-    const renderItem = ({ text, sendMsg, name, value }) => `
+    const renderItem = ({ text, dataSend, name, value }) => `
         <label class="__menu">${text}
-          <input ${sendMsg ? 'data-send="true"' : ""} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
+          <input ${dataSend} ${value && "checked"} name="${name}" type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
 
@@ -212,37 +212,35 @@ export default {
       { name: "preset", text: "常用倍速", cache: Storage.PRESET_SPEED },
     ];
 
-    const renderItem = ({ text, sendMsg, name, value }) => `
+    const renderItem = ({ text, dataSend, name, value }) => `
         <label class="__menu">${text}
-          <input ${sendMsg ? 'data-send="true"' : ""} value="${value}" name="${name}" type="text" autocomplete="off"/>
+          <input ${dataSend} value="${value}" name="${name}" type="text" autocomplete="off"/>
         </label>`;
 
     return this.generateCommonItems(configs, renderItem);
   },
   genIgnoreItems() {
-    const host = location.host;
+    const { CUSTOM_WEB_FULL, NEXT_IGNORE_URLS, FULL_IGNORE_URLS } = Storage;
     const configs = [
-      { name: "customFit", text: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), host },
-      { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: Storage.NEXT_IGNORE_URLS },
-      { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: Storage.FULL_IGNORE_URLS },
+      { name: "customRule", text: "自定义此站网页全屏规则", cache: CUSTOM_WEB_FULL, isHide: Site.isMatched(), useHost: true },
+      { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: NEXT_IGNORE_URLS },
+      { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: FULL_IGNORE_URLS },
     ];
 
-    const renderItem = ({ text, host, name, value }) => `
+    const renderItem = ({ text, dataHost, name, value }) => `
         <div class="others-sett"><p>${text}</p>
-          <textarea ${
-            host ? `data-host="${host}"` : ""
-          } name="${name}" type="text" spellcheck="false" autocomplete="off">${value}</textarea>
+          <textarea ${dataHost} name="${name}" type="text" spellcheck="false" autocomplete="off">${value}</textarea>
         </div>`;
 
     return this.generateCommonItems(configs, renderItem);
   },
   generateCommonItems(baseConfigs, renderItem) {
-    // 过滤要隐藏的项
-    const filteredConfigs = baseConfigs.filter(({ isHidden }) => !isHidden);
-
-    // 处理缓存值，有`host`取`host`的缓存
+    const filteredConfigs = baseConfigs.filter(({ isHide }) => !isHide);
     const processedConfigs = filteredConfigs.map((config) => ({
-      value: config.host ? config.cache.get(config.host) : config.cache.get(),
+      value: config.useHost ? config.cache.get(location.host) : config.cache.get(),
+      dataHost: config.useHost ? `data-host="${location.host}"` : Consts.EMPTY,
+      dataSend: config.sendMsg ? 'data-send="true"' : Consts.EMPTY,
+      host: config.useHost ? location.host : Consts.EMPTY,
       ...config,
     }));
 
