@@ -48,6 +48,11 @@ body[part*="webFullscreen"] [part*="webFullscreen"] {
   display: flex !important;
 }
 
+/** 隐藏后面的兄弟元素 */
+[part*="webFullscreen"] ~ * {
+  display: none !important;
+}
+
 [part*="webFullscreen"] {
   /** 为 control 做特殊处理 */
   .vjs-control-bar,

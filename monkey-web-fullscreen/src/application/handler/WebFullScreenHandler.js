@@ -87,10 +87,18 @@ export default {
   exitWebFullscreen() {
     if (!this.fsWrapper) return;
     const { scrollY } = this.fsWrapper;
+
+    // 临时禁用平滑滚动：为了确保接下来的滚动操作是瞬间完成的（无动画）
+    document.documentElement.style.setProperty("scroll-behavior", "auto", "important");
+
     // 是脱离原结构式网页全屏时，将视频容器还原到它原来的DOM位置
     if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
     Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
+
     requestAnimationFrame(() => Tools.scrollTop(scrollY)); // 滚动到原始位置
+    setTimeout(() => document.documentElement.style.removeProperty("scroll-behavior"), 20);
+
+    // 清理相关变量
     this.videoParents.clear();
     this.fsPlaceholder = null;
     this.fsWrapper = null;
