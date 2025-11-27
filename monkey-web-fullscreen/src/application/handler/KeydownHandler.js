@@ -98,6 +98,9 @@ export default {
     // 预设常用倍速值
     for (let i = 1; i < 6; i++) dict[`CTRL_${i}`] = () => this.setPlaybackRate(Storage.PRESET_SPEED.get()[i - 1]);
 
+    // 启/禁用自动下集
+    dict["SHIFT_E"] = () => Storage.ENABLE_AUTO_NEXT_EPISODE.set(!Storage.ENABLE_AUTO_NEXT_EPISODE.get());
+
     // 执行函数
     dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
   },

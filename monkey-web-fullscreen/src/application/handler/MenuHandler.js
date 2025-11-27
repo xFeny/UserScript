@@ -74,6 +74,7 @@ export default {
       { key: "Ctrl Z", desc: "复位缩放移动" },
       { key: "L / K", desc: "下一帧/上一帧" },
       { key: "Ctrl 1-5", desc: "预设常用倍速" },
+      { key: "Shift E", desc: "启/禁用自动下集" },
       { key: "Ctrl Alt A", desc: "截图 (默认禁用)" },
       { key: "Alt ➕ / ➖", desc: "缩放 (默认禁用)" },
       { key: "A / S 或 ➕ / ➖", desc: "倍速 ±0.25" },
