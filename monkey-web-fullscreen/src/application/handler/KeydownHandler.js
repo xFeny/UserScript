@@ -17,9 +17,9 @@ export default {
     const zoomKeys = !this.isDisableZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
     if (isNumberKey || isOverrideKey || preventKeys || (altKey && zoomKeys)) Tools.preventDefault(event);
   },
-  dispatchShortcutKey(code) {
+  dispatchShortcutKey(code, bypass) {
     const key = this.processShortcutKey({ code });
-    Tools.postMessage(window.top, { key });
+    Tools.postMessage(window.top, { key, bypass });
   },
   processShortcutKey({ key, code, ctrlKey, shiftKey, altKey }) {
     code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
@@ -62,7 +62,7 @@ export default {
     if (!this.player) Tools.sendToIFrames(data);
     if (data?.key) this.execHotKeyActions(data);
   },
-  execHotKeyActions({ key, isTrusted }) {
+  execHotKeyActions({ key, isTrusted, bypass }) {
     // Tools.log("按下的键：", { key, isTrusted });
     const dict = {
       M: () => this.toggleMute(),
@@ -74,10 +74,10 @@ export default {
       N: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
       ENTER: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen()),
       P: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.webFull) : this.toggleWebFullscreen(isTrusted)),
-      LEFT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(-Storage.SKIP_INTERVAL.get()),
-      RIGHT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(Storage.SKIP_INTERVAL.get()),
+      LEFT: () => (bypass || this.isOverrideKeyboard()) && this.adjustPlayProgress(-Storage.SKIP_INTERVAL.get()),
+      RIGHT: () => (bypass || this.isOverrideKeyboard()) && this.adjustPlayProgress(Storage.SKIP_INTERVAL.get()),
+      SPACE: () => (bypass || this.isOverrideKeyboard()) && this.togglePlayPause(this.player),
       0: () => this.adjustPlayProgress(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
-      SPACE: () => this.isOverrideKeyboard() && this.togglePlayPause(this.player),
       SHIFT_P: () => this.togglePictureInPicture(),
       SHIFT_L: () => this.toggleNativeControls(),
       CTRL_ALT_A: () => this.captureScreenshot(),

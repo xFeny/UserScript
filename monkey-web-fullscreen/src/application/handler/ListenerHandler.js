@@ -3,6 +3,7 @@ import Storage from "../common/Storage";
 import Consts from "../common/Consts";
 import Tools from "../common/Tools";
 import Site from "../common/Site";
+import Keyboard from "../common/Keyboard";
 
 const observedValue = { isFullscreen: false, fsParent: null };
 export default {
@@ -154,12 +155,16 @@ export default {
   observeDetachForFullscreen() {
     // 脱离原结构式网页全屏时禁止页面滚动
     const handle = () => Tools.scrollTop(this.fsWrapper.scrollY);
+    const handleKeydown = (event, { code } = event) => {
+      if (![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
+      Tools.preventDefault(event), this.dispatchShortcutKey(code, true);
+    };
     Object.defineProperty(this, "fsParent", {
       get: () => observedValue.fsParent,
       set: (value) => {
         observedValue.fsParent = value;
-        if (value) return window.addEventListener("scroll", handle, true);
-        window.removeEventListener("scroll", handle, true);
+        if (value) return window.addEventListener("scroll", handle, true), document.addEventListener("keydown", handleKeydown);
+        window.removeEventListener("scroll", handle, true), document.removeEventListener("keydown", handleKeydown);
       },
     });
   },
