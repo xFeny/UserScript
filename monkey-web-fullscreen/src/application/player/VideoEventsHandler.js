@@ -15,6 +15,7 @@ export default {
   timeupdate() {
     if (isNaN(this.duration)) return;
     if (!this.hasInitPlaySettings) App.initPlaySettings(this);
+    if (!App.player) App.setCurrentVideo(this);
     App.autoWebFullscreen(this);
     App.autoNextEpisode(this);
     App.cachePlayTime(this);
