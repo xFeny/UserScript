@@ -71,13 +71,18 @@ export default {
   detachForFullscreen() {
     if (this.fsParent) return;
     this.fsParent = this.fsWrapper.parentElement;
+
+    // 创建占位元素（保持原布局不塌陷）
     this.fsPlaceholder = document.createElement("div");
     Tools.cloneAttrs(this.fsWrapper, this.fsPlaceholder, ["id", "class", "style"]);
     Tools.cloneStyle(this.fsWrapper, this.fsPlaceholder, ["position", "width", "height"]);
+
+    // 替换并移动视频容器
     this.fsParent.replaceChild(this.fsPlaceholder, this.fsWrapper);
     document.body.insertAdjacentElement("beforeend", this.fsWrapper);
+
+    this.fsWrapper.querySelector("video")?.play();
     Tools.setPart(this.fsWrapper, Consts.webFull);
-    Tools.query("video", this.fsWrapper)?.play();
   },
   exitWebFullscreen() {
     if (!this.fsWrapper) return;
