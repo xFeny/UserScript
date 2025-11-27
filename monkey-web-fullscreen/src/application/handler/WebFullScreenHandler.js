@@ -69,12 +69,15 @@ export default {
     this.ensureWebFullscreen();
   },
   detachForFullscreen() {
+    if (this.fsParent) return;
     this.fsParent = this.fsWrapper.parentElement;
     this.fsPlaceholder = document.createElement("div");
+    Tools.cloneAttrs(this.fsWrapper, this.fsPlaceholder, ["id", "class", "style"]);
     Tools.cloneStyle(this.fsWrapper, this.fsPlaceholder, ["position", "width", "height"]);
     this.fsParent.replaceChild(this.fsPlaceholder, this.fsWrapper);
     document.body.insertAdjacentElement("beforeend", this.fsWrapper);
     Tools.setPart(this.fsWrapper, Consts.webFull);
+    Tools.query("video", this.fsWrapper)?.play();
   },
   exitWebFullscreen() {
     if (!this.fsWrapper) return;
