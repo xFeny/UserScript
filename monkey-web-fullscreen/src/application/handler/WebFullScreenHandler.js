@@ -87,7 +87,7 @@ export default {
   exitWebFullscreen() {
     if (!this.fsWrapper) return;
     const { scrollY } = this.fsWrapper;
-    // 分离式网页全屏，将视频容器还原到它原来的DOM位置
+    // 是脱离原结构式网页全屏时，将视频容器还原到它原来的DOM位置
     if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
     Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
     requestAnimationFrame(() => Tools.scrollTop(scrollY)); // 滚动到原始位置

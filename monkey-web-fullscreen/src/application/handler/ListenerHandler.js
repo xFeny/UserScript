@@ -4,6 +4,7 @@ import Consts from "../common/Consts";
 import Tools from "../common/Tools";
 import Site from "../common/Site";
 
+const observedValue = { isFullscreen: false, fsParent: null };
 export default {
   init() {
     this.setupDocBodyObserver();
@@ -13,6 +14,7 @@ export default {
     this.setupMouseMoveListener();
     this.setupFullscreenListener();
     this.observeFullscreenChange();
+    this.observeDetachForFullscreen();
     this.setupIgnoreUrlsChangeListener();
     document.addEventListener("load", () => this.triggerStartElement(), true);
   },
@@ -132,11 +134,10 @@ export default {
     });
   },
   observeFullscreenChange() {
-    let _isFullscreen = false;
     Object.defineProperty(this, "isFullscreen", {
-      get: () => _isFullscreen,
+      get: () => observedValue.isFullscreen,
       set: (value) => {
-        _isFullscreen = value;
+        observedValue.isFullscreen = value;
         this.handleFullscreenChange(value);
       },
     });
@@ -149,5 +150,17 @@ export default {
 
     // 时钟显示或隐藏
     this.toggleClock();
+  },
+  observeDetachForFullscreen() {
+    // 脱离原结构式网页全屏时禁止页面滚动
+    const handle = () => Tools.scrollTop(this.fsWrapper.scrollY);
+    Object.defineProperty(this, "fsParent", {
+      get: () => observedValue.fsParent,
+      set: (value) => {
+        observedValue.fsParent = value;
+        if (value) return window.addEventListener("scroll", handle, true);
+        window.removeEventListener("scroll", handle, true);
+      },
+    });
   },
 };
