@@ -389,7 +389,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 .risk-captcha-adapt .bili-mini-mask,
 #bilibili-player .bpx-player-toast-wrap,
 #bilibili-player .bpx-player-cmd-dm-wrap,
-#bilibili-player .bpx-player-dialog-wrap {
+#bilibili-player .bpx-player-dialog-wrap > :not(.bpx-player-dm-tip) {
   display: none !important;
 }
 /** 隐藏B站的提示 END **/
