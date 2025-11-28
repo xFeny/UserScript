@@ -70,7 +70,7 @@ export default {
     Promise.resolve().then(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
     this.sendTopWinInfo();
   },
-  async sendTopWinInfo() {
+  sendTopWinInfo() {
     // 向iframe传递顶级窗口信息
     const { host, href: url } = location;
     const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
