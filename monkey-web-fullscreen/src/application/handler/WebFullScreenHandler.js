@@ -70,7 +70,7 @@ export default {
   },
   detachForFullscreen() {
     if (this.fsParent) return;
-    this.fsParent = this.fsWrapper.parentElement;
+    this.fsParent = Tools.getParent(this.fsWrapper);
 
     // 创建占位元素（保持原布局不塌陷）
     this.fsPlaceholder = document.createElement("div");
@@ -149,7 +149,7 @@ export default {
   },
   videoParents: new Set(),
   findVideoParentContainer(container, maxLevel = 4, track = true) {
-    container = container ?? this.player.parentElement;
+    container = container ?? Tools.getParent(this.player);
     const { offsetWidth: cw, offsetHeight: ch } = container;
     if (track) this.videoParents.clear(); // 仅网页全屏时
 

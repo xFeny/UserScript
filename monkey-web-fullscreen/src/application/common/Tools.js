@@ -135,10 +135,16 @@ export default unsafeWindow.Tools = {
 
     return selector;
   },
+  getParent(element) {
+    if (!element) return null;
+    const parent = element.parentNode;
+    if (parent instanceof ShadowRoot) return parent.host;
+    return parent === document ? null : parent;
+  },
   getParents(element, withSelf = false, maxLevel = Infinity) {
     const parents = withSelf && element ? [element] : [];
     for (let current = element, level = 0; current && level < maxLevel; level++) {
-      current = current.parentNode instanceof ShadowRoot ? current?.getRootNode()?.host : current?.parentElement;
+      current = this.getParent(current);
       current && parents.unshift(current);
     }
     return parents;
@@ -166,10 +172,12 @@ export default unsafeWindow.Tools = {
     return Array.from({ length: nodes.snapshotLength }, (_, i) => nodes.snapshotItem(i)).filter((el) => !el.matches("script"));
   },
   setPart(node, value) {
+    if (!(node instanceof Element)) return;
     const parts = node?.getAttribute("part")?.split(/\s+/) ?? [];
     node?.setAttribute("part", [...new Set([...parts, value])].join(" ").trim());
   },
   delPart(node, value) {
+    if (!(node instanceof Element)) return;
     const parts = (node?.getAttribute("part")?.split(/\s+/) ?? []).filter((v) => v !== value);
     node?.setAttribute("part", parts.join(" ").trim());
   },
