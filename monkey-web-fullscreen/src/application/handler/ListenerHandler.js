@@ -153,8 +153,8 @@ export default {
     this.toggleClock();
   },
   observeWebFullscreenChange() {
-    const handle = () => Tools.scrollTop(this.fsWrapper.scrollY);
-    const handleKeydown = (event, { code } = event) => {
+    const handle = (event, { code, type } = event) => {
+      if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
       if (![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
       Tools.preventDefault(event), this.dispatchShortcutKey(code, true);
     };
@@ -162,8 +162,8 @@ export default {
       get: () => observedValue.fsWrapper,
       set: (value) => {
         observedValue.fsWrapper = value;
-        if (value) return window.addEventListener("scroll", handle, true), document.addEventListener("keydown", handleKeydown);
-        window.removeEventListener("scroll", handle, true), document.removeEventListener("keydown", handleKeydown);
+        const method = value ? "addEventListener" : "removeEventListener";
+        ["scroll", "keydown"].forEach((type) => window[method](type, handle, true));
       },
     });
   },
