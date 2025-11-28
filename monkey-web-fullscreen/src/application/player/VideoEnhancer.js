@@ -20,13 +20,13 @@ class VideoEnhancer {
     this.setupObserver();
   }
 
-  setupExistingVideos() {
+  async setupExistingVideos() {
     // 查找所有未添加事件监听的video元素
     const videos = Tools.querys(this.selector);
     videos.forEach((video) => this.enhanced(video));
   }
 
-  setupObserver() {
+  async setupObserver() {
     Tools.createObserver(document.body ?? document.documentElement, (mutations) => {
       mutations.forEach((m) => m.type === "childList" && this.processAddedNodes(m.addedNodes));
     });
@@ -118,7 +118,7 @@ class VideoEnhancer {
     }
   }
 
-  hookMediaMethod(method, callback) {
+  async hookMediaMethod(method, callback) {
     const original = HTMLMediaElement.prototype[method];
     HTMLMediaElement.prototype[method] = function () {
       callback.call(this, this);
@@ -126,7 +126,7 @@ class VideoEnhancer {
     };
   }
 
-  hackAttachShadow() {
+  async hackAttachShadow() {
     if (Element.prototype.__attachShadow) return;
     Element.prototype.__attachShadow = Element.prototype.attachShadow;
     Element.prototype.attachShadow = function (options) {

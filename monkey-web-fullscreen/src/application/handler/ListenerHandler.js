@@ -9,9 +9,8 @@ const observedValue = { isFullscreen: false, fsWrapper: null };
 export default {
   init() {
     this.setupDocBodyObserver();
-    this.setupVisibleListener();
     this.setupKeydownListener();
-    this.setupUrlChangeListener();
+    this.setupVisibleListener();
     this.setupMouseMoveListener();
     this.setupFullscreenListener();
     this.observeFullscreenChange();
@@ -31,7 +30,7 @@ export default {
       setTimeout(() => element?.click?.() & element?.remove?.(), 250);
     });
   },
-  setupVisibleListener() {
+  async setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
       if (this.isNormalSite() || Storage.DISABLE_INVISIBLE_PAUSE.get()) return;
 
@@ -40,27 +39,14 @@ export default {
       document.hidden ? video?.pause() : video?.play();
     });
   },
-  setupUrlChangeListener() {
-    const _wr = (method) => {
-      const original = history[method];
-      history[method] = function () {
-        original.apply(this, arguments);
-        window.dispatchEvent(new Event(method));
-      };
-    };
-    const handler = () => this.setupDocBodyObserver();
-    ["popstate", "pushState", "replaceState"].forEach((t) => _wr(t) & window.addEventListener(t, handler));
-  },
   setupDocBodyObserver() {
-    this.bodyObserver?.disconnect();
-    clearTimeout(this.observerTimeout);
-    this.bodyObserver = Tools.createObserver(document.body ?? document.documentElement, () => {
+    const observer = Tools.createObserver(document.body ?? document.documentElement, () => {
       const video = this.getVideo();
       Promise.resolve().then(() => this.removeLoginPopups());
       if (video?.offsetWidth) this.setCurrentVideo(video);
-      if (this.topWin) this.bodyObserver.disconnect();
+      if (this.topWin) observer.disconnect();
     });
-    this.observerTimeout = setTimeout(() => this.bodyObserver?.disconnect(), Consts.ONE_SEC * 10);
+    setTimeout(() => observer?.disconnect(), Consts.ONE_SEC * 10);
   },
   setCurrentVideo(video) {
     if (!video || this.player === video) return;
@@ -84,7 +70,7 @@ export default {
     Promise.resolve().then(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
     this.sendTopWinInfo();
   },
-  sendTopWinInfo() {
+  async sendTopWinInfo() {
     // 向iframe传递顶级窗口信息
     const { host, href: url } = location;
     const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
@@ -92,7 +78,7 @@ export default {
     window.topWin = this.topWin = topWin;
     Tools.sendToIFrames({ topWin });
   },
-  observeVideoSrcChange(video) {
+  async observeVideoSrcChange(video) {
     const that = this;
     if (video.hasAttribute("processed")) return;
     video.setAttribute("processed", true);
@@ -105,7 +91,7 @@ export default {
       },
     });
   },
-  setupMouseMoveListener() {
+  async setupMouseMoveListener() {
     let timer = null;
     const handleMouseEvent = ({ type, isTrusted }) => {
       const gap = type === EventTypes.MOUSE_MOVE ? 150 : 50;
@@ -128,13 +114,13 @@ export default {
       el?.blur(), Tools.addCls(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
     });
   },
-  setupFullscreenListener() {
+  async setupFullscreenListener() {
     document.addEventListener("fullscreenchange", () => {
       const isFullscreen = !!document.fullscreenElement;
       Tools.postMessage(window.top, { isFullscreen });
     });
   },
-  observeFullscreenChange() {
+  async observeFullscreenChange() {
     Object.defineProperty(this, "isFullscreen", {
       get: () => observedValue.isFullscreen,
       set: (value) => {
@@ -152,7 +138,7 @@ export default {
     // 时钟显示或隐藏
     this.toggleClock();
   },
-  observeWebFullscreenChange() {
+  async observeWebFullscreenChange() {
     const handle = (event, { code, type } = event) => {
       if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
       if (![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
@@ -163,7 +149,13 @@ export default {
       set: (value) => {
         observedValue.fsWrapper = value;
         const method = value ? "addEventListener" : "removeEventListener";
-        ["scroll", "keydown"].forEach((type) => window[method](type, handle, true));
+        ["scroll", "keydown"].forEach((type) => {
+          try {
+            window[method](type, handle, true);
+          } catch {
+            unsafeWindow[method](type, handle, true);
+          }
+        });
       },
     });
   },

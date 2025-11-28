@@ -27,9 +27,16 @@ export default {
     return keys.filter(Boolean).join("_").toUpperCase();
   },
   setupKeydownListener() {
-    window.addEventListener("keyup", (event) => this.preventDefault(event), true); // 腾讯视频
-    window.addEventListener("keydown", (event) => this.handleKeydown.call(this, event), true);
-    window.addEventListener("message", ({ data }) => this.handleMessage.call(this, data, true));
+    try {
+      window.addEventListener("keyup", (event) => this.preventDefault(event), true); // 腾讯视频
+      window.addEventListener("keydown", (event) => this.handleKeydown.call(this, event), true);
+      window.addEventListener("message", ({ data }) => this.handleMessage.call(this, data, true));
+    } catch {
+      // https://www.reddit.com 重写了 window.addEventListener 会报错，使用 unsafeWindow 绑定事件
+      unsafeWindow.addEventListener("keyup", (event) => this.preventDefault(event), true); // 腾讯视频
+      unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown.call(this, event), true);
+      unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage.call(this, data, true));
+    }
   },
   handleMessage(data) {
     // Tools.log(location.href, "接收到消息：", data);

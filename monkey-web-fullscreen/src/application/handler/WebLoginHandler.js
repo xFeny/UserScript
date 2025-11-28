@@ -8,7 +8,7 @@ import Consts from "../common/Consts";
  * - B站通过误导的方式，使其不弹窗
  */
 export default {
-  removeLoginPopups() {
+  async removeLoginPopups() {
     this.removeBiliLogin(), this.removeTencentLogin();
   },
   removeTencentLogin: () => Site.isTencent() && Tools.query("#login_win")?.remove(),
