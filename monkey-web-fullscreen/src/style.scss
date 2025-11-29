@@ -49,7 +49,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] {
 }
 
 /** 隐藏后面的兄弟元素 */
-[part*="webFullscreen"] ~ * {
+[part*="webFullscreen"] ~ *:not(.monkey-web-fullscreen) {
   display: none !important;
 }
 
