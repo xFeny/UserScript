@@ -125,7 +125,7 @@ export default {
     return Tools.query(`iframe[src*="${pathname + partial}"]`) ?? Tools.query(`iframe[src*="${pathname}"]`);
   },
   getVideoContainer() {
-    // 自定义网页全屏元素
+    // 自定义网页全屏元素，支持多个选择器，返回第一个找到的元素
     const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin?.host)?.trim();
     const container = selector ? selector.split(/[,;\n]/).reduce((acc, sel) => acc || Tools.query(sel), null) : null;
     if (container) return container;
