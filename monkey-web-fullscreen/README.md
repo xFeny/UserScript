@@ -7,27 +7,18 @@
 
 ### 快捷键大全
 
-| 快捷键      | 功能说明                     |
-| ----------- | ---------------------------- |
-| Enter | 全屏 |
-| P | 网页全屏      |
-| N | 切换下集               |
-| Z | 恢复正常倍速           |
-| R | 旋转 90° |
-| M | 静音切换 |
-| D | 弹幕显/隐      |
-| L / K | 下一帧 / 上一帧 |
-| Ctrl <b style='color:#bbb'>+</b> Z | 复位缩放移动 |
-| Shift <b style='color:#bbb'>+</b> R | 水平镜像             |
-| Shift <b style='color:#bbb'>+</b> P | 画中画切换 |
-| Ctrl <b style='color:#bbb'>+</b> Alt <b style='color:#bbb'>+</b> A | 截图 (默认禁用) |
-| Alt <b style='color:#bbb'>+</b> <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 缩放 (默认禁用)  |
-| A / S  或  <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 倍速 ±0.25               |
-| Alt <b style='color:#bbb'>+</b> ◀️🔼🔽▶️ | 移动画面 (默认禁用) |
-| ◀️▶️           | 快退/进 (默认禁用)      |
-| 空格      | 播放/暂停 (默认禁用)         |
-| 1️⃣ - 9️⃣  | 1️⃣ - 9️⃣ 倍速 |
-| 数字 0️⃣   | 快进 30 秒                   |
+| 快捷键      | 说明                     | 快捷键                  | 说明                 |
+| ----------- | ---------------------------- | ---------------------------- | ---------------------------- |
+| Enter | 全屏 | P | 网页全屏 |
+| N | 切换下集               | R              | 旋转 90°         |
+| Z | 恢复正常倍速           | D          | 弹幕显/隐      |
+| M | 静音切换 | L / K | 下一帧 / 上一帧 |
+| Ctrl <b style='color:#bbb'>+</b> Z | 复位缩放移动 | Shift <b style='color:#bbb'>+</b> R | 水平镜像 |
+| Shift <b style='color:#bbb'>+</b> P | 画中画切换 | Ctrl <b style='color:#bbb'>+</b> Alt <b style='color:#bbb'>+</b> A | 截图 (默认禁用) |
+| Alt <b style='color:#bbb'>+</b> <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 缩放 (默认禁用)  | A / S  或  <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 倍速 ±0.25 |
+| Alt <b style='color:#bbb'>+</b> ◀️🔼🔽▶️ | 移动画面 (默认禁用) | ◀️▶️ | 快退/进 (默认禁用) |
+| 空格      | 播放/暂停 (默认禁用)         | 1️⃣ - 9️⃣ | 1️⃣ - 9️⃣ 倍速 |
+| 数字 0️⃣   | 快进 30 秒                   |                    |                    |
 
 ### 自动网页全屏
 
