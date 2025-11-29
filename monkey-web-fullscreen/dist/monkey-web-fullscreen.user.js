@@ -1,61 +1,63 @@
 // ==UserScript==
-// @name         视频自动网页全屏｜倍速播放
-// @namespace    http://tampermonkey.net/
-// @version      3.3.5
-// @author       Feny
-// @description  通用 HTML5 视频工具：自动网页全屏 + 倍速调节 + 下集切换，减少手动操作！让追剧更省心、更沉浸；默认适配哔哩哔哩（含直播）、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
-// @license      GPL-3.0-only
-// @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAqdJREFUWEftl91LFFEYxp/3jB9ESZjtSl51F1RUSgRCF/kHlF1IhiFhF65dqEQkBUErdJMStBukGwQre2NZUiCRqUiURkW65mIfqGUFsW6Ii0jY7p4Tc3Rqd5zaGVldAudynve8z28e3jMzh5Dmi1R/V0vQyRRWxgWG6x22SrcnOAhQcQIbwVtXba8y1EANSpS1xzJin5c/Dz+jRDPvGWoErwRw35zuh8ChpcXXFjbwi9k/WADA9viGgovGnxtFs6EmcApMvCdBA3oIIirl4N8NNQngmRYJiwTOE7EHHLERAmXFawQ6AdCQkRbjsZIMUvIFoV0HMSsEDjCgSK8tJqAHAEDAMWLKLOexx8tiVVDEhLLVQAtzRPcwKOUANSWCw1/rsBe6PcFz8dpfAdTFgtF+EmIvBG7pID7mZNl2zkVCFQbahzqHfYerddpNhFpdsnfqauzl8ZoEuO4JXdIKOefynnZlimxXhBbqjTZL/el8pzrAVjTGmKh12Bq1ddJs974abQDXfFMuAhQ6EodwDTHWAf6/BAoK8nD0cDEKtuVhyD+OzvvLXnyWJshyApedJ1F65M9n4tlAAF5fL168fGfJWCu2DDA61GpodLvjCdp8vfjyNWQJJGUAquvMzBzafD0yEc65KZCUAmiOo4FPEqS753VSiFUB0FxbPF244en6J8SqAoTD8zhYcjZ9AP6RCVRWNacHYPD5GJqudmBi8tvaAkxNBeUuuNv5NOkAqgUpm4FIJCrfA+r0z4bnTZmvCKCv+wrsts0JBg8fvZLGY28NfoqToFhOoOJ4CS40lMu2I28mpXFP37DpJ9YXWgZQG+Tm5mBL7qakA2aGakUAZhqbrVkH0BLoB34fzcyml5K6pd/yaicRlQlgV0q6mmwitMOpyfpVKfsFya4w73cz9xQAAAAASUVORK5CYII=
-// @homepage     https://github.com/xFeny/UserScript/tree/main/monkey-web-fullscreen
-// @include      *://www.ezdmw.site/Index/video/*
-// @include      *://player.ezdmw.com/danmuku/*
-// @include      *://pages.iqiyi.com/p/zy/*
-// @include      *://*bimiacg*.net/*/play*
-// @include      *://acgfta.com/play*
-// @include      *://ppoft.com/play*
-// @match        *://tv.sohu.com/v/*
-// @match        *://www.mgtv.com/b/*
-// @match        *://www.acfun.cn/v/*
-// @match        *://www.iqiyi.com/v_*
-// @match        *://v.qq.com/x/page/*
-// @match        *://v.douyu.com/show/*
-// @match        *://v.qq.com/x/cover/*
-// @match        *://live.bilibili.com/*
-// @match        *://v.youku.com/video?*
-// @match        *://v.youku.com/v_show/*
-// @match        *://live.acfun.cn/live/*
-// @match        *://www.acfun.cn/bangumi/*
-// @match        *://www.bilibili.com/list/*
-// @match        *://www.bilibili.com/video/*
-// @match        *://www.bilibili.com/*/play/*
-// @match        *://v.qq.com/live/p/newtopic/*
-// @match        *://www.bilibili.com/festival/*
-// @match        *://v.qq.com/wasm-kernel/*/fake-video*
-// @require      https://unpkg.com/notyf@3.10.0/notyf.min.js
-// @require      data:application/javascript,%3Bwindow.notyf%3D%7BNotyf%7D%3B
-// @require      https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.js
-// @require      data:application/javascript,%3Bwindow.sweetalert2%3DSwal%3B
-// @resource     notyf/notyf.min.css  https://unpkg.com/notyf@3.10.0/notyf.min.css
-// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.css
-// @connect      gitee.com
-// @grant        GM.xmlHttpRequest
-// @grant        GM_addStyle
-// @grant        GM_addValueChangeListener
-// @grant        GM_deleteValue
-// @grant        GM_download
-// @grant        GM_getResourceText
-// @grant        GM_getValue
-// @grant        GM_info
-// @grant        GM_listValues
-// @grant        GM_registerMenuCommand
-// @grant        GM_setValue
-// @grant        GM_unregisterMenuCommand
-// @grant        unsafeWindow
-// @run-at       document-start
-// @note         *://*/*
+// @name               视频自动网页全屏｜倍速播放
+// @name:zh-TW         視頻自動網頁全屏｜倍速播放
+// @namespace          http://tampermonkey.net/
+// @version            3.4.0
+// @author             Feny
+// @description        支持所有H5视频的增强脚本，默认适配哔哩哔哩（含直播）、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；自动网页全屏 + 倍速调节 + 下集切换！大幅减少手动操作！让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
+// @description:zh-TW  支持所有H5视频的增强脚本，默認適配嗶哩嗶哩（含直播）、騰訊視頻、優酷視頻、愛奇藝、芒果TV、搜狐視頻、AcFun彈幕網自動網頁全屏；自動網頁全屏 + 倍速調節 + 下集切換！大幅減少手動操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
+// @license            GPL-3.0-only
+// @icon               data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAqdJREFUWEftl91LFFEYxp/3jB9ESZjtSl51F1RUSgRCF/kHlF1IhiFhF65dqEQkBUErdJMStBukGwQre2NZUiCRqUiURkW65mIfqGUFsW6Ii0jY7p4Tc3Rqd5zaGVldAudynve8z28e3jMzh5Dmi1R/V0vQyRRWxgWG6x22SrcnOAhQcQIbwVtXba8y1EANSpS1xzJin5c/Dz+jRDPvGWoErwRw35zuh8ChpcXXFjbwi9k/WADA9viGgovGnxtFs6EmcApMvCdBA3oIIirl4N8NNQngmRYJiwTOE7EHHLERAmXFawQ6AdCQkRbjsZIMUvIFoV0HMSsEDjCgSK8tJqAHAEDAMWLKLOexx8tiVVDEhLLVQAtzRPcwKOUANSWCw1/rsBe6PcFz8dpfAdTFgtF+EmIvBG7pID7mZNl2zkVCFQbahzqHfYerddpNhFpdsnfqauzl8ZoEuO4JXdIKOefynnZlimxXhBbqjTZL/el8pzrAVjTGmKh12Bq1ddJs974abQDXfFMuAhQ6EodwDTHWAf6/BAoK8nD0cDEKtuVhyD+OzvvLXnyWJshyApedJ1F65M9n4tlAAF5fL168fGfJWCu2DDA61GpodLvjCdp8vfjyNWQJJGUAquvMzBzafD0yEc65KZCUAmiOo4FPEqS753VSiFUB0FxbPF244en6J8SqAoTD8zhYcjZ9AP6RCVRWNacHYPD5GJqudmBi8tvaAkxNBeUuuNv5NOkAqgUpm4FIJCrfA+r0z4bnTZmvCKCv+wrsts0JBg8fvZLGY28NfoqToFhOoOJ4CS40lMu2I28mpXFP37DpJ9YXWgZQG+Tm5mBL7qakA2aGakUAZhqbrVkH0BLoB34fzcyml5K6pd/yaicRlQlgV0q6mmwitMOpyfpVKfsFya4w73cz9xQAAAAASUVORK5CYII=
+// @homepage           https://github.com/xFeny/UserScript/tree/main/monkey-web-fullscreen
+// @include            *://www.ezdmw.site/Index/video/*
+// @include            *://player.ezdmw.com/danmuku/*
+// @include            *://pages.iqiyi.com/p/zy/*
+// @include            *://*bimiacg*.net/*/play*
+// @include            *://acgfta.com/play*
+// @include            *://ppoft.com/play*
+// @match              *://tv.sohu.com/v/*
+// @match              *://www.mgtv.com/b/*
+// @match              *://www.acfun.cn/v/*
+// @match              *://www.iqiyi.com/v_*
+// @match              *://v.qq.com/x/page/*
+// @match              *://v.douyu.com/show/*
+// @match              *://v.qq.com/x/cover/*
+// @match              *://live.bilibili.com/*
+// @match              *://v.youku.com/video?*
+// @match              *://v.youku.com/v_show/*
+// @match              *://live.acfun.cn/live/*
+// @match              *://www.acfun.cn/bangumi/*
+// @match              *://www.bilibili.com/list/*
+// @match              *://www.bilibili.com/video/*
+// @match              *://www.bilibili.com/*/play/*
+// @match              *://v.qq.com/live/p/newtopic/*
+// @match              *://www.bilibili.com/festival/*
+// @match              *://v.qq.com/wasm-kernel/*/fake-video*
+// @require            https://unpkg.com/notyf@3.10.0/notyf.min.js
+// @require            data:application/javascript,%3Bwindow.notyf%3D%7BNotyf%7D%3B
+// @require            https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.js
+// @require            data:application/javascript,%3Bwindow.sweetalert2%3DSwal%3B
+// @resource           notyf/notyf.min.css  https://unpkg.com/notyf@3.10.0/notyf.min.css
+// @resource           sweetalert2          https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.css
+// @connect            gitee.com
+// @grant              GM.xmlHttpRequest
+// @grant              GM_addStyle
+// @grant              GM_addValueChangeListener
+// @grant              GM_deleteValue
+// @grant              GM_download
+// @grant              GM_getResourceText
+// @grant              GM_getValue
+// @grant              GM_info
+// @grant              GM_listValues
+// @grant              GM_registerMenuCommand
+// @grant              GM_setValue
+// @grant              GM_unregisterMenuCommand
+// @grant              unsafeWindow
+// @run-at             document-start
+// @note               *://*/*
 // ==/UserScript==
 
-(e=>{const n=Symbol("styleAdded"),t=document.createElement("style");t.textContent=e,document.addEventListener("shadow-attached",r=>{const{shadowRoot:o}=r.detail;o[n]||requestAnimationFrame(()=>{o.prepend(t.cloneNode(!0)),o[n]=!0})}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(e)})(' @charset "UTF-8";.monkey-toast{line-height:normal;left:10px!important;bottom:16%!important;color:#fff!important;font-size:13px!important;padding:6px 10px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.monkey-toast span{display:inline!important}::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen] .vjs-control-bar,[part*=webFullscreen] .ytp-chrome-bottom,[part*=webFullscreen] .ytp-chapter-hover-container{left:0!important;width:100vw!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important;transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc{cursor:none!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-tabs-header{display:flex;position:relative;margin-bottom:15px;font-size:15px!important;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;cursor:pointer;color:#64748b;font-weight:500;text-align:center;padding:12px 10px;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;visibility:visible;background-color:#3b82f6;border-radius:2px 2px 0 0}.monkey-web-fullscreen .swal2-tab:hover:not(.active){color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%;padding:0 5px;min-height:325px}.monkey-web-fullscreen .swal2-tab-panel{display:none}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 5px!important;padding:0 0 5px!important;float:none!important;height:30px!important;color:#666!important;display:flex!important;font-size:14px!important;line-height:30px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text],.monkey-web-fullscreen .__menu input[type=number]{color:#333;border-radius:3px;border:1px solid #cbd5e1!important;text-align:center!important;line-height:12px!important;font-size:12px!important;padding:0 3px!important;height:23px!important;width:75px!important}.monkey-web-fullscreen .__menu input[type=text]:focus,.monkey-web-fullscreen .__menu input[type=number]:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:38px!important;height:18px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:12px!important;height:12px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen .others-sett{margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f5f5f5}.monkey-web-fullscreen .others-sett:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .others-sett p{margin-bottom:3px;color:#333!important;font-size:13px!important;text-align:left!important}.monkey-web-fullscreen .others-sett textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;height:70px!important;font-size:12px!important;padding:3px 5px!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen .others-sett textarea:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th{font-weight:600!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:2147483647!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap,#buffer,#install,#a1 #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,[id*=player] #tips,#player #loading-box,.dplayer-comment-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}}.Clock,.__time-progress,.__rate-keep-show{color:#e0e0e0;text-indent:0!important;text-shadow:0 0 2px #000;position:absolute!important;pointer-events:none!important;font-family:Arial,Helvetica,sans-serif!important;z-index:2147483647!important;opacity:1!important}.Clock:after,.__time-progress:after,.__rate-keep-show:after{top:50%!important;left:50%!important;content:"-"!important;position:fixed!important;text-shadow:none!important;color:transparent!important;pointer-events:none!important;display:inline-block!important;background-color:transparent!important}.Clock{top:10px!important;right:20px!important;width:auto!important;height:auto!important;font-size:20px!important;line-height:20px!important;font-weight:700!important;text-align:right!important;background-color:transparent!important}.Clock.smaller{font-size:16px!important;line-height:16px!important}.__time-progress{top:30px!important;right:20px!important;font-size:12.5px!important;line-height:12.5px!important}.__time-progress b{font-size:12px!important;line-height:12px!important;display:inline-block!important;transform:scale(.75)!important;vertical-align:middle!important}.__time-progress.smaller{top:26px!important;transform:scale(.817)!important;transform-origin:top right}.__rate-keep-show{color:#c9c9c9;top:5px!important;left:5px!important;font-size:12px!important;box-shadow:none!important;display:inline-block!important;transform:scale(.917)!important;transform-origin:top} ');
+(o=>{const n=Symbol("styleAdded"),t=document.createElement("style");t.textContent=o,document.addEventListener("shadow-attached",r=>{const{shadowRoot:e}=r.detail;e[n]||requestAnimationFrame(()=>{e.prepend(t.cloneNode(!0)),e[n]=!0})}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(o)})(' @charset "UTF-8";.monkey-toast{line-height:normal;left:10px!important;bottom:16%!important;color:#fff!important;font-size:13px!important;padding:6px 10px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.monkey-toast span{display:inline!important}::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen]~*{display:none!important}[part*=webFullscreen] .vjs-control-bar,[part*=webFullscreen] .ytp-chrome-bottom,[part*=webFullscreen] .ytp-chapter-hover-container{left:0!important;width:100vw!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important;transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc{cursor:none!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-tabs-header{display:flex;position:relative;margin-bottom:15px;font-size:15px!important;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;cursor:pointer;color:#64748b;font-weight:500;text-align:center;padding:12px 10px;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;visibility:visible;background-color:#3b82f6;border-radius:2px 2px 0 0}.monkey-web-fullscreen .swal2-tab:hover:not(.active){color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%;padding:0 5px;min-height:325px}.monkey-web-fullscreen .swal2-tab-panel{display:none}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 5px!important;padding:0 0 5px!important;float:none!important;height:30px!important;color:#666!important;display:flex!important;font-size:14px!important;line-height:30px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text],.monkey-web-fullscreen .__menu input[type=number]{color:#333;border-radius:3px;border:1px solid #cbd5e1!important;text-align:center!important;line-height:12px!important;font-size:12px!important;padding:0 3px!important;height:23px!important;width:75px!important}.monkey-web-fullscreen .__menu input[type=text]:focus,.monkey-web-fullscreen .__menu input[type=number]:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:38px!important;height:18px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:12px!important;height:12px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen .others-sett{margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f5f5f5}.monkey-web-fullscreen .others-sett:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .others-sett p{margin-bottom:3px;color:#333!important;font-size:13px!important;text-align:left!important}.monkey-web-fullscreen .others-sett textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;height:70px!important;font-size:12px!important;padding:3px 5px!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen .others-sett textarea:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th{font-weight:600!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:2147483647!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap>:not(.bpx-player-dm-tip){display:none!important}#buffer,#install,#a1 #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,[id*=player] #tips,#player #loading-box,.dplayer-comment-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}}.Clock,.__time-progress,.__rate-keep-show{color:#e0e0e0;text-indent:0!important;text-shadow:0 0 2px #000;position:absolute!important;pointer-events:none!important;font-family:Arial,Helvetica,sans-serif!important;z-index:2147483647!important;opacity:1!important}.Clock:after,.__time-progress:after,.__rate-keep-show:after{top:50%!important;left:50%!important;content:"-"!important;position:fixed!important;text-shadow:none!important;color:transparent!important;pointer-events:none!important;display:inline-block!important;background-color:transparent!important}.Clock{top:10px!important;right:20px!important;width:auto!important;height:auto!important;font-size:20px!important;line-height:20px!important;font-weight:700!important;text-align:right!important;background-color:transparent!important}.Clock.smaller{font-size:16px!important;line-height:16px!important}.__time-progress{top:30px!important;right:20px!important;font-size:12.5px!important;line-height:12.5px!important}.__time-progress b{font-size:12px!important;line-height:12px!important;display:inline-block!important;transform:scale(.75)!important;vertical-align:middle!important}.__time-progress.smaller{top:26px!important;transform:scale(.817)!important;transform-origin:top right}.__rate-keep-show{color:#c9c9c9;top:5px!important;left:5px!important;font-size:12px!important;box-shadow:none!important;display:inline-block!important;transform:scale(.917)!important;transform-origin:top} ');
 
 (async function (notyf, Swal) {
   'use strict';
@@ -63,130 +65,6 @@
   var __defProp = Object.defineProperty;
   var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
   var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-  const EventTypes = {
-    CLICK: "click",
-    MOUSE_MOVE: "mousemove",
-    MOUSE_OVER: "mouseover"
-  };
-  var _GM = /* @__PURE__ */ (() => typeof GM != "undefined" ? GM : void 0)();
-  var _GM_addValueChangeListener = /* @__PURE__ */ (() => typeof GM_addValueChangeListener != "undefined" ? GM_addValueChangeListener : void 0)();
-  var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
-  var _GM_download = /* @__PURE__ */ (() => typeof GM_download != "undefined" ? GM_download : void 0)();
-  var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
-  var _GM_info = /* @__PURE__ */ (() => typeof GM_info != "undefined" ? GM_info : void 0)();
-  var _GM_listValues = /* @__PURE__ */ (() => typeof GM_listValues != "undefined" ? GM_listValues : void 0)();
-  var _GM_registerMenuCommand = /* @__PURE__ */ (() => typeof GM_registerMenuCommand != "undefined" ? GM_registerMenuCommand : void 0)();
-  var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
-  var _GM_unregisterMenuCommand = /* @__PURE__ */ (() => typeof GM_unregisterMenuCommand != "undefined" ? GM_unregisterMenuCommand : void 0)();
-  var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
-  class StorageItem {
-    constructor(name, defaultValue, useLocalStorage = false, valueParser = null) {
-      this.name = name;
-      this.valueParser = valueParser;
-      this.defaultValue = defaultValue;
-      this.useLocalStorage = useLocalStorage;
-    }
-    set(value) {
-      this.setItem(this.name, value);
-    }
-    setItem(key, value) {
-      this.useLocalStorage ? localStorage.setItem(key, value) : _GM_setValue(key, value);
-    }
-    get() {
-      return this.parser(this.getItem(this.name) ?? this.defaultValue);
-    }
-    getItem(key) {
-      const value = this.useLocalStorage ? localStorage.getItem(key) : _GM_getValue(key);
-      try {
-        return JSON.parse(value);
-      } catch (e) {
-        return value;
-      }
-    }
-    parser(value) {
-      return this.valueParser ? this.valueParser(value) : value;
-    }
-    del() {
-      this.removeItem(this.name);
-    }
-    removeItem(key) {
-      this.useLocalStorage ? localStorage.removeItem(key) : _GM_deleteValue(key);
-    }
-    fuzzyGet(pattern) {
-      const result = {};
-      this.fuzzyMatch(pattern, (key) => result[key] = this.getItem(key));
-      return result;
-    }
-    fuzzyDel(pattern) {
-      this.fuzzyMatch(pattern, (key) => this.removeItem(key));
-    }
-    fuzzyMatch(pattern, callback) {
-      const keys = this.syncFuzzyMatch(pattern);
-      keys.forEach((key) => callback.call(this, key));
-    }
-    syncFuzzyMatch(pattern) {
-      const keys = this.useLocalStorage ? Object.keys(localStorage) : _GM_listValues();
-      return keys.filter((key) => pattern instanceof RegExp ? pattern.test(key) : key.includes(pattern));
-    }
-  }
-  class TimedStorage extends StorageItem {
-    constructor(name, defaultValue, useLocalStorage, valueParser) {
-      super(name, defaultValue, useLocalStorage, valueParser);
-      requestIdleCallback(() => this.cleanupExpiredData());
-    }
-    set(suffix, value, expires) {
-      const key = this.name + suffix;
-      if (expires) expires = Date.now() + expires * 864e5;
-      expires ? this.setItem(key, JSON.stringify({ value, expires })) : this.setItem(key, value);
-    }
-    get(suffix) {
-      const storage = this.getItem(this.name + suffix);
-      if (!storage?.value) return this.parser(storage ?? this.defaultValue);
-      return storage.expires > Date.now() ? this.parser(storage.value) : this.defaultValue;
-    }
-    del(suffix) {
-      this.removeItem(this.name + suffix);
-    }
-    cleanupExpiredData() {
-      this.fuzzyMatch(this.name, (key) => {
-        const storage = this.getItem(key);
-        if (storage?.expires && storage.expires < Date.now()) this.removeItem(key);
-      });
-    }
-  }
-  const Storage = {
-    PLAY_RATE_STEP: new StorageItem("PLAY_RATE_STEP", 0.25, false, parseFloat),
-    CACHED_PLAY_RATE: new StorageItem("FENY_SCRIPTS_V_PLAYBACK_RATE", 1, true, parseFloat),
-    CLOSE_PLAY_RATE: new StorageItem("CLOSE_PLAY_RATE", false, false, (value) => Boolean(value)),
-    SKIP_INTERVAL: new StorageItem("VIDEO_SKIP_INTERVAL", 5, false, (value) => parseInt(value, 10)),
-    OVERRIDE_KEYBOARD: new StorageItem("OVERRIDE_KEYBOARD", false, false, (value) => Boolean(value)),
-    DISABLE_AUTO: new StorageItem("CLOSE_AUTO_WEB_FULL_SCREEN", false, false, (value) => Boolean(value)),
-    ZERO_KEY_SKIP_INTERVAL: new StorageItem("ZERO_KEY_SKIP_INTERVAL", 30, false, (value) => parseInt(value, 10)),
-    DISABLE_INVISIBLE_PAUSE: new StorageItem("DISABLE_INVISIBLE_PAUSE", false, false, (value) => Boolean(value)),
-    ENABLE_AUTO_NEXT_EPISODE: new StorageItem("ENABLE_AUTO_NEXT_EPISODE", false, false, (value) => Boolean(value)),
-    AUTO_NEXT_ADVANCE_SEC: new StorageItem("AUTO_NEXT_ADVANCE_SECONDS", 75, false, (value) => parseInt(value, 10)),
-    ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, (value) => Boolean(value)),
-    DISABLE_DEF_MAX_VOLUME: new StorageItem("DISABLE_DEF_MAX_VOLUME", false, false, (value) => Boolean(value)),
-    DISABLE_MEMORY_SPEED: new StorageItem("DISABLE_MEMORY_SPEED", false, false, (value) => Boolean(value)),
-    DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, (value) => Boolean(value)),
-    PRESET_SPEED: new StorageItem("PRESET_SPEED", "1.15,1.45,1.75", false, (value) => value.split(",")),
-    DISABLE_ZOOM_MOVE: new StorageItem("DISABLE_ZOOM_MOVE", true, false, (value) => Boolean(value)),
-    MOVING_DISTANCE: new StorageItem("MOVING_DISTANCE", 10, false, (value) => parseInt(value, 10)),
-    USE_SMALLER_FONT: new StorageItem("USE_SMALLER_FONT", false, false, (value) => Boolean(value)),
-    DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, (value) => Boolean(value)),
-    RATE_KEEP_SHOW: new StorageItem("RATE_KEEP_SHOW", false, false, (value) => Boolean(value)),
-    ZOOM_PERCENT: new StorageItem("ZOOM_PERCENT", 10, false, (value) => parseInt(value, 10)),
-    DISABLE_CLOCK: new StorageItem("DISABLE_CLOCK", false, false, (value) => Boolean(value)),
-    UNFULL_CLOCK: new StorageItem("UNFULL_CLOCK", false, false, (value) => Boolean(value)),
-    CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
-    REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
-    STORAGE_DAYS: new StorageItem("STORAGE_DAYS", 7, false, parseFloat),
-    NEXT_IGNORE_URLS: new StorageItem("NEXT_IGNORE_URLS", "", false),
-    FULL_IGNORE_URLS: new StorageItem("FULL_IGNORE_URLS", "", false),
-    CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", "", false),
-    CLOCK_COLOR: new StorageItem("CLOCK_COLOR", "#e0e0e0", false),
-    PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat)
-  };
   const Consts = Object.freeze({
     EMPTY: "",
     MIN_ZOOM: 25,
@@ -199,8 +77,14 @@
     MIN_PLAY_RATE: 0.0625,
     webFull: "webFullscreen",
     MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN",
-    FAKE_VIDEO: "fake-video"
+    FAKE_VIDEO: "fake-video",
+    WEBFULL_PARENT_DEPTH: 20
   });
+  const EventTypes = {
+    CLICK: "click",
+    MOUSE_MOVE: "mousemove",
+    MOUSE_OVER: "mouseover"
+  };
   function isElement(node) {
     return node instanceof Element;
   }
@@ -252,6 +136,17 @@
     }
     return results;
   }
+  var _GM = /* @__PURE__ */ (() => typeof GM != "undefined" ? GM : void 0)();
+  var _GM_addValueChangeListener = /* @__PURE__ */ (() => typeof GM_addValueChangeListener != "undefined" ? GM_addValueChangeListener : void 0)();
+  var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
+  var _GM_download = /* @__PURE__ */ (() => typeof GM_download != "undefined" ? GM_download : void 0)();
+  var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
+  var _GM_info = /* @__PURE__ */ (() => typeof GM_info != "undefined" ? GM_info : void 0)();
+  var _GM_listValues = /* @__PURE__ */ (() => typeof GM_listValues != "undefined" ? GM_listValues : void 0)();
+  var _GM_registerMenuCommand = /* @__PURE__ */ (() => typeof GM_registerMenuCommand != "undefined" ? GM_registerMenuCommand : void 0)();
+  var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
+  var _GM_unregisterMenuCommand = /* @__PURE__ */ (() => typeof GM_unregisterMenuCommand != "undefined" ? GM_unregisterMenuCommand : void 0)();
+  var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
   const Tools = _unsafeWindow.Tools = {
     noNumber: (str) => !/\d/.test(str),
     isTopWin: () => window.top === window,
@@ -266,10 +161,10 @@
     triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
     toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, Consts.EMPTY),
     postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
-    isVisible: (el) => !!(el?.offsetWidth || el?.offsetHeight || el?.getClientRects().length),
     getNumbers: (str) => typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : [],
     log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
     getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
+    isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
     preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
     hasCls: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
     delCls: (el, ...classes) => el?.classList.remove(...classes),
@@ -370,10 +265,16 @@
       }
       return selector;
     },
+    getParent(element) {
+      if (!element) return null;
+      const parent = element.parentNode;
+      if (parent instanceof ShadowRoot) return parent.host;
+      return parent === document ? null : parent;
+    },
     getParents(element, withSelf = false, maxLevel = Infinity) {
       const parents = withSelf && element ? [element] : [];
       for (let current = element, level = 0; current && level < maxLevel; level++) {
-        current = current.parentNode instanceof ShadowRoot ? current?.getRootNode()?.host : current?.parentElement;
+        current = this.getParent(current);
         current && parents.unshift(current);
       }
       return parents;
@@ -399,10 +300,12 @@
       return Array.from({ length: nodes.snapshotLength }, (_, i) => nodes.snapshotItem(i)).filter((el) => !el.matches("script"));
     },
     setPart(node, value) {
+      if (!(node instanceof Element)) return;
       const parts = node?.getAttribute("part")?.split(/\s+/) ?? [];
       node?.setAttribute("part", [.../* @__PURE__ */ new Set([...parts, value])].join(" ").trim());
     },
     delPart(node, value) {
+      if (!(node instanceof Element)) return;
       const parts = (node?.getAttribute("part")?.split(/\s+/) ?? []).filter((v) => v !== value);
       node?.setAttribute("part", parts.join(" ").trim());
     },
@@ -410,236 +313,19 @@
       if (!window.trustedTypes?.createPolicy) return htmlStr;
       const policy = trustedTypes.defaultPolicy ?? trustedTypes.createPolicy("default", { createHTML: (input) => input });
       return policy.createHTML(htmlStr);
-    }
-  };
-  class Clock {
-    constructor(container, options) {
-      __publicField(this, "options", { color: null, clss: "Clock", coexist: false });
-      if (!container) return;
-      this.options = Object.assign(this.options, options);
-      this.container = container;
-      this.animationId = null;
-      this.isRunning = false;
-      this.initClockElement();
-      this.start();
-    }
-    initClockElement() {
-      const { color, clss, coexist } = this.options;
-      if (!coexist && this.isInDOM()) this.destroy();
-      this.element = document.createElement("div");
-      if (color) this.element.style.setProperty("color", color);
-      this.element.classList.add(clss);
-      this.container.prepend(this.element);
-    }
-    isInDOM() {
-      return this.container?.contains(this.element) ?? false;
-    }
-    setCustomColor(color) {
-      if (!color) return this.element?.style.removeProperty("color");
-      this.element?.style.setProperty("color", color);
-    }
-    formatTime(date) {
-      const h = date.getHours();
-      const m = date.getMinutes();
-      const s = date.getSeconds();
-      return [h, m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
-    }
-    update() {
-      this.isRunning = true;
-      const now = /* @__PURE__ */ new Date();
-      this.element.textContent = this.formatTime(now);
-      this.animationId = requestAnimationFrame(() => this.update());
-    }
-    start() {
-      if (this.isRunning) return;
-      this.element.style.setProperty("display", "unset");
-      this.update();
-    }
-    stop() {
-      if (this.animationId) {
-        cancelAnimationFrame(this.animationId);
-        this.animationId = null;
-      }
-      this.isRunning = false;
-      this.element?.style.setProperty("display", "none");
-    }
-    destroy() {
-      this.stop();
-      this.element?.remove();
-      this.container = null;
-      this.element = null;
-    }
-  }
-  __publicField(Clock, "state", { start: "start", stop: "stop" });
-  const { matches, includes: excluded } = _GM_info.script;
-  const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
-  const siteRegExp = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
-  const Site = {
-    isAcFun: () => /acfun.cn\/v/.test(location.href),
-    isTencent: () => /v.qq.com\/x/.test(location.href),
-    isQiyi: () => /iqiyi.com\/v_*/.test(location.href),
-    isMgtv: () => /www.mgtv.com\/b/.test(location.href),
-    isDouyu: () => /v.douyu.com\/show/.test(location.href),
-    isBili: () => /bilibili.com\/video/.test(location.href),
-    isBiliLive: () => location.host === "live.bilibili.com",
-    isMatched: () => siteRegExp.some((match) => match.test(location.href.replace(location.search, Consts.EMPTY)))
-  };
-  const App$1 = window.App = {
-    init() {
-      this.setupDocBodyObserver();
-      this.setupVisibleListener();
-      this.setupKeydownListener();
-      this.setupUrlChangeListener();
-      this.setupMouseMoveListener();
-      this.setupFullscreenListener();
-      this.observeFullscreenChange();
-      this.setupIgnoreUrlsChangeListener();
-      document.addEventListener("load", () => this.triggerStartElement(), true);
     },
-    isNormalSite: () => !window?.videoInfo && !window?.topWin,
-    getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
-    isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
-    triggerStartElement() {
-      setTimeout(() => {
-        const element = Tools.query(".ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
-        if (!element || Tools.isFrequent("start")) return;
-        setTimeout(() => element?.click() & element?.remove(), 250);
+    cloneAttrs(source, target, ...attrs) {
+      attrs.flat().forEach((attr) => {
+        const value = source.getAttribute(attr);
+        if (value) target.setAttribute(attr, value);
       });
     },
-    setupVisibleListener() {
-      window.addEventListener("visibilitychange", () => {
-        if (this.isNormalSite() || Storage.DISABLE_INVISIBLE_PAUSE.get()) return;
-        const video = this.player ?? this.getVideo();
-        if (!video || video?.isEnded || !Tools.isVisible(video)) return;
-        document.hidden ? video?.pause() : video?.play();
+    cloneStyle(source, target, ...names) {
+      const computedStyle = window.getComputedStyle(source);
+      names.flat().forEach((name) => {
+        const value = computedStyle.getPropertyValue(name);
+        if (value) target.style.setProperty(name, value);
       });
-    },
-    setupUrlChangeListener() {
-      const _wr = (method) => {
-        const original = history[method];
-        history[method] = function() {
-          original.apply(this, arguments);
-          window.dispatchEvent(new Event(method));
-        };
-      };
-      const handler = () => this.setupDocBodyObserver();
-      ["popstate", "pushState", "replaceState"].forEach((t) => _wr(t) & window.addEventListener(t, handler));
-    },
-    setupDocBodyObserver() {
-      this.bodyObserver?.disconnect();
-      clearTimeout(this.observerTimeout);
-      this.bodyObserver = Tools.createObserver(document.body ?? document.documentElement, () => {
-        const video = this.getVideo();
-        Promise.resolve().then(() => this.removeLoginPopups());
-        if (video?.offsetWidth) this.setCurrentVideo(video);
-        if (this.topWin) this.bodyObserver.disconnect();
-      });
-      this.observerTimeout = setTimeout(() => this.bodyObserver?.disconnect(), Consts.ONE_SEC * 10);
-    },
-    setCurrentVideo(video) {
-      if (!video || this.player === video) return;
-      if (this.player && !this.player.paused && !isNaN(this.player.duration)) return;
-      if (!Site.isMgtv() && video.offsetWidth < 200 || this.isBackgroundVideo(video)) return;
-      this.player = video;
-      this.setVideoInfo(video);
-      this.observeVideoSrcChange(video);
-      window.videoEnhance.enhanced(video);
-    },
-    setVideoInfo(video) {
-      const isLive = Object.is(video.duration, Infinity);
-      const selector = Tools.getParentChain(video, true);
-      const videoInfo = { ...Tools.getCenterPoint(video), src: video.currentSrc, isLive, selector };
-      this.setParentWinVideoInfo(videoInfo);
-    },
-    setParentWinVideoInfo(videoInfo) {
-      window.videoInfo = this.videoInfo = videoInfo;
-      if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iframeSrc: location.href } });
-      Promise.resolve().then(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
-      this.sendTopWinInfo();
-    },
-    sendTopWinInfo() {
-      const { host, href: url } = location;
-      const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
-      const topWin = { url, host, viewWidth, viewHeight, urlHash: Tools.hashCode(url) };
-      window.topWin = this.topWin = topWin;
-      Tools.sendToIFrames({ topWin });
-    },
-    observeVideoSrcChange(video) {
-      const that = this;
-      if (video.hasAttribute("processed")) return;
-      video.setAttribute("processed", true);
-      const isFake = video.matches(Consts.FAKE_VIDEO);
-      const handleChange = (v) => (delete that.topWin, that.initVideoProps(v), that.setVideoInfo(v));
-      window.videoEnhance.defineProperty(video, isFake ? "srcConfig" : "src", {
-        set(value, setter) {
-          isFake ? this._src = value : setter(value);
-          if ((isFake || this === that.player) && value) handleChange(this);
-        }
-      });
-    },
-    setupMouseMoveListener() {
-      let timer = null;
-      const handleMouseEvent = ({ type, target, isTrusted, clientX, clientY }) => {
-        const gap = type === EventTypes.MOUSE_MOVE ? 150 : 50;
-        if (!isTrusted || Tools.isFrequent(type, gap, true)) return;
-        clearTimeout(timer), this.toggleCursor();
-        timer = setTimeout(() => this.toggleCursor(true), Consts.THREE_SEC);
-        if (target instanceof HTMLVideoElement) return this.setCurrentVideo(target);
-        const elements = document.elementsFromPoint(clientX, clientY);
-        const video = elements.find((el) => el.matches("video"));
-        if (video) this.setCurrentVideo(video);
-      };
-      document.addEventListener(EventTypes.MOUSE_MOVE, (e) => handleMouseEvent(e));
-      document.addEventListener(EventTypes.MOUSE_OVER, (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
-    },
-    toggleCursor(hide = false) {
-      if (this.isNormalSite() || Tools.isFrequent("cursor", void 0, true)) return;
-      const cls = "__hc";
-      if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
-      [...Tools.getParents(this.player, true, 3), ...Tools.getIFrames()].forEach((el) => {
-        el?.blur(), Tools.addCls(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
-      });
-    },
-    setupFullscreenListener() {
-      document.addEventListener("fullscreenchange", () => {
-        const isFullscreen = !!document.fullscreenElement;
-        Tools.postMessage(window.top, { isFullscreen });
-      });
-    },
-    observeFullscreenChange() {
-      let _isFullscreen = false;
-      Object.defineProperty(this, "isFullscreen", {
-        get: () => _isFullscreen,
-        set: (value) => {
-          _isFullscreen = value;
-          this.handleFullscreenChange(value);
-        }
-      });
-    },
-    handleFullscreenChange(isFullscreen) {
-      if (!this.player) return;
-      !isFullscreen && this.removeVideoProgress();
-      this.toggleClock();
-    },
-    createClock(state = Clock.state.stop) {
-      Promise.resolve().then(() => {
-        this.Clock?.destroy(), this.Clock = null;
-        if (!this.player?.parentNode) return;
-        const shouldDestroy = this.shouldDestroyTimeElement();
-        this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
-        this.Clock[shouldDestroy ? state : Clock.state.start]?.();
-        this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
-      });
-    },
-    toggleClock() {
-      if (this.shouldDestroyTimeElement()) return this.Clock?.stop();
-      const state = Clock.state.start;
-      this.Clock?.isInDOM() ? this.Clock[state]() : this.createClock(state);
-      this.Clock?.setCustomColor(Storage.CLOCK_COLOR.get());
-    },
-    shouldDestroyTimeElement() {
-      const isFull = this.isFullscreen;
-      return isFull && Storage.DISABLE_CLOCK.get() || !isFull && !Storage.UNFULL_CLOCK.get();
     }
   };
   const VideoEvents = {
@@ -654,6 +340,7 @@
     timeupdate() {
       if (isNaN(this.duration)) return;
       if (!this.hasInitPlaySettings) App.initPlaySettings(this);
+      if (!App.player) App.setCurrentVideo(this);
       App.autoWebFullscreen(this);
       App.autoNextEpisode(this);
       App.cachePlayTime(this);
@@ -693,11 +380,11 @@
       this.hookMediaMethod("play", (video) => this.enhanced(video));
       this.setupObserver();
     }
-    setupExistingVideos() {
+    async setupExistingVideos() {
       const videos = Tools.querys(this.selector);
       videos.forEach((video) => this.enhanced(video));
     }
-    setupObserver() {
+    async setupObserver() {
       Tools.createObserver(document.body ?? document.documentElement, (mutations) => {
         mutations.forEach((m) => m.type === "childList" && this.processAddedNodes(m.addedNodes));
       });
@@ -773,14 +460,14 @@
         console.error(`修改 ${property} 属性时出错：`, e);
       }
     }
-    hookMediaMethod(method, callback) {
+    async hookMediaMethod(method, callback) {
       const original = HTMLMediaElement.prototype[method];
       HTMLMediaElement.prototype[method] = function() {
         callback.call(this, this);
         return original.apply(this, arguments);
       };
     }
-    hackAttachShadow() {
+    async hackAttachShadow() {
       if (Element.prototype.__attachShadow) return;
       Element.prototype.__attachShadow = Element.prototype.attachShadow;
       Element.prototype.attachShadow = function(options) {
@@ -794,9 +481,131 @@
     }
   }
   window.videoEnhance = new VideoEnhancer();
+  class StorageItem {
+    constructor(name, defaultValue, useLocalStorage = false, valueParser = null) {
+      this.name = name;
+      this.valueParser = valueParser;
+      this.defaultValue = defaultValue;
+      this.useLocalStorage = useLocalStorage;
+    }
+    set(value) {
+      this.setItem(this.name, value);
+    }
+    setItem(key, value) {
+      this.useLocalStorage ? localStorage.setItem(key, value) : _GM_setValue(key, value);
+    }
+    get() {
+      return this.parser(this.getItem(this.name) ?? this.defaultValue);
+    }
+    getItem(key) {
+      const value = this.useLocalStorage ? localStorage.getItem(key) : _GM_getValue(key);
+      try {
+        return JSON.parse(value);
+      } catch (e) {
+        return value;
+      }
+    }
+    parser(value) {
+      return this.valueParser ? this.valueParser(value) : value;
+    }
+    del() {
+      this.removeItem(this.name);
+    }
+    removeItem(key) {
+      this.useLocalStorage ? localStorage.removeItem(key) : _GM_deleteValue(key);
+    }
+    fuzzyGet(pattern) {
+      const result = {};
+      this.fuzzyMatch(pattern, (key) => result[key] = this.getItem(key));
+      return result;
+    }
+    fuzzyDel(pattern) {
+      this.fuzzyMatch(pattern, (key) => this.removeItem(key));
+    }
+    fuzzyMatch(pattern, callback) {
+      const keys = this.syncFuzzyMatch(pattern);
+      keys.forEach((key) => callback.call(this, key));
+    }
+    syncFuzzyMatch(pattern) {
+      const keys = this.useLocalStorage ? Object.keys(localStorage) : _GM_listValues();
+      return keys.filter((key) => pattern instanceof RegExp ? pattern.test(key) : key.includes(pattern));
+    }
+  }
+  class TimedStorage extends StorageItem {
+    constructor(name, defaultValue, useLocalStorage, valueParser) {
+      super(name, defaultValue, useLocalStorage, valueParser);
+      requestIdleCallback(() => this.cleanupExpiredData());
+    }
+    set(suffix, value, expires) {
+      const key = this.name + suffix;
+      if (expires) expires = Date.now() + expires * 864e5;
+      expires ? this.setItem(key, JSON.stringify({ value, expires })) : this.setItem(key, value);
+    }
+    get(suffix) {
+      const storage = this.getItem(this.name + suffix);
+      if (!storage?.value) return this.parser(storage ?? this.defaultValue);
+      return storage.expires > Date.now() ? this.parser(storage.value) : this.defaultValue;
+    }
+    del(suffix) {
+      this.removeItem(this.name + suffix);
+    }
+    cleanupExpiredData() {
+      this.fuzzyMatch(this.name, (key) => {
+        const storage = this.getItem(key);
+        if (storage?.expires && storage.expires < Date.now()) this.removeItem(key);
+      });
+    }
+  }
+  const Storage = {
+    CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", "", false),
+    DISABLE_AUTO: new StorageItem("CLOSE_AUTO_WEB_FULL_SCREEN", false, false, Boolean),
+    ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, Boolean),
+    RATE_KEEP_SHOW: new StorageItem("RATE_KEEP_SHOW", false, false, Boolean),
+    PLAY_RATE_STEP: new StorageItem("PLAY_RATE_STEP", 0.25, false, parseFloat),
+    CLOSE_PLAY_RATE: new StorageItem("CLOSE_PLAY_RATE", false, false, Boolean),
+    DISABLE_MEMORY_SPEED: new StorageItem("DISABLE_MEMORY_SPEED", false, false, Boolean),
+    CACHED_PLAY_RATE: new StorageItem("FENY_SCRIPTS_V_PLAYBACK_RATE", 1, true, parseFloat),
+    PRESET_SPEED: new StorageItem("PRESET_SPEED", "1.15,1.45,1.75", false, (value) => value.split(",")),
+    SKIP_INTERVAL: new StorageItem("VIDEO_SKIP_INTERVAL", 5, false, Number),
+    ZERO_KEY_SKIP_INTERVAL: new StorageItem("ZERO_KEY_SKIP_INTERVAL", 30, false, Number),
+    OVERRIDE_KEYBOARD: new StorageItem("OVERRIDE_KEYBOARD", false, false, Boolean),
+    DISABLE_ZOOM_MOVE: new StorageItem("DISABLE_ZOOM_MOVE", true, false, Boolean),
+    MOVING_DISTANCE: new StorageItem("MOVING_DISTANCE", 10, false, Number),
+    ZOOM_PERCENT: new StorageItem("ZOOM_PERCENT", 10, false, Number),
+    ENABLE_AUTO_NEXT_EPISODE: new StorageItem("ENABLE_AUTO_NEXT_EPISODE", false, false, Boolean),
+    AUTO_NEXT_ADVANCE_SEC: new StorageItem("AUTO_NEXT_ADVANCE_SECONDS", 75, false, Number),
+    CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
+    REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
+    USE_SMALLER_FONT: new StorageItem("USE_SMALLER_FONT", false, false, Boolean),
+    DISABLE_CLOCK: new StorageItem("DISABLE_CLOCK", false, false, Boolean),
+    UNFULL_CLOCK: new StorageItem("UNFULL_CLOCK", false, false, Boolean),
+    CLOCK_COLOR: new StorageItem("CLOCK_COLOR", "#e0e0e0", false),
+    DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, Boolean),
+    STORAGE_DAYS: new StorageItem("STORAGE_DAYS", 7, false, parseFloat),
+    PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat),
+    NEXT_IGNORE_URLS: new StorageItem("NEXT_IGNORE_URLS", "", false),
+    FULL_IGNORE_URLS: new StorageItem("FULL_IGNORE_URLS", "", false),
+    DISABLE_INVISIBLE_PAUSE: new StorageItem("DISABLE_INVISIBLE_PAUSE", false, false, Boolean),
+    DISABLE_DEF_MAX_VOLUME: new StorageItem("DISABLE_DEF_MAX_VOLUME", false, false, Boolean),
+    DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, Boolean)
+  };
+  const { matches, includes: excluded } = _GM_info.script;
+  const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
+  const siteRegExp = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
+  const Site = {
+    isAcFun: () => /acfun.cn\/v/.test(location.href),
+    isTencent: () => /v.qq.com\/x/.test(location.href),
+    isQiyi: () => /iqiyi.com\/v_*/.test(location.href),
+    isMgtv: () => /www.mgtv.com\/b/.test(location.href),
+    isDouyu: () => /v.douyu.com\/show/.test(location.href),
+    isBili: () => /bilibili.com\/video/.test(location.href),
+    isBiliLive: () => location.host === "live.bilibili.com",
+    isMatched: () => siteRegExp.some((match) => match.test(location.href.replace(location.search, Consts.EMPTY)))
+  };
   const Keyboard = Object.freeze({
     A: "KeyA",
     D: "KeyD",
+    E: "KeyE",
     K: "KeyK",
     L: "KeyL",
     M: "KeyM",
@@ -815,6 +624,148 @@
     Enter: "Enter",
     NumEnter: "NumpadEnter"
   });
+  const observedValue = { isFullscreen: false, fsWrapper: null };
+  const Listen = {
+    init() {
+      this.setupDocBodyObserver();
+      this.setupKeydownListener();
+      this.setupVisibleListener();
+      this.setupMouseMoveListener();
+      this.setupFullscreenListener();
+      this.observeFullscreenChange();
+      this.observeWebFullscreenChange();
+      this.setupIgnoreUrlsChangeListener();
+      document.addEventListener("load", () => this.triggerStartElement(), true);
+    },
+    isNormalSite: () => !window?.videoInfo && !window?.topWin,
+    getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
+    isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
+    triggerStartElement() {
+      setTimeout(() => {
+        const element = Tools.query(".ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
+        if (!element || Tools.isFrequent("start")) return;
+        setTimeout(() => element?.click?.() & element?.remove?.(), 250);
+      });
+    },
+    async setupVisibleListener() {
+      window.addEventListener("visibilitychange", () => {
+        if (this.isNormalSite() || Storage.DISABLE_INVISIBLE_PAUSE.get()) return;
+        const video = this.player ?? this.getVideo();
+        if (!video || video?.isEnded || !Tools.isVisible(video)) return;
+        document.hidden ? video?.pause() : video?.play();
+      });
+    },
+    setupDocBodyObserver() {
+      const observer = Tools.createObserver(document.body ?? document.documentElement, () => {
+        const video = this.getVideo();
+        Promise.resolve().then(() => this.removeLoginPopups());
+        if (video?.offsetWidth) this.setCurrentVideo(video);
+        if (this.topWin) observer.disconnect();
+      });
+      setTimeout(() => observer?.disconnect(), Consts.ONE_SEC * 10);
+    },
+    setCurrentVideo(video) {
+      if (!video || this.player === video) return;
+      if (this.player && !this.player.paused && !isNaN(this.player.duration)) return;
+      if (!Site.isMgtv() && video.offsetWidth < 240 || this.isBackgroundVideo(video)) return;
+      this.player = video;
+      this.setVideoInfo(video);
+      this.observeVideoSrcChange(video);
+      window.videoEnhance.enhanced(video);
+    },
+    setVideoInfo(video) {
+      const isLive = Object.is(video.duration, Infinity);
+      const selector = Tools.getParentChain(video, true);
+      const videoInfo = { ...Tools.getCenterPoint(video), src: video.currentSrc, isLive, selector };
+      this.setParentWinVideoInfo(videoInfo);
+    },
+    setParentWinVideoInfo(videoInfo) {
+      window.videoInfo = this.videoInfo = videoInfo;
+      if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iframeSrc: location.href } });
+      Promise.resolve().then(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
+      this.sendTopWinInfo();
+    },
+    sendTopWinInfo() {
+      const { host, href: url } = location;
+      const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
+      const topWin = { url, host, viewWidth, viewHeight, urlHash: Tools.hashCode(url) };
+      window.topWin = this.topWin = topWin;
+      Tools.sendToIFrames({ topWin });
+    },
+    async observeVideoSrcChange(video) {
+      const that = this;
+      if (video.hasAttribute("processed")) return;
+      video.setAttribute("processed", true);
+      const isFake = video.matches(Consts.FAKE_VIDEO);
+      const handleChange = (v) => (delete that.topWin, that.initVideoProps(v), that.setVideoInfo(v));
+      window.videoEnhance.defineProperty(video, isFake ? "srcConfig" : "src", {
+        set(value, setter) {
+          isFake ? this._src = value : setter(value);
+          if ((isFake || this === that.player) && value) handleChange(this);
+        }
+      });
+    },
+    async setupMouseMoveListener() {
+      let timer = null;
+      const handleMouseEvent = ({ type, isTrusted }) => {
+        const gap = type === EventTypes.MOUSE_MOVE ? 150 : 50;
+        if (!isTrusted || Tools.isFrequent(type, gap, true)) return;
+        clearTimeout(timer), this.toggleCursor();
+        timer = setTimeout(() => this.toggleCursor(true), Consts.THREE_SEC);
+      };
+      document.addEventListener(EventTypes.MOUSE_MOVE, (e) => handleMouseEvent(e));
+      document.addEventListener(EventTypes.MOUSE_OVER, (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
+    },
+    toggleCursor(hide = false) {
+      if (this.isNormalSite() || Tools.isFrequent("cursor", void 0, true)) return;
+      const cls = "__hc";
+      if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
+      [...Tools.getParents(this.player, true, 3), ...Tools.getIFrames()].forEach((el) => {
+        el?.blur(), Tools.addCls(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
+      });
+    },
+    async setupFullscreenListener() {
+      document.addEventListener("fullscreenchange", () => {
+        const isFullscreen = !!document.fullscreenElement;
+        Tools.postMessage(window.top, { isFullscreen });
+      });
+    },
+    async observeFullscreenChange() {
+      Object.defineProperty(this, "isFullscreen", {
+        get: () => observedValue.isFullscreen,
+        set: (value) => {
+          observedValue.isFullscreen = value;
+          this.handleFullscreenChange(value);
+        }
+      });
+    },
+    handleFullscreenChange(isFullscreen) {
+      if (!this.player) return;
+      !isFullscreen && this.removeVideoProgress();
+      this.toggleClock();
+    },
+    async observeWebFullscreenChange() {
+      const handle = (event, { code, type } = event) => {
+        if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
+        if (![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
+        Tools.preventDefault(event), this.dispatchShortcutKey(code, true);
+      };
+      Object.defineProperty(this, "fsWrapper", {
+        get: () => observedValue.fsWrapper,
+        set: (value) => {
+          observedValue.fsWrapper = value;
+          const method = value ? "addEventListener" : "removeEventListener";
+          ["scroll", "keydown"].forEach((type) => {
+            try {
+              window[method](type, handle, true);
+            } catch {
+              _unsafeWindow[method](type, handle, true);
+            }
+          });
+        }
+      });
+    }
+  };
   const IconsSelector = {
     name: { full: "full", webFull: "webFull", next: "next", danmaku: "danmaku" },
     "live.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled" },
@@ -848,9 +799,9 @@
       const zoomKeys = !this.isDisableZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
       if (isNumberKey || isOverrideKey || preventKeys || altKey && zoomKeys) Tools.preventDefault(event);
     },
-    dispatchShortcutKey(code) {
+    dispatchShortcutKey(code, bypass) {
       const key = this.processShortcutKey({ code });
-      Tools.postMessage(window.top, { key });
+      Tools.postMessage(window.top, { key, bypass });
     },
     processShortcutKey({ key, code, ctrlKey, shiftKey, altKey }) {
       code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
@@ -858,9 +809,15 @@
       return keys.filter(Boolean).join("_").toUpperCase();
     },
     setupKeydownListener() {
-      window.addEventListener("keyup", (event) => this.preventDefault(event), true);
-      window.addEventListener("keydown", (event) => this.handleKeydown.call(this, event), true);
-      window.addEventListener("message", ({ data }) => this.handleMessage.call(this, data, true));
+      try {
+        window.addEventListener("keyup", (event) => this.preventDefault(event), true);
+        window.addEventListener("keydown", (event) => this.handleKeydown.call(this, event), true);
+        window.addEventListener("message", ({ data }) => this.handleMessage.call(this, data, true));
+      } catch {
+        _unsafeWindow.addEventListener("keyup", (event) => this.preventDefault(event), true);
+        _unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown.call(this, event), true);
+        _unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage.call(this, data, true));
+      }
     },
     handleMessage(data) {
       if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
@@ -885,7 +842,7 @@
       if (!this.player) Tools.sendToIFrames(data);
       if (data?.key) this.execHotKeyActions(data);
     },
-    execHotKeyActions({ key, isTrusted }) {
+    execHotKeyActions({ key, isTrusted, bypass }) {
       const dict = {
         M: () => this.toggleMute(),
         R: () => this.rotateVideo(),
@@ -895,11 +852,11 @@
         D: () => Site.isMatched() && this.triggerIconElement(SiteIcons.name.danmaku),
         N: () => Site.isMatched() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode(),
         ENTER: () => Site.isMatched() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen(),
-        P: () => Site.isMatched() ? this.triggerIconElement(SiteIcons.name.webFull) : this.webFullEnhance(isTrusted),
-        LEFT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(-Storage.SKIP_INTERVAL.get()),
-        RIGHT: () => this.isOverrideKeyboard() && this.adjustPlayProgress(Storage.SKIP_INTERVAL.get()),
+        P: () => Site.isMatched() ? this.triggerIconElement(SiteIcons.name.webFull) : this.toggleWebFullscreen(isTrusted),
+        LEFT: () => (bypass || this.isOverrideKeyboard()) && this.adjustPlayProgress(-Storage.SKIP_INTERVAL.get()),
+        RIGHT: () => (bypass || this.isOverrideKeyboard()) && this.adjustPlayProgress(Storage.SKIP_INTERVAL.get()),
+        SPACE: () => (bypass || this.isOverrideKeyboard()) && this.togglePlayPause(this.player),
         0: () => this.adjustPlayProgress(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
-        SPACE: () => this.isOverrideKeyboard() && this.togglePlayPause(this.player),
         SHIFT_P: () => this.togglePictureInPicture(),
         SHIFT_L: () => this.toggleNativeControls(),
         CTRL_ALT_A: () => this.captureScreenshot(),
@@ -913,247 +870,11 @@
       ["S", "SUB"].forEach((k) => dict[k] = () => this.adjustPlaybackRate(-step));
       ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => dict[k] = () => this.moveVideoPosition(k));
       for (let i = 1; i < 6; i++) dict[`CTRL_${i}`] = () => this.setPlaybackRate(Storage.PRESET_SPEED.get()[i - 1]);
+      dict["SHIFT_E"] = () => Storage.ENABLE_AUTO_NEXT_EPISODE.set(!Storage.ENABLE_AUTO_NEXT_EPISODE.get());
       dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
-    },
-    triggerIconElement(name) {
-      if (Tools.isFrequent("icon")) return;
-      const index = Object.values(SiteIcons.name).indexOf(name);
-      if (!Site.isBiliLive()) return Tools.query(SiteIcons[location.host]?.[name])?.click();
-      SiteIcons.name.webFull === name ? this.liveWebFullscreen() : this.getBiliLiveIcons()?.[index]?.click();
     }
   };
-  const WebLogin = {
-    removeLoginPopups() {
-      this.removeBiliLogin(), this.removeTencentLogin();
-    },
-    removeTencentLogin: () => Site.isTencent() && Tools.query("#login_win")?.remove(),
-    removeBiliLogin() {
-      if (!Site.isBili() || this.BiliTimerID) return;
-      this.BiliTimerID = setInterval(() => {
-        if (_unsafeWindow.__BiliUser__.cache.data.isLogin) clearInterval(this.BiliTimerID);
-        _unsafeWindow.__BiliUser__.isLogin = true;
-        _unsafeWindow.__BiliUser__.MiniLogin = null;
-        _unsafeWindow.__BiliUser__.cache.data.isLogin = true;
-        _unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
-      }, Consts.THREE_SEC);
-    }
-  };
-  const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELECTOR } = Storage;
-  const MenuCommand = {
-    isDisableAuto: () => Storage.DISABLE_AUTO.get(),
-    isDisableZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
-    isOverrideKeyboard: () => Storage.OVERRIDE_KEYBOARD.get(),
-    isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
-    isDisableScreenshot: () => Storage.DISABLE_SCREENSHOT.get(),
-    isEnableSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
-    restoreDefaultSetting: () => _GM_listValues().forEach((key) => _GM_deleteValue(key)),
-    setupScriptMenuCommand() {
-      if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
-      this.setupMenuChangeListener();
-      this.registMenuCommand();
-      this.hasMenu = true;
-    },
-    setupMenuChangeListener() {
-      const host = location.host;
-      [ENABLE_THIS.name + host, EPISODE_SELECTOR.name + host].forEach(
-        (key) => _GM_addValueChangeListener(key, () => this.registMenuCommand())
-      );
-    },
-    registMenuCommand() {
-      const host = location.host;
-      const isEnable = this.isEnableSiteAuto();
-      const siteFun = ({ cache }) => cache.set(host, !cache.get(host));
-      const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
-      const configs = [
-        { title: `此站${isEnable ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatched(), fn: siteFun },
-        { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
-        { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
-        { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() }
-        // { title: "还原默认", cache: { name: "RESET" }, isHidden: false, fn: this.restoreDefaultSetting },
-      ];
-      configs.forEach(({ title, cache, isHidden, fn }) => {
-        const id = `${cache.name}_MENU_ID`;
-        _GM_unregisterMenuCommand(this[id]);
-        if (isHidden) return;
-        this[id] = _GM_registerMenuCommand(title, () => {
-          if (fn) return fn.call(this, { cache, title });
-          const input = prompt(title, cache.get());
-          if (!isNaN(input) && cache.parser(input)) cache.set(input);
-        });
-      });
-    },
-    shortcutKeysPopup() {
-      const shortcutKeys = [
-        { key: "Enter", desc: "全屏" },
-        { key: "P", desc: "网页全屏" },
-        { key: "N", desc: "切换下集" },
-        { key: "R", desc: "旋转 90°" },
-        { key: "M", desc: "静音切换" },
-        { key: "D", desc: "弹幕显/隐" },
-        { key: "Z", desc: "恢复正常倍速" },
-        { key: "Shift R", desc: "水平镜像" },
-        { key: "Shift P", desc: "画中画切换" },
-        { key: "Shift L", desc: "原生控制栏" },
-        { key: "Ctrl Z", desc: "复位缩放移动" },
-        { key: "L / K", desc: "下一帧/上一帧" },
-        { key: "Ctrl 1-5", desc: "预设常用倍速" },
-        { key: "Ctrl Alt A", desc: "截图 (默认禁用)" },
-        { key: "Alt ➕ / ➖", desc: "缩放 (默认禁用)" },
-        { key: "A / S 或 ➕ / ➖", desc: "倍速 ±0.25" },
-        { key: "Alt ◀️🔼🔽▶️", desc: "移动画面 (默认禁用)" },
-        { key: "◀️▶️", desc: "快退/进 (默认禁用)" },
-        { key: "空格", desc: "播放/暂停 (默认禁用)" },
-        { key: "1️ - 9️", desc: "1️ - 9️ 倍速" },
-        { key: "数字 0️", desc: "快进 30 秒" }
-      ];
-      const rows = shortcutKeys.reduce((acc, item, i) => {
-        if (i % 2 === 0) {
-          const next = shortcutKeys[i + 1] || { key: Consts.EMPTY, desc: Consts.EMPTY };
-          return acc + `<tr><td>${item.key}</td><td>${item.desc}</td><td>${next.key}</td><td>${next.desc}</td></tr>`;
-        }
-        return acc;
-      }, Consts.EMPTY);
-      Swal.fire({
-        width: 650,
-        title: "快捷键说明",
-        showCancelButton: true,
-        cancelButtonText: "关闭",
-        showConfirmButton: false,
-        customClass: { container: "monkey-web-fullscreen" },
-        html: Tools.safeHTML(`<table><tr><th>快捷键</th><th>说明</th><th>快捷键</th><th>说明</th></tr>${rows}</table>`)
-      });
-    },
-    settingPopup() {
-      const { html: basicsHtml, cacheMap: basicsMap } = this.genBasicsItems();
-      const { html: assistHtml, cacheMap: assistMap } = this.genAssistItems();
-      const { html: paramsHtml, cacheMap: paramsMap } = this.genParamsItems();
-      const { html: ignoreHtml, cacheMap: ignoreMap } = this.genIgnoreItems();
-      const cacheMap = { ...basicsMap, ...assistMap, ...paramsMap, ...ignoreMap };
-      const modalHtml = `
-        <div class="swal2-tabs">
-          <!-- Tabs 标题栏 -->
-          <div class="swal2-tabs-header">
-              <div class="swal2-tab active" data-tab="tab1">播放设置</div>
-              <div class="swal2-tab" data-tab="tab2">辅助设置</div>
-              <div class="swal2-tab" data-tab="tab3">参数设置</div>
-              <div class="swal2-tab" data-tab="tab4">其他设置</div>
-          </div>
-          <!-- Tabs 内容区 -->
-          <div class="swal2-tabs-content">
-            <div class="swal2-tab-panel active" id="tab1">${basicsHtml}</div>
-            <div class="swal2-tab-panel" id="tab2">${assistHtml}</div>
-            <div class="swal2-tab-panel" id="tab3">${paramsHtml}</div>
-            <div class="swal2-tab-panel" id="tab4">${ignoreHtml}</div>
-          </div>
-        </div>`;
-      Swal.fire({
-        width: 410,
-        title: "设置",
-        showCancelButton: true,
-        cancelButtonText: "关闭",
-        showConfirmButton: false,
-        html: Tools.safeHTML(modalHtml),
-        customClass: { container: "monkey-web-fullscreen" },
-        didOpen(popup) {
-          Tools.querys(".swal2-tab", popup).forEach((tab) => {
-            tab.addEventListener("click", () => {
-              Tools.querys(".swal2-tab, .swal2-tab-panel", popup).forEach((el) => el.classList.remove("active"));
-              Tools.query(`#${tab.dataset.tab}`, popup).classList.add("active");
-              tab.classList.add("active");
-            });
-          });
-          Tools.querys(".__menu input, textarea", popup).forEach((ele) => {
-            ele.addEventListener("input", function() {
-              const isCheckbox = this.type === "checkbox";
-              const value = isCheckbox ? this.checked : this.value;
-              this.dataset.send && Tools.postMessage(window, { [`toggle_${this.name}`]: value });
-              setTimeout(() => {
-                const host = this.dataset.host;
-                const cache = cacheMap[this.name];
-                host ? cache.set(host, value) : cache.set(value);
-              }, 100);
-            });
-          });
-        }
-      });
-    },
-    genBasicsItems() {
-      const configs = [
-        { name: "speed", text: "禁用 倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true },
-        { name: "memory", text: "禁用 记忆倍速", cache: Storage.DISABLE_MEMORY_SPEED, sendMsg: true },
-        { name: "time", text: "禁用 记忆播放位置", cache: Storage.DISABLE_MEMORY_TIME, sendMsg: false },
-        { name: "fit", text: "禁用 自动网页全屏", cache: Storage.DISABLE_AUTO, isHidden: !Site.isMatched() },
-        { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE, sendMsg: false },
-        { name: "volume", text: "禁用 音量默认百分百", cache: Storage.DISABLE_DEF_MAX_VOLUME },
-        { name: "next", text: "启用 自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
-        { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD }
-      ].filter(({ isHidden }) => !isHidden);
-      const renderItem = ({ text, sendMsg, name, value }) => `
-        <label class="__menu">${text}
-          <input ${sendMsg ? 'data-send="true"' : ""} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
-          <span class="toggle-track"></span>
-        </label>`;
-      return this.generateCommonItems(configs, renderItem);
-    },
-    genAssistItems() {
-      const configs = [
-        { name: "pic", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
-        { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, sendMsg: true },
-        { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK, sendMsg: false },
-        { name: "clockAlways", text: "启用 非全屏显示时间", cache: Storage.UNFULL_CLOCK, sendMsg: true },
-        { name: "smallerFont", text: "启用 小字号显示时间", cache: Storage.USE_SMALLER_FONT, sendMsg: true },
-        { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, sendMsg: true }
-      ].filter(({ isHidden }) => !isHidden);
-      const renderItem = ({ text, sendMsg, name, value }) => `
-        <label class="__menu">${text}
-          <input ${sendMsg ? 'data-send="true"' : ""} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
-          <span class="toggle-track"></span>
-        </label>`;
-      return this.generateCommonItems(configs, renderItem);
-    },
-    genParamsItems() {
-      const configs = [
-        { name: "step", text: "倍速步进", cache: Storage.PLAY_RATE_STEP },
-        { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
-        { name: "zeroSkip", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL },
-        { name: "advance", text: "自动下集提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC },
-        { name: "days", text: "播放进度保存天数", cache: Storage.STORAGE_DAYS },
-        { name: "percent", text: "缩放百分比", cache: Storage.ZOOM_PERCENT },
-        { name: "move", text: "移动距离", cache: Storage.MOVING_DISTANCE },
-        { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR, sendMsg: true },
-        { name: "preset", text: "常用倍速", cache: Storage.PRESET_SPEED }
-      ];
-      const renderItem = ({ text, sendMsg, name, value }) => `
-        <label class="__menu">${text}
-          <input ${sendMsg ? 'data-send="true"' : ""} value="${value}" name="${name}" type="text" autocomplete="off"/>
-        </label>`;
-      return this.generateCommonItems(configs, renderItem);
-    },
-    genIgnoreItems() {
-      const host = location.host;
-      const configs = [
-        { name: "customFit", text: "自定义此站网页全屏规则", cache: Storage.CUSTOM_WEB_FULL, isHidden: Site.isMatched(), host },
-        { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: Storage.NEXT_IGNORE_URLS },
-        { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: Storage.FULL_IGNORE_URLS }
-      ];
-      const renderItem = ({ text, host: host2, name, value }) => `
-        <div class="others-sett"><p>${text}</p>
-          <textarea ${host2 ? `data-host="${host2}"` : ""} name="${name}" type="text" spellcheck="false" autocomplete="off">${value}</textarea>
-        </div>`;
-      return this.generateCommonItems(configs, renderItem);
-    },
-    generateCommonItems(baseConfigs, renderItem) {
-      const filteredConfigs = baseConfigs.filter(({ isHidden }) => !isHidden);
-      const processedConfigs = filteredConfigs.map((config) => ({
-        value: config.host ? config.cache.get(config.host) : config.cache.get(),
-        ...config
-      }));
-      const html = processedConfigs.map((config) => renderItem(config)).join(Consts.EMPTY);
-      const cacheMap = Object.fromEntries(processedConfigs.map((item) => [item.name, item.cache]));
-      return { html, cacheMap };
-    }
-  };
-  const VideoControl = {
+  const Control = {
     isEnded() {
       if (!this.player) return false;
       if (this.player.ended) return true;
@@ -1393,68 +1114,141 @@
       }
       this.player?.style?.setProperty(name, value);
       return this;
-    },
-    setBiliQuality() {
-      if (!Site.isBili() || !document.cookie.includes("DedeUserID") || !_unsafeWindow.player) return;
-      const current = _unsafeWindow.player.getQuality().realQ;
-      const list = _unsafeWindow.player.getSupportedQualityList();
-      const target = list.find((quality) => quality === 80) ?? list[0];
-      if (current !== target) _unsafeWindow.player.requestQuality(target);
-    },
-    getRealDuration(video) {
-      if (!Site.isQiyi()) return video.duration;
-      return _unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
-    },
-    videoProgress(video) {
-      if (!video || this.isBackgroundVideo(video)) return;
-      if (video.duration <= 30 || this.isLive() || this.shouldDestroyTimeElement()) return this.removeVideoProgress();
-      if (!this.progressElement) {
-        this.progressElement = this.createDisplayElement("__time-progress", Storage.CLOCK_COLOR.get());
-        this.progressTextNode = document.createTextNode("00:00");
-        const percentElement = document.createElement("b");
-        percentElement.textContent = "%";
-        this.progressElement?.append(this.progressTextNode, percentElement);
-        this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
-      }
-      const duration = this.getRealDuration(video);
-      if (duration > 86400) return this.removeVideoProgress();
-      const percent = Tools.toFixed(video.currentTime / duration * 100, 1);
-      const timeLeft = this.formatTime(duration - video.currentTime);
-      this.progressTextNode.textContent = `${timeLeft} / ${percent}`;
-      this.prependElement(this.progressElement);
-    },
-    removeVideoProgress() {
-      this.progressElement?.remove();
-      delete this.progressTextNode;
-      delete this.progressElement;
-    },
-    playbackRateKeepDisplay() {
-      if (!this.player || this.isLive()) return;
-      if (!Storage.RATE_KEEP_SHOW.get()) return this.removeRateKeepDisplay();
-      const e = this.player;
-      if (!e.rateKeepElement) e.rateKeepElement = this.createDisplayElement("__rate-keep-show");
-      e.rateKeepElement.textContent = `倍速: ${e.playbackRate}`;
-      this.prependElement(e.rateKeepElement);
-    },
-    removeRateKeepDisplay(video) {
-      const e = video ?? this.player;
-      e.rateKeepElement?.remove();
-      delete e.rateKeepElement;
-    },
-    createDisplayElement(clss, color) {
-      if (!this.player) return;
-      const element = document.createElement("div");
-      if (color) element.style.setProperty("color", color);
-      element.classList.add(clss);
-      this.prependElement(element);
-      return element;
-    },
-    prependElement(element, target) {
-      const container = target ?? this.player?.parentNode;
-      if (!container?.contains(element)) container?.prepend(element);
     }
   };
-  const WebFullScreen = {
+  const WebFull = {
+    triggerIconElement(name) {
+      if (Tools.isFrequent("icon")) return;
+      const index = Object.values(SiteIcons.name).indexOf(name);
+      if (!Site.isBiliLive()) return Tools.query(SiteIcons[location.host]?.[name])?.click();
+      SiteIcons.name.webFull === name ? this.liveWebFullscreen() : this.getBiliLiveIcons()?.[index]?.click();
+    },
+    liveWebFullscreen() {
+      _unsafeWindow.top.scrollTo({ top: 70 });
+      const el = Tools.query(":is(.lite-room, #player-ctnr)", top.document);
+      if (el) _unsafeWindow.top.scrollTo({ top: Tools.getElementRect(el)?.top });
+      if (!Tools.hasCls(document.body, "hide-asida-area") && _unsafeWindow.top?.livePlayer) {
+        _unsafeWindow.top.livePlayer.volume(100);
+        _unsafeWindow.top.livePlayer.switchQualityAsync("10000");
+        localStorage.setItem("FULLSCREEN-GIFT-PANEL-SHOW", 0);
+        Tools.addCls(document.body, "hide-asida-area", "hide-aside-area");
+      }
+      const icons = this.getBiliLiveIcons();
+      return Tools.triggerClick(icons?.[1]);
+    },
+    getBiliLiveIcons() {
+      Tools.triggerMousemove(this.getVideo());
+      return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
+    },
+    toggleFullscreen() {
+      if (!Tools.isTopWin()) return;
+      const isFull = !!document.fullscreenElement;
+      isFull ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
+      if (isFull || !this.fsWrapper) this.dispatchShortcutKey(Keyboard.P);
+    },
+    toggleWebFullscreen(isTrusted) {
+      if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
+      if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen();
+      this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
+    },
+    enterWebFullscreen() {
+      const container = this.fsWrapper = this.getVideoHostContainer();
+      if (!container || container.matches(":is(html, body)")) return this.ensureWebFullscreen();
+      const parents = Tools.getParents(container, true);
+      container.top = container.top ?? Tools.getElementRect(container).top;
+      container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
+      container instanceof HTMLIFrameElement || parents.length < Consts.WEBFULL_PARENT_DEPTH ? parents.forEach((el) => Tools.setPart(el, Consts.webFull)) : this.detachForFullscreen();
+      Tools.scrollTop(container.scrollY + container.top);
+      this.ensureWebFullscreen();
+    },
+    detachForFullscreen() {
+      if (this.fsParent) return;
+      this.fsParent = Tools.getParent(this.fsWrapper);
+      this.fsPlaceholder = document.createElement("div");
+      Tools.cloneAttrs(this.fsWrapper, this.fsPlaceholder, ["id", "class", "style"]);
+      Tools.cloneStyle(this.fsWrapper, this.fsPlaceholder, ["position", "width", "height"]);
+      this.fsParent.replaceChild(this.fsPlaceholder, this.fsWrapper);
+      document.body.insertAdjacentElement("beforeend", this.fsWrapper);
+      this.fsWrapper.querySelector("video")?.play();
+      Tools.setPart(this.fsWrapper, Consts.webFull);
+    },
+    exitWebFullscreen() {
+      if (!this.fsWrapper) return;
+      const { scrollY } = this.fsWrapper;
+      document.documentElement.style.setProperty("scroll-behavior", "auto", "important");
+      if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
+      Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
+      requestAnimationFrame(() => Tools.scrollTop(scrollY));
+      setTimeout(() => document.documentElement.style.removeProperty("scroll-behavior"), 20);
+      this.videoParents.clear();
+      this.fsPlaceholder = null;
+      this.fsWrapper = null;
+      this.fsParent = null;
+    },
+    getVideoHostContainer() {
+      if (this.player) return this.getVideoContainer();
+      const videoIFrame = this.getVideoIFrame();
+      if (videoIFrame) return videoIFrame;
+      const ifrs = Tools.getIFrames();
+      const { centerX, centerY } = this?.videoInfo ?? {};
+      return ifrs.length <= 1 ? ifrs[0] : ifrs.find((el) => Tools.isVisible(el) && Tools.pointInElement(centerX, centerY, el));
+    },
+    getVideoIFrame() {
+      if (!this?.videoInfo?.iframeSrc) return null;
+      const { pathname, search } = new URL(this.videoInfo.iframeSrc);
+      const decoded = decodeURI(search);
+      const partial = decoded.slice(0, decoded.length * 0.8);
+      return Tools.query(`iframe[src*="${pathname + partial}"]`) ?? Tools.query(`iframe[src*="${pathname}"]`);
+    },
+    getVideoContainer() {
+      const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin?.host)?.trim();
+      const container = selector ? selector.split(/[,;\n]/).reduce((acc, sel) => acc || Tools.query(sel), null) : null;
+      if (container) return container;
+      const ctrlContainer = this.findControlBarContainer();
+      return ctrlContainer ? this.findVideoParentContainer(ctrlContainer) : this.findVideoParentContainer();
+    },
+    findControlBarContainer() {
+      const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
+      const ctrl = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"], [class*="progress"]`;
+      const ctrlContainer = Tools.findParentWithChild(this.player, ctrl);
+      if (!ctrlContainer) return null;
+      const { width } = Tools.getElementRect(ctrlContainer);
+      const { width: vw } = Tools.getElementRect(this.player);
+      const { centerX, centerY } = Tools.getCenterPoint(ctrlContainer);
+      const inRect = Tools.pointInElement(centerX, centerY, this.player);
+      return Math.floor(width) <= Math.floor(vw) && inRect ? ctrlContainer : null;
+    },
+    videoParents: /* @__PURE__ */ new Set(),
+    findVideoParentContainer(container, maxLevel = 4, track = true) {
+      container = container ?? Tools.getParent(this.player);
+      const { offsetWidth: cw, offsetHeight: ch } = container;
+      if (track) this.videoParents.clear();
+      for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
+        if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
+        if (this.hasExplicitlySize(parent)) return container;
+        if (track) this.videoParents.add(parent);
+      }
+      return container;
+    },
+    hasExplicitlySize(element) {
+      const style = element.style;
+      const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
+      return ["width", "height"].some((prop) => {
+        const value = style.getPropertyValue(prop);
+        return value && sizeRegex.test(value);
+      });
+    },
+    ensureWebFullscreen() {
+      const { viewWidth, viewHeight } = this.topWin;
+      const elements = [...this.videoParents].reverse();
+      for (const element of elements) {
+        const { offsetWidth: width, offsetHeight: height } = this.player;
+        if (width === viewWidth && height === viewHeight && element.offsetHeight === viewHeight) continue;
+        Tools.setPart(element, Consts.webFull);
+      }
+    }
+  };
+  const Automatic = {
     autoNextEpisode(video) {
       if (video.duration < 300) return;
       if (video.hasTriedAutoNext) return;
@@ -1480,19 +1274,6 @@
       await Tools.sleep(Consts.HALF_SEC);
       return video.offsetWidth >= this.topWin.viewWidth;
     },
-    liveWebFullscreen() {
-      _unsafeWindow.top.scrollTo({ top: 70 });
-      const el = Tools.query(":is(.lite-room, #player-ctnr)", top.document);
-      if (el) _unsafeWindow.top.scrollTo({ top: Tools.getElementRect(el)?.top });
-      if (!Tools.hasCls(document.body, "hide-asida-area") && _unsafeWindow.top?.livePlayer) {
-        _unsafeWindow.top.livePlayer.volume(100);
-        _unsafeWindow.top.livePlayer.switchQualityAsync("10000");
-        localStorage.setItem("FULLSCREEN-GIFT-PANEL-SHOW", 0);
-        Tools.addCls(document.body, "hide-asida-area", "hide-aside-area");
-      }
-      const icons = this.getBiliLiveIcons();
-      return Tools.triggerClick(icons?.[1]);
-    },
     autoExitWebFullscreen() {
       if (!Site.isBili() && !Site.isAcFun()) return;
       const isWide = this.player.offsetWidth === innerWidth;
@@ -1501,13 +1282,9 @@
         const isLast = Tools.query('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
         if (!Tools.query(".video-pod") || isLast) Tools.query(".bpx-player-ending-related-item-cancel")?.click();
       });
-    },
-    getBiliLiveIcons() {
-      Tools.triggerMousemove(this.getVideo());
-      return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
     }
   };
-  const SwitchEpisode = {
+  const Episode = {
     switchEpisode(isPrev = false) {
       const targetEpisode = this.getTargetEpisode(this.getCurrentEpisode(), isPrev) ?? this.getTargetEpisodeByText(isPrev) ?? this.getTargetEpisodeByClass(isPrev);
       this.jumpToTargetEpisode(targetEpisode);
@@ -1587,7 +1364,7 @@
       rightLarge: numbers.some((val, i) => i > index && val > compareNumber)
     })
   };
-  const PickerEpisode = {
+  const EpisodePicker = {
     setupPickerEpisodeListener() {
       if (Site.isMatched() || this.hasPickerListener) return;
       this.hasPickerListener = true;
@@ -1672,96 +1449,7 @@
       }).then((result) => result.isConfirmed && confirmCallback.call(this, result.value));
     }
   };
-  const WebFullEnhance = {
-    toggleFullscreen() {
-      if (!Tools.isTopWin()) return;
-      const isFull = !!document.fullscreenElement;
-      isFull ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-      if (isFull || !this.fullscreenWrapper) this.dispatchShortcutKey(Keyboard.P);
-    },
-    webFullEnhance(isTrusted) {
-      if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
-      if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen();
-      if (this.fullscreenWrapper) return this.exitWebFullEnhance();
-      const container = this.fullscreenWrapper = this.getVideoHostContainer();
-      if (!container || container.matches(":is(html, body)")) return this.ensureWebFullscreen();
-      container.top = container.top ?? Tools.getElementRect(container).top;
-      container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
-      Tools.getParents(container, true).forEach((el) => Tools.setPart(el, Consts.webFull));
-      Tools.scrollTop(container.scrollY + container.top);
-      this.ensureWebFullscreen();
-    },
-    exitWebFullEnhance() {
-      const { scrollY } = this.fullscreenWrapper;
-      Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
-      requestAnimationFrame(() => Tools.scrollTop(scrollY));
-      this.fullscreenWrapper = null;
-      this.videoParents.clear();
-    },
-    getVideoHostContainer() {
-      if (this.player) return this.getVideoContainer();
-      const videoIFrame = this.getVideoIFrame();
-      if (videoIFrame) return videoIFrame;
-      const ifrs = Tools.getIFrames();
-      const { centerX, centerY } = this?.videoInfo ?? {};
-      return ifrs.length <= 1 ? ifrs[0] : ifrs.find((el) => Tools.isVisible(el) && Tools.pointInElement(centerX, centerY, el));
-    },
-    getVideoIFrame() {
-      if (!this?.videoInfo?.iframeSrc) return null;
-      const { pathname, search } = new URL(this.videoInfo.iframeSrc);
-      const decoded = decodeURI(search);
-      const partial = decoded.slice(0, decoded.length * 0.8);
-      return Tools.query(`iframe[src*="${pathname + partial}"]`) ?? Tools.query(`iframe[src*="${pathname}"]`);
-    },
-    getVideoContainer() {
-      const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin?.host)?.trim();
-      if (selector) return Tools.query(selector.replace(/\n/g, Consts.EMPTY));
-      const ctrlContainer = this.findControlBarContainer();
-      return ctrlContainer ? this.findVideoParentContainer(ctrlContainer) : this.findVideoParentContainer();
-    },
-    findControlBarContainer() {
-      const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
-      const ctrl = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"], [class*="progress"]`;
-      const ctrlContainer = Tools.findParentWithChild(this.player, ctrl);
-      if (!ctrlContainer) return null;
-      const { width } = Tools.getElementRect(ctrlContainer);
-      const { width: vw } = Tools.getElementRect(this.player);
-      const { centerX, centerY } = Tools.getCenterPoint(ctrlContainer);
-      const inRect = Tools.pointInElement(centerX, centerY, this.player);
-      return Math.floor(width) <= Math.floor(vw) && inRect ? ctrlContainer : null;
-    },
-    videoParents: /* @__PURE__ */ new Set(),
-    findVideoParentContainer(container, maxLevel = 4, track = true) {
-      const video = this.player;
-      container = container ?? video.parentElement;
-      const { offsetWidth: cw, offsetHeight: ch } = container;
-      if (track) this.videoParents.clear();
-      for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
-        if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
-        if (this.hasExplicitlySize(parent)) return container;
-        if (track) this.videoParents.add(parent);
-      }
-      return container;
-    },
-    hasExplicitlySize(element) {
-      const style = element.style;
-      const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
-      return ["width", "height"].some((prop) => {
-        const value = style.getPropertyValue(prop);
-        return value && sizeRegex.test(value);
-      });
-    },
-    ensureWebFullscreen() {
-      const { viewWidth, viewHeight } = this.topWin;
-      const elements = [...this.videoParents].reverse();
-      for (const element of elements) {
-        const { offsetWidth: width, offsetHeight: height } = this.player;
-        if (width === viewWidth && height === viewHeight && element.offsetHeight === viewHeight) continue;
-        Tools.setPart(element, Consts.webFull);
-      }
-    }
-  };
-  const SettMessage = {
+  const SettMsg = {
     handleSettMessage(data) {
       if ("toggle_rateKeep" in data) setTimeout(() => this.playbackRateKeepDisplay(), 150);
       if ("toggle_smallerFont" in data) this.toggleSmallerFont(data.toggle_smallerFont);
@@ -1783,6 +1471,146 @@
     },
     changeTimeElementDisplay() {
       setTimeout(() => (this.toggleClock(), this.videoProgress(this.player)), 150);
+    }
+  };
+  class Clock {
+    constructor(container, options) {
+      __publicField(this, "options", { color: null, clss: "Clock", coexist: false });
+      if (!container) return;
+      this.options = Object.assign(this.options, options);
+      this.container = container;
+      this.animationId = null;
+      this.isRunning = false;
+      this.initClockElement();
+      this.start();
+    }
+    initClockElement() {
+      const { color, clss, coexist } = this.options;
+      if (!coexist && this.isInDOM()) this.destroy();
+      this.element = document.createElement("div");
+      if (color) this.element.style.setProperty("color", color);
+      this.element.classList.add(clss);
+      this.container.prepend(this.element);
+    }
+    isInDOM() {
+      return this.container?.contains(this.element) ?? false;
+    }
+    setCustomColor(color) {
+      if (!color) return this.element?.style.removeProperty("color");
+      this.element?.style.setProperty("color", color);
+    }
+    formatTime(date) {
+      const h = date.getHours();
+      const m = date.getMinutes();
+      const s = date.getSeconds();
+      return [h, m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
+    }
+    update() {
+      this.isRunning = true;
+      const now = /* @__PURE__ */ new Date();
+      this.element.textContent = this.formatTime(now);
+      this.animationId = requestAnimationFrame(() => this.update());
+    }
+    start() {
+      if (this.isRunning) return;
+      this.element.style.setProperty("display", "unset");
+      this.update();
+    }
+    stop() {
+      if (this.animationId) {
+        cancelAnimationFrame(this.animationId);
+        this.animationId = null;
+      }
+      this.isRunning = false;
+      this.element?.style.setProperty("display", "none");
+    }
+    destroy() {
+      this.stop();
+      this.element?.remove();
+      this.container = null;
+      this.element = null;
+    }
+  }
+  __publicField(Clock, "state", { start: "start", stop: "stop" });
+  const Extend = {
+    setBiliQuality() {
+      if (!Site.isBili() || !document.cookie.includes("DedeUserID") || !_unsafeWindow.player) return;
+      const current = _unsafeWindow.player.getQuality().realQ;
+      const list = _unsafeWindow.player.getSupportedQualityList();
+      const target = list.find((quality) => quality === 80) ?? list[0];
+      if (current !== target) _unsafeWindow.player.requestQuality(target);
+    },
+    shouldDestroyTimeElement() {
+      const isFull = this.isFullscreen;
+      return isFull && Storage.DISABLE_CLOCK.get() || !isFull && !Storage.UNFULL_CLOCK.get();
+    },
+    createClock(state = Clock.state.stop) {
+      Promise.resolve().then(() => {
+        this.Clock?.destroy(), this.Clock = null;
+        if (!this.player?.parentNode) return;
+        const shouldDestroy = this.shouldDestroyTimeElement();
+        this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
+        this.Clock[shouldDestroy ? state : Clock.state.start]?.();
+        this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
+      });
+    },
+    toggleClock() {
+      if (this.shouldDestroyTimeElement()) return this.Clock?.stop();
+      const state = Clock.state.start;
+      this.Clock?.isInDOM() ? this.Clock[state]() : this.createClock(state);
+      this.Clock?.setCustomColor(Storage.CLOCK_COLOR.get());
+    },
+    getRealDuration(video) {
+      if (!Site.isQiyi()) return video.duration;
+      return _unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
+    },
+    videoProgress(video) {
+      if (!video || this.player !== video || this.isBackgroundVideo(video)) return;
+      if (video.duration <= 30 || this.isLive() || this.shouldDestroyTimeElement()) return this.removeVideoProgress();
+      if (!this.progressElement) {
+        this.progressElement = this.createDisplayElement("__time-progress", Storage.CLOCK_COLOR.get());
+        this.progressTextNode = document.createTextNode("00:00");
+        const percentElement = document.createElement("b");
+        percentElement.textContent = "%";
+        this.progressElement?.append(this.progressTextNode, percentElement);
+        this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
+      }
+      const duration = this.getRealDuration(video);
+      if (duration > 86400) return this.removeVideoProgress();
+      const percent = Tools.toFixed(video.currentTime / duration * 100, 1);
+      const timeLeft = this.formatTime(duration - video.currentTime);
+      this.progressTextNode.textContent = `${timeLeft} / ${percent}`;
+      this.prependElement(this.progressElement);
+    },
+    removeVideoProgress() {
+      this.progressElement?.remove();
+      delete this.progressTextNode;
+      delete this.progressElement;
+    },
+    playbackRateKeepDisplay() {
+      if (!this.player || this.isLive()) return;
+      if (!Storage.RATE_KEEP_SHOW.get()) return this.removeRateKeepDisplay();
+      const e = this.player;
+      if (!e.rateKeepElement) e.rateKeepElement = this.createDisplayElement("__rate-keep-show");
+      e.rateKeepElement.textContent = `倍速: ${e.playbackRate}`;
+      this.prependElement(e.rateKeepElement);
+    },
+    removeRateKeepDisplay(video) {
+      const e = video ?? this.player;
+      e.rateKeepElement?.remove();
+      delete e.rateKeepElement;
+    },
+    createDisplayElement(clss, color) {
+      if (!this.player) return;
+      const element = document.createElement("div");
+      if (color) element.style.setProperty("color", color);
+      element.classList.add(clss);
+      this.prependElement(element);
+      return element;
+    },
+    prependElement(element, target) {
+      const container = target ?? this.player?.parentNode;
+      if (!container?.contains(element)) container?.prepend(element);
     }
   };
   class URLBlacklist {
@@ -1822,10 +1650,10 @@
       }
     }
   }
-  const IgnoreUrls = {
+  const Ignore = {
     defNextIgnore: ["https://www.youtube.com/watch", "https://www.bilibili.com/video", "https://www.bilibili.com/list"],
     defFullIgnore: ["https://www.youtube.com/shorts", "https://www.youtube.com", "https://www.bilibili.com"],
-    setupIgnoreUrlsChangeListener() {
+    async setupIgnoreUrlsChangeListener() {
       this.initializeIgnoreUrls();
       [Storage.FULL_IGNORE_URLS.name, Storage.NEXT_IGNORE_URLS.name].forEach(
         (key) => _GM_addValueChangeListener(key, (_, oldVal, newVal) => {
@@ -1854,29 +1682,255 @@
       return defaultUrls;
     }
   };
+  const Login = {
+    async removeLoginPopups() {
+      this.removeBiliLogin(), this.removeTencentLogin();
+    },
+    removeTencentLogin: () => Site.isTencent() && Tools.query("#login_win")?.remove(),
+    removeBiliLogin() {
+      if (!Site.isBili() || this.BiliTimerID) return;
+      if (document.cookie.includes("DedeUserID")) return;
+      this.BiliTimerID = setInterval(() => {
+        if (_unsafeWindow.__BiliUser__?.cache?.data?.isLogin) clearInterval(this.BiliTimerID);
+        _unsafeWindow.__BiliUser__.isLogin = true;
+        _unsafeWindow.__BiliUser__.MiniLogin = null;
+        _unsafeWindow.__BiliUser__.cache.data.isLogin = true;
+        _unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
+      }, Consts.THREE_SEC);
+    }
+  };
+  const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELECTOR } = Storage;
+  const Menu = {
+    isDisableAuto: () => Storage.DISABLE_AUTO.get(),
+    isDisableZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
+    isOverrideKeyboard: () => Storage.OVERRIDE_KEYBOARD.get(),
+    isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
+    isDisableScreenshot: () => Storage.DISABLE_SCREENSHOT.get(),
+    isEnableSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
+    restoreDefaultSetting: () => _GM_listValues().forEach((key) => _GM_deleteValue(key)),
+    setupScriptMenuCommand() {
+      if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
+      this.setupMenuChangeListener();
+      this.registMenuCommand();
+      this.hasMenu = true;
+    },
+    setupMenuChangeListener() {
+      const host = location.host;
+      [ENABLE_THIS.name + host, EPISODE_SELECTOR.name + host].forEach(
+        (key) => _GM_addValueChangeListener(key, () => this.registMenuCommand())
+      );
+    },
+    registMenuCommand() {
+      const host = location.host;
+      const isEnable = this.isEnableSiteAuto();
+      const siteFun = ({ cache }) => cache.set(host, !cache.get(host));
+      const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
+      const configs = [
+        { title: `此站${isEnable ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatched(), fn: siteFun },
+        { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
+        { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
+        { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() }
+        // { title: "还原默认", cache: { name: "RESET" }, isHidden: false, fn: this.restoreDefaultSetting },
+      ];
+      configs.forEach(({ title, host: host2, cache, isHidden, fn }) => {
+        const id = `${cache.name}_MENU_ID`;
+        _GM_unregisterMenuCommand(this[id]);
+        if (isHidden) return;
+        this[id] = _GM_registerMenuCommand(title, () => {
+          if (fn) return fn.call(this, { host: host2, cache, title });
+          const input = prompt(title, host2 ? cache.get(host2) : cache.get());
+          if (!isNaN(input) && cache.parser(input)) host2 ? cache.set(host2, input) : cache.set(input);
+        });
+      });
+    },
+    shortcutKeysPopup() {
+      const shortcutKeys = [
+        { key: "Enter", desc: "全屏" },
+        { key: "P", desc: "网页全屏" },
+        { key: "N", desc: "切换下集" },
+        { key: "R", desc: "旋转 90°" },
+        { key: "M", desc: "静音切换" },
+        { key: "D", desc: "弹幕显/隐" },
+        { key: "Z", desc: "恢复正常倍速" },
+        { key: "Shift R", desc: "水平镜像" },
+        { key: "Shift P", desc: "画中画切换" },
+        { key: "Shift L", desc: "原生控制栏" },
+        { key: "Ctrl Z", desc: "复位缩放移动" },
+        { key: "L / K", desc: "下一帧/上一帧" },
+        { key: "Ctrl 1-5", desc: "预设常用倍速" },
+        { key: "Shift E", desc: "启/禁用自动下集" },
+        { key: "Ctrl Alt A", desc: "截图 (默认禁用)" },
+        { key: "Alt ➕ / ➖", desc: "缩放 (默认禁用)" },
+        { key: "A / S 或 ➕ / ➖", desc: "倍速 ±0.25" },
+        { key: "Alt ◀️🔼🔽▶️", desc: "移动画面 (默认禁用)" },
+        { key: "◀️▶️", desc: "快退/进 (默认禁用)" },
+        { key: "空格", desc: "播放/暂停 (默认禁用)" },
+        { key: "1️ - 9️", desc: "1️ - 9️ 倍速" },
+        { key: "数字 0️", desc: "快进 30 秒" }
+      ];
+      const rows = shortcutKeys.reduce((acc, item, i) => {
+        if (i % 2 === 0) {
+          const next = shortcutKeys[i + 1] || { key: Consts.EMPTY, desc: Consts.EMPTY };
+          return acc + `<tr><td>${item.key}</td><td>${item.desc}</td><td>${next.key}</td><td>${next.desc}</td></tr>`;
+        }
+        return acc;
+      }, Consts.EMPTY);
+      Swal.fire({
+        width: 650,
+        title: "快捷键说明",
+        showCancelButton: true,
+        cancelButtonText: "关闭",
+        showConfirmButton: false,
+        customClass: { container: "monkey-web-fullscreen" },
+        html: Tools.safeHTML(`<table><tr><th>快捷键</th><th>说明</th><th>快捷键</th><th>说明</th></tr>${rows}</table>`)
+      });
+    },
+    settingPopup() {
+      const { html: basicsHtml, cacheMap: basicsMap } = this.genBasicsItems();
+      const { html: assistHtml, cacheMap: assistMap } = this.genAssistItems();
+      const { html: paramsHtml, cacheMap: paramsMap } = this.genParamsItems();
+      const { html: ignoreHtml, cacheMap: ignoreMap } = this.genIgnoreItems();
+      const cacheMap = { ...basicsMap, ...assistMap, ...paramsMap, ...ignoreMap };
+      const modalHtml = `
+        <div class="swal2-tabs">
+          <!-- Tabs 标题栏 -->
+          <div class="swal2-tabs-header">
+              <div class="swal2-tab active" data-tab="tab1">播放设置</div>
+              <div class="swal2-tab" data-tab="tab2">辅助设置</div>
+              <div class="swal2-tab" data-tab="tab3">参数设置</div>
+              <div class="swal2-tab" data-tab="tab4">其他设置</div>
+          </div>
+          <!-- Tabs 内容区 -->
+          <div class="swal2-tabs-content">
+            <div class="swal2-tab-panel active" id="tab1">${basicsHtml}</div>
+            <div class="swal2-tab-panel" id="tab2">${assistHtml}</div>
+            <div class="swal2-tab-panel" id="tab3">${paramsHtml}</div>
+            <div class="swal2-tab-panel" id="tab4">${ignoreHtml}</div>
+          </div>
+        </div>`;
+      Swal.fire({
+        width: 410,
+        title: "设置",
+        showCancelButton: true,
+        cancelButtonText: "关闭",
+        showConfirmButton: false,
+        html: Tools.safeHTML(modalHtml),
+        customClass: { container: "monkey-web-fullscreen" },
+        didOpen(popup) {
+          Tools.querys(".swal2-tab", popup).forEach((tab) => {
+            tab.addEventListener("click", () => {
+              Tools.querys(".swal2-tab, .swal2-tab-panel", popup).forEach((el) => el.classList.remove("active"));
+              Tools.query(`#${tab.dataset.tab}`, popup).classList.add("active");
+              tab.classList.add("active");
+            });
+          });
+          Tools.querys(".__menu input, textarea", popup).forEach((ele) => {
+            ele.addEventListener("input", function() {
+              const isCheckbox = this.type === "checkbox";
+              const value = isCheckbox ? this.checked : this.value;
+              this.dataset.send && Tools.postMessage(window, { [`toggle_${this.name}`]: value });
+              setTimeout(() => {
+                const host = this.dataset.host;
+                const cache = cacheMap[this.name];
+                host ? cache.set(host, value) : cache.set(value);
+              }, 100);
+            });
+          });
+        }
+      });
+    },
+    genBasicsItems() {
+      const configs = [
+        { name: "speed", text: "禁用 倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true },
+        { name: "memory", text: "禁用 记忆倍速", cache: Storage.DISABLE_MEMORY_SPEED, sendMsg: true },
+        { name: "time", text: "禁用 记忆播放位置", cache: Storage.DISABLE_MEMORY_TIME, sendMsg: false },
+        { name: "fit", text: "禁用 自动网页全屏", cache: Storage.DISABLE_AUTO, isHide: !Site.isMatched() },
+        { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE, sendMsg: false },
+        { name: "volume", text: "禁用 音量默认百分百", cache: Storage.DISABLE_DEF_MAX_VOLUME },
+        { name: "next", text: "启用 自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
+        { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD }
+      ];
+      const renderItem = ({ text, dataSend, name, value }) => `
+        <label class="__menu">${text}
+          <input ${dataSend} ${value && "checked"} name="${name}" type="checkbox"/>
+          <span class="toggle-track"></span>
+        </label>`;
+      return this.generateCommonItems(configs, renderItem);
+    },
+    genAssistItems() {
+      const configs = [
+        { name: "pic", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
+        { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, sendMsg: true },
+        { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK, sendMsg: false },
+        { name: "clockAlways", text: "启用 非全屏显示时间", cache: Storage.UNFULL_CLOCK, sendMsg: true },
+        { name: "smallerFont", text: "启用 小字号显示时间", cache: Storage.USE_SMALLER_FONT, sendMsg: true },
+        { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, sendMsg: true }
+      ].filter(({ isHidden }) => !isHidden);
+      const renderItem = ({ text, dataSend, name, value }) => `
+        <label class="__menu">${text}
+          <input ${dataSend} ${value && "checked"} name="${name}" type="checkbox"/>
+          <span class="toggle-track"></span>
+        </label>`;
+      return this.generateCommonItems(configs, renderItem);
+    },
+    genParamsItems() {
+      const configs = [
+        { name: "step", text: "倍速步进", cache: Storage.PLAY_RATE_STEP },
+        { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
+        { name: "zeroSkip", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL },
+        { name: "advance", text: "自动下集提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC },
+        { name: "days", text: "播放进度保存天数", cache: Storage.STORAGE_DAYS },
+        { name: "percent", text: "缩放百分比", cache: Storage.ZOOM_PERCENT },
+        { name: "move", text: "移动距离", cache: Storage.MOVING_DISTANCE },
+        { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR, sendMsg: true },
+        { name: "preset", text: "常用倍速", cache: Storage.PRESET_SPEED }
+      ];
+      const renderItem = ({ text, dataSend, name, value }) => `
+        <label class="__menu">${text}
+          <input ${dataSend} value="${value}" name="${name}" type="text" autocomplete="off"/>
+        </label>`;
+      return this.generateCommonItems(configs, renderItem);
+    },
+    genIgnoreItems() {
+      const { CUSTOM_WEB_FULL, NEXT_IGNORE_URLS, FULL_IGNORE_URLS } = Storage;
+      const configs = [
+        { name: "customRule", text: "自定义此站网页全屏规则", cache: CUSTOM_WEB_FULL, isHide: Site.isMatched(), useHost: true },
+        { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: NEXT_IGNORE_URLS },
+        { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: FULL_IGNORE_URLS }
+      ];
+      const renderItem = ({ text, dataHost, name, value }) => `
+        <div class="others-sett"><p>${text}</p>
+          <textarea ${dataHost} name="${name}" type="text" spellcheck="false" autocomplete="off">${value}</textarea>
+        </div>`;
+      return this.generateCommonItems(configs, renderItem);
+    },
+    generateCommonItems(baseConfigs, renderItem) {
+      const filteredConfigs = baseConfigs.filter(({ isHide }) => !isHide);
+      const processedConfigs = filteredConfigs.map((config) => ({
+        value: config.useHost ? config.cache.get(location.host) : config.cache.get(),
+        dataHost: config.useHost ? `data-host="${location.host}"` : Consts.EMPTY,
+        dataSend: config.sendMsg ? 'data-send="true"' : Consts.EMPTY,
+        host: config.useHost ? location.host : Consts.EMPTY,
+        ...config
+      }));
+      const html = processedConfigs.map((config) => renderItem(config)).join(Consts.EMPTY);
+      const cacheMap = Object.fromEntries(processedConfigs.map((item) => [item.name, item.cache]));
+      return { html, cacheMap };
+    }
+  };
+  const handlers = [Listen, Keydown, Control, WebFull, Automatic, Episode, EpisodePicker, Ignore, SettMsg, Menu, Extend, Login];
+  _unsafeWindow.AUTO_WEB_FULLSCREEN = window.App = {};
+  handlers.forEach((handler) => {
+    Object.entries(handler).forEach(([key, value]) => {
+      App[key] = value instanceof Function ? value.bind(App) : value;
+    });
+  });
+  App.init();
   const cssLoader = (e) => {
     const t = GM_getResourceText(e);
     return GM_addStyle(t), t;
   };
   cssLoader("sweetalert2");
   cssLoader("notyf/notyf.min.css");
-  [
-    Keydown,
-    IgnoreUrls,
-    SettMessage,
-    MenuCommand,
-    VideoControl,
-    WebFullScreen,
-    WebFullEnhance,
-    SwitchEpisode,
-    PickerEpisode,
-    WebLogin
-  ].forEach((handler) => {
-    Object.entries(handler).forEach(([key, value]) => {
-      App$1[key] = value instanceof Function ? value.bind(App$1) : value;
-    });
-  });
-  _unsafeWindow.AUTO_WEB_FULLSCREEN = App$1;
-  App$1.init();
 
 })(notyf, sweetalert2);
