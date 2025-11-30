@@ -295,4 +295,9 @@ export default {
     this.player?.style?.setProperty(name, value);
     return this;
   },
+  toggleAutoNextEnabled() {
+    const status = !Storage.ENABLE_AUTO_NEXT_EPISODE.get();
+    Storage.ENABLE_AUTO_NEXT_EPISODE.set(status);
+    this.showToast(`已${status ? "启" : "禁"}用自动切换下集`);
+  },
 };

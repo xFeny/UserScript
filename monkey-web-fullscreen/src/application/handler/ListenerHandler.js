@@ -153,7 +153,7 @@ export default {
       if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
       if (![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
 
-      if (type === "keyup") return Tools.preventDefault(event); // 只一种按键事件触发
+      if (type === "keyup") return Tools.preventDefault(event); // 防止 keyup 事件触发
       Tools.preventDefault(event), this.dispatchShortcutKey(code, true);
     };
     Object.defineProperty(this, "fsWrapper", {
