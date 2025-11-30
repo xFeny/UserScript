@@ -41,19 +41,21 @@ export default {
     delete video.hasTriedAutoNext;
     delete video.hasApplyCachedRate;
     delete video.hasInitPlaySettings;
-    video.__duration = video.duration;
-    Tools.resetLimitCounter("autoWebFull");
-    if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
     delete this.hasAppliedCachedTime;
+
+    video.__duration = video.duration;
+    if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
+
+    Tools.resetLimitCounter("autoWebFull");
     this.removeRateKeepDisplay(video);
     this.removeVideoProgress();
   },
   initPlaySettings(video) {
     if (!this.player) return;
     video.hasInitPlaySettings = true;
-    setTimeout(() => this.applyCachedTime(video), 50); // 确保topWin信息的即时性和可靠性
     this.applyCachedPlayRate(video);
     this.playbackRateKeepDisplay();
+    this.applyCachedTime(video);
     this.setBiliQuality();
     this.createClock();
   },
@@ -103,7 +105,7 @@ export default {
   },
   cachePlayTime(video) {
     if (Tools.isFrequent("cacheTime", Consts.ONE_SEC, true)) return; // 节流
-    if (!this.topWin || video.paused || video.duration < 120 || this.isLive()) return;
+    if (!this.topWin || this.isLive() || video.paused || video.duration < 120 || video.urlHash) return;
     if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return; //播放时间太短
 
     // 禁用记忆、播放结束、距离结束10秒，清除记忆缓存

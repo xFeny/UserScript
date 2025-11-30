@@ -56,8 +56,8 @@ class VideoEnhancer {
 
   enhanced(video) {
     if (video.hasAttribute(this.attr)) return;
-    this.setupEventListeners(video);
     video.tsr = { ...this.defaultTsr };
+    this.setupEventListeners(video);
   }
 
   setupEventListeners(video) {

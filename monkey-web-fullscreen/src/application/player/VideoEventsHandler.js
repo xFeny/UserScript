@@ -28,7 +28,6 @@ export default {
   },
   playing() {
     this.isEnded = false;
-    if (this.duration <= 7) return; // 超短的视频不操作
     App.setCurrentVideo(this);
     App.initPlaySettings(this);
   },
