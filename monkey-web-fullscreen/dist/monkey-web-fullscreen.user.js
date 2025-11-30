@@ -750,6 +750,7 @@
       const handle = (event, { code, type } = event) => {
         if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
         if (![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
+        if (type === "keyup") return Tools.preventDefault(event);
         Tools.preventDefault(event), this.dispatchShortcutKey(code, true);
       };
       Object.defineProperty(this, "fsWrapper", {
@@ -757,7 +758,7 @@
         set: (value) => {
           observedValue.fsWrapper = value;
           const method = value ? "addEventListener" : "removeEventListener";
-          ["scroll", "keydown"].forEach((type) => {
+          ["scroll", "keyup", "keydown"].forEach((type) => {
             try {
               window[method](type, handle, true);
             } catch {
