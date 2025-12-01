@@ -51,9 +51,6 @@ export default {
   enterWebFullscreen() {
     // video的宿主容器元素
     const container = (this.fsWrapper = this.getVideoHostContainer());
-
-    // 防止在网页全屏过程别的视频进行播放，造成当前视频被暂停而影响效果
-    Tools.querys("video").forEach((video) => video !== this.player && video.pause());
     if (!container || container.matches(":is(html, body)")) return this.ensureWebFullscreen();
 
     // 进入网页全屏
