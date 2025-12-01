@@ -21,7 +21,7 @@ export default {
   },
   isDynamicDuration(video) {
     if (!video) return false;
-    if (video.__isDynamic) return true;
+    if (video.currentTime > video.__duration || video.__isDynamic) return true;
     if (video.currentTime > 5 || Tools.isOverLimit("isDynamic", 10)) return false;
 
     // 记录默认时长，用于判断是否为动态时长
