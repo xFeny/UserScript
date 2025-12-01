@@ -127,7 +127,7 @@ export default {
   getVideoContainer() {
     // 自定义网页全屏元素，支持多个选择器，返回第一个找到的元素
     const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin?.host)?.trim();
-    const container = selector ? selector.split(/[,;\n]/).reduce((acc, sel) => acc || Tools.query(sel), null) : null;
+    const container = selector ? this.player.closest(selector) : null;
     if (container) return container;
 
     // 查找相关元素
