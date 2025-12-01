@@ -230,11 +230,11 @@
    
 #### 配置示例  
 
-| 网站                                                         | CSS 选择器                                           | 效果说明         |
-| ------------------------------------------------------------ | ---------------------------------------------------- | ---------------- |
-| 抖音（[https://www.douyin.com/](https://www.douyin.com/)）   | `#slidelist > div`                                   | 支持滚动切换视频 |
-| 虎牙（[https://www.huya.com](https://www.huya.com/)）        | `#player-wrap`                                       | 隐藏底部礼物栏   |
-| Lemon Live（[https://lemonlive.deno.dev](https://lemonlive.deno.dev)） | `#app > main > div > div > div > div:nth-of-type(2)` | 保留控制栏和弹幕 |
+| 网站                                                         | CSS 选择器                                           | 效果说明                     |
+| ------------------------------------------------------------ | ---------------------------------------------------- | ---------------------------- |
+| 抖音（[https://www.douyin.com/](https://www.douyin.com/)）   | `#slidelist > div`                                   | 保持在网页全屏下，能切换视频 |
+| 虎牙（[https://www.huya.com](https://www.huya.com/)）        | `#player-wrap`                                       | 隐藏底部礼物栏               |
+| Lemon Live（[https://lemonlive.deno.dev](https://lemonlive.deno.dev)） | `#app > main > div > div > div > div:nth-of-type(2)` | 保留控制栏和弹幕             |
 
 ### 其他功能
 

@@ -67,7 +67,7 @@ export default {
     const sibling = Tools.findSibling(element, eleName);
     const children = Array.from(sibling?.parentElement?.children ?? []);
     return children.filter((ele) => {
-      const currClass = Array.from(ele.classList).filter((cls) => !["cur", "active"].includes(cls));
+      const currClass = Array.from(ele.classList).filter((cls) => !["on", "cur", "active"].includes(cls));
       const hasSameClass = eleClass.some((value) => currClass.includes(value));
       return currClass.length ? hasSameClass : ele.tagName === eleName;
     });

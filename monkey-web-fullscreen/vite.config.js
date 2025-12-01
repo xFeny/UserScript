@@ -26,6 +26,15 @@ const match = [
 
 // 不使用自带图标进行网页全屏的，使用@include
 const include = [
+  "*://x.com/*",
+  "*://vimeo.com/*",
+  "*://www.twitch.tv/*",
+  "*://www.reddit.com/*",
+  "*://www.youtube.com/*",
+  "*://www.facebook.com/*",
+  "*://www.instagram.com/*",
+  "*://www.dailymotion.com/*",
+  "*://geo.dailymotion.com/*",
   "*://www.ezdmw.site/Index/video/*",
   "*://player.ezdmw.com/danmuku/*",
   "*://pages.iqiyi.com/p/zy/*",
@@ -65,7 +74,7 @@ export default defineConfig({
         match,
         include,
         author: "Feny",
-        version: "3.4.1",
+        version: "3.4.2",
         connect: "gitee.com",
         license: "GPL-3.0-only",
         description: description.join("；"),
