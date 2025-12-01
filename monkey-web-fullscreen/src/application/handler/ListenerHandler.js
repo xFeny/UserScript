@@ -151,6 +151,8 @@ export default {
   async observeWebFullscreenChange() {
     const handle = (event, { code, type } = event) => {
       if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
+
+      if (this.isInputFocus(event)) return;
       if (![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
 
       if (type === "keyup") return Tools.preventDefault(event); // 防止 keyup 事件触发

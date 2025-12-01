@@ -9,6 +9,11 @@ import SiteIcons from "../common/SiteIcons";
  * 快捷键和消息相关逻辑处理
  */
 export default {
+  isInputFocus(event) {
+    const target = event.composedPath()[0];
+    const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
+    return isInput || target?.isContentEditable;
+  },
   preventDefault(event, { code, altKey } = event) {
     const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
     const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
@@ -53,9 +58,7 @@ export default {
   },
   handleKeydown(event, { key, code, isTrusted } = event) {
     // Tools.log("键盘事件：", { key, code });
-    const target = event.composedPath()[0];
-    const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
-    if (this.isNormalSite() || isInput || target?.isContentEditable) return;
+    if (this.isNormalSite() || this.isInputFocus(event)) return;
     if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
 
     this.preventDefault(event);
