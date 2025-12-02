@@ -145,7 +145,7 @@ export default {
     // 退出全屏模式时，是否需要移除播放进度元素
     !isFullscreen && this.shouldDestroyTimeElement() && this.removeVideoProgress();
 
-    // 是通过按`Esc`而不是`Enter`退出全屏模式时，还需退出网页全屏才行
+    // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
     !isFullscreen && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
 
     // 时钟显示或隐藏
