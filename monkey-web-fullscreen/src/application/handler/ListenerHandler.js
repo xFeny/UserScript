@@ -141,7 +141,7 @@ export default {
   },
   handleFullscreenChange(isFullscreen) {
     // 退出全屏模式时，是否需要移除播放进度元素
-    this.player && !isFullscreen && this.shouldDestroyTimeElement() && this.removeVideoProgress();
+    this.player && this.shouldDestroyTimeElement() && this.removeVideoProgress();
 
     // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
     !isFullscreen && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
