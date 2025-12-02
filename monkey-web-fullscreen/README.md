@@ -174,7 +174,7 @@
 
 #### 测试网站
 
-可在以下导航站中的影视动漫网站测试功能：
+脚本已针对以下导航站收录的影视动漫类网站，完成下集切换功能的通用性测试：
 
 - 聚神铺导航（[https://www.jspoo.com/](https://www.jspoo.com/)）
 - 硬核指南（[https://yinghezhinan.com/](https://yinghezhinan.com/)）
