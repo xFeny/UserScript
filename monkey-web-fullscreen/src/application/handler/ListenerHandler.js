@@ -140,16 +140,14 @@ export default {
     });
   },
   handleFullscreenChange(isFullscreen) {
-    if (!this.player) return;
-
     // 退出全屏模式时，是否需要移除播放进度元素
-    !isFullscreen && this.shouldDestroyTimeElement() && this.removeVideoProgress();
+    this.player && !isFullscreen && this.shouldDestroyTimeElement() && this.removeVideoProgress();
 
     // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
     !isFullscreen && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
 
     // 时钟显示或隐藏
-    this.toggleClock();
+    this.player && this.toggleClock();
   },
   async observeWebFullscreenChange() {
     const handle = (event, { code, type } = event) => {
