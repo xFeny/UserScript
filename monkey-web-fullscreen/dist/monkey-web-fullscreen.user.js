@@ -2,13 +2,22 @@
 // @name               视频自动网页全屏｜倍速播放
 // @name:zh-TW         視頻自動網頁全屏｜倍速播放
 // @namespace          http://tampermonkey.net/
-// @version            3.4.1
+// @version            3.4.2
 // @author             Feny
-// @description        支持所有H5视频的增强脚本，默认适配哔哩哔哩（含直播）、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；自动网页全屏 + 倍速调节 + 下集切换，大幅减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
-// @description:zh-TW  支持所有H5视频的增强脚本，默認適配嗶哩嗶哩（含直播）、騰訊視頻、優酷視頻、愛奇藝、芒果TV、搜狐視頻、AcFun彈幕網自動網頁全屏；自動網頁全屏 + 倍速調節 + 下集切換，大幅減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
+// @description        支持所有H5视频的增强脚本，通用网页全屏｜倍速调节，对微博/推特/Instagram/Facebook等平台均适用；默认适配哔哩哔哩（含直播）、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；自动网页全屏 + 倍速调节 + 下集切换，大幅减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
+// @description:zh-TW  支持所有H5视频的增强脚本，通用網頁全屏｜倍速調節，对微博/推特/Instagram/Facebook等平臺均適用；默認適配嗶哩嗶哩（含直播）、騰訊視頻、優酷視頻、愛奇藝、芒果TV、搜狐視頻、AcFun彈幕網自動網頁全屏；自動網頁全屏 + 倍速調節 + 下集切換，大幅減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
 // @license            GPL-3.0-only
 // @icon               data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAqdJREFUWEftl91LFFEYxp/3jB9ESZjtSl51F1RUSgRCF/kHlF1IhiFhF65dqEQkBUErdJMStBukGwQre2NZUiCRqUiURkW65mIfqGUFsW6Ii0jY7p4Tc3Rqd5zaGVldAudynve8z28e3jMzh5Dmi1R/V0vQyRRWxgWG6x22SrcnOAhQcQIbwVtXba8y1EANSpS1xzJin5c/Dz+jRDPvGWoErwRw35zuh8ChpcXXFjbwi9k/WADA9viGgovGnxtFs6EmcApMvCdBA3oIIirl4N8NNQngmRYJiwTOE7EHHLERAmXFawQ6AdCQkRbjsZIMUvIFoV0HMSsEDjCgSK8tJqAHAEDAMWLKLOexx8tiVVDEhLLVQAtzRPcwKOUANSWCw1/rsBe6PcFz8dpfAdTFgtF+EmIvBG7pID7mZNl2zkVCFQbahzqHfYerddpNhFpdsnfqauzl8ZoEuO4JXdIKOefynnZlimxXhBbqjTZL/el8pzrAVjTGmKh12Bq1ddJs974abQDXfFMuAhQ6EodwDTHWAf6/BAoK8nD0cDEKtuVhyD+OzvvLXnyWJshyApedJ1F65M9n4tlAAF5fL168fGfJWCu2DDA61GpodLvjCdp8vfjyNWQJJGUAquvMzBzafD0yEc65KZCUAmiOo4FPEqS753VSiFUB0FxbPF244en6J8SqAoTD8zhYcjZ9AP6RCVRWNacHYPD5GJqudmBi8tvaAkxNBeUuuNv5NOkAqgUpm4FIJCrfA+r0z4bnTZmvCKCv+wrsts0JBg8fvZLGY28NfoqToFhOoOJ4CS40lMu2I28mpXFP37DpJ9YXWgZQG+Tm5mBL7qakA2aGakUAZhqbrVkH0BLoB34fzcyml5K6pd/yaicRlQlgV0q6mmwitMOpyfpVKfsFya4w73cz9xQAAAAASUVORK5CYII=
 // @homepage           https://github.com/xFeny/UserScript/tree/main/monkey-web-fullscreen
+// @include            *://x.com/*
+// @include            *://vimeo.com/*
+// @include            *://www.twitch.tv/*
+// @include            *://www.reddit.com/*
+// @include            *://www.youtube.com/*
+// @include            *://www.facebook.com/*
+// @include            *://www.instagram.com/*
+// @include            *://www.dailymotion.com/*
+// @include            *://geo.dailymotion.com/*
 // @include            *://www.ezdmw.site/Index/video/*
 // @include            *://player.ezdmw.com/danmuku/*
 // @include            *://pages.iqiyi.com/p/zy/*
@@ -743,12 +752,14 @@
     },
     handleFullscreenChange(isFullscreen) {
       if (!this.player) return;
-      !isFullscreen && this.removeVideoProgress();
+      !isFullscreen && this.shouldDestroyTimeElement() && this.removeVideoProgress();
+      !isFullscreen && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
       this.toggleClock();
     },
     async observeWebFullscreenChange() {
       const handle = (event, { code, type } = event) => {
         if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
+        if (this.isInputFocus(event)) return;
         if (![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
         if (type === "keyup") return Tools.preventDefault(event);
         Tools.preventDefault(event), this.dispatchShortcutKey(code, true);
@@ -794,6 +805,11 @@
     }
   })();
   const Keydown = {
+    isInputFocus(event) {
+      const target = event.composedPath()[0];
+      const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
+      return isInput || target?.isContentEditable;
+    },
     preventDefault(event, { code, altKey } = event) {
       const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
       const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
@@ -831,9 +847,7 @@
       this.processEvent(data);
     },
     handleKeydown(event, { key, code, isTrusted } = event) {
-      const target = event.composedPath()[0];
-      const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
-      if (this.isNormalSite() || isInput || target?.isContentEditable) return;
+      if (this.isNormalSite() || this.isInputFocus(event)) return;
       if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
       this.preventDefault(event);
       key = this.processShortcutKey(event);
@@ -861,6 +875,7 @@
         SPACE: () => (bypass || this.isOverrideKeyboard()) && this.togglePlayPause(this.player),
         0: () => this.adjustPlayProgress(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
         SHIFT_P: () => this.togglePictureInPicture(),
+        SHIFT_E: () => this.toggleAutoNextEnabled(),
         SHIFT_L: () => this.toggleNativeControls(),
         CTRL_ALT_A: () => this.captureScreenshot(),
         CTRL_Z: () => this.resetVideoTransform(),
@@ -873,7 +888,6 @@
       ["S", "SUB"].forEach((k) => dict[k] = () => this.adjustPlaybackRate(-step));
       ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => dict[k] = () => this.moveVideoPosition(k));
       for (let i = 1; i < 6; i++) dict[`CTRL_${i}`] = () => this.setPlaybackRate(Storage.PRESET_SPEED.get()[i - 1]);
-      dict["SHIFT_E"] = () => Storage.ENABLE_AUTO_NEXT_EPISODE.set(!Storage.ENABLE_AUTO_NEXT_EPISODE.get());
       dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
     }
   };
@@ -891,7 +905,7 @@
     },
     isDynamicDuration(video) {
       if (!video) return false;
-      if (video.__isDynamic) return true;
+      if (video.currentTime > video.__duration || video.__isDynamic) return true;
       if (video.currentTime > 5 || Tools.isOverLimit("isDynamic", 10)) return false;
       if (!video.__duration) video.__duration = video.duration;
       const { duration, __duration, currentTime, seekable } = video;
@@ -1117,6 +1131,11 @@
       }
       this.player?.style?.setProperty(name, value);
       return this;
+    },
+    toggleAutoNextEnabled() {
+      const status = !Storage.ENABLE_AUTO_NEXT_EPISODE.get();
+      Storage.ENABLE_AUTO_NEXT_EPISODE.set(status);
+      this.showToast(`已${status ? "启" : "禁"}用自动切换下集`);
     }
   };
   const WebFull = {
@@ -1205,7 +1224,7 @@
     },
     getVideoContainer() {
       const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin?.host)?.trim();
-      const container = selector ? selector.split(/[,;\n]/).reduce((acc, sel) => acc || Tools.query(sel), null) : null;
+      const container = selector ? this.player.closest(selector) : null;
       if (container) return container;
       const ctrlContainer = this.findControlBarContainer();
       return ctrlContainer ? this.findVideoParentContainer(ctrlContainer) : this.findVideoParentContainer();
@@ -1331,7 +1350,7 @@
       const sibling = Tools.findSibling(element, eleName);
       const children = Array.from(sibling?.parentElement?.children ?? []);
       return children.filter((ele) => {
-        const currClass = Array.from(ele.classList).filter((cls) => !["cur", "active"].includes(cls));
+        const currClass = Array.from(ele.classList).filter((cls) => !["on", "cur", "active"].includes(cls));
         const hasSameClass = eleClass.some((value) => currClass.includes(value));
         return currClass.length ? hasSameClass : ele.tagName === eleName;
       });
