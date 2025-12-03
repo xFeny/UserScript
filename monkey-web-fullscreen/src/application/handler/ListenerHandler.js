@@ -182,6 +182,8 @@ export default {
       if (this.verifyPassed) return;
 
       this.setupKeydownListener();
+      this.setupVisibleListener();
+      this.setupMouseMoveListener();
       document.head.append(style.cloneNode(true));
       this.setParentWinVideoInfo(this.videoInfo);
     });
