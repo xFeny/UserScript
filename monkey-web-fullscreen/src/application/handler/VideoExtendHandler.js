@@ -77,7 +77,7 @@ export default {
   },
   createProgressElement() {
     if (this.progressElement) return this.progressElement;
-    if (window.videoProgressElement) this.progressElement = window.videoProgressElement;
+    if (window.videoProgressElement) return (this.progressElement = window.videoProgressElement);
 
     // 创建播放进度元素
     const element = this.createDisplayElement("__time-progress", Storage.CLOCK_COLOR.get());
