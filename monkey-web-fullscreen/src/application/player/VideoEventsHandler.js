@@ -1,3 +1,4 @@
+import Consts from "../common/Consts";
 import Tools from "../common/Tools";
 /**
  * 视频事件监听器处理函数
@@ -11,6 +12,7 @@ export default {
   loadeddata() {
     App.initVideoProps(this);
     App.verifyListenerBound();
+    this.tsr = { ...Consts.DEFAULT_TSR };
     Tools.query(".conplaying")?.click(); // https://skr.skrcc.cc:666
   },
   timeupdate() {
@@ -31,12 +33,6 @@ export default {
     this.isEnded = false;
     App.setCurrentVideo(this);
     App.initPlaySettings(this);
-  },
-  pause() {
-    // https://www.mcydh.com、https://dick.xfani.com
-    // 某些动漫网站会提示是否跳转上次播放进度，然后暂停播放等待确认跳转
-    Tools.query(".ec-no")?.click();
-    Tools.query('[id*="loading"]._noplayer')?.remove();
   },
   ended() {
     this.isEnded = true;

@@ -9,15 +9,14 @@ class VideoEnhancer {
   timeout = 100;
   attr = "enhanced";
   selector = ":is(video, fake-video):not([enhanced])";
-  defaultTsr = { zoom: 100, moveX: 0, moveY: 0, rotation: 0, isMirrored: false };
   danmuSelector = ':is([class*="danmu" i], [class*="danmaku" i], [class*="barrage" i])';
   videoEvents = Object.entries(VideoEvents);
 
   constructor() {
+    this.setupObserver();
     this.hackAttachShadow();
     this.setupExistingVideos();
     this.hookMediaMethod("play", (video) => this.enhanced(video)); // 防止没有增强到
-    this.setupObserver();
   }
 
   async setupExistingVideos() {
@@ -56,20 +55,11 @@ class VideoEnhancer {
 
   enhanced(video) {
     if (video.hasAttribute(this.attr)) return;
-    video.tsr = { ...this.defaultTsr };
-    this.setupEventListeners(video);
-  }
-
-  setupEventListeners(video) {
     this.videoEvents.forEach(([type, handler]) => {
       video.removeEventListener(type, handler, true);
       video.addEventListener(type, handler, true);
       video.setAttribute(this.attr, true);
     });
-  }
-
-  resetTsr(video) {
-    video.tsr = { ...this.defaultTsr };
   }
 
   setPlaybackRate(video, playRate) {

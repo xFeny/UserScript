@@ -1,12 +1,31 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
 import Clock from "../common/Clock";
+import Consts from "../common/Consts";
 import Storage from "../common/Storage";
 
 /**
  * 视频一些额外处理
  */
 export default {
+  async removeLoginPopups() {
+    this.removeBiliLogin(), this.removeTencentLogin();
+  },
+  removeTencentLogin: () => Site.isTencent() && Tools.query("#login_win")?.remove(),
+  removeBiliLogin() {
+    if (!Site.isBili() || this.BiliTimerID) return;
+    if (document.cookie.includes("DedeUserID")) return;
+
+    // 处理B站未登录观看视频1分钟左右的登录弹窗
+    this.BiliTimerID = setInterval(() => {
+      if (unsafeWindow.__BiliUser__?.cache?.data?.isLogin) clearInterval(this.BiliTimerID);
+
+      unsafeWindow.__BiliUser__.isLogin = true;
+      unsafeWindow.__BiliUser__.MiniLogin = null;
+      unsafeWindow.__BiliUser__.cache.data.isLogin = true;
+      unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
+    }, Consts.THREE_SEC);
+  },
   setBiliQuality() {
     if (!Site.isBili() || !document.cookie.includes("DedeUserID") || !unsafeWindow.player) return;
     const current = unsafeWindow.player.getQuality().realQ;
@@ -46,26 +65,39 @@ export default {
     if (!video || this.player !== video || this.isBackgroundVideo(video)) return;
     if (video.duration <= 30 || this.isLive() || this.shouldDestroyTimeElement()) return this.removeVideoProgress();
 
-    if (!this.progressElement) {
-      this.progressElement = this.createDisplayElement("__time-progress", Storage.CLOCK_COLOR.get());
-      this.progressTextNode = document.createTextNode("00:00");
-      const percentElement = document.createElement("b");
-      percentElement.textContent = "%";
-      this.progressElement?.append(this.progressTextNode, percentElement);
-      this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
-    }
-
     const duration = this.getRealDuration(video);
     if (duration > 864e2) return this.removeVideoProgress();
 
     const percent = Tools.toFixed((video.currentTime / duration) * 100, 1);
     const timeLeft = this.formatTime(duration - video.currentTime);
-    this.progressTextNode.textContent = `${timeLeft} / ${percent}`;
-    this.prependElement(this.progressElement);
+
+    const element = this.createProgressElement(); // 创建相关元素
+    element.textNode.textContent = `${timeLeft} / ${percent}`;
+    this.prependElement(element);
+  },
+  createProgressElement() {
+    if (this.progressElement) return this.progressElement;
+    if (window.videoProgressElement) this.progressElement = window.videoProgressElement;
+
+    // 创建播放进度元素
+    const element = this.createDisplayElement("__time-progress", Storage.CLOCK_COLOR.get());
+
+    // 创建文本节点，并挂载到element
+    const textNode = document.createTextNode("00:00");
+    element.textNode = textNode;
+
+    // 创建百分号
+    const percent = document.createElement("b");
+    percent.textContent = "%";
+
+    element.append(textNode, percent);
+    window.videoProgressElement = this.progressElement = element;
+    this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
+
+    return element;
   },
   removeVideoProgress() {
     this.progressElement?.remove();
-    delete this.progressTextNode;
     delete this.progressElement;
   },
   playbackRateKeepDisplay() {

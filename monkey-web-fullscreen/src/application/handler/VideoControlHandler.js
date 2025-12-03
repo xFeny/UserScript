@@ -219,7 +219,7 @@ export default {
       .setVideoTsr("--scale", 1)
       .setVideoTsr("--mirror", 1)
       .setVideoTsr("--rotate", "0deg");
-    window.videoEnhance.resetTsr(this.player);
+    this.player.tsr = { ...Consts.DEFAULT_TSR };
   },
   async captureScreenshot() {
     if (!this.player || this.isDisableScreenshot()) return;
