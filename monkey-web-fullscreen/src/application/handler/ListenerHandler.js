@@ -140,7 +140,6 @@ export default {
     });
   },
   handleFullscreenChange(isFullscreen) {
-    if (!this.player) return;
     // 退出全屏模式时，是否需要移除播放进度元素
     this.shouldDestroyTimeElement() && this.removeVideoProgress();
 
