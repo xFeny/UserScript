@@ -48,6 +48,7 @@ export default {
     if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
     if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
     if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
+    if ("verifyPassed" in data) this.verifyPassed = data.verifyPassed;
     if (data?.topWin) window.topWin = this.topWin = data.topWin;
 
     // 处理设置消息

@@ -140,14 +140,15 @@ export default {
     });
   },
   handleFullscreenChange(isFullscreen) {
+    if (!this.player) return;
     // 退出全屏模式时，是否需要移除播放进度元素
-    this.player && this.shouldDestroyTimeElement() && this.removeVideoProgress();
+    this.shouldDestroyTimeElement() && this.removeVideoProgress();
 
     // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
     !isFullscreen && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
 
     // 时钟显示或隐藏
-    this.player && this.toggleClock();
+    this.toggleClock();
   },
   async observeWebFullscreenChange() {
     const handle = (event, { code, type } = event) => {
@@ -172,6 +173,17 @@ export default {
           }
         });
       },
+    });
+  },
+  async verifyListenerBound() {
+    if (this.verifyPassed) return;
+    // 如：https://nkvod.me，会丢失事件监听的情况，所以需重新绑定
+    Tools.postMessage(window, { verifyPassed: true });
+    Tools.sleep(50).then(() => {
+      if (this.verifyPassed) return;
+      document.head.append(style.cloneNode(true));
+      this.setParentWinVideoInfo(videoInfo);
+      this.setupKeydownListener();
     });
   },
 };

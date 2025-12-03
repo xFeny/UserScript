@@ -10,6 +10,7 @@ export default {
   },
   loadeddata() {
     App.initVideoProps(this);
+    App.verifyListenerBound();
     Tools.query(".conplaying")?.click(); // https://skr.skrcc.cc:666
   },
   timeupdate() {

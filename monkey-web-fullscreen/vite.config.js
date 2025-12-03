@@ -76,7 +76,7 @@ export default defineConfig({
         match,
         include,
         author: "Feny",
-        version: "3.4.2",
+        version: "3.4.3",
         connect: "gitee.com",
         license: "GPL-3.0-only",
         description: description.join("；"),
@@ -105,6 +105,7 @@ export default defineConfig({
             const styleAdded = Symbol("styleAdded");
             const style = document.createElement("style");
             style.textContent = cssText;
+            window.style = style;
 
             // 向 Shadow DOM 插入样式
             document.addEventListener("shadow-attached", (e) => {
