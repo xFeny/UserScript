@@ -177,13 +177,14 @@ export default {
   },
   verifyListenerBound() {
     if (this.verifyPassed) return;
-    // 如：https://nkvod.me，会丢失事件监听的情况，所以需重新绑定
+    // 在 https://nkvod.me，会发生丢失事件监听的情况，所以需重新绑定
     Tools.postMessage(window, { verifyPassed: true });
     Tools.sleep(50).then(() => {
       if (this.verifyPassed) return;
+
+      this.setupKeydownListener();
       document.head.append(style.cloneNode(true));
       this.setParentWinVideoInfo(this.videoInfo);
-      this.setupKeydownListener();
     });
   },
 };
