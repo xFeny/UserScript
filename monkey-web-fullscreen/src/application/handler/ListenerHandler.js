@@ -184,7 +184,7 @@ export default {
       this.setupKeydownListener();
       this.setupVisibleListener();
       this.setupMouseMoveListener();
-      document.head.append(style.cloneNode(true));
+      document.head.append(scriptStyle.cloneNode(true));
       this.setParentWinVideoInfo(this.videoInfo);
     });
   },
