@@ -175,14 +175,14 @@ export default {
       },
     });
   },
-  async verifyListenerBound() {
+  verifyListenerBound() {
     if (this.verifyPassed) return;
     // 如：https://nkvod.me，会丢失事件监听的情况，所以需重新绑定
     Tools.postMessage(window, { verifyPassed: true });
     Tools.sleep(50).then(() => {
       if (this.verifyPassed) return;
       document.head.append(style.cloneNode(true));
-      this.setParentWinVideoInfo(videoInfo);
+      this.setParentWinVideoInfo(this.videoInfo);
       this.setupKeydownListener();
     });
   },
