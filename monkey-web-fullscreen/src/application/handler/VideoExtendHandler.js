@@ -115,8 +115,7 @@ export default {
   },
   setTimeElementColor(color) {
     // 设置播放剩余时间颜色
-    const progressStyle = this.progressElement?.style;
-    color ? progressStyle?.setProperty("color", color) : progressStyle?.removeProperty("color");
+    this.progressElement?.style?.[color ? "setProperty" : "removeProperty"]("color", color);
 
     // 设置时钟颜色
     this.Clock?.setCustomColor(color);
