@@ -140,14 +140,11 @@ export default {
     });
   },
   handleFullscreenChange(isFullscreen) {
-    // 退出全屏模式时，是否需要移除播放进度元素
-    this.shouldHideTime() && this.removeProgressElement();
-
     // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
     !isFullscreen && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
 
-    // 设置播放器时钟显示或隐藏
-    this.setupPlayerClock();
+    // 播放器右上角时间的显/隐
+    this.changeTimeElementDisplay();
   },
   async observeWebFullscreenChange() {
     const handle = (event, { code, type } = event) => {

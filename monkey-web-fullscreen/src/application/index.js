@@ -5,12 +5,11 @@ import WebFull from "./handler/WebFullScreenHandler";
 import Automatic from "./handler/AutoExecuteHandler";
 import Episode from "./handler/EpisodeSwitchHandler";
 import EpisodePicker from "./handler/EpisodePickerHandler";
-import SettMsg from "./handler/SettMessageHandler";
 import Extend from "./handler/VideoExtendHandler";
 import Ignore from "./handler/IgnoreUrlsHandler";
 import Menu from "./handler/MenuHandler";
 
-const handlers = [Listen, Keydown, Control, WebFull, Automatic, Episode, EpisodePicker, Ignore, SettMsg, Extend, Menu];
+const handlers = [Listen, Keydown, Control, WebFull, Automatic, Episode, EpisodePicker, Ignore, Extend, Menu];
 unsafeWindow.AUTO_WEB_FULLSCREEN = window.App = {};
 handlers.forEach((handler) => {
   // 将Handler方法变为App的方法，内部this指向App

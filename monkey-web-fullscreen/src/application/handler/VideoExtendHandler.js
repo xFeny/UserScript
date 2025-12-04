@@ -109,4 +109,19 @@ export default {
     const container = target ?? Tools.getParent(this.player);
     if (!container?.contains(element)) container?.prepend(element);
   },
+  toggleTimeElementClass(addClass, clss = "smaller") {
+    if (addClass) return Tools.addCls(this.Clock?.element, clss), Tools.addCls(this.progressElement, clss);
+    Tools.delCls(this.Clock?.element, clss), Tools.delCls(this.progressElement, clss);
+  },
+  setTimeElementColor(color) {
+    // 设置播放剩余时间颜色
+    const progressStyle = this.progressElement?.style;
+    color ? progressStyle?.setProperty("color", color) : progressStyle?.removeProperty("color");
+
+    // 设置时钟颜色
+    this.Clock?.setCustomColor(color);
+  },
+  changeTimeElementDisplay() {
+    this.setupPlayerClock(), this.videoProgress(this.player);
+  },
 };

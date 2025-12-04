@@ -43,20 +43,6 @@ export default {
       unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage.call(this, data, true));
     }
   },
-  handleMessage(data) {
-    // Tools.log(location.href, "接收到消息：", data);
-    if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
-    if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
-    if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
-    if ("verifyPassed" in data) this.verifyPassed = data.verifyPassed;
-    if (data?.topWin) window.topWin = this.topWin = data.topWin;
-
-    // 处理设置消息
-    this.handleSettMessage(data);
-
-    // 处理键盘按键消息和继续分发消息
-    this.processEvent(data);
-  },
   handleKeydown(event, { key, code, isTrusted } = event) {
     // Tools.log("键盘事件：", { key, code });
     if (this.isNormalSite() || this.isInputFocus(event)) return;
@@ -112,5 +98,29 @@ export default {
 
     // 执行函数
     dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
+  },
+  handleMessage(data) {
+    // Tools.log(location.href, "接收到消息：", data);
+    if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
+    if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
+    if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
+    if ("verifyPassed" in data) this.verifyPassed = data.verifyPassed;
+    if (data?.topWin) window.topWin = this.topWin = data.topWin;
+
+    // 处理设置消息
+    this.handleSettMessage(data);
+
+    // 处理键盘按键消息和继续分发消息
+    this.processEvent(data);
+  },
+  handleSettMessage(data) {
+    // 处理在 “更多设置” 中操作功能切换（启用/禁用）时发来的消息
+    if ("toggle_rateKeep" in data) setTimeout(() => this.playbackRateKeepDisplay(), 150);
+    if ("toggle_clockAlways" in data) setTimeout(() => this.changeTimeElementDisplay(), 150);
+    if ("toggle_smallerFont" in data) this.toggleTimeElementClass(data.toggle_smallerFont);
+    if ("toggle_color" in data) this.setTimeElementColor(data.toggle_color);
+    if (data?.toggle_speed) this.resetToDefaultPlayRate();
+    if (data?.toggle_memory) this.deleteCachedPlayRate();
+    if (data?.toggle_zoom) this.resetVideoTransform();
   },
 };
