@@ -118,7 +118,7 @@ export default {
     this.progressElement?.style?.[color ? "setProperty" : "removeProperty"]("color", color);
 
     // 设置时钟颜色
-    this.Clock?.setCustomColor(color);
+    this.Clock?.setColor(color);
   },
   changeTimeElementDisplay() {
     this.setupPlayerClock(), this.videoProgress(this.player);
