@@ -37,12 +37,6 @@ export default class Clock {
     return this;
   }
 
-  setColor(color) {
-    this.element?.style?.[color ? "setProperty" : "removeProperty"]("color", color);
-
-    return this;
-  }
-
   formatTime(date) {
     const pad = (n) => n.toString().padStart(2, "0");
     return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;

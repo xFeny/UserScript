@@ -100,7 +100,7 @@ export default {
   createDisplayElement(clss, color) {
     if (!this.player) return;
     const element = document.createElement("div");
-    if (color) element.style.setProperty("color", color);
+    Tools.setStyle(element, "color", color);
     element.classList.add(clss);
     this.prependElement(element);
     return element;
@@ -114,11 +114,7 @@ export default {
     Tools.delCls(this.Clock?.element, clss), Tools.delCls(this.progressElement, clss);
   },
   setTimeElementColor(color) {
-    // 设置播放剩余时间颜色
-    this.progressElement?.style?.[color ? "setProperty" : "removeProperty"]("color", color);
-
-    // 设置时钟颜色
-    this.Clock?.setColor(color);
+    Tools.setStyle([this.progressElement, this.Clock?.element], "color", color);
   },
   changeTimeElementDisplay() {
     this.setupPlayerClock(), this.videoProgress(this.player);

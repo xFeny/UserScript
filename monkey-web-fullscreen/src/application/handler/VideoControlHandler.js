@@ -127,7 +127,7 @@ export default {
     this.setCurrentTime(time);
     this.hasAppliedCachedTime = true;
     this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
-      el.style.setProperty("transform", `translateY(${-5 - el.offsetHeight}px)`);
+      Tools.setStyle(el, "transform", `translateY(${-5 - el.offsetHeight}px)`);
     });
   },
   clearCachedTime(video) {
@@ -236,7 +236,7 @@ export default {
       const url = URL.createObjectURL(await new Promise((resolve) => canvas.toBlob(resolve, "image/png")));
       GM_download({ url, name: `视频截图_${Date.now()}.png`, onload: () => URL.revokeObjectURL(url) });
     } catch (e) {
-      canvas.style.setProperty("max-width", "98vw");
+      Tools.setStyle(canvas, "max-width", "98vw");
       const popup = window.open(Consts.EMPTY, "_blank", "width=1000,height=570,top=130,left=270");
       popup.document.title = "鼠标右键选择「图片另存为」";
       popup.document.body.appendChild(canvas);
@@ -287,13 +287,13 @@ export default {
     try {
       // 默认 transform 样式
       this.player.__trans = this.player.__trans ?? getComputedStyle(this.player)?.getPropertyValue("transform");
-      this.player?.style?.setProperty("--deftsr", this.player.__trans);
+      Tools.setStyle(this.player, "--deftsr", this.player.__trans);
     } catch (e) {
       console.debug(e);
     }
 
     // transform 变换值
-    this.player?.style?.setProperty(name, value);
+    Tools.setStyle(this.player, name, value);
     return this;
   },
   toggleAutoNextEnabled() {

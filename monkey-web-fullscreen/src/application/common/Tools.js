@@ -199,4 +199,9 @@ export default unsafeWindow.Tools = {
       if (value) target.style.setProperty(name, value);
     });
   },
+  setStyle(eles, prop, val, priority) {
+    if (!eles || !prop) return;
+    const fn = val ? "setProperty" : "removeProperty";
+    [].concat(eles).forEach((el) => el?.style?.[fn]?.(prop, val, priority));
+  },
 };
