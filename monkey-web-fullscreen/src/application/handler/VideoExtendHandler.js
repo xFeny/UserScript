@@ -56,7 +56,6 @@ export default {
     this.Clock?.isInDOM() ? this.Clock[state]() : this.createClock(state);
     this.Clock?.setCustomColor(Storage.CLOCK_COLOR.get());
   },
-
   getRealDuration(video) {
     if (!Site.isQiyi()) return video.duration;
     return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;

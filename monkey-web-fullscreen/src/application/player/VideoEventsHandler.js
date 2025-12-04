@@ -1,5 +1,5 @@
-import Consts from "../common/Consts";
 import Tools from "../common/Tools";
+
 /**
  * 视频事件监听器处理函数
  * this指向的是当前播放的video对象
@@ -12,7 +12,6 @@ export default {
   loadeddata() {
     App.initVideoProps(this);
     App.verifyListenerBound();
-    this.tsr = { ...Consts.DEFAULT_TSR };
     Tools.query(".conplaying")?.click(); // https://skr.skrcc.cc:666
   },
   timeupdate() {

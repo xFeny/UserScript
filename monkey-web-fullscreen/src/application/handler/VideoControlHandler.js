@@ -44,6 +44,7 @@ export default {
     delete this.hasAppliedCachedTime;
 
     video.__duration = video.duration;
+    video.tsr = { ...Consts.DEFAULT_TSR };
     if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
 
     Tools.resetLimitCounter("autoWebFull");
