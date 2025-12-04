@@ -85,7 +85,6 @@ export default {
   },
   removeProgressElement() {
     this.progressElement?.remove();
-    delete this.progressElement;
   },
   playbackRateKeepDisplay() {
     if (!this.player || this.isLive()) return;
