@@ -164,7 +164,7 @@ export default {
 
     const tsr = this.player.tsr;
     tsr.isMirrored = !tsr.isMirrored;
-    this.setVideoTsr("--mirror", tsr.isMirrored ? -1 : 1);
+    this.setTsr("--mirror", tsr.isMirrored ? -1 : 1);
   },
   rotateVideo() {
     if (!this.player) return;
@@ -174,7 +174,7 @@ export default {
     const { videoWidth, videoHeight } = this.player;
     const isVertical = [90, 270].includes(tsr.rotation);
     const scale = isVertical ? videoHeight / videoWidth : 1;
-    this.setVideoTsr("--scale", scale).setVideoTsr("--rotate", `${tsr.rotation}deg`);
+    this.setTsr("--scale", scale).setTsr("--rotate", `${tsr.rotation}deg`);
   },
   zoomVideo(isDown) {
     if (!this.player || this.isDisableZoom()) return;
@@ -185,7 +185,7 @@ export default {
     if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
 
     tsr.zoom = zoom;
-    this.setVideoTsr("--zoom", zoom / 100);
+    this.setTsr("--zoom", zoom / 100);
     this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC);
   },
   moveVideoPosition(direction) {
@@ -208,18 +208,13 @@ export default {
 
     // 赋值
     (tsr.moveX += x), (tsr.moveY += y);
-    this.setVideoTsr("--moveX", `${tsr.moveX}px`).setVideoTsr("--moveY", `${tsr.moveY}px`);
+    this.setTsr("--moveX", `${tsr.moveX}px`).setTsr("--moveY", `${tsr.moveY}px`);
     this.showToast(`${desc}：${x ? tsr.moveX : tsr.moveY}px`, Consts.ONE_SEC);
   },
   resetVideoTransform() {
     if (!this.player || this.isDisableZoom()) return;
 
-    this.setVideoTsr("--zoom", 1)
-      .setVideoTsr("--moveX", 0)
-      .setVideoTsr("--moveY", 0)
-      .setVideoTsr("--scale", 1)
-      .setVideoTsr("--mirror", 1)
-      .setVideoTsr("--rotate", "0deg");
+    this.setTsr("--zoom").setTsr("--moveX").setTsr("--moveY").setTsr("--scale").setTsr("--mirror").setTsr("--rotate");
     this.player.tsr = { ...Consts.DEFAULT_TSR };
   },
   async captureScreenshot() {
@@ -281,7 +276,7 @@ export default {
     const s = Math.floor(seconds % 60);
     return [...(h ? [h] : []), m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
   },
-  setVideoTsr(name, value) {
+  setTsr(name, value) {
     Tools.addCls(this.player, "__tsr");
 
     try {
