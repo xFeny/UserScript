@@ -109,7 +109,7 @@ export default {
     return element;
   },
   prependElement(element, target) {
-    const container = target ?? this.player?.parentNode;
+    const container = target ?? Tools.getParent(this.player);
     if (!container?.contains(element)) container?.prepend(element);
   },
 };
