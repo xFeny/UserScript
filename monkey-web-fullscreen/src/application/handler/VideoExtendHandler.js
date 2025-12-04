@@ -90,15 +90,12 @@ export default {
     if (!this.player || this.isLive()) return;
     if (!Storage.RATE_KEEP_SHOW.get()) return this.removeRateKeepDisplay();
 
-    const e = this.player;
-    if (!e.rateKeepElement) e.rateKeepElement = this.createDisplayElement("__rate-keep-show");
-    e.rateKeepElement.textContent = `倍速: ${e.playbackRate}`;
-    this.prependElement(e.rateKeepElement);
+    if (!this.rateKeepElement) this.rateKeepElement = this.createDisplayElement("__rate-keep-show");
+    this.rateKeepElement.textContent = `倍速: ${this.player.playbackRate}`;
+    this.prependElement(this.rateKeepElement);
   },
-  removeRateKeepDisplay(video) {
-    const e = video ?? this.player;
-    e.rateKeepElement?.remove();
-    delete e.rateKeepElement;
+  removeRateKeepDisplay() {
+    this.rateKeepElement?.remove();
   },
   createDisplayElement(clss, color) {
     if (!this.player) return;
