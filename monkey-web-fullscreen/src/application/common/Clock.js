@@ -3,10 +3,10 @@
  */
 export default class Clock {
   static state = { start: "start", stop: "stop" };
-  options = { color: null, clss: "Clock", coexist: false };
+  options = { color: null, clss: "Clock" };
 
   constructor(container, options) {
-    if (!container) return;
+    if (!container) throw new Error("时钟初始化失败：container不能为空");
     this.options = Object.assign(this.options, options);
 
     this.container = container;
@@ -18,34 +18,41 @@ export default class Clock {
   }
 
   initClockElement() {
-    const { color, clss, coexist } = this.options;
-    if (!coexist && this.isInDOM()) this.destroy();
+    if (this.element) return;
+    const { color, clss } = this.options;
+
     this.element = document.createElement("div");
     if (color) this.element.style.setProperty("color", color);
     this.element.classList.add(clss);
+
     this.container.prepend(this.element);
   }
 
-  isInDOM() {
-    return this.container?.contains(this.element) ?? false;
+  setContainer(container) {
+    if (!container || this.container === container) return this;
+    if (this.element && !container.contains(this.element)) container.prepend(this.element);
+    this.container = container;
+
+    return this;
   }
 
   setCustomColor(color) {
     if (!color) return this.element?.style.removeProperty("color");
     this.element?.style.setProperty("color", color);
+
+    return this;
   }
 
   formatTime(date) {
-    const h = date.getHours();
-    const m = date.getMinutes();
-    const s = date.getSeconds();
-    return [h, m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
+    const pad = (n) => n.toString().padStart(2, "0");
+    return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
   }
 
   update() {
     this.isRunning = true;
     const now = new Date();
     this.element.textContent = this.formatTime(now);
+    if (!this.container.contains(this.element)) this.container.prepend(this.element);
     this.animationId = requestAnimationFrame(() => this.update());
   }
 
@@ -55,14 +62,14 @@ export default class Clock {
     this.update();
   }
 
-  stop() {
+  stop(hide = false) {
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
     }
 
     this.isRunning = false;
-    this.element?.style.setProperty("display", "none");
+    if (hide) this.element?.style.setProperty("display", "none");
   }
 
   destroy() {

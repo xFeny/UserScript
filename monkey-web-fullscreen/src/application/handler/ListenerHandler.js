@@ -141,13 +141,13 @@ export default {
   },
   handleFullscreenChange(isFullscreen) {
     // 退出全屏模式时，是否需要移除播放进度元素
-    this.shouldDestroyTimeElement() && this.removeVideoProgress();
+    this.shouldHideTime() && this.removeProgressElement();
 
     // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
     !isFullscreen && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
 
-    // 时钟显示或隐藏
-    this.toggleClock();
+    // 设置播放器时钟显示或隐藏
+    this.setupPlayerClock();
   },
   async observeWebFullscreenChange() {
     const handle = (event, { code, type } = event) => {

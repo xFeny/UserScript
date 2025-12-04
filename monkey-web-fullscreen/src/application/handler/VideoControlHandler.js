@@ -49,7 +49,7 @@ export default {
 
     Tools.resetLimitCounter("autoWebFull");
     this.removeRateKeepDisplay(video);
-    this.removeVideoProgress();
+    this.removeProgressElement();
   },
   initPlaySettings(video) {
     if (!this.player) return;
@@ -57,8 +57,8 @@ export default {
     this.applyCachedPlayRate(video);
     this.playbackRateKeepDisplay();
     this.applyCachedTime(video);
+    this.setupPlayerClock();
     this.setBiliQuality();
-    this.createClock();
   },
   deleteCachedPlayRate: () => Storage.CACHED_PLAY_RATE.del(),
   getRemainingTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),

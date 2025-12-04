@@ -33,39 +33,27 @@ export default {
     const target = list.find((quality) => quality === 80) ?? list[0];
     if (current !== target) unsafeWindow.player.requestQuality(target);
   },
-  shouldDestroyTimeElement() {
+  shouldHideTime() {
     const isFull = this.isFullscreen;
     return (isFull && Storage.DISABLE_CLOCK.get()) || (!isFull && !Storage.UNFULL_CLOCK.get());
   },
-  createClock(state = Clock.state.stop) {
-    Promise.resolve().then(() => {
-      this.Clock?.destroy(), (this.Clock = null); // 先销毁再创建
-      if (!this.player?.parentNode) return;
+  async setupPlayerClock() {
+    if (!this.player || this.shouldHideTime()) return this.Clock?.stop(true);
+    if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(Tools.getParent(this.player)).start();
 
-      // 全屏或非全屏显示时间
-      const shouldDestroy = this.shouldDestroyTimeElement();
-      this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
-      this.Clock[shouldDestroy ? state : Clock.state.start]?.();
-      this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
-    });
-  },
-  toggleClock() {
-    if (this.shouldDestroyTimeElement()) return this.Clock?.stop();
-
-    const state = Clock.state.start;
-    this.Clock?.isInDOM() ? this.Clock[state]() : this.createClock(state);
-    this.Clock?.setCustomColor(Storage.CLOCK_COLOR.get());
+    this.Clock = new Clock(Tools.getParent(this.player), { color: Storage.CLOCK_COLOR.get() });
+    this.toggleTimeElementClass(Storage.USE_SMALLER_FONT.get());
   },
   getRealDuration(video) {
     if (!Site.isQiyi()) return video.duration;
     return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
   },
   videoProgress(video) {
-    if (!video || this.player !== video || this.isBackgroundVideo(video)) return;
-    if (video.duration <= 30 || this.isLive() || this.shouldDestroyTimeElement()) return this.removeVideoProgress();
+    if (!video || video.paused || this.player !== video || this.isBackgroundVideo(video)) return;
+    if (video.duration <= 30 || this.isLive() || this.shouldHideTime()) return this.removeProgressElement();
 
     const duration = this.getRealDuration(video);
-    if (duration > 864e2) return this.removeVideoProgress();
+    if (duration > 864e2) return this.removeProgressElement();
 
     const percent = Tools.toFixed((video.currentTime / duration) * 100, 1);
     const timeLeft = this.formatTime(duration - video.currentTime);
@@ -91,11 +79,11 @@ export default {
 
     element.append(textNode, percent);
     window.videoProgressElement = this.progressElement = element;
-    this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
+    this.toggleTimeElementClass(Storage.USE_SMALLER_FONT.get());
 
     return element;
   },
-  removeVideoProgress() {
+  removeProgressElement() {
     this.progressElement?.remove();
     delete this.progressElement;
   },
