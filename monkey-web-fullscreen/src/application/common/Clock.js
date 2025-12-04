@@ -38,8 +38,7 @@ export default class Clock {
   }
 
   setColor(color) {
-    if (!color) return this.element?.style.removeProperty("color");
-    this.element?.style.setProperty("color", color);
+    this.element?.style?.[color ? "setProperty" : "removeProperty"]("color", color);
 
     return this;
   }
