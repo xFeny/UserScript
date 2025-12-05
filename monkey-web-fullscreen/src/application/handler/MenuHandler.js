@@ -37,7 +37,7 @@ export default {
 
     // 菜单配置项
     const configs = [
-      { title: `此站${isEnable ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatched(), fn: siteFun },
+      { title: `此站${isEnable ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatch(), fn: siteFun },
       { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() },
@@ -149,14 +149,12 @@ export default {
         // 为input、textarea绑定事件
         Tools.querys(".__menu input, textarea", popup).forEach((ele) => {
           ele.addEventListener("input", function () {
-            const isCheckbox = this.type === "checkbox";
-            const value = isCheckbox ? this.checked : this.value;
-            this.dataset.send && Tools.postMessage(window, { [`toggle_${this.name}`]: value });
-            setTimeout(() => {
-              const host = this.dataset.host;
-              const cache = cacheMap[this.name];
-              host ? cache.set(host, value) : cache.set(value);
-            }, 100);
+            const cache = cacheMap[this.name];
+            const { host, send, delay } = this.dataset;
+            const value = Object.is(this.type, "checkbox") ? this.checked : this.value;
+            if (send) Tools.postMessage(window, { [`toggle_${this.name}`]: value });
+            const setCache = () => (host ? cache.set(host, value) : cache.set(value));
+            delay ? setTimeout(setCache, 50) : setCache();
           });
         });
       },
@@ -164,19 +162,19 @@ export default {
   },
   genBasicsItems() {
     const configs = [
-      { name: "speed", text: "禁用 倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true },
-      { name: "memory", text: "禁用 记忆倍速", cache: Storage.DISABLE_MEMORY_SPEED, sendMsg: true },
-      { name: "time", text: "禁用 记忆播放位置", cache: Storage.DISABLE_MEMORY_TIME, sendMsg: false },
-      { name: "fit", text: "禁用 自动网页全屏", cache: Storage.DISABLE_AUTO, isHide: !Site.isMatched() },
-      { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE, sendMsg: false },
+      { name: "speed", text: "禁用 倍速调节", cache: Storage.CLOSE_PLAY_RATE, attrs: ["send", "delay"] },
+      { name: "memory", text: "禁用 记忆倍速", cache: Storage.DISABLE_MEMORY_SPEED, attrs: ["send"] },
+      { name: "time", text: "禁用 记忆播放位置", cache: Storage.DISABLE_MEMORY_TIME },
+      { name: "fit", text: "禁用 自动网页全屏", cache: Storage.DISABLE_AUTO, isHide: !Site.isMatch() },
+      { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
       { name: "volume", text: "禁用 音量默认百分百", cache: Storage.DISABLE_DEF_MAX_VOLUME },
       { name: "next", text: "启用 自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
     ];
 
-    const renderItem = ({ text, dataSend, name, value }) => `
+    const renderItem = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
-          <input ${dataSend} ${value && "checked"} name="${name}" type="checkbox"/>
+          <input ${dataset} ${value && "checked"} name="${name}" type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
 
@@ -185,16 +183,16 @@ export default {
   genAssistItems() {
     const configs = [
       { name: "pic", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
-      { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, sendMsg: true },
-      { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK, sendMsg: false },
-      { name: "clockAlways", text: "启用 非全屏显示时间", cache: Storage.UNFULL_CLOCK, sendMsg: true },
-      { name: "smallerFont", text: "启用 小字号显示时间", cache: Storage.USE_SMALLER_FONT, sendMsg: true },
-      { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, sendMsg: true },
+      { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, attrs: ["send"] },
+      { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK },
+      { name: "clockAlways", text: "启用 非全屏显示时间", cache: Storage.UNFULL_CLOCK, attrs: ["send"] },
+      { name: "smallerFont", text: "启用 小字号显示时间", cache: Storage.USE_SMALLER_FONT, attrs: ["send"] },
+      { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },
     ].filter(({ isHidden }) => !isHidden);
 
-    const renderItem = ({ text, dataSend, name, value }) => `
+    const renderItem = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
-          <input ${dataSend} ${value && "checked"} name="${name}" type="checkbox"/>
+          <input ${dataset} ${value && "checked"} name="${name}" type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
 
@@ -209,13 +207,13 @@ export default {
       { name: "days", text: "播放进度保存天数", cache: Storage.STORAGE_DAYS },
       { name: "percent", text: "缩放百分比", cache: Storage.ZOOM_PERCENT },
       { name: "move", text: "移动距离", cache: Storage.MOVING_DISTANCE },
-      { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR, sendMsg: true },
+      { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR, attrs: ["send"] },
       { name: "preset", text: "常用倍速", cache: Storage.PRESET_SPEED },
     ];
 
-    const renderItem = ({ text, dataSend, name, value }) => `
+    const renderItem = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
-          <input ${dataSend} value="${value}" name="${name}" type="text" autocomplete="off"/>
+          <input ${dataset} value="${value}" name="${name}" type="text" autocomplete="off"/>
         </label>`;
 
     return this.generateCommonItems(configs, renderItem);
@@ -223,27 +221,32 @@ export default {
   genIgnoreItems() {
     const { CUSTOM_WEB_FULL, NEXT_IGNORE_URLS, FULL_IGNORE_URLS } = Storage;
     const configs = [
-      { name: "customRule", text: "自定义此站网页全屏规则", cache: CUSTOM_WEB_FULL, isHide: Site.isMatched(), useHost: true },
+      { name: "customRule", text: "自定义此站网页全屏规则", cache: CUSTOM_WEB_FULL, isHide: Site.isMatch(), useHost: true },
       { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: NEXT_IGNORE_URLS },
       { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: FULL_IGNORE_URLS },
     ];
 
-    const renderItem = ({ text, dataHost, name, value }) => `
+    const renderItem = ({ text, dataset, name, value }) => `
         <div class="others-sett"><p>${text}</p>
-          <textarea ${dataHost} name="${name}" type="text" spellcheck="false" autocomplete="off">${value}</textarea>
+          <textarea ${dataset} name="${name}" type="text" spellcheck="false" autocomplete="off">${value}</textarea>
         </div>`;
 
     return this.generateCommonItems(configs, renderItem);
   },
   generateCommonItems(baseConfigs, renderItem) {
+    const getDataset = (attrs = [], host) =>
+      attrs.length ? attrs.map((key) => `data-${key}="${key === "host" ? host : true}"`).join(" ") : Consts.EMPTY;
+
     const filteredConfigs = baseConfigs.filter(({ isHide }) => !isHide);
-    const processedConfigs = filteredConfigs.map((config) => ({
-      value: config.useHost ? config.cache.get(location.host) : config.cache.get(),
-      dataHost: config.useHost ? `data-host="${location.host}"` : Consts.EMPTY,
-      dataSend: config.sendMsg ? 'data-send="true"' : Consts.EMPTY,
-      host: config.useHost ? location.host : Consts.EMPTY,
-      ...config,
-    }));
+    const processedConfigs = filteredConfigs.map((config) => {
+      const { cache, attrs, useHost } = config;
+      const host = useHost ? location.host : Consts.EMPTY;
+      const value = useHost ? cache.get(location.host) : cache.get();
+
+      const _attrs = Array.isArray(attrs) ? [...attrs] : [];
+      if (useHost && !_attrs.includes("host")) _attrs.push("host");
+      return { ...config, value, host, dataset: getDataset(_attrs, location.host) };
+    });
 
     // 生成HTML字符串
     const html = processedConfigs.map((config) => renderItem(config)).join(Consts.EMPTY);

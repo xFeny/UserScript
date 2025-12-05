@@ -87,9 +87,6 @@ export default {
     const playRate = Math.max(Consts.MIN_PLAY_RATE, Number(this.player.playbackRate) + step);
     this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
   },
-  resetToDefaultPlayRate() {
-    this.setPlaybackRate(Consts.DEF_PLAY_RATE, false)?.then(() => this.showToast("已恢复正常倍速播放"));
-  },
   applyCachedPlayRate(video) {
     if (video.hasApplyCachedRate) return;
     if (Storage.DISABLE_MEMORY_SPEED.get()) return this.deleteCachedPlayRate();

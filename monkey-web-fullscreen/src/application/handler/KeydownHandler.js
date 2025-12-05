@@ -66,11 +66,11 @@ export default {
       R: () => this.rotateVideo(),
       L: () => this.freezeVideoFrame(),
       K: () => this.freezeVideoFrame(true),
-      Z: () => this.resetToDefaultPlayRate(),
-      D: () => Site.isMatched() && this.triggerIconElement(SiteIcons.name.danmaku),
-      N: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
-      ENTER: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen()),
-      P: () => (Site.isMatched() ? this.triggerIconElement(SiteIcons.name.webFull) : this.toggleWebFullscreen(isTrusted)),
+      Z: () => this.setPlaybackRate(Consts.DEF_PLAY_RATE),
+      D: () => Site.isMatch() && this.triggerIconElement(SiteIcons.name.danmaku),
+      N: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
+      ENTER: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen()),
+      P: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.toggleWebFullscreen(isTrusted)),
       LEFT: () => (bypass || this.isOverrideKeyboard()) && this.adjustPlayProgress(-Storage.SKIP_INTERVAL.get()),
       RIGHT: () => (bypass || this.isOverrideKeyboard()) && this.adjustPlayProgress(Storage.SKIP_INTERVAL.get()),
       SPACE: () => (bypass || this.isOverrideKeyboard()) && this.togglePlayPause(this.player),
@@ -115,12 +115,13 @@ export default {
   },
   handleSettMessage(data) {
     // 处理在 “更多设置” 中操作功能切换（启用/禁用）时发来的消息
-    if ("toggle_rateKeep" in data) setTimeout(() => this.playbackRateKeepDisplay(), 150);
-    if ("toggle_clockAlways" in data) setTimeout(() => this.changeTimeElementDisplay(), 150);
-    if ("toggle_smallerFont" in data) this.toggleTimeElementClass(data.toggle_smallerFont);
-    if ("toggle_color" in data) this.setTimeElementColor(data.toggle_color);
-    if (data?.toggle_speed) this.resetToDefaultPlayRate();
-    if (data?.toggle_memory) this.deleteCachedPlayRate();
-    if (data?.toggle_zoom) this.resetVideoTransform();
+    if ("toggle_rateKeep" in data) this.playbackRateKeepDisplay(); // 左上角常显倍速
+    if ("toggle_clockAlways" in data) this.changeTimeElementDisplay(); // 非全屏显示时间
+    if ("toggle_smallerFont" in data) this.toggleTimeElementClass(data.toggle_smallerFont); // 小字号显示时间
+    if ("toggle_color" in data) this.setTimeElementColor(data.toggle_color); // 时间颜色
+
+    if (data?.toggle_speed) this.setPlaybackRate(Consts.DEF_PLAY_RATE, false); // 禁用倍速调节
+    if (data?.toggle_memory) this.deleteCachedPlayRate(); // 禁用记忆倍速
+    if (data?.toggle_zoom) this.resetVideoTransform(); // 禁用缩放
   },
 };

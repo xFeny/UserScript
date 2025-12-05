@@ -16,7 +16,7 @@ import Swal from "sweetalert2";
  */
 export default {
   setupPickerEpisodeListener() {
-    if (Site.isMatched() || this.hasPickerListener) return;
+    if (Site.isMatch() || this.hasPickerListener) return;
     this.hasPickerListener = true;
     document.body.addEventListener(
       EventTypes.CLICK,

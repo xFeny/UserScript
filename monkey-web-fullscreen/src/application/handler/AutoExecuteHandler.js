@@ -24,7 +24,7 @@ export default {
     if (this.player !== video) return;
     if (Tools.isFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
     if (video.hasWebFull || !this.topWin || !video.offsetWidth) return;
-    if ((Site.isMatched() && this.isDisableAuto()) || (!Site.isMatched() && !this.isEnableSiteAuto())) return;
+    if ((Site.isMatch() && this.isDisableAuto()) || (!Site.isMatch() && !this.isEnableSiteAuto())) return;
     if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWebFull")) return (video.hasWebFull = true);
     if (await this.isWebFull(video)) return (video.hasWebFull = true);
 

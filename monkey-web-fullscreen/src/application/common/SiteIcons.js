@@ -17,7 +17,7 @@ const IconsSelector = {
 };
 
 export default await (async () => {
-  if (!Site.isMatched()) return IconsSelector;
+  if (!Site.isMatch()) return IconsSelector;
 
   try {
     const url = "https://gitee.com/xfeny/UserScript/raw/dev/monkey-web-fullscreen/src/IconsSelector.json";
