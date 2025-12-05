@@ -171,7 +171,7 @@ export default {
       },
     });
   },
-  verifyListenerBound() {
+  fixListenerLoss() {
     if (this.verifyPassed) return;
     // 在 https://nkvod.me，会发生丢失事件监听的情况，所以需重新绑定
     Tools.postMessage(window, { verifyPassed: true });
