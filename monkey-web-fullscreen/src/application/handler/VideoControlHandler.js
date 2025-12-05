@@ -75,10 +75,7 @@ export default {
     if (show) this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
     this.playbackRateKeepDisplay(); // 倍速始终显示
 
-    // 禁止记忆倍速
-    if (Storage.DISABLE_MEMORY_SPEED.get()) return Promise.resolve();
-
-    Storage.CACHED_PLAY_RATE.set(this.player.playbackRate);
+    if (!Storage.DISABLE_MEMORY_SPEED.get()) Storage.CACHED_PLAY_RATE.set(this.player.playbackRate);
     return Promise.resolve();
   },
   adjustPlaybackRate(step = Storage.PLAY_RATE_STEP.get()) {
@@ -95,12 +92,9 @@ export default {
     if (Consts.DEF_PLAY_RATE === playRate || Number(video.playbackRate) === playRate) return;
     this.setPlaybackRate(playRate, !video.hasApplyCachedRate)?.then(() => (video.hasApplyCachedRate = true));
   },
-  adjustPlayProgress(second = Storage.SKIP_INTERVAL.get()) {
+  skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
     if (!this.player || this.isLive() || this.isEnded()) return;
-
-    // 跳过指定秒数
-    const currentTime = Math.min(Number(this.player.currentTime) + second, this.player.duration);
-    this.setCurrentTime(currentTime);
+    this.setCurrentTime(Math.min(Number(this.player.currentTime) + second, this.player.duration));
   },
   cachePlayTime(video) {
     if (Tools.isFrequent("cacheTime", Consts.ONE_SEC, true)) return; // 节流
@@ -141,13 +135,11 @@ export default {
 
     return cacheTimeKey;
   },
-  clearMultiVideoCacheTime() {
-    Promise.resolve().then(() => {
-      if (!Tools.isMultiVideo()) return;
-      const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
-      const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
-      if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
-    });
+  async clearMultiVideoCacheTime() {
+    if (!Tools.isMultiVideo()) return;
+    const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
+    const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
+    if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
   },
   setCurrentTime(currentTime) {
     if (currentTime) this.player.currentTime = Math.max(0, currentTime);
