@@ -174,7 +174,7 @@ export default {
 
     const renderItem = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
-          <input ${dataset} ${value && "checked"} name="${name}" type="checkbox"/>
+          <input ${dataset} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
 
@@ -192,7 +192,7 @@ export default {
 
     const renderItem = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
-          <input ${dataset} ${value && "checked"} name="${name}" type="checkbox"/>
+          <input ${dataset} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
 
@@ -245,6 +245,7 @@ export default {
 
       const _attrs = Array.isArray(attrs) ? [...attrs] : [];
       if (useHost && !_attrs.includes("host")) _attrs.push("host");
+
       return { ...config, value, host, dataset: getDataset(_attrs, location.host) };
     });
 
