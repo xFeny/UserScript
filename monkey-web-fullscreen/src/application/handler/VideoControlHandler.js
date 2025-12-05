@@ -38,6 +38,7 @@ export default {
   initVideoProps(video) {
     delete video.hasWebFull;
     delete video.__isDynamic;
+    delete video.cacheTimeKey;
     delete video.hasTriedAutoNext;
     delete video.hasApplyCachedRate;
     delete video.hasInitPlaySettings;
@@ -133,8 +134,15 @@ export default {
   clearCachedTime(video) {
     Storage.PLAY_TIME.del(this.getCacheTimeKey(video));
   },
-  getCacheTimeKey(video) {
-    return `${this.topWin.urlHash}_${Math.floor(video.__duration || video.duration)}`;
+  getCacheTimeKey(video, { src, duration, __duration } = video) {
+    if (video.cacheTimeKey) return video.cacheTimeKey;
+
+    const srcHash = src && !src.startsWith("blob:") ? Tools.hashCode(new URL(src).pathname) : Consts.EMPTY;
+    const baseKey = `${this.topWin.urlHash}_${Math.floor(__duration || duration)}`;
+    const cacheTimeKey = srcHash ? `${srcHash}_${baseKey}` : baseKey;
+    video.cacheTimeKey = cacheTimeKey;
+
+    return cacheTimeKey;
   },
   clearMultiVideoCacheTime() {
     Promise.resolve().then(() => {
