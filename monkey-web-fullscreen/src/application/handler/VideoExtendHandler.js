@@ -8,13 +8,6 @@ import Storage from "../common/Storage";
  * 视频一些额外处理
  */
 export default {
-  async autoClickRelevantElements() {
-    // 某些网站需要点击播放图标才会加载video元素，减少手动操作
-    // 如：https://www.dadalv.cc 、https://www.jiaozi.me 、https://www.pipilv.cc
-    const element = Tools.query(".ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
-    if (element) setTimeout(() => element?.click?.(), 100), (this.relevantElements = element);
-    if (this.relevantElements) setTimeout(() => (element?.remove?.(), delete this.relevantElements), Consts.ONE_SEC);
-  },
   removeLoginPopups() {
     this.removeBiliLogin(), this.removeTencentLogin();
   },

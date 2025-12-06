@@ -69,7 +69,7 @@ interface App {
   adjustPlaybackRate(step?: number): void;
   resetToDefaultPlayRate(): void;
   applyCachedPlayRate(video: HTMLVideoElement): void;
-  adjustPlayProgress(second?: number): void;
+  skipPlayback(second?: number): void;
   cachePlayTime(video: HTMLVideoElement): void;
   applyCachedTime(video: HTMLVideoElement): void;
   clearCachedTime(video: HTMLVideoElement): void;
