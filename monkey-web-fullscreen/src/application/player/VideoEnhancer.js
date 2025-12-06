@@ -8,7 +8,7 @@ import VideoEvents from "./VideoEventsHandler";
 class VideoEnhancer {
   timeout = 100;
   attr = "enhanced";
-  selector = ":is(video, fake-video):not([enhanced])";
+  selector = ":is(video, fake-video):not([loop][muted], [enhanced])";
   danmuSelector = ':is([class*="danmu" i], [class*="danmaku" i], [class*="barrage" i])';
   videoEvents = Object.entries(VideoEvents);
 
@@ -59,6 +59,13 @@ class VideoEnhancer {
       video.removeEventListener(type, handler, true);
       video.addEventListener(type, handler, true);
       video.setAttribute(this.attr, true);
+    });
+  }
+
+  removeEvents(video) {
+    this.videoEvents.forEach(([type, handler]) => {
+      video.removeEventListener(type, handler, true);
+      video.removeAttribute(this.attr);
     });
   }
 

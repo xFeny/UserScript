@@ -5,6 +5,18 @@ import Tools from "../common/Tools";
 import Site from "../common/Site";
 import Keyboard from "../common/Keyboard";
 
+// 4. 定义getElementEvents函数（核心：获取元素绑定的所有事件）
+function getElementEvents(elem) {
+  const result = {};
+  if (window.eventMap.has(elem)) {
+    const elementEvents = window.eventMap.get(elem);
+    // 遍历所有事件类型，转为数组（Set转数组方便查看）
+    elementEvents.forEach((handlers, type) => {
+      result[type] = Array.from(handlers);
+    });
+  }
+  return result;
+}
 const observedValue = { isFullscreen: false, fsWrapper: null };
 export default {
   init() {
@@ -50,7 +62,7 @@ export default {
 
     this.player = video;
     this.setVideoInfo(video);
-    this.observeVideoSrcChange(video);
+    this.observeVideoChange(video);
     window.videoEnhance.enhanced(video);
   },
   setVideoInfo(video) {
@@ -73,10 +85,11 @@ export default {
     window.topWin = this.topWin = topWin;
     Tools.sendToIFrames({ topWin });
   },
-  async observeVideoSrcChange(video) {
+  async observeVideoChange(video) {
     const that = this;
     if (video.hasAttribute("processed")) return;
     video.setAttribute("processed", true);
+
     const isFake = video.matches(Consts.FAKE_VIDEO);
     const handleChange = (v) => (delete that.topWin, that.initVideoProps(v), that.setVideoInfo(v));
     window.videoEnhance.defineProperty(video, isFake ? "srcConfig" : "src", {
@@ -94,6 +107,14 @@ export default {
         // 使得源变更后 applyCachedTime() 能恢复到正确的播放进度
         setTimeout(() => delete this.urlHash, 1200);
       },
+    });
+
+    // ========== 视频元素移除监听：防止内存泄漏 ==========
+    const observer = Tools.createObserver(Tools.getParent(video), () => {
+      if (document.body.contains(video)) return;
+      if (this.player === video) delete this.player;
+      window.videoEnhance.removeEvents(video);
+      observer.disconnect();
     });
   },
   async setupMouseMoveListener() {

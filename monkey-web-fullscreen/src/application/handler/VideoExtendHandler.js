@@ -9,10 +9,10 @@ import Storage from "../common/Storage";
  */
 export default {
   async removeRelevantElements(video) {
-    // 不使用网站自己的播放进度，如：https://skr.skr1.cc:666
+    // 防止网站的播放进度，对脚本的进度恢复造成影响，如：https://skr.skr1.cc:666
     if (video.__isRemoveRelevant || Tools.isFrequent("choice", Consts.THREE_SEC, true)) return;
     const element = Tools.query(".ec-no, .conplaying, .choice-true, .close-btn, .closeclick");
-    if (element) (video.__isRemoveRelevant = true), element.click?.(), element.remove?.();
+    element ? (element.click?.(), element.remove?.()) : (video.__isRemoveRelevant = true);
   },
   removeLoginPopups() {
     this.removeBiliLogin(), this.removeTencentLogin();
