@@ -15,14 +15,7 @@ class VideoEnhancer {
   constructor() {
     this.setupObserver();
     this.hackAttachShadow();
-    this.setupExistingVideos();
     this.hookMediaMethod("play", (video) => this.enhanced(video)); // 防止没有增强到
-  }
-
-  async setupExistingVideos() {
-    // 查找所有未添加事件监听的video元素
-    const videos = Tools.querys(this.selector);
-    videos.forEach((video) => this.enhanced(video));
   }
 
   async setupObserver() {
