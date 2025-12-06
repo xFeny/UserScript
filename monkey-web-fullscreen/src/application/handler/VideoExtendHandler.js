@@ -8,6 +8,12 @@ import Storage from "../common/Storage";
  * 视频一些额外处理
  */
 export default {
+  async removeRelevantElements(video) {
+    // 不使用网站自己的播放进度，如：https://skr.skr1.cc:666
+    if (video.__isRemoveRelevant || Tools.isFrequent("choice", Consts.THREE_SEC, true)) return;
+    const element = Tools.query(".ec-no, .conplaying, .choice-true, .close-btn, .closeclick");
+    if (element) (video.__isRemoveRelevant = true), element.click?.(), element.remove?.();
+  },
   removeLoginPopups() {
     this.removeBiliLogin(), this.removeTencentLogin();
   },

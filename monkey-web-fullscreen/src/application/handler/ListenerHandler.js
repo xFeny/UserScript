@@ -35,7 +35,7 @@ export default {
 
       // 某些网站需要点击相关元素，才会加载视频，如：https://www.dadalv.cc、https://www.pipilv.cc
       const element = Tools.query("body > #start");
-      if (element) setTimeout(() => element.click?.(), 100);
+      if (element) setTimeout(() => (element.click?.(), element.remove?.()), 300);
 
       Promise.resolve().then(() => this.removeLoginPopups());
       if (video?.offsetWidth) this.setCurrentVideo(video);

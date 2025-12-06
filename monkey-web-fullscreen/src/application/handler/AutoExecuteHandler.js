@@ -11,22 +11,22 @@ import Keyboard from "../common/Keyboard";
 export default {
   autoNextEpisode(video) {
     if (video.duration < 300) return;
-    if (video.hasTriedAutoNext) return;
+    if (video.__hasTriedAutoNext) return;
     if (!Storage.ENABLE_AUTO_NEXT_EPISODE.get()) return;
     if (Tools.isFrequent("autoNext", Consts.THREE_SEC, true)) return;
     if (this.getRemainingTime(video) > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return; // 距离结束还剩多少秒切换下集
-    if (this.isNextIgnoreUrl()) return (video.hasTriedAutoNext = true);
+    if (this.isNextIgnoreUrl()) return (video.__hasTriedAutoNext = true);
 
     this.dispatchShortcutKey(Keyboard.N);
-    video.hasTriedAutoNext = true;
+    video.__hasTriedAutoNext = true;
   },
   async autoWebFullscreen(video) {
     if (this.player !== video) return;
     if (Tools.isFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
-    if (video.hasWebFull || !this.topWin || !video.offsetWidth) return;
+    if (video.__hasWebFull || !this.topWin || !video.offsetWidth) return;
     if ((Site.isMatch() && this.isDisableAuto()) || (!Site.isMatch() && !this.isEnableSiteAuto())) return;
-    if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWebFull")) return (video.hasWebFull = true);
-    if (await this.isWebFull(video)) return (video.hasWebFull = true);
+    if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWebFull")) return (video.__hasWebFull = true);
+    if (await this.isWebFull(video)) return (video.__hasWebFull = true);
 
     // 发送网页全屏消息
     this.dispatchShortcutKey(Keyboard.P);

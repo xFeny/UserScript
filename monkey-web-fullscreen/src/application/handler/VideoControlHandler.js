@@ -36,14 +36,10 @@ export default {
     return result;
   },
   initVideoProps(video) {
-    delete video.hasWebFull;
-    delete video.__isDynamic;
-    delete video.cacheTimeKey;
-    delete video.hasTriedAutoNext;
-    delete video.hasApplyCachedRate;
-    delete video.hasInitPlaySettings;
-    delete this.hasAppliedCachedTime;
+    // 遍删除自定义属性
+    Object.getOwnPropertyNames(video).forEach((prop) => prop.startsWith("__") && delete video[prop]);
 
+    // 设置默认值
     video.__duration = video.duration;
     video.tsr = { ...Consts.DEFAULT_TSR };
     if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
@@ -54,7 +50,7 @@ export default {
   },
   initPlaySettings(video) {
     if (!this.player) return;
-    video.hasInitPlaySettings = true;
+    video.__hasInitPlaySettings = true;
     this.applyCachedPlayRate(video);
     this.playbackRateKeepDisplay();
     this.applyCachedTime(video);
@@ -85,12 +81,12 @@ export default {
     this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
   },
   applyCachedPlayRate(video) {
-    if (video.hasApplyCachedRate) return;
+    if (video.__hasApplyCachedRate) return;
     if (Storage.DISABLE_MEMORY_SPEED.get()) return this.deleteCachedPlayRate();
 
     const playRate = Storage.CACHED_PLAY_RATE.get();
     if (Consts.DEF_PLAY_RATE === playRate || Number(video.playbackRate) === playRate) return;
-    this.setPlaybackRate(playRate, !video.hasApplyCachedRate)?.then(() => (video.hasApplyCachedRate = true));
+    this.setPlaybackRate(playRate, !video.__hasApplyCachedRate)?.then(() => (video.__hasApplyCachedRate = true));
   },
   skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
     if (!this.player || this.isLive() || this.isEnded()) return;
@@ -110,14 +106,14 @@ export default {
   },
   applyCachedTime(video) {
     if (Storage.DISABLE_MEMORY_TIME.get()) return this.clearCachedTime(video);
-    if (this.hasAppliedCachedTime || !this.topWin || this.isLive()) return;
+    if (this.__hasAppliedCachedTime || !this.topWin || this.isLive()) return;
 
     // 从存储中获取该视频的缓存播放时间
     const time = Storage.PLAY_TIME.get(this.getCacheTimeKey(video));
-    if (time <= Number(video.currentTime)) return (this.hasAppliedCachedTime = true);
+    if (time <= Number(video.currentTime)) return (this.__hasAppliedCachedTime = true);
 
     this.setCurrentTime(time);
-    this.hasAppliedCachedTime = true;
+    this.__hasAppliedCachedTime = true;
     this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
       Tools.setStyle(el, "transform", `translateY(${-5 - el.offsetHeight}px)`);
     });
@@ -126,12 +122,12 @@ export default {
     Storage.PLAY_TIME.del(this.getCacheTimeKey(video));
   },
   getCacheTimeKey(video, { src, duration, __duration } = video) {
-    if (video.cacheTimeKey) return video.cacheTimeKey;
+    if (video.__cacheTimeKey) return video.__cacheTimeKey;
 
     const srcHash = src && !src.startsWith("blob:") ? Tools.hashCode(new URL(src).pathname) : Consts.EMPTY;
     const baseKey = `${this.topWin.urlHash}_${Math.floor(__duration || duration)}`;
     const cacheTimeKey = srcHash ? `${srcHash}_${baseKey}` : baseKey;
-    video.cacheTimeKey = cacheTimeKey;
+    video.__cacheTimeKey = cacheTimeKey;
 
     return cacheTimeKey;
   },
