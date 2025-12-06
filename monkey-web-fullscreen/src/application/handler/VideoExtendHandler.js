@@ -8,11 +8,11 @@ import Storage from "../common/Storage";
  * 视频一些额外处理
  */
 export default {
-  async removeRelevantElements(video) {
+  async removeRelevantElements() {
     // 防止网站的播放进度，对脚本的进度恢复造成影响，如：https://skr.skr1.cc:666
-    if (video.__isRemoveRelevant || Tools.isFrequent("choice", Consts.THREE_SEC, true)) return;
+    if (Tools.isFrequent("choice", Consts.ONE_SEC, true) || Tools.isOverLimit("choice", 3)) return;
     const element = Tools.query(".ec-no, .conplaying, .choice-true, .close-btn, .closeclick");
-    element ? (element.click?.(), element.remove?.()) : (video.__isRemoveRelevant = true);
+    if (element) element.click?.(), element.remove?.();
   },
   removeLoginPopups() {
     this.removeBiliLogin(), this.removeTencentLogin();
