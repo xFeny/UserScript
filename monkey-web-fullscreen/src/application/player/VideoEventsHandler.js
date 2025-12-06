@@ -7,7 +7,7 @@ import Tools from "../common/Tools";
 export default {
   loadedmetadata() {
     App.autoWebFullscreen(this);
-    Tools.querys('[id*="loading"]').forEach((el) => !Tools.query('[class*="player"]', el) && Tools.addCls(el, "_noplayer"));
+    Tools.querys('[id*="loading"]').forEach((el) => !Tools.query("video", el) && Tools.addCls(el, "_noplayer"));
   },
   loadeddata() {
     App.fixListenerLoss();
