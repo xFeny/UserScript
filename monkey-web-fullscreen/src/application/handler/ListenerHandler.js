@@ -16,20 +16,10 @@ export default {
     this.observeFullscreenChange();
     this.observeWebFullscreenChange();
     this.setupIgnoreUrlsChangeListener();
-    document.addEventListener("load", () => this.triggerStartElement(), true);
   },
   isNormalSite: () => !window?.videoInfo && !window?.topWin,
   getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
   isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
-  triggerStartElement() {
-    setTimeout(() => {
-      // 某些网站需要点击播放图标才会加载video元素，减少手动操作
-      // 如：https://www.dadalv.cc 、https://www.jiaozi.me 、https://www.pipilv.cc
-      const element = Tools.query(".ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
-      if (!element || Tools.isFrequent("start")) return;
-      setTimeout(() => element?.click?.() & element?.remove?.(), 250);
-    });
-  },
   async setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
       if (this.isNormalSite() || Storage.DISABLE_INVISIBLE_PAUSE.get()) return;
@@ -42,6 +32,7 @@ export default {
   setupDocBodyObserver() {
     const observer = Tools.createObserver(document.body ?? document.documentElement, () => {
       const video = this.getVideo();
+      this.autoClickRelevantElements();
       Promise.resolve().then(() => this.removeLoginPopups());
       if (video?.offsetWidth) this.setCurrentVideo(video);
       if (this.topWin) observer.disconnect();
@@ -89,7 +80,7 @@ export default {
         // 因源变更不会停止timeupdate事件，cachePlayTime() 把旧源的播放进度缓存到了新源的播放进度中
         // 造成新源恢复的播放进度维持了旧源的播放进度，因此在视频源发生变更时，应阻止 cachePlayTime() 继续缓存
         // 示例网站：https://www.wasu.cn，点击已缓存进度的上集时会该发生问题(未完全杜绝，快速来回切换还是会发生，用户也不会这样玩吧😭)
-        this.urlHash = that.topWin.urlHash;
+        this.urlHash = that.topWin?.urlHash;
         setTimeout(() => (this.currentTime = 0), 10);
 
         isFake ? (this._src = value) : setter(value);
@@ -149,10 +140,7 @@ export default {
   async observeWebFullscreenChange() {
     const handle = (event, { code, type } = event) => {
       if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
-
-      if (this.isInputFocus(event)) return;
-      if (![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
-
+      if (this.isInputFocus(event) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
       if (type === "keyup") return Tools.preventDefault(event); // 防止 keyup 事件触发
       Tools.preventDefault(event), this.dispatchShortcutKey(code, true);
     };

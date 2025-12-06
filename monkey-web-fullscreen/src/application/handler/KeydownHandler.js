@@ -87,8 +87,7 @@ export default {
 
     // 倍速加减
     const step = Storage.PLAY_RATE_STEP.get();
-    ["A", "ADD"].forEach((k) => (dict[k] = () => this.adjustPlaybackRate(step)));
-    ["S", "SUB"].forEach((k) => (dict[k] = () => this.adjustPlaybackRate(-step)));
+    ["A", "S", "ADD", "SUB"].forEach((k, i) => (dict[k] = () => this.adjustPlaybackRate((i % 2 ? -1 : 1) * step)));
 
     // 视频移动
     ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => (dict[k] = () => this.moveVideoPosition(k)));
