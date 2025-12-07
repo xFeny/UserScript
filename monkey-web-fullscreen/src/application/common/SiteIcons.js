@@ -1,4 +1,6 @@
 import Site from "./Site";
+import Consts from "./Consts";
+import Storage from "./Storage";
 
 /**
  * 脚本`@match`的网站 网页全屏、弹幕、下一集css选择器配置
@@ -19,11 +21,16 @@ const IconsSelector = {
 export default await (async () => {
   if (!Site.isMatch()) return IconsSelector;
 
+  const storeSelector = Storage.ICONS_SELECTOR.get();
+  if (storeSelector) return storeSelector;
+
   try {
     const url = "https://gitee.com/xfeny/UserScript/raw/dev/monkey-web-fullscreen/src/IconsSelector.json";
     const res = await GM.xmlHttpRequest({ url, timeout: 3000 });
     const remoteSelector = JSON.parse(res.responseText ?? "{}");
-    return { ...IconsSelector, ...remoteSelector };
+    const selectors = { ...IconsSelector, ...remoteSelector };
+    Storage.ICONS_SELECTOR.set(Consts.EMPTY, selectors, 1 / 4); // 缓存6小时
+    return selectors;
   } catch (e) {
     console.error("加载远程配置失败", e);
     return IconsSelector;

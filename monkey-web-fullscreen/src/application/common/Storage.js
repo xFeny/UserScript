@@ -73,18 +73,20 @@ class TimedStorage extends StorageItem {
   }
 
   set(suffix, value, expires) {
+    if ([null, undefined].includes(suffix)) throw new Error("TimedStorage 设置值时 suffix 不能为空");
+
     const key = this.name + suffix;
     if (expires) expires = Date.now() + expires * 864e5; // 转换为毫秒 单位: 天
     expires ? this.setItem(key, JSON.stringify({ value, expires })) : this.setItem(key, value);
   }
 
-  get(suffix) {
+  get(suffix = "") {
     const storage = this.getItem(this.name + suffix);
     if (!storage?.value) return this.parser(storage ?? this.defaultValue);
     return storage.expires > Date.now() ? this.parser(storage.value) : this.defaultValue;
   }
 
-  del(suffix) {
+  del(suffix = "") {
     this.removeItem(this.name + suffix);
   }
 
@@ -98,6 +100,8 @@ class TimedStorage extends StorageItem {
 
 /**
  * 缓存的 key-value
+ *
+ * ICONS_SELECTOR 缓存远端`@match`网址的相关图标选择器
  *
  * 网页全屏相关
  * CUSTOM_WEB_FULL: 自定义此站网页全屏规则
@@ -150,6 +154,8 @@ class TimedStorage extends StorageItem {
  * PARENT_DEPTH: 此站网页全屏层级数
  */
 export default {
+  ICONS_SELECTOR: new TimedStorage("ICONS_SELECTOR", null, false),
+
   CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", "", false),
   DISABLE_AUTO: new StorageItem("CLOSE_AUTO_WEB_FULL_SCREEN", false, false, Boolean),
   ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, Boolean),
