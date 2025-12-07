@@ -76,10 +76,10 @@ export default unsafeWindow.Tools = {
     const dict = { clientX, clientY, bubbles: true };
     element?.dispatchEvent(new MouseEvent(eventType, dict));
   },
-  createObserver(target, callback, options) {
+  createObserver(target, callback, options = {}) {
     const observer = new MutationObserver(callback);
-    target = target instanceof Element ? target : this.query(target);
-    observer.observe(target, { childList: true, subtree: true, ...options });
+    const observeTarget = typeof target === "string" ? this.query(target) : target;
+    observer.observe(observeTarget, { childList: true, subtree: true, ...options });
     return observer;
   },
   closest(element, selector, maxLevel = 3) {
