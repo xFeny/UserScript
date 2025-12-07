@@ -413,13 +413,6 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   display: none !important;
 }
 
-/** 现代浏览器（支持 :has()）使用原生选择器 **/
-@supports (selector(:has(div))) {
-  #loading:not(:has([class*="player"])) {
-    display: none !important;
-  }
-}
-
 .Clock,
 .__time-progress,
 .__rate-keep-show {
