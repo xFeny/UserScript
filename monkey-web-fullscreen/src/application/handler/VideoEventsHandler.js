@@ -7,7 +7,7 @@ export default {
   async setupShadowVideoEventListeners() {
     document.addEventListener("shadow-video", (e) => {
       const { video } = e.detail;
-      this.setupVideoEventListeners(video);
+      if (video) this.setupVideoEventListeners(video);
     });
   },
   async setupVideoEventListeners(video) {
