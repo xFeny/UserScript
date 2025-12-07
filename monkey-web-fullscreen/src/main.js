@@ -1,4 +1,4 @@
-import "./application/player/VideoEnhancer";
+import "./application/VideoEnhancer";
 import "./application";
 
 // 样式

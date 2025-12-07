@@ -1,37 +1,40 @@
-import EventTypes from "../common/EventTypes";
-import Storage from "../common/Storage";
-import Consts from "../common/Consts";
-import Tools from "../common/Tools";
 import Site from "../common/Site";
+import Tools from "../common/Tools";
+import Consts from "../common/Consts";
+import Storage from "../common/Storage";
 import Keyboard from "../common/Keyboard";
+import EventTypes from "../common/EventTypes";
 
-// 4. 定义getElementEvents函数（核心：获取元素绑定的所有事件）
-function getElementEvents(elem) {
-  const result = {};
-  if (window.eventMap.has(elem)) {
-    const elementEvents = window.eventMap.get(elem);
-    // 遍历所有事件类型，转为数组（Set转数组方便查看）
-    elementEvents.forEach((handlers, type) => {
-      result[type] = Array.from(handlers);
-    });
-  }
-  return result;
-}
+// 要 Object.defineProperty 的值
 const observedValue = { isFullscreen: false, fsWrapper: null };
+
+/**
+ * 应用程序初始化
+ */
 export default {
-  init() {
+  isNormalSite: () => !window?.videoInfo && !window?.topWin,
+  isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
+  getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
+  init(isNonFirstInit = false) {
     this.setupDocBodyObserver();
     this.setupKeydownListener();
     this.setupVisibleListener();
     this.setupMouseMoveListener();
     this.setupFullscreenListener();
+    this.setupVideoEventListeners();
+
+    if (isNonFirstInit) return;
     this.observeFullscreenChange();
     this.observeWebFullscreenChange();
     this.setupIgnoreUrlsChangeListener();
+    this.setupDocMutationObserver();
   },
-  isNormalSite: () => !window?.videoInfo && !window?.topWin,
-  getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
-  isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
+  setupDocMutationObserver() {
+    new MutationObserver(() => {
+      if (this.documentElement === document.documentElement) return;
+      this.init(true), document.head.append(scriptStyle.cloneNode(true));
+    }).observe(document, { childList: true });
+  },
   async setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
       if (this.isNormalSite() || Storage.DISABLE_INVISIBLE_PAUSE.get()) return;
@@ -42,7 +45,9 @@ export default {
     });
   },
   setupDocBodyObserver() {
-    const observer = Tools.createObserver(document.body ?? document.documentElement, () => {
+    this.documentElement = document.documentElement;
+    this.docObserver?.disconnect(), clearTimeout(this.observerTimer);
+    this.docObserver = Tools.createObserver(document, () => {
       const video = this.getVideo();
 
       // 某些网站需要点击相关元素，才会加载视频，如：https://www.dadalv.cc、https://www.pipilv.cc
@@ -51,9 +56,9 @@ export default {
 
       Promise.resolve().then(() => this.removeLoginPopups());
       if (video?.offsetWidth) this.setCurrentVideo(video);
-      if (this.topWin) observer.disconnect();
+      if (this.topWin) this.docObserver.disconnect();
     });
-    setTimeout(() => observer?.disconnect(), Consts.ONE_SEC * 10);
+    this.observerTimer = setTimeout(() => this.docObserver?.disconnect(), Consts.ONE_SEC * 10);
   },
   setCurrentVideo(video) {
     if (!video || this.player === video) return;
@@ -63,7 +68,6 @@ export default {
     this.player = video;
     this.setVideoInfo(video);
     this.observeVideoChange(video);
-    window.videoEnhance.enhanced(video);
   },
   setVideoInfo(video) {
     const isLive = Object.is(video.duration, Infinity);
@@ -107,14 +111,6 @@ export default {
         // 使得源变更后 applyCachedTime() 能恢复到正确的播放进度
         setTimeout(() => delete this.urlHash, 1200);
       },
-    });
-
-    // ========== 视频元素移除监听：防止内存泄漏 ==========
-    const observer = Tools.createObserver(Tools.getParent(video), () => {
-      if (document.body.contains(video)) return;
-      if (this.player === video) delete this.player;
-      window.videoEnhance.removeEvents(video);
-      observer.disconnect();
     });
   },
   async setupMouseMoveListener() {
@@ -182,20 +178,6 @@ export default {
           }
         });
       },
-    });
-  },
-  fixListenerLoss() {
-    if (this.verifyPassed) return;
-    // 在 https://nkvod.me，会发生丢失事件监听的情况，所以需重新绑定
-    Tools.postMessage(window, { verifyPassed: true });
-    Tools.sleep(50).then(() => {
-      if (this.verifyPassed) return;
-
-      this.setupKeydownListener();
-      this.setupVisibleListener();
-      this.setupMouseMoveListener();
-      document.head.append(scriptStyle.cloneNode(true));
-      this.setParentWinVideoInfo(this.videoInfo);
     });
   },
 };

@@ -92,7 +92,7 @@ export default {
   removeProgressElement() {
     this.progressElement?.remove();
   },
-  playbackRateKeepDisplay() {
+  async playbackRateKeepDisplay() {
     if (!this.player || this.isLive()) return;
     if (!Storage.RATE_KEEP_SHOW.get()) return this.removeRateKeepDisplay();
 
