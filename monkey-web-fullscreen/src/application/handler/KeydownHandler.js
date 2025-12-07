@@ -34,13 +34,13 @@ export default {
   setupKeydownListener() {
     try {
       window.addEventListener("keyup", (event) => this.preventDefault(event), true); // 腾讯视频
-      window.addEventListener("keydown", (event) => this.handleKeydown.call(this, event), true);
-      window.addEventListener("message", ({ data }) => this.handleMessage.call(this, data));
+      window.addEventListener("keydown", (event) => this.handleKeydown(event), true);
+      window.addEventListener("message", ({ data }) => this.handleMessage(data));
     } catch {
       // https://www.reddit.com 重写了 window.addEventListener 会报错，使用 unsafeWindow 绑定事件
       unsafeWindow.addEventListener("keyup", (event) => this.preventDefault(event), true); // 腾讯视频
-      unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown.call(this, event), true);
-      unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage.call(this, data));
+      unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
+      unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
     }
   },
   handleKeydown(event, { key, code, isTrusted } = event) {
