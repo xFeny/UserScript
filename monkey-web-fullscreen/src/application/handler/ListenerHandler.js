@@ -109,7 +109,7 @@ export default {
 
         // timeout 要晚于 cachePlayTime() 的更新频率
         // 使得源变更后 applyCachedTime() 能恢复到正确的播放进度
-        setTimeout(() => delete this.urlHash, 1200);
+        setTimeout(() => delete this.urlHash, 1500);
       },
     });
   },

@@ -46,7 +46,7 @@ export default {
           number ? Tools.notyf(`当前集数：${number}`) : Tools.notyf("获取集数失败 〒▽〒", true);
         } catch (e) {
           Tools.notyf("获取集数失败 〒▽〒", true);
-          console.debug(e);
+          console.error(e);
         }
       },
       confirmCallback(value) {
@@ -65,7 +65,7 @@ export default {
           numbers.length ? Tools.notyf(`所有集数：${numbers.join(" ")}`) : Tools.notyf("获取集数失败 〒▽〒", true);
         } catch (e) {
           Tools.notyf("获取集数失败 〒▽〒", true);
-          console.debug(e);
+          console.error(e);
         }
       },
       confirmCallback(value) {

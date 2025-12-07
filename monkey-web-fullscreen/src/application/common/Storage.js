@@ -25,7 +25,7 @@ class StorageItem {
     const value = this.useLocalStorage ? localStorage.getItem(key) : GM_getValue(key);
     try {
       return JSON.parse(value);
-    } catch (e) {
+    } catch {
       return value;
     }
   }
