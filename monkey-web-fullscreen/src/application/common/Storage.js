@@ -154,9 +154,9 @@ class TimedStorage extends StorageItem {
  * PARENT_DEPTH: 此站网页全屏层级数
  */
 export default {
-  ICONS_SELECTOR: new TimedStorage("ICONS_SELECTOR", null, false),
+  ICONS_SELECTOR: new TimedStorage("ICONS_SELECTOR", null),
 
-  CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", "", false),
+  CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", ""),
   DISABLE_AUTO: new StorageItem("CLOSE_AUTO_WEB_FULL_SCREEN", false, false, Boolean),
   ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, Boolean),
 
