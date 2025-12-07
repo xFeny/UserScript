@@ -35,12 +35,12 @@ export default {
     this.tryAutoPlay(video);
   },
   playing(video) {
-    video.isEnded = false;
+    video.__isEnded = false;
     this.setCurrentVideo(video);
     this.initPlaySettings(video);
   },
   ended(video) {
-    video.isEnded = true;
+    video.__isEnded = true;
     this.autoExitWebFullscreen();
     this.clearCachedTime(video);
   },

@@ -40,7 +40,7 @@ export default {
       if (this.isNormalSite() || Storage.DISABLE_INVISIBLE_PAUSE.get()) return;
 
       const video = this.player ?? this.getVideo();
-      if (!video || video?.isEnded || !Tools.isVisible(video)) return;
+      if (!video || video?.__isEnded || !Tools.isVisible(video)) return;
       document.hidden ? video?.pause() : video?.play();
     });
   },
@@ -67,7 +67,7 @@ export default {
 
     this.player = video;
     this.setVideoInfo(video);
-    this.observeVideoChange(video);
+    this.observeVideoSrcChange(video);
   },
   setVideoInfo(video) {
     const isLive = Object.is(video.duration, Infinity);
@@ -89,27 +89,17 @@ export default {
     window.topWin = this.topWin = topWin;
     Tools.sendToIFrames({ topWin });
   },
-  async observeVideoChange(video) {
+  async observeVideoSrcChange(video) {
     const that = this;
     if (video.hasAttribute("processed")) return;
     video.setAttribute("processed", true);
 
     const isFake = video.matches(Consts.FAKE_VIDEO);
-    const handleChange = (v) => (delete that.topWin, that.initVideoProps(v), that.setVideoInfo(v));
+    const handleChange = (v) => (delete that.topWin, that.setVideoInfo(v));
     window.videoEnhance.defineProperty(video, isFake ? "srcConfig" : "src", {
       set(value, setter) {
-        // 因源变更不会停止timeupdate事件，cachePlayTime() 把旧源的播放进度缓存到了新源的播放进度中
-        // 造成新源恢复的播放进度维持了旧源的播放进度，因此在视频源发生变更时，应阻止 cachePlayTime() 继续缓存
-        // 示例网站：https://www.wasu.cn，点击已缓存进度的上集时会该发生问题(未完全杜绝，快速来回切换还是会发生，用户也不会这样玩吧😭)
-        this.urlHash = that.topWin?.urlHash;
-        setTimeout(() => (this.currentTime = 0), 10);
-
         isFake ? (this._src = value) : setter(value);
         if ((isFake || this === that.player) && value) handleChange(this);
-
-        // timeout 要晚于 cachePlayTime() 的更新频率
-        // 使得源变更后 applyCachedTime() 能恢复到正确的播放进度
-        setTimeout(() => delete this.urlHash, 1500);
       },
     });
   },

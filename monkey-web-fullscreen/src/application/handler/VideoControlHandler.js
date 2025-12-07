@@ -94,7 +94,7 @@ export default {
   },
   cachePlayTime(video) {
     if (Tools.isFrequent("cacheTime", Consts.ONE_SEC, true)) return; // 节流
-    if (!this.topWin || this.isLive() || video.paused || video.duration < 120 || video.urlHash) return;
+    if (!this.topWin || this.isLive() || video.paused || video.duration < 120) return;
     if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return; //播放时间太短
 
     // 禁用记忆、播放结束、距离结束10秒，清除记忆缓存
@@ -106,14 +106,14 @@ export default {
   },
   applyCachedTime(video) {
     if (Storage.DISABLE_MEMORY_TIME.get()) return this.clearCachedTime(video);
-    if (this.__hasAppliedCachedTime || !this.topWin || this.isLive()) return;
+    if (video.__hasAppliedCachedTime || !this.topWin || this.isLive()) return;
 
     // 从存储中获取该视频的缓存播放时间
     const time = Storage.PLAY_TIME.get(this.getCacheTimeKey(video));
-    if (time <= Number(video.currentTime)) return (this.__hasAppliedCachedTime = true);
+    if (time <= Number(video.currentTime)) return (video.__hasAppliedCachedTime = true);
 
     this.setCurrentTime(time);
-    this.__hasAppliedCachedTime = true;
+    video.__hasAppliedCachedTime = true;
     this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
       Tools.setStyle(el, "transform", `translateY(${-5 - el.offsetHeight}px)`);
     });
