@@ -1,9 +1,7 @@
-class VideoEnhancer {
-  constructor() {
-    this.hackAttachShadow();
-  }
+import Tools from "./common/Tools";
 
-  setPlaybackRate(video, playRate) {
+class VideoEnhancer {
+  static setPlaybackRate(video, playRate) {
     this.bypassPlaybackRateLimit(video);
     video.playbackRate = video.__playRate = (+playRate).toFixed(2).replace(/\.?0+$/, "");
   }
@@ -13,7 +11,7 @@ class VideoEnhancer {
    * @param video - 视频元素
    * @see 腾讯视频fake-video https://v.qq.com/wasm-kernel/1.0.49/fake-video-element-iframe.js
    */
-  bypassPlaybackRateLimit(video) {
+  static bypassPlaybackRateLimit(video) {
     this.defineProperty(video, "playbackRate", {
       set(value, setter) {
         if (this.playbackRate === value) return;
@@ -27,7 +25,7 @@ class VideoEnhancer {
     });
   }
 
-  defineProperty(video, property, descs) {
+  static defineProperty(video, property, descs) {
     try {
       const isMediaElement = video instanceof HTMLMediaElement;
       const videoPrototype = isMediaElement ? HTMLMediaElement.prototype : Object.getPrototypeOf(video);
@@ -49,19 +47,28 @@ class VideoEnhancer {
     }
   }
 
-  async hackAttachShadow() {
+  static hackAttachShadow() {
     if (Element.prototype.__attachShadow) return;
     Element.prototype.__attachShadow = Element.prototype.attachShadow;
     Element.prototype.attachShadow = function (options) {
       if (this._shadowRoot) return this._shadowRoot;
       const shadowRoot = (this._shadowRoot = this.__attachShadow.call(this, options));
-      const shadowEvent = new CustomEvent("shadow-attached", { bubbles: true, detail: { shadowRoot } });
-      document.dispatchEvent(shadowEvent);
+      document.dispatchEvent(new CustomEvent("shadow-attached", { detail: { shadowRoot } }));
+      VideoEnhancer.detectShadowVideoElement();
       return shadowRoot;
     };
 
     Element.prototype.attachShadow.toString = () => Element.prototype.__attachShadow.toString();
   }
+
+  static detectShadowVideoElement() {
+    if (Tools.isFrequent("shadow", 100, true)) return;
+    const video = Tools.query("video");
+    if (!video || video.hasDispatched) return;
+    document.dispatchEvent(new CustomEvent("shadow-video", { detail: { video } }));
+    video.hasDispatched = true;
+  }
 }
 
-export default window.videoEnhance = new VideoEnhancer();
+VideoEnhancer.hackAttachShadow();
+export default VideoEnhancer;

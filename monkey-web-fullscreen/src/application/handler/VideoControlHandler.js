@@ -2,6 +2,7 @@ import Site from "../common/Site";
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
+import VideoEnhancer from "../VideoEnhancer";
 
 /**
  * 视频控制相关逻辑处理
@@ -67,7 +68,7 @@ export default {
     if (!playRate || Number(this.player.playbackRate) === playRate) return;
 
     // 设置倍速
-    window.videoEnhance.setPlaybackRate(this.player, playRate);
+    VideoEnhancer.setPlaybackRate(this.player, playRate);
     if (show) this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
     this.playbackRateKeepDisplay(); // 倍速始终显示
 

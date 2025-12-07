@@ -4,6 +4,7 @@ import Consts from "../common/Consts";
 import Storage from "../common/Storage";
 import Keyboard from "../common/Keyboard";
 import EventTypes from "../common/EventTypes";
+import VideoEnhancer from "../VideoEnhancer";
 
 // 要 Object.defineProperty 的值
 const observedValue = { isFullscreen: false, fsWrapper: null };
@@ -27,6 +28,7 @@ export default {
     this.observeFullscreenChange();
     this.observeWebFullscreenChange();
     this.setupIgnoreUrlsChangeListener();
+    this.setupShadowVideoEventListeners();
     this.setupDocMutationObserver();
   },
   setupDocMutationObserver() {
@@ -96,7 +98,7 @@ export default {
 
     const isFake = video.matches(Consts.FAKE_VIDEO);
     const handleChange = (v) => (delete that.topWin, that.setVideoInfo(v));
-    window.videoEnhance.defineProperty(video, isFake ? "srcConfig" : "src", {
+    VideoEnhancer.defineProperty(video, isFake ? "srcConfig" : "src", {
       set(value, setter) {
         isFake ? (this._src = value) : setter(value);
         if ((isFake || this === that.player) && value) handleChange(this);

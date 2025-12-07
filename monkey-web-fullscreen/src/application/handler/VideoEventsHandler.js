@@ -4,9 +4,22 @@ import Tools from "../common/Tools";
  * 视频监听事件逻辑处理
  */
 export default {
-  async setupVideoEventListeners() {
+  async setupShadowVideoEventListeners() {
+    document.addEventListener("shadow-video", (e) => {
+      const { video } = e.detail;
+      this.setupVideoEventListeners(video);
+    });
+  },
+  async setupVideoEventListeners(video) {
+    // 事件处理函数
+    const handleEvent = (event) => {
+      const target = video ?? event.target;
+      if (video || target.matches("video, fake-video")) this[event.type](target);
+    };
+
+    // 要监听的事件
     ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "ended"].forEach((type) => {
-      document.addEventListener(type, ({ target }) => target.matches("video, fake-video") && this[type](target), true);
+      (video ?? document).addEventListener(type, handleEvent, true);
     });
   },
   loadedmetadata(video) {
@@ -30,8 +43,8 @@ export default {
     this.videoProgress(video);
   },
   canplay(video) {
-    if (video.hasTryAutoPlay || Tools.isMultiVideo()) return;
-    video.hasTryAutoPlay = true;
+    if (video.__hasTryAutoPlay || Tools.isMultiVideo()) return;
+    video.__hasTryAutoPlay = true;
     this.tryAutoPlay(video);
   },
   playing(video) {
