@@ -177,6 +177,7 @@
     getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
     isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
     preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
+    isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
     hasCls: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
     delCls: (el, ...classes) => el?.classList.remove(...classes),
     addCls: (el, ...classes) => el?.classList.add(...classes),
@@ -675,6 +676,7 @@
       });
     },
     handleFullscreenChange(isFullscreen) {
+      isFullscreen && Tools.isInputable(document.activeElement) && document.activeElement.blur();
       !isFullscreen && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
       this.changeTimeElementDisplay();
     },
@@ -730,11 +732,7 @@
     }
   })();
   const Keydown = {
-    isInputFocus(event) {
-      const target = event.composedPath()[0];
-      const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
-      return isInput || target?.isContentEditable;
-    },
+    isInputFocus: (event) => Tools.isInputable(event.composedPath()[0]),
     preventDefault(event, { code, altKey } = event) {
       const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
       const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
