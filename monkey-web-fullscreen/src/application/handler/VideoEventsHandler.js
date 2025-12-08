@@ -18,7 +18,7 @@ export default {
     };
 
     ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "ended"].forEach((type) => {
-      (video ?? document).addEventListener(type, handleEvent, { capture: true, passive: true });
+      (video ?? document).addEventListener(type, handleEvent, true);
     });
   },
   loadedmetadata(video) {
