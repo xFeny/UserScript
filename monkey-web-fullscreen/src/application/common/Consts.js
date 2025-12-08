@@ -7,6 +7,7 @@ export default Object.freeze({
   MAX_ZOOM: 400,
   HALF_SEC: 500,
   ONE_SEC: 1000,
+  TWO_SEC: 2000,
   THREE_SEC: 3000,
   DEF_PLAY_RATE: 1,
   MAX_PLAY_RATE: 16,

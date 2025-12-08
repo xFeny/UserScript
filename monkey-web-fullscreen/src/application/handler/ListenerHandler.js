@@ -112,7 +112,7 @@ export default {
       if (!isTrusted || Tools.isFrequent(type, gap, true)) return;
 
       clearTimeout(timer), this.toggleCursor();
-      timer = setTimeout(() => this.toggleCursor(true), Consts.THREE_SEC);
+      timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
     };
 
     document.addEventListener(EventTypes.MOUSE_MOVE, (e) => handleMouseEvent(e));
