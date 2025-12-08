@@ -73,9 +73,8 @@ class VideoEnhancer {
     const original = HTMLVideoElement.prototype.play;
     HTMLVideoElement.prototype.play = function () {
       if (this.getRootNode() instanceof ShadowRoot && !this.hasAttribute("received")) {
+        document.dispatchEvent(new CustomEvent("shadow-video", { detail: { video: this } }));
         Tools.log("该 Shadow video 未绑定监听，派发事件进行绑定！");
-        const event = new CustomEvent("shadow-video", { detail: { video: this } });
-        document.dispatchEvent(event);
       }
       return original.apply(this, arguments);
     };
