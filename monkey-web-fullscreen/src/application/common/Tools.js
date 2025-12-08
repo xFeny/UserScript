@@ -53,8 +53,9 @@ export default unsafeWindow.Tools = {
     if (count < maxCount) return this.limitCountMap.set(key, count + 1) && false;
     return true;
   },
-  resetLimitCounter(key = "default") {
-    this.limitCountMap.set(key, 0);
+  resetLimit(...keys) {
+    const keyList = keys.length > 0 ? keys : ["default"];
+    keyList.forEach((key) => this.limitCountMap.set(key, 0));
   },
   getCenterPoint(element) {
     if (!element) return { centerX: 0, centerY: 0 };

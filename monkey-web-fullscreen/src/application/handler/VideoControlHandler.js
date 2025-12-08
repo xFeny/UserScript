@@ -45,7 +45,7 @@ export default {
     video.tsr = { ...Consts.DEFAULT_TSR };
     if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
 
-    Tools.resetLimitCounter("autoWebFull");
+    Tools.resetLimit("rateKeep", "autoWebFull");
     this.removeRateKeepDisplay(video);
     this.removeProgressElement();
   },

@@ -34,7 +34,9 @@ export default {
     if (!video._mfs_hasInitPlaySettings) this.initPlaySettings(video);
     if (!this.player) this.setCurrentVideo(video);
 
+    this.resumeRateKeepDisplay();
     this.removeRelevantElements(video);
+
     this.autoWebFullscreen(video);
     this.autoNextEpisode(video);
 

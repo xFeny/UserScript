@@ -100,11 +100,14 @@ export default {
     this.rateKeepElement.textContent = `倍速: ${this.player.playbackRate}`;
     this.prependElement(this.rateKeepElement);
   },
+  resumeRateKeepDisplay() {
+    if (Tools.isOverLimit("rateKeep")) return;
+    this.playbackRateKeepDisplay();
+  },
   removeRateKeepDisplay() {
     this.rateKeepElement?.remove();
   },
   createDisplayElement(clss, color) {
-    if (!this.player) return;
     const element = document.createElement("div");
     Tools.setStyle(element, "color", color);
     element.classList.add(clss);
