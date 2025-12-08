@@ -7,7 +7,8 @@ export default {
   setupShadowVideoEventListeners() {
     document.addEventListener("shadow-video", (e) => {
       const { video } = e.detail;
-      if (video) this.setupVideoEventListeners(video);
+      if (!video || video.hasAttribute("received")) return;
+      this.setupVideoEventListeners(video), video.setAttribute("received", true);
     });
   },
   setupVideoEventListeners(video) {

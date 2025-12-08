@@ -63,14 +63,25 @@ class VideoEnhancer {
 
   static detectShadowVideoElement() {
     if (Tools.isFrequent("shadow", 100, true)) return;
-    const videos = Tools.querys("video:not([dispatched])");
+    const videos = Tools.querys("video:not([received])");
+
     if (!videos.length) return;
-    videos.forEach((video) => {
-      video.setAttribute("dispatched", true);
-      document.dispatchEvent(new CustomEvent("shadow-video", { detail: { video } }));
-    });
+    videos.forEach((video) => document.dispatchEvent(new CustomEvent("shadow-video", { detail: { video } })));
+  }
+
+  static interceptShadowVideo() {
+    const original = HTMLVideoElement.prototype.play;
+    HTMLVideoElement.prototype.play = function () {
+      if (this.getRootNode() instanceof ShadowRoot && !this.hasAttribute("received")) {
+        Tools.log("该 Shadow video 未绑定监听，派发事件进行绑定！");
+        const event = new CustomEvent("shadow-video", { detail: { video: this } });
+        document.dispatchEvent(event);
+      }
+      return original.apply(this, arguments);
+    };
   }
 }
 
 VideoEnhancer.hackAttachShadow();
+VideoEnhancer.interceptShadowVideo();
 export default VideoEnhancer;
