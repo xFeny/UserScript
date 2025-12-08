@@ -144,6 +144,9 @@ export default {
     });
   },
   handleFullscreenChange(isFullscreen) {
+    // 全屏时移除输入框焦点（解决B站自动聚焦问题）
+    isFullscreen && Tools.isInputable(document.activeElement) && document.activeElement.blur();
+
     // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
     !isFullscreen && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
 

@@ -9,11 +9,7 @@ import SiteIcons from "../common/SiteIcons";
  * 快捷键和消息相关逻辑处理
  */
 export default {
-  isInputFocus(event) {
-    const target = event.composedPath()[0];
-    const isInput = ["INPUT", "TEXTAREA"].includes(target.tagName);
-    return isInput || target?.isContentEditable;
-  },
+  isInputFocus: (event) => Tools.isInputable(event.composedPath()[0]),
   preventDefault(event, { code, altKey } = event) {
     const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
     const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
