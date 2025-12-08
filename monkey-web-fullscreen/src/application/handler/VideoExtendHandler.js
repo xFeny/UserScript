@@ -45,9 +45,9 @@ export default {
   },
   async setupPlayerClock() {
     if (!this.player || this.shouldHideTime()) return this.Clock?.stop(true);
-    if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(Tools.getParent(this.player)).start();
+    if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(this.player.parentNode).start();
 
-    this.Clock = new Clock(Tools.getParent(this.player), { color: Storage.CLOCK_COLOR.get() });
+    this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
     this.toggleTimeElementClass(Storage.USE_SMALLER_FONT.get());
   },
   getRealDuration(video) {
@@ -112,8 +112,8 @@ export default {
     return element;
   },
   prependElement(element, target) {
-    const container = target ?? Tools.getParent(this.player);
-    if (!container?.contains(element)) container?.prepend(element);
+    const container = target ?? this.player?.parentNode;
+    if (element && !container?.contains(element)) container?.prepend(element);
   },
   toggleTimeElementClass(addClass, clss = "smaller") {
     if (addClass) return Tools.addCls(this.Clock?.element, clss), Tools.addCls(this.progressElement, clss);

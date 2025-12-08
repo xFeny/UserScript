@@ -22,36 +22,36 @@ export default {
   },
   isDynamicDuration(video) {
     if (!video) return false;
-    if (video.currentTime > video.__duration || video.__isDynamic) return true;
+    if (video.currentTime > video._mfs_duration || video._mfs_isDynamic) return true;
     if (video.currentTime > 5 || Tools.isOverLimit("isDynamic", 10)) return false;
 
     // 记录默认时长，用于判断是否为动态时长
-    if (!video.__duration) video.__duration = video.duration;
-    const { duration, __duration, currentTime, seekable } = video;
-    const isDynamic = Math.floor(duration) > Math.floor(__duration);
+    if (!video._mfs_duration) video._mfs_duration = video.duration;
+    const { duration, _mfs_duration, currentTime, seekable } = video;
+    const isDynamic = Math.floor(duration) > Math.floor(_mfs_duration);
 
     // 距离直播点﹤8秒（会误判短视频）
     const isNearLive = duration < 10 && seekable.length && seekable.end(0) - currentTime < 8;
     const result = isDynamic || isNearLive;
-    if (result) video.__isDynamic = true; // 为true，后续不再重新计算
+    if (result) video._mfs_isDynamic = true; // 为true，后续不再重新计算
     return result;
   },
   initVideoProps(video) {
     // 遍删除自定义属性
-    Object.getOwnPropertyNames(video).forEach((prop) => prop.startsWith("__") && delete video[prop]);
+    Object.getOwnPropertyNames(video).forEach((prop) => prop.startsWith("_mfs_") && delete video[prop]);
 
     // 设置默认值
-    video.__duration = video.duration;
+    video._mfs_duration = video.duration;
     video.tsr = { ...Consts.DEFAULT_TSR };
     if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
 
-    Tools.resetLimitCounter("autoFull");
+    Tools.resetLimitCounter("autoWebFull");
     this.removeRateKeepDisplay(video);
     this.removeProgressElement();
   },
   initPlaySettings(video) {
     if (!this.player) return;
-    video.__hasInitPlaySettings = true;
+    video._mfs_hasInitPlaySettings = true;
     this.applyCachedPlayRate(video);
     this.playbackRateKeepDisplay();
     this.applyCachedTime(video);
@@ -82,12 +82,12 @@ export default {
     this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
   },
   applyCachedPlayRate(video) {
-    if (video.__hasApplyCachedRate) return;
+    if (video._mfs_hasApplyCRate) return;
     if (Storage.DISABLE_MEMORY_SPEED.get()) return this.deleteCachedPlayRate();
 
     const playRate = Storage.CACHED_PLAY_RATE.get();
     if (Consts.DEF_PLAY_RATE === playRate || Number(video.playbackRate) === playRate) return;
-    this.setPlaybackRate(playRate, !video.__hasApplyCachedRate)?.then(() => (video.__hasApplyCachedRate = true));
+    this.setPlaybackRate(playRate, !video._mfs_hasApplyCRate)?.then(() => (video._mfs_hasApplyCRate = true));
   },
   skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
     if (!this.player || this.isLive() || this.isEnded()) return;
@@ -107,14 +107,14 @@ export default {
   },
   applyCachedTime(video) {
     if (Storage.DISABLE_MEMORY_TIME.get()) return this.clearCachedTime(video);
-    if (video.__hasAppliedCachedTime || !this.topWin || this.isLive()) return;
+    if (video._mfs_hasApplyCTime || !this.topWin || this.isLive()) return;
 
     // 从存储中获取该视频的缓存播放时间
     const time = Storage.PLAY_TIME.get(this.getCacheTimeKey(video));
-    if (time <= Number(video.currentTime)) return (video.__hasAppliedCachedTime = true);
+    if (time <= Number(video.currentTime)) return (video._mfs_hasApplyCTime = true);
 
     this.setCurrentTime(time);
-    video.__hasAppliedCachedTime = true;
+    video._mfs_hasApplyCTime = true;
     this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
       Tools.setStyle(el, "transform", `translateY(${-5 - el.offsetHeight}px)`);
     });
@@ -122,13 +122,13 @@ export default {
   clearCachedTime(video) {
     Storage.PLAY_TIME.del(this.getCacheTimeKey(video));
   },
-  getCacheTimeKey(video, { src, duration, __duration } = video) {
-    if (video.__cacheTimeKey) return video.__cacheTimeKey;
+  getCacheTimeKey(video, { src, duration, _mfs_duration } = video) {
+    if (video._mfs_cacheTKey) return video._mfs_cacheTKey;
 
     const srcHash = src && !src.startsWith("blob:") ? Tools.hashCode(new URL(src).pathname) : Consts.EMPTY;
-    const baseKey = `${this.topWin.urlHash}_${Math.floor(__duration || duration)}`;
+    const baseKey = `${this.topWin.urlHash}_${Math.floor(_mfs_duration || duration)}`;
     const cacheTimeKey = srcHash ? `${srcHash}_${baseKey}` : baseKey;
-    video.__cacheTimeKey = cacheTimeKey;
+    video._mfs_cacheTKey = cacheTimeKey;
 
     return cacheTimeKey;
   },

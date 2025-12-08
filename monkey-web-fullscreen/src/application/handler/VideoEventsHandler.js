@@ -18,7 +18,7 @@ export default {
     };
 
     ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "ended"].forEach((type) => {
-      (video ?? document).addEventListener(type, handleEvent, true);
+      (video ?? document).addEventListener(type, handleEvent, { capture: true, passive: true });
     });
   },
   loadedmetadata(video) {
@@ -31,7 +31,7 @@ export default {
   timeupdate(video) {
     if (isNaN(video.duration)) return;
 
-    if (!video.__hasInitPlaySettings) this.initPlaySettings(video);
+    if (!video._mfs_hasInitPlaySettings) this.initPlaySettings(video);
     if (!this.player) this.setCurrentVideo(video);
 
     this.removeRelevantElements(video);
@@ -42,17 +42,17 @@ export default {
     this.videoProgress(video);
   },
   canplay(video) {
-    if (video.__hasTryAutoPlay || Tools.isMultiVideo()) return;
-    video.__hasTryAutoPlay = true;
+    if (video._mfs_hasTryAutoPlay || Tools.isMultiVideo()) return;
+    video._mfs_hasTryAutoPlay = true;
     this.tryAutoPlay(video);
   },
   playing(video) {
-    video.__isEnded = false;
+    video._mfs_isEnded = false;
     this.setCurrentVideo(video);
     this.initPlaySettings(video);
   },
   ended(video) {
-    video.__isEnded = true;
+    video._mfs_isEnded = true;
     this.autoExitWebFullscreen();
     this.clearCachedTime(video);
   },

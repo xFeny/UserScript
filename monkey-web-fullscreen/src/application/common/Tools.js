@@ -22,7 +22,7 @@ export default unsafeWindow.Tools = {
   getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
   isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
   preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
-  dispatchCustomEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
+  emitCustomEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
   isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
   hasCls: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
   delCls: (el, ...classes) => el?.classList.remove(...classes),

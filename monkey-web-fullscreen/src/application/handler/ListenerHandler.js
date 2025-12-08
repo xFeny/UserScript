@@ -42,7 +42,7 @@ export default {
       if (this.isNormalSite() || Storage.DISABLE_INVISIBLE_PAUSE.get()) return;
 
       const video = this.player ?? this.getVideo();
-      if (!video || video?.__isEnded || !Tools.isVisible(video)) return;
+      if (!video || video?._mfs_isEnded || !Tools.isVisible(video)) return;
       document.hidden ? video?.pause() : video?.play();
     });
   },

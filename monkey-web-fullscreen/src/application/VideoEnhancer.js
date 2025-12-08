@@ -54,7 +54,7 @@ class VideoEnhancer {
       if (this._shadowRoot) return this._shadowRoot;
 
       const shadowRoot = (this._shadowRoot = this.__attachShadow.call(this, options));
-      Tools.dispatchCustomEvent("shadow-attached", { shadowRoot });
+      Tools.emitCustomEvent("shadow-attached", { shadowRoot });
       VideoEnhancer.detectShadowVideoElement();
 
       return shadowRoot;
@@ -66,14 +66,14 @@ class VideoEnhancer {
   static detectShadowVideoElement() {
     if (Tools.isFrequent("shadow", 100, true)) return;
     const videos = Tools.querys("video:not([received])");
-    if (videos.length) videos.forEach((video) => Tools.dispatchCustomEvent("shadow-video", { video }));
+    if (videos.length) videos.forEach((video) => Tools.emitCustomEvent("shadow-video", { video }));
   }
 
   static interceptShadowVideo() {
     const original = HTMLVideoElement.prototype.play;
     HTMLVideoElement.prototype.play = function () {
       if (this.getRootNode() instanceof ShadowRoot && !this.hasAttribute("received")) {
-        Tools.dispatchCustomEvent("shadow-video", { video: this });
+        Tools.emitCustomEvent("shadow-video", { video: this });
         Tools.log("该 Shadow video 未绑定监听，派发事件进行绑定！");
       }
 
