@@ -2,10 +2,10 @@
 // @name               视频自动网页全屏｜倍速播放
 // @name:zh-TW         視頻自動網頁全屏｜倍速播放
 // @namespace          http://tampermonkey.net/
-// @version            3.4.2
+// @version            3.5.0
 // @author             Feny
-// @description        支持所有H5视频的增强脚本，通用网页全屏｜倍速调节，对微博/推特/Instagram/Facebook等平台均适用；默认适配哔哩哔哩（含直播）、腾讯视频、优酷视频、爱奇艺、芒果TV、搜狐视频、AcFun弹幕网自动网页全屏；自动网页全屏 + 倍速调节 + 下集切换，大幅减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
-// @description:zh-TW  支持所有H5视频的增强脚本，通用網頁全屏｜倍速調節，对微博/推特/Instagram/Facebook等平臺均適用；默認適配嗶哩嗶哩（含直播）、騰訊視頻、優酷視頻、愛奇藝、芒果TV、搜狐視頻、AcFun彈幕網自動網頁全屏；自動網頁全屏 + 倍速調節 + 下集切換，大幅減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
+// @description        支持所有H5视频的增强脚本，通用网页全屏｜倍速调节，对微博 / 推特 / Instagram / Facebook等平台均适用；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / 搜狐视频 / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
+// @description:zh-TW  支持所有H5视频的增强脚本，通用網頁全屏｜倍速調節，对微博 / 推特 / Instagram / Facebook等平臺均適用；B站(含直播) / 騰訊視頻 / 優酷 / 愛奇藝 / 芒果TV / 搜狐視頻 / AcFun 默認自動網頁全屏，其他網站可手動開啓；自動網頁全屏 + 記憶倍速 + 下集切換，減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
 // @license            GPL-3.0-only
 // @icon               data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAqdJREFUWEftl91LFFEYxp/3jB9ESZjtSl51F1RUSgRCF/kHlF1IhiFhF65dqEQkBUErdJMStBukGwQre2NZUiCRqUiURkW65mIfqGUFsW6Ii0jY7p4Tc3Rqd5zaGVldAudynve8z28e3jMzh5Dmi1R/V0vQyRRWxgWG6x22SrcnOAhQcQIbwVtXba8y1EANSpS1xzJin5c/Dz+jRDPvGWoErwRw35zuh8ChpcXXFjbwi9k/WADA9viGgovGnxtFs6EmcApMvCdBA3oIIirl4N8NNQngmRYJiwTOE7EHHLERAmXFawQ6AdCQkRbjsZIMUvIFoV0HMSsEDjCgSK8tJqAHAEDAMWLKLOexx8tiVVDEhLLVQAtzRPcwKOUANSWCw1/rsBe6PcFz8dpfAdTFgtF+EmIvBG7pID7mZNl2zkVCFQbahzqHfYerddpNhFpdsnfqauzl8ZoEuO4JXdIKOefynnZlimxXhBbqjTZL/el8pzrAVjTGmKh12Bq1ddJs974abQDXfFMuAhQ6EodwDTHWAf6/BAoK8nD0cDEKtuVhyD+OzvvLXnyWJshyApedJ1F65M9n4tlAAF5fL168fGfJWCu2DDA61GpodLvjCdp8vfjyNWQJJGUAquvMzBzafD0yEc65KZCUAmiOo4FPEqS753VSiFUB0FxbPF244en6J8SqAoTD8zhYcjZ9AP6RCVRWNacHYPD5GJqudmBi8tvaAkxNBeUuuNv5NOkAqgUpm4FIJCrfA+r0z4bnTZmvCKCv+wrsts0JBg8fvZLGY28NfoqToFhOoOJ4CS40lMu2I28mpXFP37DpJ9YXWgZQG+Tm5mBL7qakA2aGakUAZhqbrVkH0BLoB34fzcyml5K6pd/yaicRlQlgV0q6mmwitMOpyfpVKfsFya4w73cz9xQAAAAASUVORK5CYII=
 // @homepage           https://github.com/xFeny/UserScript/tree/main/monkey-web-fullscreen
@@ -66,7 +66,7 @@
 // @note               *://*/*
 // ==/UserScript==
 
-(o=>{const n=Symbol("styleAdded"),t=document.createElement("style");t.textContent=o,document.addEventListener("shadow-attached",r=>{const{shadowRoot:e}=r.detail;e[n]||requestAnimationFrame(()=>{e.prepend(t.cloneNode(!0)),e[n]=!0})}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(o)})(' @charset "UTF-8";.monkey-toast{line-height:normal;left:10px!important;bottom:16%!important;color:#fff!important;font-size:13px!important;padding:6px 10px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.monkey-toast span{display:inline!important}::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen]~*:not(.monkey-web-fullscreen){display:none!important}[part*=webFullscreen] .vjs-control-bar,[part*=webFullscreen] .ytp-chrome-bottom,[part*=webFullscreen] .ytp-chapter-hover-container{left:0!important;width:100vw!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important;transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc{cursor:none!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-tabs-header{display:flex;position:relative;margin-bottom:15px;font-size:15px!important;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;cursor:pointer;color:#64748b;font-weight:500;text-align:center;padding:12px 10px;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;visibility:visible;background-color:#3b82f6;border-radius:2px 2px 0 0}.monkey-web-fullscreen .swal2-tab:hover:not(.active){color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%;padding:0 5px;min-height:325px}.monkey-web-fullscreen .swal2-tab-panel{display:none}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 5px!important;padding:0 0 5px!important;float:none!important;height:30px!important;color:#666!important;display:flex!important;font-size:14px!important;line-height:30px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text],.monkey-web-fullscreen .__menu input[type=number]{color:#333;border-radius:3px;border:1px solid #cbd5e1!important;text-align:center!important;line-height:12px!important;font-size:12px!important;padding:0 3px!important;height:23px!important;width:75px!important}.monkey-web-fullscreen .__menu input[type=text]:focus,.monkey-web-fullscreen .__menu input[type=number]:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:38px!important;height:18px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:12px!important;height:12px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen .others-sett{margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f5f5f5}.monkey-web-fullscreen .others-sett:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .others-sett p{margin-bottom:3px;color:#333!important;font-size:13px!important;text-align:left!important}.monkey-web-fullscreen .others-sett textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;height:70px!important;font-size:12px!important;padding:3px 5px!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen .others-sett textarea:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th{font-weight:600!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:2147483647!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap>:not(.bpx-player-dm-tip){display:none!important}#buffer,#install,#a1 #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,[id*=player] #tips,#player #loading-box,.dplayer-comment-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}@supports (selector(:has(div))){#loading:not(:has([class*=player])){display:none!important}}.Clock,.__time-progress,.__rate-keep-show{color:#e0e0e0;text-indent:0!important;text-shadow:0 0 2px #000;position:absolute!important;pointer-events:none!important;font-family:Arial,Helvetica,sans-serif!important;z-index:2147483647!important;opacity:1!important}.Clock:after,.__time-progress:after,.__rate-keep-show:after{top:50%!important;left:50%!important;content:"-"!important;position:fixed!important;text-shadow:none!important;color:transparent!important;pointer-events:none!important;display:inline-block!important;background-color:transparent!important}.Clock{top:10px!important;right:20px!important;width:auto!important;height:auto!important;font-size:20px!important;line-height:20px!important;font-weight:700!important;text-align:right!important;background-color:transparent!important}.Clock.smaller{font-size:16px!important;line-height:16px!important}.__time-progress{top:30px!important;right:20px!important;font-size:12.5px!important;line-height:12.5px!important}.__time-progress b{font-size:12px!important;line-height:12px!important;display:inline-block!important;transform:scale(.75)!important;vertical-align:middle!important}.__time-progress.smaller{top:26px!important;transform:scale(.817)!important;transform-origin:top right}.__rate-keep-show{color:#c9c9c9;top:5px!important;left:5px!important;font-size:12px!important;box-shadow:none!important;display:inline-block!important;transform:scale(.917)!important;transform-origin:top} ');
+(o=>{const n=Symbol("styleAdded"),t=document.createElement("style");t.textContent=o,window.scriptStyle=t,document.addEventListener("shadow-attached",r=>{const{shadowRoot:e}=r.detail;e[n]||requestAnimationFrame(()=>{e.prepend(t.cloneNode(!0)),e[n]=!0})}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(o)})(' @charset "UTF-8";.monkey-toast{line-height:normal;left:10px!important;bottom:16%!important;color:#fff!important;font-size:13px!important;padding:6px 10px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.monkey-toast span{display:inline!important}::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen]~*:not(.monkey-web-fullscreen){display:none!important}[part*=webFullscreen] .vjs-control-bar,[part*=webFullscreen] .ytp-chrome-bottom,[part*=webFullscreen] .ytp-chapter-hover-container{left:0!important;width:100vw!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important;transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc{cursor:none!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-tabs-header{display:flex;position:relative;margin-bottom:15px;font-size:15px!important;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;cursor:pointer;color:#64748b;font-weight:500;text-align:center;padding:12px 10px;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;visibility:visible;background-color:#3b82f6;border-radius:2px 2px 0 0}.monkey-web-fullscreen .swal2-tab:hover:not(.active){color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%;padding:0 5px;min-height:325px}.monkey-web-fullscreen .swal2-tab-panel{display:none}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 5px!important;padding:0 0 5px!important;float:none!important;height:30px!important;color:#666!important;display:flex!important;font-size:14px!important;line-height:30px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text],.monkey-web-fullscreen .__menu input[type=number]{color:#333;border-radius:3px;border:1px solid #cbd5e1!important;text-align:center!important;line-height:12px!important;font-size:12px!important;padding:0 3px!important;height:23px!important;width:75px!important}.monkey-web-fullscreen .__menu input[type=text]:focus,.monkey-web-fullscreen .__menu input[type=number]:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:38px!important;height:18px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:12px!important;height:12px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen .others-sett{margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f5f5f5}.monkey-web-fullscreen .others-sett:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .others-sett p{margin-bottom:3px;color:#333!important;font-size:13px!important;text-align:left!important}.monkey-web-fullscreen .others-sett textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;height:70px!important;font-size:12px!important;padding:3px 5px!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen .others-sett textarea:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th{font-weight:600!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:2147483647!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap>:not(.bpx-player-dm-tip){display:none!important}#buffer,#install,#fd_tips,#a1 #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,[id*=player] #tips,#player #loading-box,.dplayer-comment-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}.Clock,.__time-progress,.__rate-keep-show{color:#e0e0e0;text-indent:0!important;text-shadow:0 0 2px #000;position:absolute!important;pointer-events:none!important;font-family:Arial,Helvetica,sans-serif!important;z-index:2147483647!important;opacity:1!important}.Clock:after,.__time-progress:after,.__rate-keep-show:after{top:50%!important;left:50%!important;content:"-"!important;position:fixed!important;text-shadow:none!important;color:transparent!important;pointer-events:none!important;display:inline-block!important;background-color:transparent!important}.Clock{top:10px!important;right:20px!important;width:auto!important;height:auto!important;font-size:20px!important;line-height:20px!important;font-weight:700!important;text-align:right!important;background-color:transparent!important}.Clock.smaller{font-size:16px!important;line-height:16px!important}.__time-progress{top:30px!important;right:20px!important;font-size:12.5px!important;line-height:12.5px!important}.__time-progress b{font-size:12px!important;line-height:12px!important;display:inline-block!important;transform:scale(.75)!important;vertical-align:middle!important}.__time-progress.smaller{top:26px!important;transform:scale(.817)!important;transform-origin:top right}.__rate-keep-show{color:#c9c9c9;top:5px!important;left:5px!important;font-size:12px!important;box-shadow:none!important;display:inline-block!important;transform:scale(.917)!important;transform-origin:top} ');
 
 (async function (notyf, Swal) {
   'use strict';
@@ -80,14 +80,16 @@
     MAX_ZOOM: 400,
     HALF_SEC: 500,
     ONE_SEC: 1e3,
+    TWO_SEC: 2e3,
     THREE_SEC: 3e3,
     DEF_PLAY_RATE: 1,
     MAX_PLAY_RATE: 16,
     MIN_PLAY_RATE: 0.0625,
     webFull: "webFullscreen",
-    MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN",
     FAKE_VIDEO: "fake-video",
-    WEBFULL_PARENT_DEPTH: 20
+    WEBFULL_PARENT_DEPTH: 20,
+    MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN",
+    DEFAULT_TSR: { zoom: 100, moveX: 0, moveY: 0, rotation: 0, isMirrored: false }
   });
   const EventTypes = {
     CLICK: "click",
@@ -225,10 +227,10 @@
       const dict = { clientX, clientY, bubbles: true };
       element?.dispatchEvent(new MouseEvent(eventType, dict));
     },
-    createObserver(target, callback, options) {
+    createObserver(target, callback, options = {}) {
       const observer = new MutationObserver(callback);
-      target = target instanceof Element ? target : this.query(target);
-      observer.observe(target, { childList: true, subtree: true, ...options });
+      const observeTarget = typeof target === "string" ? this.query(target) : target;
+      observer.observe(observeTarget, { childList: true, subtree: true, ...options });
       return observer;
     },
     closest(element, selector, maxLevel = 3) {
@@ -335,108 +337,24 @@
         const value = computedStyle.getPropertyValue(name);
         if (value) target.style.setProperty(name, value);
       });
-    }
-  };
-  const VideoEvents = {
-    loadedmetadata() {
-      App.autoWebFullscreen(this);
-      Tools.querys('[id*="loading"]').forEach((el) => !Tools.query('[class*="player"]', el) && Tools.addCls(el, "_noplayer"));
     },
-    loadeddata() {
-      App.initVideoProps(this);
-      Tools.query(".conplaying")?.click();
-    },
-    timeupdate() {
-      if (isNaN(this.duration)) return;
-      if (!this.hasInitPlaySettings) App.initPlaySettings(this);
-      if (!App.player) App.setCurrentVideo(this);
-      App.autoWebFullscreen(this);
-      App.autoNextEpisode(this);
-      App.cachePlayTime(this);
-      App.videoProgress(this);
-    },
-    canplay() {
-      if (this.hasTryAutoPlay || Tools.isMultiVideo()) return;
-      this.hasTryAutoPlay = true;
-      App.tryAutoPlay(this);
-    },
-    playing() {
-      this.isEnded = false;
-      App.setCurrentVideo(this);
-      App.initPlaySettings(this);
-    },
-    pause() {
-      Tools.query(".ec-no")?.click();
-      Tools.query('[id*="loading"]._noplayer')?.remove();
-    },
-    ended() {
-      this.isEnded = true;
-      App.autoExitWebFullscreen();
-      App.clearCachedTime(this);
+    setStyle(eles, prop, val, priority) {
+      if (!eles || !prop) return;
+      const fn = val ? "setProperty" : "removeProperty";
+      [].concat(eles).forEach((el) => el?.style?.[fn]?.(prop, val, priority));
     }
   };
   class VideoEnhancer {
-    constructor() {
-      __publicField(this, "timeout", 100);
-      __publicField(this, "attr", "enhanced");
-      __publicField(this, "selector", ":is(video, fake-video):not([enhanced])");
-      __publicField(this, "defaultTsr", { zoom: 100, moveX: 0, moveY: 0, rotation: 0, isMirrored: false });
-      __publicField(this, "danmuSelector", ':is([class*="danmu" i], [class*="danmaku" i], [class*="barrage" i])');
-      __publicField(this, "videoEvents", Object.entries(VideoEvents));
-      this.hackAttachShadow();
-      this.setupExistingVideos();
-      this.hookMediaMethod("play", (video) => this.enhanced(video));
-      this.setupObserver();
-    }
-    async setupExistingVideos() {
-      const videos = Tools.querys(this.selector);
-      videos.forEach((video) => this.enhanced(video));
-    }
-    async setupObserver() {
-      Tools.createObserver(document.body ?? document.documentElement, (mutations) => {
-        mutations.forEach((m) => m.type === "childList" && this.processAddedNodes(m.addedNodes));
-      });
-    }
-    /**
-     * 异步处理新增节点，避免阻塞主线程
-     * @param {NodeList} nodes - 新增节点列表
-     */
-    async processAddedNodes(nodes) {
-      const { timeout, selector, danmuSelector } = this;
-      for (const node of nodes) {
-        if (!(node instanceof Element) || node.matches(danmuSelector)) continue;
-        if (node.matches(selector)) requestIdleCallback(() => this.enhanced(node), { timeout });
-        else if (node.hasChildNodes()) {
-          Tools.querys(selector, node).forEach((video) => requestIdleCallback(() => this.enhanced(video), { timeout }));
-        }
-        await new Promise((resolve) => setTimeout(resolve, 0));
-      }
-    }
-    enhanced(video) {
-      if (video.hasAttribute(this.attr)) return;
-      video.tsr = { ...this.defaultTsr };
-      this.setupEventListeners(video);
-    }
-    setupEventListeners(video) {
-      this.videoEvents.forEach(([type, handler]) => {
-        video.removeEventListener(type, handler, true);
-        video.addEventListener(type, handler, true);
-        video.setAttribute(this.attr, true);
-      });
-    }
-    resetTsr(video) {
-      video.tsr = { ...this.defaultTsr };
-    }
-    setPlaybackRate(video, playRate) {
+    static setPlaybackRate(video, playRate) {
       this.bypassPlaybackRateLimit(video);
-      video.playbackRate = video.__playRate = Tools.toFixed(playRate);
+      video.playbackRate = video.__playRate = (+playRate).toFixed(2).replace(/\.?0+$/, "");
     }
     /**
      * 绕过视频播放器的播放速率限制
      * @param video - 视频元素
      * @see 腾讯视频fake-video https://v.qq.com/wasm-kernel/1.0.49/fake-video-element-iframe.js
      */
-    bypassPlaybackRateLimit(video) {
+    static bypassPlaybackRateLimit(video) {
       this.defineProperty(video, "playbackRate", {
         set(value, setter) {
           if (this.playbackRate === value) return;
@@ -448,7 +366,7 @@
         }
       });
     }
-    defineProperty(video, property, descs) {
+    static defineProperty(video, property, descs) {
       try {
         const isMediaElement = video instanceof HTMLMediaElement;
         const videoPrototype = isMediaElement ? HTMLMediaElement.prototype : Object.getPrototypeOf(video);
@@ -468,27 +386,42 @@
         console.error(`修改 ${property} 属性时出错：`, e);
       }
     }
-    async hookMediaMethod(method, callback) {
-      const original = HTMLMediaElement.prototype[method];
-      HTMLMediaElement.prototype[method] = function() {
-        callback.call(this, this);
-        return original.apply(this, arguments);
-      };
-    }
-    async hackAttachShadow() {
+    static hackAttachShadow() {
       if (Element.prototype.__attachShadow) return;
       Element.prototype.__attachShadow = Element.prototype.attachShadow;
       Element.prototype.attachShadow = function(options) {
         if (this._shadowRoot) return this._shadowRoot;
         const shadowRoot = this._shadowRoot = this.__attachShadow.call(this, options);
-        const shadowEvent = new CustomEvent("shadow-attached", { bubbles: true, detail: { shadowRoot } });
-        document.dispatchEvent(shadowEvent);
+        document.dispatchEvent(new CustomEvent("shadow-attached", { detail: { shadowRoot } }));
+        VideoEnhancer.detectShadowVideoElement();
         return shadowRoot;
       };
       Element.prototype.attachShadow.toString = () => Element.prototype.__attachShadow.toString();
     }
+    static detectShadowVideoElement() {
+      if (Tools.isFrequent("shadow", 100, true)) return;
+      const videos = Tools.querys("video:not([dispatched])");
+      if (!videos.length) return;
+      videos.forEach((video) => {
+        video.setAttribute("dispatched", true);
+        document.dispatchEvent(new CustomEvent("shadow-video", { detail: { video } }));
+      });
+    }
   }
-  window.videoEnhance = new VideoEnhancer();
+  VideoEnhancer.hackAttachShadow();
+  const { matches, includes: excluded } = _GM_info.script;
+  const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
+  const siteRegExp = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
+  const Site = {
+    isAcFun: () => /acfun.cn\/v/.test(location.href),
+    isTencent: () => /v.qq.com\/x/.test(location.href),
+    isQiyi: () => /iqiyi.com\/v_*/.test(location.href),
+    isMgtv: () => /www.mgtv.com\/b/.test(location.href),
+    isDouyu: () => /v.douyu.com\/show/.test(location.href),
+    isBili: () => /bilibili.com\/video/.test(location.href),
+    isBiliLive: () => location.host === "live.bilibili.com",
+    isMatch: () => siteRegExp.some((match) => match.test(location.href.replace(location.search, Consts.EMPTY)))
+  };
   class StorageItem {
     constructor(name, defaultValue, useLocalStorage = false, valueParser = null) {
       this.name = name;
@@ -509,7 +442,7 @@
       const value = this.useLocalStorage ? localStorage.getItem(key) : _GM_getValue(key);
       try {
         return JSON.parse(value);
-      } catch (e) {
+      } catch {
         return value;
       }
     }
@@ -545,16 +478,17 @@
       requestIdleCallback(() => this.cleanupExpiredData());
     }
     set(suffix, value, expires) {
+      if ([null, void 0].includes(suffix)) throw new Error("TimedStorage 设置值时 suffix 不能为空");
       const key = this.name + suffix;
       if (expires) expires = Date.now() + expires * 864e5;
       expires ? this.setItem(key, JSON.stringify({ value, expires })) : this.setItem(key, value);
     }
-    get(suffix) {
+    get(suffix = "") {
       const storage = this.getItem(this.name + suffix);
       if (!storage?.value) return this.parser(storage ?? this.defaultValue);
       return storage.expires > Date.now() ? this.parser(storage.value) : this.defaultValue;
     }
-    del(suffix) {
+    del(suffix = "") {
       this.removeItem(this.name + suffix);
     }
     cleanupExpiredData() {
@@ -565,7 +499,8 @@
     }
   }
   const Storage = {
-    CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", "", false),
+    ICONS_SELECTOR: new TimedStorage("ICONS_SELECTOR", null),
+    CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", ""),
     DISABLE_AUTO: new StorageItem("CLOSE_AUTO_WEB_FULL_SCREEN", false, false, Boolean),
     ENABLE_THIS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, Boolean),
     RATE_KEEP_SHOW: new StorageItem("RATE_KEEP_SHOW", false, false, Boolean),
@@ -597,19 +532,6 @@
     DISABLE_DEF_MAX_VOLUME: new StorageItem("DISABLE_DEF_MAX_VOLUME", false, false, Boolean),
     DISABLE_SCREENSHOT: new StorageItem("DISABLE_ZOOM", true, false, Boolean)
   };
-  const { matches, includes: excluded } = _GM_info.script;
-  const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
-  const siteRegExp = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
-  const Site = {
-    isAcFun: () => /acfun.cn\/v/.test(location.href),
-    isTencent: () => /v.qq.com\/x/.test(location.href),
-    isQiyi: () => /iqiyi.com\/v_*/.test(location.href),
-    isMgtv: () => /www.mgtv.com\/b/.test(location.href),
-    isDouyu: () => /v.douyu.com\/show/.test(location.href),
-    isBili: () => /bilibili.com\/video/.test(location.href),
-    isBiliLive: () => location.host === "live.bilibili.com",
-    isMatched: () => siteRegExp.some((match) => match.test(location.href.replace(location.search, Consts.EMPTY)))
-  };
   const Keyboard = Object.freeze({
     A: "KeyA",
     D: "KeyD",
@@ -634,43 +556,49 @@
   });
   const observedValue = { isFullscreen: false, fsWrapper: null };
   const Listen = {
-    init() {
+    isNormalSite: () => !window?.videoInfo && !window?.topWin,
+    isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
+    getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
+    init(isNonFirstInit = false) {
       this.setupDocBodyObserver();
       this.setupKeydownListener();
       this.setupVisibleListener();
       this.setupMouseMoveListener();
       this.setupFullscreenListener();
+      this.setupVideoEventListeners();
+      if (isNonFirstInit) return;
       this.observeFullscreenChange();
       this.observeWebFullscreenChange();
       this.setupIgnoreUrlsChangeListener();
-      document.addEventListener("load", () => this.triggerStartElement(), true);
+      this.setupShadowVideoEventListeners();
+      this.setupDocMutationObserver();
     },
-    isNormalSite: () => !window?.videoInfo && !window?.topWin,
-    getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
-    isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
-    triggerStartElement() {
-      setTimeout(() => {
-        const element = Tools.query(".ec-no, .conplaying, #start, .choice-true, .close-btn, .closeclick");
-        if (!element || Tools.isFrequent("start")) return;
-        setTimeout(() => element?.click?.() & element?.remove?.(), 250);
-      });
+    setupDocMutationObserver() {
+      new MutationObserver(() => {
+        if (this.documentElement === document.documentElement) return;
+        this.init(true), document.head.append(scriptStyle.cloneNode(true));
+      }).observe(document, { childList: true });
     },
     async setupVisibleListener() {
       window.addEventListener("visibilitychange", () => {
         if (this.isNormalSite() || Storage.DISABLE_INVISIBLE_PAUSE.get()) return;
         const video = this.player ?? this.getVideo();
-        if (!video || video?.isEnded || !Tools.isVisible(video)) return;
+        if (!video || video?.__isEnded || !Tools.isVisible(video)) return;
         document.hidden ? video?.pause() : video?.play();
       });
     },
     setupDocBodyObserver() {
-      const observer = Tools.createObserver(document.body ?? document.documentElement, () => {
+      this.documentElement = document.documentElement;
+      this.docObserver?.disconnect(), clearTimeout(this.observerTimer);
+      this.docObserver = Tools.createObserver(document, () => {
         const video = this.getVideo();
+        const element = Tools.query("body > #start");
+        if (element) setTimeout(() => (element.click?.(), element.remove?.()), 300);
         Promise.resolve().then(() => this.removeLoginPopups());
         if (video?.offsetWidth) this.setCurrentVideo(video);
-        if (this.topWin) observer.disconnect();
+        if (this.topWin) this.docObserver.disconnect();
       });
-      setTimeout(() => observer?.disconnect(), Consts.ONE_SEC * 10);
+      this.observerTimer = setTimeout(() => this.docObserver?.disconnect(), Consts.ONE_SEC * 10);
     },
     setCurrentVideo(video) {
       if (!video || this.player === video) return;
@@ -679,7 +607,6 @@
       this.player = video;
       this.setVideoInfo(video);
       this.observeVideoSrcChange(video);
-      window.videoEnhance.enhanced(video);
     },
     setVideoInfo(video) {
       const isLive = Object.is(video.duration, Infinity);
@@ -705,14 +632,11 @@
       if (video.hasAttribute("processed")) return;
       video.setAttribute("processed", true);
       const isFake = video.matches(Consts.FAKE_VIDEO);
-      const handleChange = (v) => (delete that.topWin, that.initVideoProps(v), that.setVideoInfo(v));
-      window.videoEnhance.defineProperty(video, isFake ? "srcConfig" : "src", {
+      const handleChange = (v) => (delete that.topWin, that.setVideoInfo(v));
+      VideoEnhancer.defineProperty(video, isFake ? "srcConfig" : "src", {
         set(value, setter) {
-          this.urlHash = that.topWin.urlHash;
-          setTimeout(() => this.currentTime = 0, 10);
           isFake ? this._src = value : setter(value);
           if ((isFake || this === that.player) && value) handleChange(this);
-          setTimeout(() => delete this.urlHash, 1200);
         }
       });
     },
@@ -722,7 +646,7 @@
         const gap = type === EventTypes.MOUSE_MOVE ? 150 : 50;
         if (!isTrusted || Tools.isFrequent(type, gap, true)) return;
         clearTimeout(timer), this.toggleCursor();
-        timer = setTimeout(() => this.toggleCursor(true), Consts.THREE_SEC);
+        timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
       };
       document.addEventListener(EventTypes.MOUSE_MOVE, (e) => handleMouseEvent(e));
       document.addEventListener(EventTypes.MOUSE_OVER, (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
@@ -751,16 +675,13 @@
       });
     },
     handleFullscreenChange(isFullscreen) {
-      if (!this.player) return;
-      !isFullscreen && this.shouldDestroyTimeElement() && this.removeVideoProgress();
       !isFullscreen && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
-      this.toggleClock();
+      this.changeTimeElementDisplay();
     },
     async observeWebFullscreenChange() {
       const handle = (event, { code, type } = event) => {
         if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
-        if (this.isInputFocus(event)) return;
-        if (![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
+        if (this.isInputFocus(event) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
         if (type === "keyup") return Tools.preventDefault(event);
         Tools.preventDefault(event), this.dispatchShortcutKey(code, true);
       };
@@ -793,12 +714,16 @@
     "v.qq.com": { full: ".txp_btn_fullscreen", webFull: ".txp_btn_fake", danmaku: ".barrage-switch", next: ".txp_btn_next_u" }
   };
   const SiteIcons = await (async () => {
-    if (!Site.isMatched()) return IconsSelector;
+    if (!Site.isMatch()) return IconsSelector;
+    const storeSelector = Storage.ICONS_SELECTOR.get();
+    if (storeSelector) return storeSelector;
     try {
       const url = "https://gitee.com/xfeny/UserScript/raw/dev/monkey-web-fullscreen/src/IconsSelector.json";
       const res = await _GM.xmlHttpRequest({ url, timeout: 3e3 });
       const remoteSelector = JSON.parse(res.responseText ?? "{}");
-      return { ...IconsSelector, ...remoteSelector };
+      const selectors = { ...IconsSelector, ...remoteSelector };
+      Storage.ICONS_SELECTOR.set(Consts.EMPTY, selectors, 1 / 4);
+      return selectors;
     } catch (e) {
       console.error("加载远程配置失败", e);
       return IconsSelector;
@@ -830,21 +755,13 @@
     setupKeydownListener() {
       try {
         window.addEventListener("keyup", (event) => this.preventDefault(event), true);
-        window.addEventListener("keydown", (event) => this.handleKeydown.call(this, event), true);
-        window.addEventListener("message", ({ data }) => this.handleMessage.call(this, data, true));
+        window.addEventListener("keydown", (event) => this.handleKeydown(event), true);
+        window.addEventListener("message", ({ data }) => this.handleMessage(data));
       } catch {
         _unsafeWindow.addEventListener("keyup", (event) => this.preventDefault(event), true);
-        _unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown.call(this, event), true);
-        _unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage.call(this, data, true));
+        _unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
+        _unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
       }
-    },
-    handleMessage(data) {
-      if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
-      if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
-      if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
-      if (data?.topWin) window.topWin = this.topWin = data.topWin;
-      this.handleSettMessage(data);
-      this.processEvent(data);
     },
     handleKeydown(event, { key, code, isTrusted } = event) {
       if (this.isNormalSite() || this.isInputFocus(event)) return;
@@ -865,15 +782,15 @@
         R: () => this.rotateVideo(),
         L: () => this.freezeVideoFrame(),
         K: () => this.freezeVideoFrame(true),
-        Z: () => this.resetToDefaultPlayRate(),
-        D: () => Site.isMatched() && this.triggerIconElement(SiteIcons.name.danmaku),
-        N: () => Site.isMatched() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode(),
-        ENTER: () => Site.isMatched() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen(),
-        P: () => Site.isMatched() ? this.triggerIconElement(SiteIcons.name.webFull) : this.toggleWebFullscreen(isTrusted),
-        LEFT: () => (bypass || this.isOverrideKeyboard()) && this.adjustPlayProgress(-Storage.SKIP_INTERVAL.get()),
-        RIGHT: () => (bypass || this.isOverrideKeyboard()) && this.adjustPlayProgress(Storage.SKIP_INTERVAL.get()),
+        Z: () => this.setPlaybackRate(Consts.DEF_PLAY_RATE),
+        D: () => Site.isMatch() && this.triggerIconElement(SiteIcons.name.danmaku),
+        N: () => Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode(),
+        ENTER: () => Site.isMatch() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen(),
+        P: () => Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.toggleWebFullscreen(isTrusted),
+        LEFT: () => (bypass || this.isOverrideKeyboard()) && this.skipPlayback(-Storage.SKIP_INTERVAL.get()),
+        RIGHT: () => (bypass || this.isOverrideKeyboard()) && this.skipPlayback(Storage.SKIP_INTERVAL.get()),
         SPACE: () => (bypass || this.isOverrideKeyboard()) && this.togglePlayPause(this.player),
-        0: () => this.adjustPlayProgress(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
+        0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
         SHIFT_P: () => this.togglePictureInPicture(),
         SHIFT_E: () => this.toggleAutoNextEnabled(),
         SHIFT_L: () => this.toggleNativeControls(),
@@ -884,11 +801,77 @@
         ALT_ADD: () => this.zoomVideo()
       };
       const step = Storage.PLAY_RATE_STEP.get();
-      ["A", "ADD"].forEach((k) => dict[k] = () => this.adjustPlaybackRate(step));
-      ["S", "SUB"].forEach((k) => dict[k] = () => this.adjustPlaybackRate(-step));
+      ["A", "S", "ADD", "SUB"].forEach((k, i) => dict[k] = () => this.adjustPlaybackRate((i % 2 ? -1 : 1) * step));
       ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => dict[k] = () => this.moveVideoPosition(k));
       for (let i = 1; i < 6; i++) dict[`CTRL_${i}`] = () => this.setPlaybackRate(Storage.PRESET_SPEED.get()[i - 1]);
       dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
+    },
+    handleMessage(data) {
+      if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
+      if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
+      if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
+      if ("verifyPassed" in data) this.verifyPassed = data.verifyPassed;
+      if (data?.topWin) window.topWin = this.topWin = data.topWin;
+      this.handleSettMessage(data);
+      this.processEvent(data);
+    },
+    handleSettMessage(data) {
+      if ("toggle_rateKeep" in data) this.playbackRateKeepDisplay();
+      if ("toggle_clockAlways" in data) this.changeTimeElementDisplay();
+      if ("toggle_smallerFont" in data) this.toggleTimeElementClass(data.toggle_smallerFont);
+      if ("toggle_color" in data) this.setTimeElementColor(data.toggle_color);
+      if (data?.toggle_speed) this.setPlaybackRate(Consts.DEF_PLAY_RATE);
+      if (data?.toggle_memory) this.deleteCachedPlayRate();
+      if (data?.toggle_zoom) this.resetVideoTransform();
+    }
+  };
+  const Events = {
+    setupShadowVideoEventListeners() {
+      document.addEventListener("shadow-video", (e) => {
+        const { video } = e.detail;
+        if (video) this.setupVideoEventListeners(video);
+      });
+    },
+    setupVideoEventListeners(video) {
+      const handleEvent = (event) => {
+        const target = video ?? event.target;
+        if (video || target.matches("video, fake-video")) this[event.type](target);
+      };
+      ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "ended"].forEach((type) => {
+        (video ?? document).addEventListener(type, handleEvent, true);
+      });
+    },
+    loadedmetadata(video) {
+      this.autoWebFullscreen(video);
+      Tools.querys('[id*="loading"]').forEach((el) => !Tools.query("video", el) && Tools.addCls(el, "_noplayer"));
+    },
+    loadeddata(video) {
+      this.initVideoProps(video);
+    },
+    timeupdate(video) {
+      if (isNaN(video.duration)) return;
+      if (!video.__hasInitPlaySettings) this.initPlaySettings(video);
+      if (!this.player) this.setCurrentVideo(video);
+      this.removeRelevantElements(video);
+      this.autoWebFullscreen(video);
+      this.autoNextEpisode(video);
+      this.cachePlayTime(video);
+      this.videoProgress(video);
+    },
+    canplay(video) {
+      if (video.__hasTryAutoPlay || Tools.isMultiVideo()) return;
+      video.__hasTryAutoPlay = true;
+      this.tryAutoPlay(video);
+    },
+    playing(video) {
+      video.__isEnded = false;
+      this.setCurrentVideo(video);
+      this.initPlaySettings(video);
+    },
+    ended(video) {
+      video.__isEnded = true;
+      this.autoExitWebFullscreen();
+      this.clearCachedTime(video);
     }
   };
   const Control = {
@@ -916,26 +899,22 @@
       return result;
     },
     initVideoProps(video) {
-      delete video.hasWebFull;
-      delete video.__isDynamic;
-      delete video.hasTriedAutoNext;
-      delete video.hasApplyCachedRate;
-      delete video.hasInitPlaySettings;
-      delete this.hasAppliedCachedTime;
+      Object.getOwnPropertyNames(video).forEach((prop) => prop.startsWith("__") && delete video[prop]);
       video.__duration = video.duration;
+      video.tsr = { ...Consts.DEFAULT_TSR };
       if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
-      Tools.resetLimitCounter("autoWebFull");
+      Tools.resetLimitCounter("autoFull");
       this.removeRateKeepDisplay(video);
-      this.removeVideoProgress();
+      this.removeProgressElement();
     },
     initPlaySettings(video) {
       if (!this.player) return;
-      video.hasInitPlaySettings = true;
+      video.__hasInitPlaySettings = true;
       this.applyCachedPlayRate(video);
       this.playbackRateKeepDisplay();
       this.applyCachedTime(video);
+      this.setupPlayerClock();
       this.setBiliQuality();
-      this.createClock();
     },
     deleteCachedPlayRate: () => Storage.CACHED_PLAY_RATE.del(),
     getRemainingTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
@@ -945,11 +924,10 @@
       if (!this.player || isNaN(this.player.duration) || this.isDisablePlaybackRate()) return;
       if (this.isLive() || this.isEnded() || this.isBackgroundVideo(this.player)) return;
       if (!playRate || Number(this.player.playbackRate) === playRate) return;
-      window.videoEnhance.setPlaybackRate(this.player, playRate);
+      VideoEnhancer.setPlaybackRate(this.player, playRate);
       if (show) this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
       this.playbackRateKeepDisplay();
-      if (Storage.DISABLE_MEMORY_SPEED.get()) return Promise.resolve();
-      Storage.CACHED_PLAY_RATE.set(this.player.playbackRate);
+      if (!Storage.DISABLE_MEMORY_SPEED.get()) Storage.CACHED_PLAY_RATE.set(this.player.playbackRate);
       return Promise.resolve();
     },
     adjustPlaybackRate(step = Storage.PLAY_RATE_STEP.get()) {
@@ -957,24 +935,20 @@
       const playRate = Math.max(Consts.MIN_PLAY_RATE, Number(this.player.playbackRate) + step);
       this.setPlaybackRate(Math.min(Consts.MAX_PLAY_RATE, playRate));
     },
-    resetToDefaultPlayRate() {
-      this.setPlaybackRate(Consts.DEF_PLAY_RATE, false)?.then(() => this.showToast("已恢复正常倍速播放"));
-    },
     applyCachedPlayRate(video) {
-      if (video.hasApplyCachedRate) return;
+      if (video.__hasApplyCachedRate) return;
       if (Storage.DISABLE_MEMORY_SPEED.get()) return this.deleteCachedPlayRate();
       const playRate = Storage.CACHED_PLAY_RATE.get();
       if (Consts.DEF_PLAY_RATE === playRate || Number(video.playbackRate) === playRate) return;
-      this.setPlaybackRate(playRate, !video.hasApplyCachedRate)?.then(() => video.hasApplyCachedRate = true);
+      this.setPlaybackRate(playRate, !video.__hasApplyCachedRate)?.then(() => video.__hasApplyCachedRate = true);
     },
-    adjustPlayProgress(second = Storage.SKIP_INTERVAL.get()) {
+    skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
       if (!this.player || this.isLive() || this.isEnded()) return;
-      const currentTime = Math.min(Number(this.player.currentTime) + second, this.player.duration);
-      this.setCurrentTime(currentTime);
+      this.setCurrentTime(Math.min(Number(this.player.currentTime) + second, this.player.duration));
     },
     cachePlayTime(video) {
       if (Tools.isFrequent("cacheTime", Consts.ONE_SEC, true)) return;
-      if (!this.topWin || this.isLive() || video.paused || video.duration < 120 || video.urlHash) return;
+      if (!this.topWin || this.isLive() || video.paused || video.duration < 120) return;
       if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
       if (Storage.DISABLE_MEMORY_TIME.get() || this.isEnded()) return this.clearCachedTime(video);
       if (this.getRemainingTime(video) <= 10) return this.clearCachedTime(video);
@@ -983,28 +957,31 @@
     },
     applyCachedTime(video) {
       if (Storage.DISABLE_MEMORY_TIME.get()) return this.clearCachedTime(video);
-      if (this.hasAppliedCachedTime || !this.topWin || this.isLive()) return;
+      if (video.__hasAppliedCachedTime || !this.topWin || this.isLive()) return;
       const time = Storage.PLAY_TIME.get(this.getCacheTimeKey(video));
-      if (time <= Number(video.currentTime)) return this.hasAppliedCachedTime = true;
+      if (time <= Number(video.currentTime)) return video.__hasAppliedCachedTime = true;
       this.setCurrentTime(time);
-      this.hasAppliedCachedTime = true;
+      video.__hasAppliedCachedTime = true;
       this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
-        el.style.setProperty("transform", `translateY(${-5 - el.offsetHeight}px)`);
+        Tools.setStyle(el, "transform", `translateY(${-5 - el.offsetHeight}px)`);
       });
     },
     clearCachedTime(video) {
       Storage.PLAY_TIME.del(this.getCacheTimeKey(video));
     },
-    getCacheTimeKey(video) {
-      return `${this.topWin.urlHash}_${Math.floor(video.__duration || video.duration)}`;
+    getCacheTimeKey(video, { src, duration, __duration } = video) {
+      if (video.__cacheTimeKey) return video.__cacheTimeKey;
+      const srcHash = src && !src.startsWith("blob:") ? Tools.hashCode(new URL(src).pathname) : Consts.EMPTY;
+      const baseKey = `${this.topWin.urlHash}_${Math.floor(__duration || duration)}`;
+      const cacheTimeKey = srcHash ? `${srcHash}_${baseKey}` : baseKey;
+      video.__cacheTimeKey = cacheTimeKey;
+      return cacheTimeKey;
     },
-    clearMultiVideoCacheTime() {
-      Promise.resolve().then(() => {
-        if (!Tools.isMultiVideo()) return;
-        const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
-        const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
-        if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
-      });
+    async clearMultiVideoCacheTime() {
+      if (!Tools.isMultiVideo()) return;
+      const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
+      const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
+      if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
     },
     setCurrentTime(currentTime) {
       if (currentTime) this.player.currentTime = Math.max(0, currentTime);
@@ -1023,7 +1000,7 @@
       if (!this.player) return;
       const tsr = this.player.tsr;
       tsr.isMirrored = !tsr.isMirrored;
-      this.setVideoTsr("--mirror", tsr.isMirrored ? -1 : 1);
+      this.setTsr("--mirror", tsr.isMirrored ? -1 : 1);
     },
     rotateVideo() {
       if (!this.player) return;
@@ -1032,7 +1009,7 @@
       const { videoWidth, videoHeight } = this.player;
       const isVertical = [90, 270].includes(tsr.rotation);
       const scale = isVertical ? videoHeight / videoWidth : 1;
-      this.setVideoTsr("--scale", scale).setVideoTsr("--rotate", `${tsr.rotation}deg`);
+      this.setTsr("--scale", scale).setTsr("--rotate", `${tsr.rotation}deg`);
     },
     zoomVideo(isDown) {
       if (!this.player || this.isDisableZoom()) return;
@@ -1041,7 +1018,7 @@
       const zoom = tsr.zoom + (isDown ? -step : step);
       if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
       tsr.zoom = zoom;
-      this.setVideoTsr("--zoom", zoom / 100);
+      this.setTsr("--zoom", zoom / 100);
       this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC);
     },
     moveVideoPosition(direction) {
@@ -1058,13 +1035,13 @@
       if (tsr.isMirrored) x = -x, _x = x;
       ({ 90: () => (x = y, y = -_x), 180: () => (x = -x, y = -y), 270: () => (x = -y, y = _x) })[tsr.rotation]?.();
       tsr.moveX += x, tsr.moveY += y;
-      this.setVideoTsr("--moveX", `${tsr.moveX}px`).setVideoTsr("--moveY", `${tsr.moveY}px`);
+      this.setTsr("--moveX", `${tsr.moveX}px`).setTsr("--moveY", `${tsr.moveY}px`);
       this.showToast(`${desc}：${x ? tsr.moveX : tsr.moveY}px`, Consts.ONE_SEC);
     },
     resetVideoTransform() {
       if (!this.player || this.isDisableZoom()) return;
-      this.setVideoTsr("--zoom", 1).setVideoTsr("--moveX", 0).setVideoTsr("--moveY", 0).setVideoTsr("--scale", 1).setVideoTsr("--mirror", 1).setVideoTsr("--rotate", "0deg");
-      window.videoEnhance.resetTsr(this.player);
+      this.setTsr("--zoom").setTsr("--moveX").setTsr("--moveY").setTsr("--scale").setTsr("--mirror").setTsr("--rotate");
+      this.player.tsr = { ...Consts.DEFAULT_TSR };
     },
     async captureScreenshot() {
       if (!this.player || this.isDisableScreenshot()) return;
@@ -1078,7 +1055,7 @@
         const url = URL.createObjectURL(await new Promise((resolve) => canvas.toBlob(resolve, "image/png")));
         _GM_download({ url, name: `视频截图_${Date.now()}.png`, onload: () => URL.revokeObjectURL(url) });
       } catch (e) {
-        canvas.style.setProperty("max-width", "98vw");
+        Tools.setStyle(canvas, "max-width", "98vw");
         const popup = window.open(Consts.EMPTY, "_blank", "width=1000,height=570,top=130,left=270");
         popup.document.title = "鼠标右键选择「图片另存为」";
         popup.document.body.appendChild(canvas);
@@ -1121,15 +1098,15 @@
       const s = Math.floor(seconds % 60);
       return [...h ? [h] : [], m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
     },
-    setVideoTsr(name, value) {
+    setTsr(name, value) {
       Tools.addCls(this.player, "__tsr");
       try {
         this.player.__trans = this.player.__trans ?? getComputedStyle(this.player)?.getPropertyValue("transform");
-        this.player?.style?.setProperty("--deftsr", this.player.__trans);
+        Tools.setStyle(this.player, "--deftsr", this.player.__trans);
       } catch (e) {
         console.debug(e);
       }
-      this.player?.style?.setProperty(name, value);
+      Tools.setStyle(this.player, name, value);
       return this;
     },
     toggleAutoNextEnabled() {
@@ -1197,11 +1174,11 @@
     exitWebFullscreen() {
       if (!this.fsWrapper) return;
       const { scrollY } = this.fsWrapper;
-      document.documentElement.style.setProperty("scroll-behavior", "auto", "important");
+      Tools.setStyle(document.documentElement, "scroll-behavior", "auto", "important");
       if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
       Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
       requestAnimationFrame(() => Tools.scrollTop(scrollY));
-      setTimeout(() => document.documentElement.style.removeProperty("scroll-behavior"), 20);
+      setTimeout(() => Tools.setStyle(document.documentElement, "scroll-behavior"), 100);
       this.videoParents.clear();
       this.fsPlaceholder = null;
       this.fsWrapper = null;
@@ -1273,21 +1250,21 @@
   const Automatic = {
     autoNextEpisode(video) {
       if (video.duration < 300) return;
-      if (video.hasTriedAutoNext) return;
+      if (video.__hasTriedAutoNext) return;
       if (!Storage.ENABLE_AUTO_NEXT_EPISODE.get()) return;
-      if (Tools.isFrequent("autoNext", Consts.THREE_SEC, true)) return;
+      if (Tools.isFrequent("autoNext", Consts.TWO_SEC, true)) return;
       if (this.getRemainingTime(video) > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return;
-      if (this.isNextIgnoreUrl()) return video.hasTriedAutoNext = true;
+      if (this.isNextIgnoreUrl()) return video.__hasTriedAutoNext = true;
       this.dispatchShortcutKey(Keyboard.N);
-      video.hasTriedAutoNext = true;
+      video.__hasTriedAutoNext = true;
     },
     async autoWebFullscreen(video) {
       if (this.player !== video) return;
-      if (Tools.isFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
-      if (video.hasWebFull || !this.topWin || !video.offsetWidth) return;
-      if (Site.isMatched() && this.isDisableAuto() || !Site.isMatched() && !this.isEnableSiteAuto()) return;
-      if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWebFull")) return video.hasWebFull = true;
-      if (await this.isWebFull(video)) return video.hasWebFull = true;
+      if (Tools.isFrequent("autoFull", Consts.ONE_SEC, true)) return;
+      if (video.__hasWebFull || !this.topWin || !video.offsetWidth) return;
+      if (Site.isMatch() && this.isDisableAuto() || !Site.isMatch() && !this.isEnableSiteAuto()) return;
+      if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoFull")) return video.__hasWebFull = true;
+      if (await this.isWebFull(video)) return video.__hasWebFull = true;
       this.dispatchShortcutKey(Keyboard.P);
     },
     async isWebFull(video) {
@@ -1345,14 +1322,18 @@
     },
     getAllEpisodes(element) {
       if (!element) return [];
+      const numSet = /* @__PURE__ */ new Set();
       const eleName = element.tagName;
       const eleClass = Array.from(element.classList);
       const sibling = Tools.findSibling(element, eleName);
       const children = Array.from(sibling?.parentElement?.children ?? []);
       return children.filter((ele) => {
+        const num = this.getEpisodeNumber(ele);
         const currClass = Array.from(ele.classList).filter((cls) => !["on", "cur", "active"].includes(cls));
         const hasSameClass = eleClass.some((value) => currClass.includes(value));
-        return currClass.length ? hasSameClass : ele.tagName === eleName;
+        const isMatch = currClass.length ? hasSameClass : ele.tagName === eleName;
+        if (!isMatch || !num || numSet.has(num)) return false;
+        return numSet.add(num);
       });
     },
     jumpToTargetEpisode(element) {
@@ -1388,7 +1369,7 @@
   };
   const EpisodePicker = {
     setupPickerEpisodeListener() {
-      if (Site.isMatched() || this.hasPickerListener) return;
+      if (Site.isMatch() || this.hasPickerListener) return;
       this.hasPickerListener = true;
       document.body.addEventListener(
         EventTypes.CLICK,
@@ -1415,7 +1396,7 @@
             number ? Tools.notyf(`当前集数：${number}`) : Tools.notyf("获取集数失败 〒▽〒", true);
           } catch (e) {
             Tools.notyf("获取集数失败 〒▽〒", true);
-            console.debug(e);
+            console.error(e);
           }
         },
         confirmCallback(value) {
@@ -1434,7 +1415,7 @@
             numbers.length ? Tools.notyf(`所有集数：${numbers.join(" ")}`) : Tools.notyf("获取集数失败 〒▽〒", true);
           } catch (e) {
             Tools.notyf("获取集数失败 〒▽〒", true);
-            console.debug(e);
+            console.error(e);
           }
         },
         confirmCallback(value) {
@@ -1471,35 +1452,12 @@
       }).then((result) => result.isConfirmed && confirmCallback.call(this, result.value));
     }
   };
-  const SettMsg = {
-    handleSettMessage(data) {
-      if ("toggle_rateKeep" in data) setTimeout(() => this.playbackRateKeepDisplay(), 150);
-      if ("toggle_smallerFont" in data) this.toggleSmallerFont(data.toggle_smallerFont);
-      if ("toggle_color" in data) this.setTimeElementColor(data.toggle_color);
-      if ("toggle_clockAlways" in data) this.changeTimeElementDisplay();
-      if (data?.toggle_speed) this.resetToDefaultPlayRate();
-      if (data?.toggle_memory) this.deleteCachedPlayRate();
-      if (data?.toggle_zoom) this.resetVideoTransform();
-    },
-    toggleSmallerFont(useSmallerFont) {
-      const clss = "smaller";
-      if (useSmallerFont) return Tools.addCls(this.Clock?.element, clss), Tools.addCls(this.progressElement, clss);
-      Tools.delCls(this.Clock?.element, clss), Tools.delCls(this.progressElement, clss);
-    },
-    setTimeElementColor(color) {
-      const progressStyle = this.progressElement?.style;
-      color ? progressStyle?.setProperty("color", color) : progressStyle?.removeProperty("color");
-      this.Clock?.setCustomColor(color);
-    },
-    changeTimeElementDisplay() {
-      setTimeout(() => (this.toggleClock(), this.videoProgress(this.player)), 150);
-    }
-  };
   class Clock {
     constructor(container, options) {
-      __publicField(this, "options", { color: null, clss: "Clock", coexist: false });
-      if (!container) return;
+      __publicField(this, "options", { color: null, clss: "Clock" });
+      if (!container) throw new Error("时钟创建失败：container不能为空");
       this.options = Object.assign(this.options, options);
+      this.dateInstance = /* @__PURE__ */ new Date();
       this.container = container;
       this.animationId = null;
       this.isRunning = false;
@@ -1507,54 +1465,71 @@
       this.start();
     }
     initClockElement() {
-      const { color, clss, coexist } = this.options;
-      if (!coexist && this.isInDOM()) this.destroy();
+      if (this.element) return;
+      const { color, clss } = this.options;
       this.element = document.createElement("div");
       if (color) this.element.style.setProperty("color", color);
       this.element.classList.add(clss);
       this.container.prepend(this.element);
     }
-    isInDOM() {
-      return this.container?.contains(this.element) ?? false;
-    }
-    setCustomColor(color) {
-      if (!color) return this.element?.style.removeProperty("color");
-      this.element?.style.setProperty("color", color);
+    setContainer(container) {
+      if (!container || this.container === container) return this;
+      if (this.element && !container.contains(this.element)) container.prepend(this.element);
+      this.container = container;
+      return this;
     }
     formatTime(date) {
-      const h = date.getHours();
-      const m = date.getMinutes();
-      const s = date.getSeconds();
-      return [h, m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
+      const pad = (n) => n.toString().padStart(2, "0");
+      return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
     }
     update() {
-      this.isRunning = true;
-      const now = /* @__PURE__ */ new Date();
-      this.element.textContent = this.formatTime(now);
+      if (!this.isRunning) return;
+      this.dateInstance.setTime(Date.now());
+      this.element.textContent = this.formatTime(this.dateInstance);
+      if (!this.container.contains(this.element)) this.container.prepend(this.element);
       this.animationId = requestAnimationFrame(() => this.update());
     }
     start() {
       if (this.isRunning) return;
+      this.isRunning = true;
       this.element.style.setProperty("display", "unset");
       this.update();
     }
-    stop() {
-      if (this.animationId) {
-        cancelAnimationFrame(this.animationId);
-        this.animationId = null;
-      }
+    stop(hide = false) {
       this.isRunning = false;
-      this.element?.style.setProperty("display", "none");
+      if (this.animationId) cancelAnimationFrame(this.animationId), this.animationId = null;
+      if (hide) this.element?.style.setProperty("display", "none");
     }
     destroy() {
       this.stop();
       this.element?.remove();
+      this.dateInstance = null;
       this.container = null;
       this.element = null;
     }
   }
   __publicField(Clock, "state", { start: "start", stop: "stop" });
   const Extend = {
+    async removeRelevantElements() {
+      if (Tools.isFrequent("choice", Consts.ONE_SEC, true) || Tools.isOverLimit("choice", 3)) return;
+      const element = Tools.query(".ec-no, .conplaying, .choice-true, .close-btn, .closeclick");
+      if (element) element.click?.(), element.remove?.();
+    },
+    removeLoginPopups() {
+      this.removeBiliLogin(), this.removeTencentLogin();
+    },
+    removeTencentLogin: () => Site.isTencent() && Tools.query("#login_win")?.remove(),
+    removeBiliLogin() {
+      if (!Site.isBili() || this.BiliTimerID) return;
+      if (document.cookie.includes("DedeUserID")) return;
+      this.BiliTimerID = setInterval(() => {
+        if (_unsafeWindow.__BiliUser__?.cache?.data?.isLogin) clearInterval(this.BiliTimerID);
+        _unsafeWindow.__BiliUser__.isLogin = true;
+        _unsafeWindow.__BiliUser__.MiniLogin = null;
+        _unsafeWindow.__BiliUser__.cache.data.isLogin = true;
+        _unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
+      }, Consts.THREE_SEC);
+    },
     setBiliQuality() {
       if (!Site.isBili() || !document.cookie.includes("DedeUserID") || !_unsafeWindow.player) return;
       const current = _unsafeWindow.player.getQuality().realQ;
@@ -1562,77 +1537,78 @@
       const target = list.find((quality) => quality === 80) ?? list[0];
       if (current !== target) _unsafeWindow.player.requestQuality(target);
     },
-    shouldDestroyTimeElement() {
+    shouldHideTime() {
       const isFull = this.isFullscreen;
       return isFull && Storage.DISABLE_CLOCK.get() || !isFull && !Storage.UNFULL_CLOCK.get();
     },
-    createClock(state = Clock.state.stop) {
-      Promise.resolve().then(() => {
-        this.Clock?.destroy(), this.Clock = null;
-        if (!this.player?.parentNode) return;
-        const shouldDestroy = this.shouldDestroyTimeElement();
-        this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
-        this.Clock[shouldDestroy ? state : Clock.state.start]?.();
-        this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
-      });
-    },
-    toggleClock() {
-      if (this.shouldDestroyTimeElement()) return this.Clock?.stop();
-      const state = Clock.state.start;
-      this.Clock?.isInDOM() ? this.Clock[state]() : this.createClock(state);
-      this.Clock?.setCustomColor(Storage.CLOCK_COLOR.get());
+    async setupPlayerClock() {
+      if (!this.player || this.shouldHideTime()) return this.Clock?.stop(true);
+      if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(Tools.getParent(this.player)).start();
+      this.Clock = new Clock(Tools.getParent(this.player), { color: Storage.CLOCK_COLOR.get() });
+      this.toggleTimeElementClass(Storage.USE_SMALLER_FONT.get());
     },
     getRealDuration(video) {
       if (!Site.isQiyi()) return video.duration;
       return _unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
     },
     videoProgress(video) {
-      if (!video || this.player !== video || this.isBackgroundVideo(video)) return;
-      if (video.duration <= 30 || this.isLive() || this.shouldDestroyTimeElement()) return this.removeVideoProgress();
-      if (!this.progressElement) {
-        this.progressElement = this.createDisplayElement("__time-progress", Storage.CLOCK_COLOR.get());
-        this.progressTextNode = document.createTextNode("00:00");
-        const percentElement = document.createElement("b");
-        percentElement.textContent = "%";
-        this.progressElement?.append(this.progressTextNode, percentElement);
-        this.toggleSmallerFont(Storage.USE_SMALLER_FONT.get());
-      }
+      if (!video || video.paused || this.player !== video || this.isBackgroundVideo(video)) return;
+      if (video.duration <= 30 || this.isLive() || this.shouldHideTime()) return this.removeProgressElement();
       const duration = this.getRealDuration(video);
-      if (duration > 86400) return this.removeVideoProgress();
+      if (duration > 86400) return this.removeProgressElement();
       const percent = Tools.toFixed(video.currentTime / duration * 100, 1);
       const timeLeft = this.formatTime(duration - video.currentTime);
-      this.progressTextNode.textContent = `${timeLeft} / ${percent}`;
-      this.prependElement(this.progressElement);
+      const element = this.createProgressElement();
+      element.textNode.textContent = `${timeLeft} / ${percent}`;
+      this.prependElement(element);
     },
-    removeVideoProgress() {
+    createProgressElement() {
+      if (this.progressElement) return this.progressElement;
+      if (window.videoProgressElement) return this.progressElement = window.videoProgressElement;
+      const element = this.createDisplayElement("__time-progress", Storage.CLOCK_COLOR.get());
+      const textNode = document.createTextNode("00:00");
+      element.textNode = textNode;
+      const percent = document.createElement("b");
+      percent.textContent = "%";
+      element.append(textNode, percent);
+      window.videoProgressElement = this.progressElement = element;
+      this.toggleTimeElementClass(Storage.USE_SMALLER_FONT.get());
+      return element;
+    },
+    removeProgressElement() {
       this.progressElement?.remove();
-      delete this.progressTextNode;
-      delete this.progressElement;
     },
-    playbackRateKeepDisplay() {
+    async playbackRateKeepDisplay() {
       if (!this.player || this.isLive()) return;
       if (!Storage.RATE_KEEP_SHOW.get()) return this.removeRateKeepDisplay();
-      const e = this.player;
-      if (!e.rateKeepElement) e.rateKeepElement = this.createDisplayElement("__rate-keep-show");
-      e.rateKeepElement.textContent = `倍速: ${e.playbackRate}`;
-      this.prependElement(e.rateKeepElement);
+      if (!this.rateKeepElement) this.rateKeepElement = this.createDisplayElement("__rate-keep-show");
+      this.rateKeepElement.textContent = `倍速: ${this.player.playbackRate}`;
+      this.prependElement(this.rateKeepElement);
     },
-    removeRateKeepDisplay(video) {
-      const e = video ?? this.player;
-      e.rateKeepElement?.remove();
-      delete e.rateKeepElement;
+    removeRateKeepDisplay() {
+      this.rateKeepElement?.remove();
     },
     createDisplayElement(clss, color) {
       if (!this.player) return;
       const element = document.createElement("div");
-      if (color) element.style.setProperty("color", color);
+      Tools.setStyle(element, "color", color);
       element.classList.add(clss);
       this.prependElement(element);
       return element;
     },
     prependElement(element, target) {
-      const container = target ?? this.player?.parentNode;
+      const container = target ?? Tools.getParent(this.player);
       if (!container?.contains(element)) container?.prepend(element);
+    },
+    toggleTimeElementClass(addClass, clss = "smaller") {
+      if (addClass) return Tools.addCls(this.Clock?.element, clss), Tools.addCls(this.progressElement, clss);
+      Tools.delCls(this.Clock?.element, clss), Tools.delCls(this.progressElement, clss);
+    },
+    setTimeElementColor(color) {
+      Tools.setStyle([this.progressElement, this.Clock?.element], "color", color);
+    },
+    changeTimeElementDisplay() {
+      this.setupPlayerClock(), this.videoProgress(this.player);
     }
   };
   class URLBlacklist {
@@ -1704,23 +1680,6 @@
       return defaultUrls;
     }
   };
-  const Login = {
-    async removeLoginPopups() {
-      this.removeBiliLogin(), this.removeTencentLogin();
-    },
-    removeTencentLogin: () => Site.isTencent() && Tools.query("#login_win")?.remove(),
-    removeBiliLogin() {
-      if (!Site.isBili() || this.BiliTimerID) return;
-      if (document.cookie.includes("DedeUserID")) return;
-      this.BiliTimerID = setInterval(() => {
-        if (_unsafeWindow.__BiliUser__?.cache?.data?.isLogin) clearInterval(this.BiliTimerID);
-        _unsafeWindow.__BiliUser__.isLogin = true;
-        _unsafeWindow.__BiliUser__.MiniLogin = null;
-        _unsafeWindow.__BiliUser__.cache.data.isLogin = true;
-        _unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
-      }, Consts.THREE_SEC);
-    }
-  };
   const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELECTOR } = Storage;
   const Menu = {
     isDisableAuto: () => Storage.DISABLE_AUTO.get(),
@@ -1748,7 +1707,7 @@
       const siteFun = ({ cache }) => cache.set(host, !cache.get(host));
       const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
       const configs = [
-        { title: `此站${isEnable ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatched(), fn: siteFun },
+        { title: `此站${isEnable ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatch(), fn: siteFun },
         { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
         { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
         { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() }
@@ -1848,14 +1807,12 @@
           });
           Tools.querys(".__menu input, textarea", popup).forEach((ele) => {
             ele.addEventListener("input", function() {
-              const isCheckbox = this.type === "checkbox";
-              const value = isCheckbox ? this.checked : this.value;
-              this.dataset.send && Tools.postMessage(window, { [`toggle_${this.name}`]: value });
-              setTimeout(() => {
-                const host = this.dataset.host;
-                const cache = cacheMap[this.name];
-                host ? cache.set(host, value) : cache.set(value);
-              }, 100);
+              const cache = cacheMap[this.name];
+              const { host, send, delay } = this.dataset;
+              const value = Object.is(this.type, "checkbox") ? this.checked : this.value;
+              if (send) Tools.postMessage(window, { [`toggle_${this.name}`]: value });
+              const setCache = () => host ? cache.set(host, value) : cache.set(value);
+              delay ? setTimeout(setCache, 50) : setCache();
             });
           });
         }
@@ -1863,18 +1820,18 @@
     },
     genBasicsItems() {
       const configs = [
-        { name: "speed", text: "禁用 倍速调节", cache: Storage.CLOSE_PLAY_RATE, sendMsg: true },
-        { name: "memory", text: "禁用 记忆倍速", cache: Storage.DISABLE_MEMORY_SPEED, sendMsg: true },
-        { name: "time", text: "禁用 记忆播放位置", cache: Storage.DISABLE_MEMORY_TIME, sendMsg: false },
-        { name: "fit", text: "禁用 自动网页全屏", cache: Storage.DISABLE_AUTO, isHide: !Site.isMatched() },
-        { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE, sendMsg: false },
+        { name: "speed", text: "禁用 倍速调节", cache: Storage.CLOSE_PLAY_RATE, attrs: ["send", "delay"] },
+        { name: "memory", text: "禁用 记忆倍速", cache: Storage.DISABLE_MEMORY_SPEED, attrs: ["send"] },
+        { name: "time", text: "禁用 记忆播放位置", cache: Storage.DISABLE_MEMORY_TIME },
+        { name: "fit", text: "禁用 自动网页全屏", cache: Storage.DISABLE_AUTO, isHide: !Site.isMatch() },
+        { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
         { name: "volume", text: "禁用 音量默认百分百", cache: Storage.DISABLE_DEF_MAX_VOLUME },
         { name: "next", text: "启用 自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
         { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD }
       ];
-      const renderItem = ({ text, dataSend, name, value }) => `
+      const renderItem = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
-          <input ${dataSend} ${value && "checked"} name="${name}" type="checkbox"/>
+          <input ${dataset} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
       return this.generateCommonItems(configs, renderItem);
@@ -1882,15 +1839,15 @@
     genAssistItems() {
       const configs = [
         { name: "pic", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
-        { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, sendMsg: true },
-        { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK, sendMsg: false },
-        { name: "clockAlways", text: "启用 非全屏显示时间", cache: Storage.UNFULL_CLOCK, sendMsg: true },
-        { name: "smallerFont", text: "启用 小字号显示时间", cache: Storage.USE_SMALLER_FONT, sendMsg: true },
-        { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, sendMsg: true }
+        { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, attrs: ["send"] },
+        { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK },
+        { name: "clockAlways", text: "启用 非全屏显示时间", cache: Storage.UNFULL_CLOCK, attrs: ["send"] },
+        { name: "smallerFont", text: "启用 小字号显示时间", cache: Storage.USE_SMALLER_FONT, attrs: ["send"] },
+        { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] }
       ].filter(({ isHidden }) => !isHidden);
-      const renderItem = ({ text, dataSend, name, value }) => `
+      const renderItem = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
-          <input ${dataSend} ${value && "checked"} name="${name}" type="checkbox"/>
+          <input ${dataset} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
       return this.generateCommonItems(configs, renderItem);
@@ -1904,43 +1861,45 @@
         { name: "days", text: "播放进度保存天数", cache: Storage.STORAGE_DAYS },
         { name: "percent", text: "缩放百分比", cache: Storage.ZOOM_PERCENT },
         { name: "move", text: "移动距离", cache: Storage.MOVING_DISTANCE },
-        { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR, sendMsg: true },
+        { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR, attrs: ["send"] },
         { name: "preset", text: "常用倍速", cache: Storage.PRESET_SPEED }
       ];
-      const renderItem = ({ text, dataSend, name, value }) => `
+      const renderItem = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
-          <input ${dataSend} value="${value}" name="${name}" type="text" autocomplete="off"/>
+          <input ${dataset} value="${value}" name="${name}" type="text" autocomplete="off"/>
         </label>`;
       return this.generateCommonItems(configs, renderItem);
     },
     genIgnoreItems() {
       const { CUSTOM_WEB_FULL, NEXT_IGNORE_URLS, FULL_IGNORE_URLS } = Storage;
       const configs = [
-        { name: "customRule", text: "自定义此站网页全屏规则", cache: CUSTOM_WEB_FULL, isHide: Site.isMatched(), useHost: true },
+        { name: "customRule", text: "自定义此站网页全屏规则", cache: CUSTOM_WEB_FULL, isHide: Site.isMatch(), useHost: true },
         { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: NEXT_IGNORE_URLS },
         { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: FULL_IGNORE_URLS }
       ];
-      const renderItem = ({ text, dataHost, name, value }) => `
+      const renderItem = ({ text, dataset, name, value }) => `
         <div class="others-sett"><p>${text}</p>
-          <textarea ${dataHost} name="${name}" type="text" spellcheck="false" autocomplete="off">${value}</textarea>
+          <textarea ${dataset} name="${name}" type="text" spellcheck="false" autocomplete="off">${value}</textarea>
         </div>`;
       return this.generateCommonItems(configs, renderItem);
     },
     generateCommonItems(baseConfigs, renderItem) {
+      const getDataset = (attrs = [], host) => attrs.length ? attrs.map((key) => `data-${key}="${key === "host" ? host : true}"`).join(" ") : Consts.EMPTY;
       const filteredConfigs = baseConfigs.filter(({ isHide }) => !isHide);
-      const processedConfigs = filteredConfigs.map((config) => ({
-        value: config.useHost ? config.cache.get(location.host) : config.cache.get(),
-        dataHost: config.useHost ? `data-host="${location.host}"` : Consts.EMPTY,
-        dataSend: config.sendMsg ? 'data-send="true"' : Consts.EMPTY,
-        host: config.useHost ? location.host : Consts.EMPTY,
-        ...config
-      }));
+      const processedConfigs = filteredConfigs.map((config) => {
+        const { cache, attrs, useHost } = config;
+        const host = useHost ? location.host : Consts.EMPTY;
+        const value = useHost ? cache.get(location.host) : cache.get();
+        const _attrs = Array.isArray(attrs) ? [...attrs] : [];
+        if (useHost && !_attrs.includes("host")) _attrs.push("host");
+        return { ...config, value, host, dataset: getDataset(_attrs, location.host) };
+      });
       const html = processedConfigs.map((config) => renderItem(config)).join(Consts.EMPTY);
       const cacheMap = Object.fromEntries(processedConfigs.map((item) => [item.name, item.cache]));
       return { html, cacheMap };
     }
   };
-  const handlers = [Listen, Keydown, Control, WebFull, Automatic, Episode, EpisodePicker, Ignore, SettMsg, Menu, Extend, Login];
+  const handlers = [Listen, Keydown, Events, Control, WebFull, Automatic, Episode, EpisodePicker, Extend, Ignore, Menu];
   _unsafeWindow.AUTO_WEB_FULLSCREEN = window.App = {};
   handlers.forEach((handler) => {
     Object.entries(handler).forEach(([key, value]) => {
