@@ -63,10 +63,12 @@ class VideoEnhancer {
 
   static detectShadowVideoElement() {
     if (Tools.isFrequent("shadow", 100, true)) return;
-    const video = Tools.query("video");
-    if (!video || video.hasDispatched) return;
-    document.dispatchEvent(new CustomEvent("shadow-video", { detail: { video } }));
-    video.hasDispatched = true;
+    const videos = Tools.querys("video:not([dispatched])");
+    if (!videos.length) return;
+    videos.forEach((video) => {
+      video.setAttribute("dispatched", true);
+      document.dispatchEvent(new CustomEvent("shadow-video", { detail: { video } }));
+    });
   }
 }
 
