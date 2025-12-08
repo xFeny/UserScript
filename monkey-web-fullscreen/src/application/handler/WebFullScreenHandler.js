@@ -38,13 +38,12 @@ export default {
     return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
   },
   toggleFullscreen() {
-    if (!Tools.isTopWin()) return;
-    const isFull = !!document.fullscreenElement;
-    isFull ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-    if (isFull || !this.fsWrapper) this.dispatchShortcutKey(Keyboard.P); // 全屏或非网页全屏模式下
+    if (!Tools.isTopWin() || Tools.isFrequent("toggleFull")) return;
+    this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
+    if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcutKey(Keyboard.P); // 全屏或非网页全屏模式下
   },
   toggleWebFullscreen(isTrusted) {
-    if (this.isNormalSite() || Tools.isFrequent("enhance")) return;
+    if (this.isNormalSite() || Tools.isFrequent("toggleWeb")) return;
     if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
     this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
   },
