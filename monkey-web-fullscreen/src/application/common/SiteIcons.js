@@ -29,7 +29,7 @@ export default await (async () => {
     const res = await GM.xmlHttpRequest({ url, timeout: 3000 });
     const remoteSelector = JSON.parse(res.responseText ?? "{}");
     const selectors = { ...IconsSelector, ...remoteSelector };
-    Storage.ICONS_SELECTOR.set(Consts.EMPTY, selectors, 1 / 4); // 缓存6小时
+    Storage.ICONS_SELECTOR.set(Consts.EMPTY, selectors, 1 / 3); // 缓存8小时
     return selectors;
   } catch (e) {
     console.error("加载远程配置失败", e);
