@@ -16,27 +16,31 @@ export default {
   isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
   getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
   init(isNonFirstInit = false) {
-    this.setupDocBodyObserver();
+    this.setupVideoDetector();
     this.setupKeydownListener();
-    this.setupVisibleListener();
-    this.setupMouseMoveListener();
-    this.setupFullscreenListener();
-    this.setupVideoEventListeners();
 
-    if (isNonFirstInit) return;
-    this.observeFullscreenChange();
-    this.observeWebFullscreenChange();
-    this.setupIgnoreUrlsChangeListener();
-    this.setupShadowVideoEventListeners();
-    this.setupDocMutationObserver();
+    // 非核心监听器：放到微任务执行（不阻塞当前初始化链路）
+    queueMicrotask(() => {
+      this.setupVisibleListener();
+      this.setupMouseMoveListener();
+      this.setupFullscreenListener();
+      this.setupVideoEventListeners();
+
+      if (isNonFirstInit) return;
+      this.setupDocumentObserver();
+      this.observeFullscreenChange();
+      this.observeWebFullscreenChange();
+      this.setupIgnoreUrlsChangeListener();
+      this.setupShadowVideoEventListeners();
+    });
   },
-  setupDocMutationObserver() {
+  setupDocumentObserver() {
     new MutationObserver(() => {
       if (this.documentElement === document.documentElement) return;
       this.init(true), document.head.append(scriptStyle.cloneNode(true));
     }).observe(document, { childList: true });
   },
-  async setupVisibleListener() {
+  setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
       if (this.isNormalSite() || Storage.DISABLE_INVISIBLE_PAUSE.get()) return;
 
@@ -45,7 +49,7 @@ export default {
       document.hidden ? video?.pause() : video?.play();
     });
   },
-  setupDocBodyObserver() {
+  setupVideoDetector() {
     this.documentElement = document.documentElement;
     this.docObserver?.disconnect(), clearTimeout(this.observerTimer);
     this.docObserver = Tools.createObserver(document, () => {
@@ -90,7 +94,7 @@ export default {
     window.topWin = this.topWin = topWin;
     Tools.sendToIFrames({ topWin });
   },
-  async observeVideoSrcChange(video) {
+  observeVideoSrcChange(video) {
     const that = this;
     if (video.hasAttribute("processed")) return;
     video.setAttribute("processed", true);
@@ -104,7 +108,7 @@ export default {
       },
     });
   },
-  async setupMouseMoveListener() {
+  setupMouseMoveListener() {
     let timer = null;
     const handleEvent = ({ type, isTrusted }) => {
       const gap = Object.is(type, "mousemove") ? 150 : 50;
@@ -127,13 +131,13 @@ export default {
       el?.blur(), Tools.addCls(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
     });
   },
-  async setupFullscreenListener() {
+  setupFullscreenListener() {
     document.addEventListener("fullscreenchange", () => {
       const isFullscreen = !!document.fullscreenElement;
       Tools.postMessage(window.top, { isFullscreen });
     });
   },
-  async observeFullscreenChange() {
+  observeFullscreenChange() {
     Object.defineProperty(this, "isFullscreen", {
       get: () => observedValue.isFullscreen,
       set: (value) => {
@@ -152,7 +156,7 @@ export default {
     // 播放器右上角时间的显/隐
     this.changeTimeElementDisplay();
   },
-  async observeWebFullscreenChange() {
+  observeWebFullscreenChange() {
     const handle = (event, { code, type } = event) => {
       if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
       if (this.isInputFocus(event) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
