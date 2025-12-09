@@ -2,51 +2,44 @@
  * 基础存储项类，提供通用的存储操作
  */
 class StorageItem {
-  constructor(name, defVal, useLocalStore = false, parser = null) {
+  constructor(name, defVal, useLocalStore = false, parser = (v) => v) {
     this.name = name;
     this.defVal = defVal;
     this.parser = parser;
-    this.useLocalStore = useLocalStore;
     this.storage = useLocalStore ? localStorage : { getItem: GM_getValue, setItem: GM_setValue, removeItem: GM_deleteValue };
   }
 
-  set(value) {
-    this.storage.setItem(this.name, value);
+  set(value, key = this.name) {
+    this.storage.setItem(key, value);
   }
 
-  get() {
-    return this.getValue(this.name);
-  }
-
-  getValue(key) {
+  get(key = this.name) {
     const value = this.storage.getItem(key);
-    const pv = (() => {
-      try {
-        return JSON.parse(value) ?? this.defVal;
-      } catch {
-        return value ?? this.defVal;
-      }
-    })();
-    return this.parser?.(pv) ?? pv;
+    try {
+      return this.parser(JSON.parse(value) ?? this.defVal);
+    } catch {
+      return this.parser(value ?? this.defVal);
+    }
   }
 
-  del() {
-    this.storage.removeItem(this.name);
+  del(key = this.name) {
+    this.storage.removeItem(key);
   }
 
   fuzzyGet(pattern) {
     const result = {};
-    this.fuzzyMatch(pattern, (key) => (result[key] = this.storage.getItem(key)));
+    this.fuzzyHandle(pattern, (key) => (result[key] = this.storage.getItem(key)));
     return result;
   }
 
   fuzzyDel(pattern) {
-    this.fuzzyMatch(pattern, (key) => this.storage.removeItem(key));
+    this.fuzzyHandle(pattern, (key) => this.storage.removeItem(key));
   }
 
-  fuzzyMatch(pattern, callback) {
-    const keys = this.useLocalStore ? Object.keys(localStorage) : GM_listValues();
-    keys.filter((key) => (pattern instanceof RegExp ? pattern.test(key) : key.includes(pattern))).forEach(callback);
+  fuzzyHandle(pattern, callback) {
+    const keys = Object.is(this.storage, localStorage) ? Object.keys(localStorage) : GM_listValues();
+    const keyMatcher = pattern instanceof RegExp ? (key) => pattern.test(key) : (key) => key.includes(pattern);
+    keys.filter(keyMatcher).forEach(callback);
   }
 }
 
@@ -60,26 +53,24 @@ class TimedStorage extends StorageItem {
   }
 
   set(suffix, value, expires) {
-    if ([null, undefined].includes(suffix)) throw new Error("TimedStorage 设置值时 suffix 不能为空");
-
-    const key = this.name + suffix;
-    if (expires) expires = Date.now() + expires * 864e5; // 转换为毫秒 单位: 天
-    expires ? this.storage.setItem(key, JSON.stringify({ value, expires })) : this.storage.setItem(key, value);
+    if (suffix == null) throw new Error("suffix 不能为空");
+    const val = expires ? JSON.stringify({ value, expires: Date.now() + expires * 864e5 }) : value;
+    super.set(val, this.name + suffix);
   }
 
   get(suffix = "") {
-    const data = this.getValue(this.name + suffix);
+    const data = super.get(this.name + suffix);
     return !data?.value ? data : data.expires > Date.now() ? data.value : this.defVal;
   }
 
   del(suffix = "") {
-    this.storage.removeItem(this.name + suffix);
+    super.del(this.name + suffix);
   }
 
   cleanupExpiredData() {
-    this.fuzzyMatch(this.name, (key) => {
-      const data = this.getValue(key);
-      if (data?.expires && data.expires < Date.now()) this.storage.removeItem(key);
+    this.fuzzyHandle(this.name, (key) => {
+      const data = super.get(key);
+      if (data?.expires && data.expires < Date.now()) super.del(key);
     });
   }
 }
