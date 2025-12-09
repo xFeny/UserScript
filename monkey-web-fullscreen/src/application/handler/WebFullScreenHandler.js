@@ -34,7 +34,7 @@ export default {
   },
   getBiliLiveIcons() {
     // 图标从右到左：全屏、网页全屏、弹幕设置、弹幕开关、小窗模式，即下标[0]是全屏图标
-    Tools.triggerMousemove(this.getVideo());
+    Tools.emitMousemove(this.getVideo());
     return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
   },
   toggleFullscreen() {

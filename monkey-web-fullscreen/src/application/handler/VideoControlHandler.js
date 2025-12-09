@@ -37,21 +37,24 @@ export default {
     return result;
   },
   initVideoProps(video) {
-    // 遍删除自定义属性
-    Object.getOwnPropertyNames(video).forEach((prop) => prop.startsWith("_mfs_") && delete video[prop]);
+    // 清理视频元素上脚本自定义的_mfs_前缀私有属性，避免残留状态干扰
+    Object.keys(video).forEach((k) => k.startsWith("_mfs_") && delete video[k]);
 
-    // 设置默认值
+    // 设置默认一些值
     video._mfs_duration = video.duration;
     video.tsr = { ...Consts.DEFAULT_TSR };
     if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
 
+    // 重置次数限制
     Tools.resetLimit("rateKeep", "autoWebFull");
+
+    // 移除相关的自定义元素
     this.removeRateKeepDisplay(video);
     this.removeProgressElement();
   },
   initPlaySettings(video) {
     if (!this.player) return;
-    video._mfs_hasInitPlaySettings = true;
+    video._mfs_hasPlayInited = true;
     this.applyCachedPlayRate(video);
     this.playbackRateKeepDisplay();
     this.applyCachedTime(video);

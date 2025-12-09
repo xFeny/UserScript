@@ -1,4 +1,3 @@
-import EventTypes from "../common/EventTypes";
 import Storage from "../common/Storage";
 import Tools from "../common/Tools";
 import Site from "../common/Site";
@@ -18,24 +17,23 @@ export default {
   setupPickerEpisodeListener() {
     if (Site.isMatch() || this.hasPickerListener) return;
     this.hasPickerListener = true;
-    document.body.addEventListener(
-      EventTypes.CLICK,
-      (event, { target, ctrlKey, altKey, isTrusted } = event) => {
-        if (!ctrlKey || !altKey || !isTrusted || this.isLive()) return;
-        if (!Tools.isTopWin()) return Tools.notyf("此页面不能抓取 (•ิ_•ิ)?", true);
-        Tools.preventDefault(event);
 
-        const hasCurrentSelector = Storage.CURR_EPISODE_SELECTOR.get(location.host);
-        const hasRelativeSelector = Storage.REL_EPISODE_SELECTOR.get(location.host);
-        if (hasCurrentSelector && hasRelativeSelector) return Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
+    const handle = (event, { target, ctrlKey, altKey, isTrusted } = event) => {
+      if (!ctrlKey || !altKey || !isTrusted || this.isLive()) return;
+      if (!Tools.isTopWin()) return Tools.notyf("此页面不能抓取 (•ิ_•ิ)?", true);
+      Tools.preventDefault(event);
 
-        const number = this.getEpisodeNumber(target);
-        if (!number) return Tools.notyf("点击位置无数字 (•ิ_•ิ)?", true);
+      const hasCurrentSelector = Storage.CURR_EPISODE_SELECTOR.get(location.host);
+      const hasRelativeSelector = Storage.REL_EPISODE_SELECTOR.get(location.host);
+      if (hasCurrentSelector && hasRelativeSelector) return Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
 
-        hasCurrentSelector ? this.pickerRelativeEpisodeChain(target) : this.pickerCurrentEpisodeChain(target);
-      },
-      true
-    );
+      const number = this.getEpisodeNumber(target);
+      if (!number) return Tools.notyf("点击位置无数字 (•ิ_•ิ)?", true);
+
+      hasCurrentSelector ? this.pickerRelativeEpisodeChain(target) : this.pickerCurrentEpisodeChain(target);
+    };
+
+    document.addEventListener("click", handle, true);
   },
   pickerCurrentEpisodeChain(element) {
     if (Storage.CURR_EPISODE_SELECTOR.get(location.host)) return;

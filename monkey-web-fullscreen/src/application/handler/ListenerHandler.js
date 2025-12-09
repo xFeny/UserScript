@@ -3,7 +3,6 @@ import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
 import Keyboard from "../common/Keyboard";
-import EventTypes from "../common/EventTypes";
 import VideoEnhancer from "../VideoEnhancer";
 
 // 要 Object.defineProperty 的值
@@ -107,16 +106,16 @@ export default {
   },
   async setupMouseMoveListener() {
     let timer = null;
-    const handleMouseEvent = ({ type, isTrusted }) => {
-      const gap = type === EventTypes.MOUSE_MOVE ? 150 : 50;
+    const handleEvent = ({ type, isTrusted }) => {
+      const gap = Object.is(type, "mousemove") ? 150 : 50;
       if (!isTrusted || Tools.isFrequent(type, gap, true)) return;
 
       clearTimeout(timer), this.toggleCursor();
       timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
     };
 
-    document.addEventListener(EventTypes.MOUSE_MOVE, (e) => handleMouseEvent(e));
-    document.addEventListener(EventTypes.MOUSE_OVER, (e) => e.target.matches("video, iframe") && handleMouseEvent(e));
+    document.addEventListener("mousemove", (e) => handleEvent(e));
+    document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleEvent(e));
   },
   toggleCursor(hide = false) {
     if (this.isNormalSite() || Tools.isFrequent("cursor", undefined, true)) return;
