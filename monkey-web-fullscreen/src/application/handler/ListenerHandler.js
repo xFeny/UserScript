@@ -111,8 +111,7 @@ export default {
   setupMouseMoveListener() {
     let timer = null;
     const handleEvent = ({ type, isTrusted }) => {
-      const gap = Object.is(type, "mousemove") ? 150 : 50;
-      if (!isTrusted || Tools.isFrequent(type, gap, true)) return;
+      if (!isTrusted || Tools.isFrequent(type, 100, true)) return;
 
       clearTimeout(timer), this.toggleCursor();
       timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
