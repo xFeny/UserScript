@@ -46,8 +46,7 @@ class StorageItem {
 
   fuzzyMatch(pattern, callback) {
     const keys = this.useLocalStore ? Object.keys(localStorage) : GM_listValues();
-    const res = keys.filter((key) => (pattern instanceof RegExp ? pattern.test(key) : key.includes(pattern)));
-    res.forEach(callback);
+    keys.filter((key) => (pattern instanceof RegExp ? pattern.test(key) : key.includes(pattern))).forEach(callback);
   }
 }
 
