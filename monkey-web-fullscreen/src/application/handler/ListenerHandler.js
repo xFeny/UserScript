@@ -19,7 +19,7 @@ export default {
     this.setupVideoDetector();
     this.setupKeydownListener();
 
-    // 非核心监听器：放到微任务执行（不阻塞当前初始化链路）
+    // 延后执行非核心监听器，让函数快速执行完，不阻塞主线程
     queueMicrotask(() => {
       this.setupVisibleListener();
       this.setupMouseMoveListener();

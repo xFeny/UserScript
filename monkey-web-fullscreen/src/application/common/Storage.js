@@ -2,64 +2,52 @@
  * 基础存储项类，提供通用的存储操作
  */
 class StorageItem {
-  constructor(name, defaultValue, useLocalStorage = false, valueParser = null) {
+  constructor(name, defVal, useLocalStore = false, parser = null) {
     this.name = name;
-    this.valueParser = valueParser;
-    this.defaultValue = defaultValue;
-    this.useLocalStorage = useLocalStorage;
+    this.defVal = defVal;
+    this.parser = parser;
+    this.useLocalStore = useLocalStore;
+    this.storage = useLocalStore ? localStorage : { getItem: GM_getValue, setItem: GM_setValue, removeItem: GM_deleteValue };
   }
 
   set(value) {
-    this.setItem(this.name, value);
-  }
-
-  setItem(key, value) {
-    this.useLocalStorage ? localStorage.setItem(key, value) : GM_setValue(key, value);
+    this.storage.setItem(this.name, value);
   }
 
   get() {
-    return this.parser(this.getItem(this.name) ?? this.defaultValue);
+    return this.getValue(this.name);
   }
 
-  getItem(key) {
-    const value = this.useLocalStorage ? localStorage.getItem(key) : GM_getValue(key);
-    try {
-      return JSON.parse(value);
-    } catch {
-      return value;
-    }
-  }
-
-  parser(value) {
-    return this.valueParser ? this.valueParser(value) : value;
+  getValue(key) {
+    const value = this.storage.getItem(key);
+    const pv = (() => {
+      try {
+        return JSON.parse(value) ?? this.defVal;
+      } catch {
+        return value ?? this.defVal;
+      }
+    })();
+    return this.parser?.(pv) ?? pv;
   }
 
   del() {
-    this.removeItem(this.name);
-  }
-
-  removeItem(key) {
-    this.useLocalStorage ? localStorage.removeItem(key) : GM_deleteValue(key);
+    this.storage.removeItem(this.name);
   }
 
   fuzzyGet(pattern) {
     const result = {};
-    this.fuzzyMatch(pattern, (key) => (result[key] = this.getItem(key)));
+    this.fuzzyMatch(pattern, (key) => (result[key] = this.storage.getItem(key)));
     return result;
   }
 
   fuzzyDel(pattern) {
-    this.fuzzyMatch(pattern, (key) => this.removeItem(key));
+    this.fuzzyMatch(pattern, (key) => this.storage.removeItem(key));
   }
 
   fuzzyMatch(pattern, callback) {
-    const keys = this.syncFuzzyMatch(pattern);
-    keys.forEach((key) => callback.call(this, key));
-  }
-
-  syncFuzzyMatch(pattern) {
-    const keys = this.useLocalStorage ? Object.keys(localStorage) : GM_listValues();
-    return keys.filter((key) => (pattern instanceof RegExp ? pattern.test(key) : key.includes(pattern)));
+    const keys = this.useLocalStore ? Object.keys(localStorage) : GM_listValues();
+    const res = keys.filter((key) => (pattern instanceof RegExp ? pattern.test(key) : key.includes(pattern)));
+    res.forEach(callback);
   }
 }
 
@@ -67,8 +55,8 @@ class StorageItem {
  * 带过期时间的存储项类，用于需要动态键的存储操作
  */
 class TimedStorage extends StorageItem {
-  constructor(name, defaultValue, useLocalStorage, valueParser) {
-    super(name, defaultValue, useLocalStorage, valueParser);
+  constructor(name, defVal, useLocalStore, parser) {
+    super(name, defVal, useLocalStore, parser);
     requestIdleCallback(() => this.cleanupExpiredData());
   }
 
@@ -77,23 +65,22 @@ class TimedStorage extends StorageItem {
 
     const key = this.name + suffix;
     if (expires) expires = Date.now() + expires * 864e5; // 转换为毫秒 单位: 天
-    expires ? this.setItem(key, JSON.stringify({ value, expires })) : this.setItem(key, value);
+    expires ? this.storage.setItem(key, JSON.stringify({ value, expires })) : this.storage.setItem(key, value);
   }
 
   get(suffix = "") {
-    const storage = this.getItem(this.name + suffix);
-    if (!storage?.value) return this.parser(storage ?? this.defaultValue);
-    return storage.expires > Date.now() ? this.parser(storage.value) : this.defaultValue;
+    const data = this.getValue(this.name + suffix);
+    return !data?.value ? data : data.expires > Date.now() ? data.value : this.defVal;
   }
 
   del(suffix = "") {
-    this.removeItem(this.name + suffix);
+    this.storage.removeItem(this.name + suffix);
   }
 
   cleanupExpiredData() {
     this.fuzzyMatch(this.name, (key) => {
-      const storage = this.getItem(key);
-      if (storage?.expires && storage.expires < Date.now()) this.removeItem(key);
+      const data = this.getValue(key);
+      if (data?.expires && data.expires < Date.now()) this.storage.removeItem(key);
     });
   }
 }
@@ -154,7 +141,7 @@ class TimedStorage extends StorageItem {
  * PARENT_DEPTH: 此站网页全屏层级数
  */
 export default {
-  ICONS_SELECTOR: new TimedStorage("ICONS_SELECTOR", null),
+  ICONS_SELECTOR: new TimedStorage("ICONS_SELECTOR", ""),
 
   CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", ""),
   DISABLE_AUTO: new StorageItem("CLOSE_AUTO_WEB_FULL_SCREEN", false, false, Boolean),
@@ -177,20 +164,20 @@ export default {
 
   ENABLE_AUTO_NEXT_EPISODE: new StorageItem("ENABLE_AUTO_NEXT_EPISODE", false, false, Boolean),
   AUTO_NEXT_ADVANCE_SEC: new StorageItem("AUTO_NEXT_ADVANCE_SECONDS", 75, false, Number),
-  CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", null),
-  REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", null),
+  CURR_EPISODE_SELECTOR: new TimedStorage("CURRENT_EPISODE_SELECTOR_", ""),
+  REL_EPISODE_SELECTOR: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", ""),
 
   USE_SMALLER_FONT: new StorageItem("USE_SMALLER_FONT", false, false, Boolean),
   DISABLE_CLOCK: new StorageItem("DISABLE_CLOCK", false, false, Boolean),
   UNFULL_CLOCK: new StorageItem("UNFULL_CLOCK", false, false, Boolean),
-  CLOCK_COLOR: new StorageItem("CLOCK_COLOR", "#e0e0e0", false),
+  CLOCK_COLOR: new StorageItem("CLOCK_COLOR", "#e0e0e0"),
 
   DISABLE_MEMORY_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, Boolean),
   STORAGE_DAYS: new StorageItem("STORAGE_DAYS", 7, false, parseFloat),
-  PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true, parseFloat),
+  PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true),
 
-  NEXT_IGNORE_URLS: new StorageItem("NEXT_IGNORE_URLS", "", false),
-  FULL_IGNORE_URLS: new StorageItem("FULL_IGNORE_URLS", "", false),
+  NEXT_IGNORE_URLS: new StorageItem("NEXT_IGNORE_URLS", ""),
+  FULL_IGNORE_URLS: new StorageItem("FULL_IGNORE_URLS", ""),
 
   DISABLE_INVISIBLE_PAUSE: new StorageItem("DISABLE_INVISIBLE_PAUSE", false, false, Boolean),
   DISABLE_DEF_MAX_VOLUME: new StorageItem("DISABLE_DEF_MAX_VOLUME", false, false, Boolean),

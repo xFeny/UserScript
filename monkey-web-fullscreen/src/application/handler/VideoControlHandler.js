@@ -97,6 +97,7 @@ export default {
     this.setCurrentTime(Math.min(Number(this.player.currentTime) + second, this.player.duration));
   },
   cachePlayTime(video) {
+    if (video !== this.player) return;
     if (Tools.isFrequent("cacheTime", Consts.ONE_SEC, true)) return; // 节流
     if (!this.topWin || this.isLive() || video.paused || video.duration < 120) return;
     if (Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return; //播放时间太短
@@ -137,7 +138,7 @@ export default {
   },
   async clearMultiVideoCacheTime() {
     if (!Tools.isMultiVideo()) return;
-    const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
+    const pattern = new RegExp(`${Storage.PLAY_TIME.name}.*${this.topWin.urlHash}`);
     const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
     if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
   },
