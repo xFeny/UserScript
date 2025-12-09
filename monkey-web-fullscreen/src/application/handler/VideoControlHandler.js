@@ -22,13 +22,13 @@ export default {
   },
   isDynamicDuration(video) {
     if (!video) return false;
-    if (video.currentTime > video._mfs_duration || video._mfs_isDynamic) return true;
+    if (video.currentTime > video.__duration || video._mfs_isDynamic) return true;
     if (video.currentTime > 5 || Tools.isOverLimit("isDynamic", 10)) return false;
 
     // 记录默认时长，用于判断是否为动态时长
-    if (!video._mfs_duration) video._mfs_duration = video.duration;
-    const { duration, _mfs_duration, currentTime, seekable } = video;
-    const isDynamic = Math.floor(duration) > Math.floor(_mfs_duration);
+    if (!video.__duration) video.__duration = video.duration;
+    const { duration, __duration, currentTime, seekable } = video;
+    const isDynamic = Math.floor(duration) > Math.floor(__duration);
 
     // 距离直播点﹤8秒（会误判短视频）
     const isNearLive = duration < 10 && seekable.length && seekable.end(0) - currentTime < 8;
@@ -41,7 +41,7 @@ export default {
     Object.keys(video).forEach((k) => k.startsWith("_mfs_") && delete video[k]);
 
     // 设置默认一些值
-    video._mfs_duration = video.duration;
+    video.__duration = video.duration;
     video.tsr = { ...Consts.DEFAULT_TSR };
     if (!Storage.DISABLE_DEF_MAX_VOLUME.get()) video.volume = 1;
 
@@ -125,11 +125,11 @@ export default {
   clearCachedTime(video) {
     Storage.PLAY_TIME.del(this.getCacheTimeKey(video));
   },
-  getCacheTimeKey(video, { src, duration, _mfs_duration } = video) {
+  getCacheTimeKey(video, { src, duration, __duration } = video) {
     if (video._mfs_cacheTKey) return video._mfs_cacheTKey;
 
     const srcHash = src && !src.startsWith("blob:") ? Tools.hashCode(new URL(src).pathname) : Consts.EMPTY;
-    const baseKey = `${this.topWin.urlHash}_${Math.floor(_mfs_duration || duration)}`;
+    const baseKey = `${this.topWin.urlHash}_${Math.floor(__duration || duration)}`;
     const cacheTimeKey = srcHash ? `${srcHash}_${baseKey}` : baseKey;
     video._mfs_cacheTKey = cacheTimeKey;
 
