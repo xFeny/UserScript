@@ -120,6 +120,7 @@ export default {
     this.setCurrentTime(time);
     video._mfs_hasApplyCTime = true;
     this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
+      if (video.playbackRate === Consts.DEF_PLAY_RATE) return;
       Tools.setStyle(el, "transform", `translateY(${-5 - el.offsetHeight}px)`);
     });
   },
