@@ -15,26 +15,23 @@ export default {
   isNormalSite: () => !window?.videoInfo && !window?.topWin,
   isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
   getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
-  init(isNonFirstInit = false) {
+  init(isNonFirst = false) {
     this.setupVideoDetector();
     this.setupKeydownListener();
+    this.setupVisibleListener();
+    this.setupMouseMoveListener();
+    this.setupFullscreenListener();
+    this.setupVideoEventListeners();
 
-    // 延后执行非核心监听器，让函数快速执行完，不阻塞主线程
-    queueMicrotask(() => {
-      this.setupVisibleListener();
-      this.setupMouseMoveListener();
-      this.setupFullscreenListener();
-      this.setupVideoEventListeners();
-
-      if (isNonFirstInit) return;
-      this.setupDocumentObserver();
-      this.observeFullscreenChange();
-      this.observeWebFullscreenChange();
-      this.setupIgnoreUrlsChangeListener();
-      this.setupShadowVideoEventListeners();
-    });
+    if (isNonFirst) return;
+    this.setupDocumentObserver();
+    this.observeFullscreenChange();
+    this.observeWebFullscreenChange();
+    this.setupIgnoreUrlsChangeListener();
+    this.setupShadowVideoEventListeners();
   },
   setupDocumentObserver() {
+    // 示例网站：https://nkvod.me、https://www.lkvod.com
     new MutationObserver(() => {
       if (this.docElement === document.documentElement) return;
       this.init(true), document.head.append(scriptStyle.cloneNode(true));
