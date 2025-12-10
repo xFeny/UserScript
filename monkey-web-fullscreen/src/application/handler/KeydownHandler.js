@@ -29,12 +29,12 @@ export default {
   },
   setupKeydownListener() {
     try {
-      window.addEventListener("keyup", (event) => this.preventDefault(event), true); // 腾讯视频
+      window.addEventListener("keyup", (event) => this.preventDefault(event), true); // 阻止相关按键，通一`keydown`处理
       window.addEventListener("keydown", (event) => this.handleKeydown(event), true);
       window.addEventListener("message", ({ data }) => this.handleMessage(data));
     } catch {
-      // https://www.reddit.com 重写了 window.addEventListener 会报错，使用 unsafeWindow 绑定事件
-      unsafeWindow.addEventListener("keyup", (event) => this.preventDefault(event), true); // 腾讯视频
+      // https://www.reddit.com 重写了`addEventListener`导致异常，降级`unsafeWindow`绑定事件
+      unsafeWindow.addEventListener("keyup", (event) => this.preventDefault(event), true);
       unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
       unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
     }
@@ -99,10 +99,9 @@ export default {
     if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
     if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
     if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
-    if ("verifyPassed" in data) this.verifyPassed = data.verifyPassed;
     if (data?.topWin) window.topWin = this.topWin = data.topWin;
 
-    // 处理设置消息
+    // 处理设置时传递过来的消息
     this.handleSettMessage(data);
 
     // 处理键盘按键消息和继续分发消息

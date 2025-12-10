@@ -36,7 +36,7 @@ export default {
   },
   setupDocumentObserver() {
     new MutationObserver(() => {
-      if (this.documentElement === document.documentElement) return;
+      if (this.docElement === document.documentElement) return;
       this.init(true), document.head.append(scriptStyle.cloneNode(true));
     }).observe(document, { childList: true });
   },
@@ -50,16 +50,16 @@ export default {
     });
   },
   setupVideoDetector() {
-    this.documentElement = document.documentElement;
-    this.docObserver?.disconnect(), clearTimeout(this.observerTimer);
-    this.docObserver = Tools.createObserver(document, () => {
-      if (this.topWin) return this.docObserver?.disconnect();
+    this.docElement = document.documentElement;
+    this.observeDoc?.disconnect(), clearTimeout(this.obsTimer);
+    this.observeDoc = Tools.createObserver(document, () => {
+      if (this.topWin) return this.observeDoc?.disconnect();
 
       const video = this.getVideo();
       if (video?.offsetWidth) this.setCurrentVideo(video);
       this.removeLoginPopups(), this.triggerRelevantElement(video);
     });
-    this.observerTimer = setTimeout(() => this.docObserver?.disconnect(), Consts.ONE_SEC * 10);
+    this.obsTimer = setTimeout(() => this.observeDoc?.disconnect(), Consts.ONE_SEC * 10);
   },
   setCurrentVideo(video) {
     if (!video || this.player === video) return;
