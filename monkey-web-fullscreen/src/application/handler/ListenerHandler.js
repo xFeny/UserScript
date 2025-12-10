@@ -88,10 +88,10 @@ export default {
     Tools.sendToIFrames({ topWin });
   },
   observeVideoSrcChange(video) {
-    const that = this;
-    if (video.hasAttribute("processed")) return;
-    video.setAttribute("processed", true);
+    if (video.hasAttribute("observed")) return;
+    video.setAttribute("observed", true);
 
+    const that = this;
     const isFake = video.matches(Consts.FAKE_VIDEO);
     const handleChange = (v) => (delete that.topWin, that.setVideoInfo(v));
     VideoEnhancer.defineProperty(video, isFake ? "srcConfig" : "src", {

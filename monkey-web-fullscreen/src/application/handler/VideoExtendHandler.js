@@ -71,8 +71,7 @@ export default {
     this.prependElement(element);
   },
   createProgressElement() {
-    if (this.progressElement) return this.progressElement;
-    if (window.videoProgressElement) return (this.progressElement = window.videoProgressElement);
+    if (this.progressNode) return this.progressNode;
 
     // 创建播放进度元素
     const element = this.createDisplayElement("__time-progress", Storage.CLOCK_COLOR.get());
@@ -85,14 +84,14 @@ export default {
     const percent = document.createElement("b");
     percent.textContent = "%";
 
+    this.progressNode = element;
     element.append(textNode, percent);
-    window.videoProgressElement = this.progressElement = element;
     this.toggleTimeElementClass(Storage.USE_SMALLER_FONT.get());
 
     return element;
   },
   removeProgressElement() {
-    this.progressElement?.remove();
+    this.progressNode?.remove();
   },
   playbackRateKeepDisplay() {
     if (!this.player || this.isLive()) return;
@@ -122,11 +121,11 @@ export default {
     if (element && !container?.contains(element)) container?.prepend(element);
   },
   toggleTimeElementClass(addClass, clss = "smaller") {
-    if (addClass) return Tools.addCls(this.Clock?.element, clss), Tools.addCls(this.progressElement, clss);
-    Tools.delCls(this.Clock?.element, clss), Tools.delCls(this.progressElement, clss);
+    if (addClass) return Tools.addCls(this.Clock?.element, clss), Tools.addCls(this.progressNode, clss);
+    Tools.delCls(this.Clock?.element, clss), Tools.delCls(this.progressNode, clss);
   },
   setTimeElementColor(color) {
-    Tools.setStyle([this.progressElement, this.Clock?.element], "color", color);
+    Tools.setStyle([this.progressNode, this.Clock?.element], "color", color);
   },
   changeTimeElementDisplay() {
     this.setupPlayerClock(), this.videoProgress(this.player);

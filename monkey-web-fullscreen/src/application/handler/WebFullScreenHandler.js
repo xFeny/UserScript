@@ -173,10 +173,9 @@ export default {
     const { viewWidth, viewHeight } = this.topWin;
     const elements = [...this.videoParents].reverse();
 
-    // 确保video父元素的宽高与视窗一致
-    // findVideoParentContainer 获取到的父容器，由于外联css设置了固定的宽高
-    // 在网页全屏后，需要重新判断元素的宽高，确保视频成功网页全屏
-    // 如：https://www.toutiao.com
+    // 核心目的：确保视频父元素宽高与视窗完全匹配，保障网页全屏正常显示
+    // 背景说明：当父元素因外联CSS设置了固定宽高值；当进入网页全屏后，父元素宽高未适应视窗，因此需要重新计算并修正元素宽高；
+    // 如：https://www.toutiao.com/video/7579134807163060782、https://www.163.com/v/video/VO3QRCEH5.html
     for (const element of elements) {
       const { offsetWidth: width, offsetHeight: height } = this.player;
       if (width === viewWidth && height === viewHeight && element.offsetHeight === viewHeight) continue;
