@@ -8,6 +8,11 @@ import Storage from "../common/Storage";
  * 视频一些额外处理
  */
 export default {
+  triggerRelevantElement(video) {
+    // 某些网站需要点击相关元素，才会加载视频，如：https://www.dadalv.cc、https://www.pipilv.cc
+    const element = Tools.query("body > #start");
+    element && video ? element.remove?.() : element.click?.();
+  },
   async removeRelevantElements() {
     // 防止网站的播放进度，对脚本的进度恢复造成影响，如：https://skr.skr1.cc:666
     if (Tools.isFrequent("choice", Consts.ONE_SEC, true) || Tools.isOverLimit("choice", 3)) return;

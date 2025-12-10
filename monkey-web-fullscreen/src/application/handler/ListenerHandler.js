@@ -53,15 +53,11 @@ export default {
     this.documentElement = document.documentElement;
     this.docObserver?.disconnect(), clearTimeout(this.observerTimer);
     this.docObserver = Tools.createObserver(document, () => {
+      if (this.topWin) return this.docObserver?.disconnect();
+
       const video = this.getVideo();
-
-      // 某些网站需要点击相关元素，才会加载视频，如：https://www.dadalv.cc、https://www.pipilv.cc
-      const element = Tools.query("body > #start");
-      if (element) setTimeout(() => (element.click?.(), element.remove?.()), 300);
-
-      Promise.resolve().then(() => this.removeLoginPopups());
       if (video?.offsetWidth) this.setCurrentVideo(video);
-      if (this.topWin) this.docObserver.disconnect();
+      this.removeLoginPopups(), this.triggerRelevantElement(video);
     });
     this.observerTimer = setTimeout(() => this.docObserver?.disconnect(), Consts.ONE_SEC * 10);
   },
