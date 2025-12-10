@@ -1,4 +1,4 @@
-import Tools from "./common/Tools";
+import Tools from "../../common/Tools";
 
 class VideoEnhancer {
   static setPlaybackRate(video, playRate) {

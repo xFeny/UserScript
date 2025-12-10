@@ -12,11 +12,13 @@ import Menu from "./handler/MenuHandler";
 
 const handlers = [Listen, Keydown, Events, Control, WebFull, Automatic, Episode, EpisodePicker, Extend, Ignore, Menu];
 unsafeWindow.AUTO_WEB_FULLSCREEN = window.App = {};
+
+// 合并处理器方法到App并绑定上下文
 handlers.forEach((handler) => {
-  // 将Handler方法变为App的方法，内部this指向App
-  Object.entries(handler).forEach(([key, value]) => {
+  const entries = Object.entries(handler);
+  for (const [key, value] of entries) {
     App[key] = value instanceof Function ? value.bind(App) : value;
-  });
+  }
 });
 
 App.init();
