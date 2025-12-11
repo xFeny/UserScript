@@ -9,13 +9,6 @@ import VideoEnhancer from "../VideoEnhancer";
  * 如：倍速、快进、缩放、移动等
  */
 export default {
-  isEnded() {
-    if (!this.player) return false;
-    if (this.player.ended) return true;
-    const { duration, currentTime } = this.player;
-    if (isNaN(duration) || duration <= 0) return false;
-    return duration - currentTime <= 0.1;
-  },
   isLive() {
     if (!this.videoInfo && !this.player) return false;
     return this.videoInfo.isLive || this.player?.duration === Infinity || this.isDynamicDuration(this.player);
@@ -66,9 +59,8 @@ export default {
   togglePlayPause: (video) => (Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause()),
   tryAutoPlay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),
   setPlaybackRate(playRate, show = true) {
-    if (!this.player || isNaN(this.player.duration) || this.isDisableSpeed()) return;
-    if (this.isLive() || this.isEnded() || this.isBackgroundVideo(this.player)) return;
-    if (!playRate || Number(this.player.playbackRate) === playRate) return;
+    if (!this.player || isNaN(this.player.duration) || this.player.ended || this.isLive()) return;
+    if (!playRate || this.isDisableSpeed() || Number(this.player.playbackRate) === playRate) return;
 
     // 设置倍速
     VideoEnhancer.setPlaybackRate(this.player, playRate);
@@ -79,8 +71,6 @@ export default {
     return Promise.resolve();
   },
   adjustPlaybackRate(step = Storage.SPEED_STEP.get()) {
-    if (!this.player) return;
-
     const playRate = Math.max(Consts.MIN_SPEED, Number(this.player.playbackRate) + step);
     this.setPlaybackRate(Math.min(Consts.MAX_SPEED, playRate));
   },
@@ -93,7 +83,7 @@ export default {
     this.setPlaybackRate(playRate, !video._mfs_hasApplyCRate)?.then(() => (video._mfs_hasApplyCRate = true));
   },
   skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
-    if (!this.player || this.isLive() || this.isEnded()) return;
+    if (!this.player || this.isLive() || this.player.ended) return;
     this.setCurrentTime(Math.min(Number(this.player.currentTime) + second, this.player.duration));
   },
   cachePlayTime(video) {

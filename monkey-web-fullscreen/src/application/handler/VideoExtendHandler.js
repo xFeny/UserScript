@@ -56,8 +56,8 @@ export default {
     if (!Site.isQiyi()) return video.duration;
     return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
   },
-  videoProgress(video) {
-    if (!video || video.paused || this.player !== video || this.isBackgroundVideo(video)) return;
+  videoProgress(video, bypass) {
+    if (!video || (!bypass && video.paused) || this.player !== video || this.isBackgroundVideo(video)) return;
     if (video.duration <= 30 || this.isLive() || this.shouldHideTime()) return this.removeProgressElement();
 
     const duration = this.getRealDuration(video);
@@ -128,6 +128,6 @@ export default {
     Tools.setStyle([this.progressNode, this.Clock?.element], "color", color);
   },
   changeTimeElementDisplay() {
-    this.setupPlayerClock(), this.videoProgress(this.player);
+    this.setupPlayerClock(), this.videoProgress(this.player, true);
   },
 };
