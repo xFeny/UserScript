@@ -37,14 +37,11 @@ export default class URLBlacklist {
         // 首先匹配主机名
         if (parsedUrl.hostname !== entry.hostname) return false;
 
-        // 然后匹配路径
-        if (entry.pathname === "/") {
-          // 根路径只精确匹配网站首页，不匹配任何子路径
-          return normalizedPath === "/";
-        } else {
-          // 其他路径匹配精确路径或其子路径
-          return normalizedPath === entry.pathname || normalizedPath.startsWith(`${entry.pathname}/`);
-        }
+        // 根路径只精确匹配网站首页，不匹配任何子路径
+        if (entry.pathname === "/") return normalizedPath === "/";
+
+        // 其他路径匹配精确路径或其子路径
+        return normalizedPath === entry.pathname || normalizedPath.startsWith(`${entry.pathname}/`);
       });
     } catch (e) {
       console.error(`要检查的URL无效: ${url}`, e);

@@ -13,7 +13,7 @@ const observedValue = { isFullscreen: false, fsWrapper: null };
  */
 export default {
   noVideo: () => !window?.videoInfo,
-  isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
+  isBackgroundVideo: (video) => video?.muted && video?.loop,
   getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
   init(isNonFirst = false) {
     this.setupVideoDetector();
@@ -42,8 +42,8 @@ export default {
       if (this.noVideo() || Storage.IS_INVISIBLE_PAUSE.get()) return;
 
       const video = this.player ?? this.getVideo();
-      if (!video || video?.ended || !Tools.isVisible(video)) return;
-      document.hidden ? video?.pause() : video?.play();
+      if (!video || video.ended || !Tools.isVisible(video)) return;
+      document.hidden ? video.pause() : video.play();
     });
   },
   setupVideoDetector() {

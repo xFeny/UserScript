@@ -17,7 +17,7 @@ export default {
     const index = Object.values(SiteIcons.name).indexOf(name);
     this.liveAuxHandle(), this.getLiveIcons()?.[index]?.click();
   },
-  liveAuxHandle() {
+  async liveAuxHandle() {
     unsafeWindow.top.scrollTo({ top: 70 });
     const el = Tools.query(":is(.lite-room, #player-ctnr)", top.document);
     if (el) unsafeWindow.top.scrollTo({ top: Tools.getElementRect(el)?.top });

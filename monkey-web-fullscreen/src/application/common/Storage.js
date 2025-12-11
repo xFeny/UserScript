@@ -47,9 +47,15 @@ class StorageItem {
  * 带过期时间的存储项类，用于需要动态键的存储操作
  */
 class TimedStorage extends StorageItem {
+  static global = { instances: [], cleanupTriggered: false }; // 全局唯一清理逻辑
+
   constructor(name, defVal, useLocalStore, parser) {
     super(name, defVal, useLocalStore, parser);
-    requestIdleCallback(() => this.cleanupExpiredData());
+
+    TimedStorage.global.instances.push(this);
+    if (TimedStorage.global.cleanupTriggered) return;
+    requestIdleCallback(() => TimedStorage.cleanupExpiredData());
+    TimedStorage.global.cleanupTriggered = true;
   }
 
   set(suffix, value, expires) {
@@ -67,10 +73,15 @@ class TimedStorage extends StorageItem {
     super.del(this.name + suffix);
   }
 
-  cleanupExpiredData() {
-    this.fuzzyHandle(this.name, (key) => {
-      const data = super.get(key);
-      if (data?.expires && data.expires < Date.now()) super.del(key);
+  static cleanupExpiredData() {
+    // 清理每个实例对应的过期数据
+    this.global.instances.forEach((instance) => {
+      instance.fuzzyHandle(instance.name, (key) => {
+        const data = StorageItem.prototype.get.call(instance, key);
+        if (data?.expires && data.expires < Date.now()) {
+          StorageItem.prototype.del.call(instance, key);
+        }
+      });
     });
   }
 }
