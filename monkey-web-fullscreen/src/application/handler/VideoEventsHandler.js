@@ -44,9 +44,9 @@ export default {
     this.videoProgress(video);
   },
   canplay(video) {
-    if (video._mfs_hasTryAutoPlay || Tools.isMultiVideo()) return;
-    video._mfs_hasTryAutoPlay = true;
-    this.tryAutoPlay(video);
+    if (video._mfs_hasTryPlay || Tools.isMultiVideo()) return;
+    video._mfs_hasTryPlay = true;
+    this.tryPlay(video);
   },
   playing(video) {
     this.setCurrentVideo(video);

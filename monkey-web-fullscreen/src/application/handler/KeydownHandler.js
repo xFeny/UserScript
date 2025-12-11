@@ -69,7 +69,7 @@ export default {
       P: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.toggleWebFullscreen(isTrusted)),
       LEFT: () => (bypass || this.isOverrideKey()) && this.skipPlayback(-Storage.SKIP_INTERVAL.get()),
       RIGHT: () => (bypass || this.isOverrideKey()) && this.skipPlayback(Storage.SKIP_INTERVAL.get()),
-      SPACE: () => (bypass || this.isOverrideKey()) && this.togglePlayPause(this.player),
+      SPACE: () => (bypass || this.isOverrideKey()) && this.playToggle(this.player),
       0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
       SHIFT_P: () => this.togglePictureInPicture(),
       SHIFT_E: () => this.toggleAutoNextEnabled(),

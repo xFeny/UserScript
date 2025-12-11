@@ -19,9 +19,9 @@ export default {
   },
   async autoWebFullscreen(video) {
     if (!this.topWin || !video.offsetWidth || this.player !== video) return;
-    if (video._mfs_hasWebFull || Tools.isThrottle("autoWebFull", Consts.ONE_SEC)) return;
+    if (video._mfs_hasWebFull || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
     if ((Site.isMatch() && this.isAutoDefault()) || (!Site.isMatch() && !this.isAutoSite())) return;
-    if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWebFull")) return (video._mfs_hasWebFull = true);
+    if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWide")) return (video._mfs_hasWebFull = true);
     if (await this.isWebFull(video)) return (video._mfs_hasWebFull = true);
 
     // 发送网页全屏消息

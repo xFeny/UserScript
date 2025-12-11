@@ -13,7 +13,6 @@ export default unsafeWindow.Tools = {
   query: (selector, context) => querySelector(selector, context),
   querys: (selector, context) => querySelectorAll(selector, context),
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
-  triggerClick: (ele) => ele?.dispatchEvent(new MouseEvent("click", { bubbles: true })),
   toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, Consts.EMPTY),
   postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
   getNumbers: (str) => (typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : []),

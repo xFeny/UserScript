@@ -39,7 +39,7 @@ export default {
     if (!Storage.IS_MAX_VOLUME.get()) video.volume = 1;
 
     // 重置次数限制
-    Tools.resetLimit("rateKeep", "autoWebFull");
+    Tools.resetLimit("rateKeep", "autoWide");
 
     // 移除相关的自定义元素
     this.removeRateKeepDisplay(video);
@@ -56,8 +56,8 @@ export default {
   },
   delCachedPlayRate: () => Storage.CACHED_SPEED.del(),
   remainTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
-  togglePlayPause: (video) => (Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause()),
-  tryAutoPlay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),
+  playToggle: (video) => (Site.isDouyu() ? video?.click() : video?.paused ? video?.play() : video?.pause()),
+  tryPlay: (video) => video?.paused && (Site.isDouyu() ? video?.click() : video?.play()),
   setPlaybackRate(playRate, show = true) {
     if (!this.player || isNaN(this.player.duration) || this.player.ended || this.isLive()) return;
     if (!playRate || this.isDisableSpeed() || Number(this.player.playbackRate) === playRate) return;
