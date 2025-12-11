@@ -49,12 +49,10 @@ export default {
     this.tryAutoPlay(video);
   },
   playing(video) {
-    video._mfs_isEnded = false;
     this.setCurrentVideo(video);
     this.initPlaySettings(video);
   },
   ended(video) {
-    video._mfs_isEnded = true;
     this.autoExitWebFullscreen();
     this.clearCachedTime(video);
   },
