@@ -44,18 +44,18 @@ class StorageItem {
 }
 
 /**
- * 带过期时间的存储项类，用于需要动态键的存储操作
+ * 带过期时间的存储类（继承自基础存储类）
+ * 1. 支持为存储值设置过期时间（按天计算）
+ * 2. 全局唯一的过期数据清理逻辑（仅首次创建实例时触发）
  */
 class TimedStorage extends StorageItem {
-  static global = { instances: [], cleanupTriggered: false }; // 全局唯一清理逻辑
+  static instances = [];
 
   constructor(name, defVal, useLocalStore, parser) {
     super(name, defVal, useLocalStore, parser);
 
-    TimedStorage.global.instances.push(this);
-    if (TimedStorage.global.cleanupTriggered) return;
-    requestIdleCallback(() => TimedStorage.cleanupExpiredData());
-    TimedStorage.global.cleanupTriggered = true;
+    TimedStorage.instances.push(this);
+    if (TimedStorage.instances.length === 1) requestIdleCallback(() => TimedStorage.cleanExpired());
   }
 
   set(suffix, value, expires) {
@@ -73,10 +73,11 @@ class TimedStorage extends StorageItem {
     super.del(this.name + suffix);
   }
 
-  static cleanupExpiredData() {
+  static cleanExpired() {
     // 清理每个实例对应的过期数据
-    this.global.instances.forEach((instance) => {
+    this.instances.forEach((instance) => {
       instance.fuzzyHandle(instance.name, (key) => {
+        // 调用父类get方法获取原始数据
         const data = StorageItem.prototype.get.call(instance, key);
         if (data?.expires && data.expires < Date.now()) {
           StorageItem.prototype.del.call(instance, key);
