@@ -39,7 +39,7 @@ export default {
   },
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
-      if (this.isNormalSite() || Storage.DISABLE_INVISIBLE_PAUSE.get()) return;
+      if (this.isNormalSite() || Storage.IS_INVISIBLE_PAUSE.get()) return;
 
       const video = this.player ?? this.getVideo();
       if (!video || video?._mfs_isEnded || !Tools.isVisible(video)) return;
@@ -104,7 +104,7 @@ export default {
   setupMouseMoveListener() {
     let timer = null;
     const handleEvent = ({ type, isTrusted }) => {
-      if (!isTrusted || Tools.isFrequent(type, 100, true)) return;
+      if (!isTrusted || this.isNormalSite() || Tools.isThrottle(type, 100)) return;
 
       clearTimeout(timer), this.toggleCursor();
       timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
@@ -113,10 +113,7 @@ export default {
     document.addEventListener("mousemove", (e) => handleEvent(e));
     document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleEvent(e));
   },
-  toggleCursor(hide = false) {
-    if (this.isNormalSite() || Tools.isFrequent("cursor", undefined, true)) return;
-    const cls = "__hc";
-
+  toggleCursor(hide = false, cls = "__hc") {
     if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
 
     [...Tools.getParents(this.player, true, 3), ...Tools.getIFrames()].forEach((el) => {

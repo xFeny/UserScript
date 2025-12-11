@@ -10,21 +10,17 @@ import Keyboard from "../common/Keyboard";
  */
 export default {
   autoNextEpisode(video) {
-    if (video.duration < 300) return;
-    if (video._mfs_hasTriedAutoNext) return;
-    if (!Storage.ENABLE_AUTO_NEXT_EPISODE.get()) return;
-    if (Tools.isFrequent("autoNext", Consts.TWO_SEC, true)) return;
-    if (this.getRemainingTime(video) > Storage.AUTO_NEXT_ADVANCE_SEC.get()) return; // 距离结束还剩多少秒切换下集
+    if (video.duration < 300 || video._mfs_hasTriedAutoNext || !Storage.IS_AUTO_NEXT.get()) return;
+    if (Tools.isThrottle("autoNext", Consts.TWO_SEC) || this.getRemainTime(video) > Storage.NEXT_ADVANCE_SEC.get()) return;
     if (this.isNextIgnoreUrl()) return (video._mfs_hasTriedAutoNext = true);
 
     this.dispatchShortcutKey(Keyboard.N);
     video._mfs_hasTriedAutoNext = true;
   },
   async autoWebFullscreen(video) {
-    if (this.player !== video) return;
-    if (Tools.isFrequent("autoWebFull", Consts.ONE_SEC, true)) return;
-    if (video._mfs_hasWebFull || !this.topWin || !video.offsetWidth) return;
-    if ((Site.isMatch() && this.isDisableAuto()) || (!Site.isMatch() && !this.isEnableSiteAuto())) return;
+    if (!this.topWin || !video.offsetWidth || this.player !== video) return;
+    if (video._mfs_hasWebFull || Tools.isThrottle("autoWebFull", Consts.ONE_SEC)) return;
+    if ((Site.isMatch() && this.isAutoDefault()) || (!Site.isMatch() && !this.isAutoSite())) return;
     if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWebFull")) return (video._mfs_hasWebFull = true);
     if (await this.isWebFull(video)) return (video._mfs_hasWebFull = true);
 

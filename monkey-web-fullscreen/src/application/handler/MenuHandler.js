@@ -4,18 +4,17 @@ import Tools from "../common/Tools";
 import Site from "../common/Site";
 import Swal from "sweetalert2";
 
-const { ENABLE_THIS_SITE_AUTO: ENABLE_THIS, CURR_EPISODE_SELECTOR: EPISODE_SELECTOR } = Storage;
+const { IS_SITE_AUTO, CURRENT_EPISODE } = Storage;
 
 /**
  * 脚本菜单相关逻辑处理
  */
 export default {
-  isDisableAuto: () => Storage.DISABLE_AUTO.get(),
+  isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
+  isAutoDefault: () => Storage.IS_AUTO_DEF.get(),
+  isDisableSpeed: () => Storage.DISABLE_SPEED.get(),
   isDisableZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
-  isOverrideKeyboard: () => Storage.OVERRIDE_KEYBOARD.get(),
-  isDisablePlaybackRate: () => Storage.CLOSE_PLAY_RATE.get(),
-  isDisableScreenshot: () => Storage.DISABLE_SCREENSHOT.get(),
-  isEnableSiteAuto: () => ENABLE_THIS.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
+  isAutoSite: () => IS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
   restoreDefaultSetting: () => GM_listValues().forEach((key) => GM_deleteValue(key)),
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
@@ -25,20 +24,20 @@ export default {
   },
   setupMenuChangeListener() {
     const host = location.host;
-    [ENABLE_THIS.name + host, EPISODE_SELECTOR.name + host].forEach((key) =>
+    [IS_SITE_AUTO.name + host, CURRENT_EPISODE.name + host].forEach((key) =>
       GM_addValueChangeListener(key, () => this.registMenuCommand())
     );
   },
   registMenuCommand() {
     const host = location.host;
-    const isEnable = this.isEnableSiteAuto();
+    const isAutoSite = this.isAutoSite();
     const siteFun = ({ cache }) => cache.set(host, !cache.get(host));
-    const delPicker = () => Storage.CURR_EPISODE_SELECTOR.del(host) & Storage.REL_EPISODE_SELECTOR.del(host);
+    const delPicker = () => Storage.CURRENT_EPISODE.del(host) & Storage.RELATIVE_EPISODE.del(host);
 
     // 菜单配置项
     const configs = [
-      { title: `此站${isEnable ? "禁" : "启"}用自动网页全屏`, cache: ENABLE_THIS, isHidden: Site.isMatch(), fn: siteFun },
-      { title: "删除此站剧集选择器", cache: EPISODE_SELECTOR, isHidden: !EPISODE_SELECTOR.get(host), fn: delPicker },
+      { title: `此站${isAutoSite ? "禁" : "启"}用自动网页全屏`, cache: IS_SITE_AUTO, isHidden: Site.isMatch(), fn: siteFun },
+      { title: "删除此站剧集选择器", cache: CURRENT_EPISODE, isHidden: !CURRENT_EPISODE.get(host), fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() },
       // { title: "还原默认", cache: { name: "RESET" }, isHidden: false, fn: this.restoreDefaultSetting },
@@ -162,14 +161,14 @@ export default {
   },
   genBasicsItems() {
     const configs = [
-      { name: "speed", text: "禁用 倍速调节", cache: Storage.CLOSE_PLAY_RATE, attrs: ["send", "delay"] },
-      { name: "memory", text: "禁用 记忆倍速", cache: Storage.DISABLE_MEMORY_SPEED, attrs: ["send"] },
-      { name: "time", text: "禁用 记忆播放位置", cache: Storage.DISABLE_MEMORY_TIME },
-      { name: "fit", text: "禁用 自动网页全屏", cache: Storage.DISABLE_AUTO, isHide: !Site.isMatch() },
-      { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.DISABLE_INVISIBLE_PAUSE },
-      { name: "volume", text: "禁用 音量默认百分百", cache: Storage.DISABLE_DEF_MAX_VOLUME },
-      { name: "next", text: "启用 自动切换至下集", cache: Storage.ENABLE_AUTO_NEXT_EPISODE },
-      { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEYBOARD },
+      { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_SPEED, attrs: ["send", "delay"] },
+      { name: "memory", text: "禁用 记忆倍速", cache: Storage.NOT_CACHE_SPEED, attrs: ["send"] },
+      { name: "time", text: "禁用 记忆播放位置", cache: Storage.NOT_CACHE_TIME },
+      { name: "fit", text: "禁用 自动网页全屏", cache: Storage.IS_AUTO_DEF, isHide: !Site.isMatch() },
+      { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.IS_INVISIBLE_PAUSE },
+      { name: "volume", text: "禁用 音量默认百分百", cache: Storage.IS_MAX_VOLUME },
+      { name: "next", text: "启用 自动切换至下集", cache: Storage.IS_AUTO_NEXT },
+      { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEY },
     ];
 
     const renderItem = ({ text, dataset, name, value }) => `
@@ -185,8 +184,8 @@ export default {
       { name: "pic", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
       { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, attrs: ["send"] },
       { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK },
-      { name: "clockAlways", text: "启用 非全屏显示时间", cache: Storage.UNFULL_CLOCK, attrs: ["send"] },
-      { name: "smallerFont", text: "启用 小字号显示时间", cache: Storage.USE_SMALLER_FONT, attrs: ["send"] },
+      { name: "clockAlways", text: "启用 非全屏显示时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
+      { name: "smallerFont", text: "启用 小字号显示时间", cache: Storage.USE_SMALL_FONT, attrs: ["send"] },
       { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },
     ].filter(({ isHidden }) => !isHidden);
 
@@ -200,10 +199,10 @@ export default {
   },
   genParamsItems() {
     const configs = [
-      { name: "step", text: "倍速步进", cache: Storage.PLAY_RATE_STEP },
+      { name: "step", text: "倍速步进", cache: Storage.SPEED_STEP },
       { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
       { name: "zeroSkip", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL },
-      { name: "advance", text: "自动下集提前秒数", cache: Storage.AUTO_NEXT_ADVANCE_SEC },
+      { name: "advance", text: "自动下集提前秒数", cache: Storage.NEXT_ADVANCE_SEC },
       { name: "days", text: "播放进度保存天数", cache: Storage.STORAGE_DAYS },
       { name: "percent", text: "缩放百分比", cache: Storage.ZOOM_PERCENT },
       { name: "move", text: "移动距离", cache: Storage.MOVING_DISTANCE },

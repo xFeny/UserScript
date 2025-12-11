@@ -12,8 +12,8 @@ export default {
   isInputFocus: (event) => Tools.isInputable(event.composedPath()[0]),
   preventDefault(event, { code, altKey } = event) {
     const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
-    const isOverrideKey = this.isOverrideKeyboard() && overrideKey.includes(code);
-    const isNumberKey = Tools.isNumber(event.key) && !this.isDisablePlaybackRate();
+    const isNumberKey = Tools.isNumber(event.key) && !this.isDisableSpeed();
+    const isOverrideKey = this.isOverrideKey() && overrideKey.includes(code);
     const preventKeys = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
     const zoomKeys = !this.isDisableZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
     if (isNumberKey || isOverrideKey || preventKeys || (altKey && zoomKeys)) Tools.preventDefault(event);
@@ -67,9 +67,9 @@ export default {
       N: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
       ENTER: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen()),
       P: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.toggleWebFullscreen(isTrusted)),
-      LEFT: () => (bypass || this.isOverrideKeyboard()) && this.skipPlayback(-Storage.SKIP_INTERVAL.get()),
-      RIGHT: () => (bypass || this.isOverrideKeyboard()) && this.skipPlayback(Storage.SKIP_INTERVAL.get()),
-      SPACE: () => (bypass || this.isOverrideKeyboard()) && this.togglePlayPause(this.player),
+      LEFT: () => (bypass || this.isOverrideKey()) && this.skipPlayback(-Storage.SKIP_INTERVAL.get()),
+      RIGHT: () => (bypass || this.isOverrideKey()) && this.skipPlayback(Storage.SKIP_INTERVAL.get()),
+      SPACE: () => (bypass || this.isOverrideKey()) && this.togglePlayPause(this.player),
       0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
       SHIFT_P: () => this.togglePictureInPicture(),
       SHIFT_E: () => this.toggleAutoNextEnabled(),
@@ -82,7 +82,7 @@ export default {
     };
 
     // 倍速加减
-    const step = Storage.PLAY_RATE_STEP.get();
+    const step = Storage.SPEED_STEP.get();
     ["A", "S", "ADD", "SUB"].forEach((k, i) => (dict[k] = () => this.adjustPlaybackRate((i % 2 ? -1 : 1) * step)));
 
     // 视频移动
@@ -115,7 +115,7 @@ export default {
     if ("toggle_color" in data) this.setTimeElementColor(data.toggle_color); // 时间颜色
 
     if (data?.toggle_speed) this.setPlaybackRate(Consts.DEF_PLAY_RATE); // 禁用倍速调节
-    if (data?.toggle_memory) this.deleteCachedPlayRate(); // 禁用记忆倍速
+    if (data?.toggle_memory) this.delCachedPlaybackRate(); // 禁用记忆倍速
     if (data?.toggle_zoom) this.resetVideoTransform(); // 禁用缩放
   },
 };
