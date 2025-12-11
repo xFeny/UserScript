@@ -24,8 +24,7 @@ export default {
   },
   removeTencentLogin: () => Site.isTencent() && Tools.query("#login_win")?.remove(),
   removeBiliLogin() {
-    if (!Site.isBili() || this.BiliTimerID) return;
-    if (unsafeWindow.UserStatus?.userInfo?.isLogin) return;
+    if (!Site.isBili() || this.BiliTimerID || unsafeWindow.UserStatus?.userInfo?.isLogin) return;
 
     // 处理B站未登录观看视频1分钟左右的登录弹窗
     this.BiliTimerID = setInterval(() => {
@@ -102,8 +101,7 @@ export default {
     this.prependElement(this.rateKeepElement);
   },
   resumeRateKeepDisplay() {
-    if (Tools.isOverLimit("rateKeep")) return;
-    if (document.contains(this.rateKeepElement)) return;
+    if (Tools.isOverLimit("rateKeep") || document.contains(this.rateKeepElement)) return;
     this.playbackRateKeepDisplay();
   },
   removeRateKeepDisplay() {

@@ -11,23 +11,19 @@ import VideoEnhancer from "../VideoEnhancer";
 export default {
   isLive() {
     if (!this.videoInfo && !this.player) return false;
-    return this.videoInfo.isLive || this.player?.duration === Infinity || this.isDynamicDuration(this.player);
+    return this.videoInfo.isLive || this.player?.duration === Infinity || this.isDynamicDur(this.player);
   },
-  isDynamicDuration(video) {
-    if (!video) return false;
-    if (video.currentTime > video.__duration || video._mfs_isDynamic) return true;
-    if (video.currentTime > 5 || Tools.isOverLimit("isDynamic", 10)) return false;
+  isDynamicDur(video) {
+    if (video._mfs_isDynamic || video.currentTime > video.__duration) return true;
 
     // 记录默认时长，用于判断是否为动态时长
-    if (!video.__duration) video.__duration = video.duration;
-    const { duration, __duration, currentTime, seekable } = video;
-    const isDynamic = Math.floor(duration) > Math.floor(__duration);
+    const { duration, __duration } = video;
+    if (!__duration) video.__duration = duration;
 
-    // 距离直播点﹤8秒（会误判短视频）
-    const isNearLive = duration < 10 && seekable.length && seekable.end(0) - currentTime < 8;
-    const result = isDynamic || isNearLive;
-    if (result) video._mfs_isDynamic = true; // 为true，后续不再重新计算
-    return result;
+    const isDynamic = Math.floor(duration) > Math.floor(__duration);
+    if (isDynamic) video._mfs_isDynamic = true; // 为true，后续不再重新计算
+
+    return isDynamic;
   },
   initVideoProps(video) {
     // 清理视频元素上脚本自定义的_mfs_前缀私有属性，避免残留状态干扰
@@ -230,8 +226,7 @@ export default {
     this.player.currentTime += (isPrev ? -1 : 1) / 24;
   },
   toggleNativeControls() {
-    if (!this.player) return;
-    this.player.controls = !this.player.controls;
+    if (this.player) this.player.controls = !this.player.controls;
   },
   customToast(startText, colorText, endText, duration, isRemove) {
     const span = document.createElement("span");

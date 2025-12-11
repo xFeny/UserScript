@@ -13,11 +13,11 @@ import SiteIcons from "../common/SiteIcons";
 export default {
   triggerIconElement(name) {
     if (Tools.isFrequent("icon")) return;
-    const index = Object.values(SiteIcons.name).indexOf(name);
     if (!Site.isBiliLive()) return Tools.query(SiteIcons[location.host]?.[name])?.click();
-    this.liveExtraHandle(), this.getLiveIcons()?.[index]?.click();
+    const index = Object.values(SiteIcons.name).indexOf(name);
+    this.liveAuxHandle(), this.getLiveIcons()?.[index]?.click();
   },
-  liveExtraHandle() {
+  liveAuxHandle() {
     unsafeWindow.top.scrollTo({ top: 70 });
     const el = Tools.query(":is(.lite-room, #player-ctnr)", top.document);
     if (el) unsafeWindow.top.scrollTo({ top: Tools.getElementRect(el)?.top });
