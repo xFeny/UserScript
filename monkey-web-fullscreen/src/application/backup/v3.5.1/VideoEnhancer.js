@@ -64,7 +64,7 @@ class VideoEnhancer {
   }
 
   static detectShadowVideoElement() {
-    if (Tools.isFrequent("shadow", 100, true)) return;
+    if (Tools.isThrottle("shadow", 100)) return;
     const videos = Tools.querys("video:not([received])");
     if (videos.length) videos.forEach((video) => Tools.emitCustomEvent("shadow-video", { video }));
   }

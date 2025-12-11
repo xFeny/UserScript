@@ -35,16 +35,21 @@ export default unsafeWindow.Tools = {
     this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
   },
   freqTimes: new Map(),
-  isFrequent(key = "default", gap = 300, isThrottle = false) {
+  _getTimeDiff(key) {
     const now = Date.now();
     const last = this.freqTimes.get(key) ?? 0;
-    const delta = now - last;
-
-    // 限制模式：返回是否过于频繁
-    if (!isThrottle) return this.freqTimes.set(key, now) && delta < gap;
-
-    // 节流模式：间隔满足时执行一次
-    return delta >= gap ? this.freqTimes.set(key, now) && false : true;
+    const diff = now - last;
+    return { now, last, diff };
+  },
+  isFrequent(key = "frequent", gap = 300) {
+    const { now, diff } = this._getTimeDiff(key);
+    // 判断操作是否过于频繁，true = 过于频繁（不执行），false = 可以执行
+    return this.freqTimes.set(key, now) && diff < gap;
+  },
+  isThrottle(key = "throttle", gap = 300) {
+    const { now, diff } = this._getTimeDiff(key);
+    // 判断是否需要节流，true = 需要节流（不执行），false = 可以执行
+    return diff >= gap ? this.freqTimes.set(key, now) && false : true;
   },
   limitCountMap: new Map(),
   isOverLimit(key = "default", maxCount = 5) {
