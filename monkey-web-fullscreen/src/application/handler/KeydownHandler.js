@@ -41,7 +41,7 @@ export default {
   },
   handleKeydown(event, { key, code, isTrusted } = event) {
     // Tools.log("键盘事件：", { key, code });
-    if (this.isNormalSite() || this.isInputFocus(event)) return;
+    if (this.noVideo() || this.isInputFocus(event)) return;
     if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
 
     this.preventDefault(event);

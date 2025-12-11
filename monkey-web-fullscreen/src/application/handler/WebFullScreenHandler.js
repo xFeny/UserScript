@@ -39,7 +39,7 @@ export default {
     if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcutKey(Keyboard.P); // 全屏或非网页全屏模式下
   },
   toggleWebFullscreen(isTrusted) {
-    if (this.isNormalSite() || Tools.isFrequent("toggleWeb")) return;
+    if (this.noVideo() || Tools.isFrequent("toggleWeb")) return;
     if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
     this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
   },

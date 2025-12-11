@@ -12,7 +12,7 @@ const observedValue = { isFullscreen: false, fsWrapper: null };
  * 应用程序初始化
  */
 export default {
-  isNormalSite: () => !window?.videoInfo && !window?.topWin,
+  noVideo: () => !window?.videoInfo,
   isBackgroundVideo: (video) => video?.muted && video?.hasAttribute("loop"),
   getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
   init(isNonFirst = false) {
@@ -39,7 +39,7 @@ export default {
   },
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
-      if (this.isNormalSite() || Storage.IS_INVISIBLE_PAUSE.get()) return;
+      if (this.noVideo() || Storage.IS_INVISIBLE_PAUSE.get()) return;
 
       const video = this.player ?? this.getVideo();
       if (!video || video?.ended || !Tools.isVisible(video)) return;
@@ -104,7 +104,7 @@ export default {
   setupMouseMoveListener() {
     let timer = null;
     const handleEvent = ({ type, isTrusted }) => {
-      if (!isTrusted || this.isNormalSite() || Tools.isThrottle(type, 100)) return;
+      if (!isTrusted || this.noVideo() || Tools.isThrottle(type, 100)) return;
 
       clearTimeout(timer), this.toggleCursor();
       timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
