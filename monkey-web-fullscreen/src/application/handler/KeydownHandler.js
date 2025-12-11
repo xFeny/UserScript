@@ -62,7 +62,7 @@ export default {
       R: () => this.rotateVideo(),
       L: () => this.freezeVideoFrame(),
       K: () => this.freezeVideoFrame(true),
-      Z: () => this.setPlaybackRate(Consts.DEF_PLAY_RATE),
+      Z: () => this.setPlaybackRate(Consts.DEF_SPEED),
       D: () => Site.isMatch() && this.triggerIconElement(SiteIcons.name.danmaku),
       N: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
       ENTER: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen()),
@@ -114,8 +114,8 @@ export default {
     if ("toggle_smallerFont" in data) this.toggleTimeElementClass(data.toggle_smallerFont); // 小字号显示时间
     if ("toggle_color" in data) this.setTimeElementColor(data.toggle_color); // 时间颜色
 
-    if (data?.toggle_speed) this.setPlaybackRate(Consts.DEF_PLAY_RATE); // 禁用倍速调节
-    if (data?.toggle_memory) this.delCachedPlaybackRate(); // 禁用记忆倍速
+    if (data?.toggle_speed) this.setPlaybackRate(Consts.DEF_SPEED); // 禁用倍速调节
+    if (data?.toggle_memory) this.delCachedPlayRate(); // 禁用记忆倍速
     if (data?.toggle_zoom) this.resetVideoTransform(); // 禁用缩放
   },
 };

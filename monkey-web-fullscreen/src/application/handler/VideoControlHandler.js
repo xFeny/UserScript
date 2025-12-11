@@ -54,8 +54,8 @@ export default {
     this.setupPlayerClock();
     this.setBiliQuality();
   },
-  delCachedPlaybackRate: () => Storage.CACHED_SPEED.del(),
-  getRemainTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
+  delCachedPlayRate: () => Storage.CACHED_SPEED.del(),
+  remainTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
   togglePlayPause: (video) => (Site.isDouyu() ? Tools.triggerClick(video) : video?.paused ? video?.play() : video?.pause()),
   tryAutoPlay: (video) => video?.paused && (Site.isDouyu() ? Tools.triggerClick(video) : video?.play()),
   setPlaybackRate(playRate, show = true) {
@@ -76,11 +76,11 @@ export default {
   },
   applyCachedPlayRate(video) {
     if (video._mfs_hasApplyCRate) return;
-    if (Storage.NOT_CACHE_SPEED.get()) return this.delCachedPlaybackRate();
+    if (Storage.NOT_CACHE_SPEED.get()) return this.delCachedPlayRate();
 
     const playRate = Storage.CACHED_SPEED.get();
     if (Consts.DEF_SPEED === playRate || Number(video.playbackRate) === playRate) return;
-    this.setPlaybackRate(playRate, !video._mfs_hasApplyCRate)?.then(() => (video._mfs_hasApplyCRate = true));
+    this.setPlaybackRate(playRate)?.then(() => (video._mfs_hasApplyCRate = true));
   },
   skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
     if (!this.player || this.isLive() || this.player.ended) return;
@@ -91,7 +91,7 @@ export default {
     if (Tools.isThrottle("cacheTime", Consts.ONE_SEC)) return;
 
     // 禁用记忆、距离结束10秒，清除记忆缓存
-    if (Storage.NOT_CACHE_TIME.get() || this.getRemainTime(video) <= 10) return this.clearCachedTime(video);
+    if (Storage.NOT_CACHE_TIME.get() || this.remainTime(video) <= 10) return this.clearCachedTime(video);
 
     Storage.PLAY_TIME.set(this.getCacheTimeKey(video), Number(video.currentTime) - 1, Storage.STORAGE_DAYS.get());
     this.clearMultiVideoCacheTime(); // 清除页面内多视频的播放进度存储，如：抖音网页版
