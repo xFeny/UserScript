@@ -2,7 +2,6 @@ import Site from "../common/Site";
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
-import SiteIcons from "../common/SiteIcons";
 import Keyboard from "../common/Keyboard";
 
 /**
@@ -36,7 +35,7 @@ export default {
   autoExitWebFullscreen() {
     if (!Site.isBili() && !Site.isAcFun()) return;
     const isWide = this.player.offsetWidth === innerWidth;
-    if (isWide) this.triggerIconElement(this.isFullscreen ? SiteIcons.name.full : SiteIcons.name.webFull);
+    if (isWide) this.triggerIconElement(this.isFullscreen ? Site.icons.full : Site.icons.webFull);
 
     // 取消连播触发条件：
     // - B站普通视频（非番剧）播放结束时

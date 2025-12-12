@@ -3,7 +3,6 @@ import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
 import Keyboard from "../common/Keyboard";
-import SiteIcons from "../common/SiteIcons";
 
 /**
  * 快捷键和消息相关逻辑处理
@@ -63,10 +62,10 @@ export default {
       L: () => this.freezeVideoFrame(),
       K: () => this.freezeVideoFrame(true),
       Z: () => this.setPlaybackRate(Consts.DEF_SPEED),
-      D: () => Site.isMatch() && this.triggerIconElement(SiteIcons.name.danmaku),
-      N: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.next) : this.switchEpisode()),
-      ENTER: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.full) : this.toggleFullscreen()),
-      P: () => (Site.isMatch() ? this.triggerIconElement(SiteIcons.name.webFull) : this.toggleWebFullscreen(isTrusted)),
+      D: () => Site.isMatch() && this.triggerIconElement(Site.icons.danmaku),
+      N: () => (Site.isMatch() ? this.triggerIconElement(Site.icons.next) : this.switchEpisode()),
+      ENTER: () => (Site.isMatch() ? this.triggerIconElement(Site.icons.full) : this.toggleFullscreen()),
+      P: () => (Site.isMatch() ? this.triggerIconElement(Site.icons.webFull) : this.toggleWebFullscreen(isTrusted)),
       LEFT: () => (bypass || this.isOverrideKey()) && this.skipPlayback(-Storage.SKIP_INTERVAL.get()),
       RIGHT: () => (bypass || this.isOverrideKey()) && this.skipPlayback(Storage.SKIP_INTERVAL.get()),
       SPACE: () => (bypass || this.isOverrideKey()) && this.playToggle(this.player),

@@ -1,4 +1,4 @@
-import URLBlacklist from "../common/URLBlacklist";
+import URLBlacklist from "../common//lib/URLBlacklist";
 import Storage from "../common/Storage";
 
 /**

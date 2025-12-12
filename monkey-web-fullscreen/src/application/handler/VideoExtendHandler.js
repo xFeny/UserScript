@@ -1,7 +1,7 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
-import Clock from "../common/Clock";
 import Consts from "../common/Consts";
+import Clock from "../common/lib/Clock";
 import Storage from "../common/Storage";
 
 /**

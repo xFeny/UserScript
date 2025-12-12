@@ -3,7 +3,6 @@ import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
 import Keyboard from "../common/Keyboard";
-import SiteIcons from "../common/SiteIcons";
 
 /**
  * 网页全屏逻辑处理
@@ -13,8 +12,8 @@ import SiteIcons from "../common/SiteIcons";
 export default {
   triggerIconElement(name) {
     if (Tools.isFrequent("icon")) return;
-    if (!Site.isBiliLive()) return Tools.query(SiteIcons.getIcons()?.[name])?.click();
-    const index = Object.values(SiteIcons.name).indexOf(name);
+    if (!Site.isBiliLive()) return Tools.query(Site.getIcons()?.[name])?.click();
+    const index = Object.values(Site.icons).indexOf(name);
     this.liveAuxHandle(), this.getLiveIcons()?.[index]?.click();
   },
   async liveAuxHandle() {

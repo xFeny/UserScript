@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import monkey, { util, cdn } from "vite-plugin-monkey";
 import AutoImport from "unplugin-auto-import/vite";
+import cleanup from "rollup-plugin-cleanup";
 
 // 使用自带图标进行网页全屏的，使用@match
 const match = [
@@ -65,6 +66,7 @@ if (isDev) match.unshift("*://*/*");
 export default defineConfig({
   build: {
     target: "es2022",
+    rollupOptions: { plugins: [cleanup({ comments: "none", exclude: ["node_modules/**"] })] },
   },
   plugins: [
     AutoImport({

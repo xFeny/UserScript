@@ -1,8 +1,20 @@
 /**
- * 实时显示当前时间
+ * 时钟组件类
+ * 功能：在指定容器中实时更新数字时钟
+ * @class
+ * @example
+ * // 基础使用
+ * const clock = new Clock(document.body, { color: '#333', clss: 'my-clock' });
+ * // 停止时钟（隐藏）
+ * clock.stop(true);
+ * // 重新启动
+ * clock.start();
+ * // 切换容器
+ * clock.setContainer(document.getElementById('clock-box'));
+ * // 销毁时钟
+ * clock.destroy();
  */
 export default class Clock {
-  static state = { start: "start", stop: "stop" };
   options = { color: null, clss: "Clock" };
 
   constructor(container, options) {
