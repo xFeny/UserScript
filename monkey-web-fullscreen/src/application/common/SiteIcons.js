@@ -25,15 +25,15 @@ export default class SiteIcons {
     const url = "https://gitee.com/xfeny/UserScript/raw/dev/monkey-web-fullscreen/src/IconsSelector.json";
     GM.xmlHttpRequest({ url, timeout: 3000 })
       .then((res) => {
-        const remoteSelector = JSON.parse(res.responseText ?? "{}");
-        this.selectors = { ...this.selectors, ...remoteSelector };
+        const remoteConf = JSON.parse(res.responseText ?? "{}");
+        this.selectors = { ...this.selectors, ...remoteConf };
         Storage.ICONS_SELECTOR.set(Consts.EMPTY, this.selectors, 1 / 3); // 缓存8小时
       })
       .catch((e) => console.error("加载远程配置失败", e));
   }
 
   static getIcons(domain) {
-    if (Storage.ICONS_SELECTOR.get()) this.loadRemote();
+    if (!Storage.ICONS_SELECTOR.get()) this.loadRemote();
     return this.selectors[domain];
   }
 }
