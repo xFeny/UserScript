@@ -2,7 +2,7 @@ import { Notyf } from "notyf";
 import Consts from "./Consts";
 import { querySelector, querySelectorAll } from "./shadow-dom-utils";
 
-export default unsafeWindow.Tools = {
+export default unsafeWindow.FsTools = {
   noNumber: (str) => !/\d/.test(str),
   isTopWin: () => window.top === window,
   isNumber: (str) => /^[0-9]$/.test(str),
