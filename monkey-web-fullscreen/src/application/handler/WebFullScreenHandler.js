@@ -13,7 +13,7 @@ import SiteIcons from "../common/SiteIcons";
 export default {
   triggerIconElement(name) {
     if (Tools.isFrequent("icon")) return;
-    if (!Site.isBiliLive()) return Tools.query(SiteIcons.getIcons(location.host)?.[name])?.click();
+    if (!Site.isBiliLive()) return Tools.query(SiteIcons.getIcons()?.[name])?.click();
     const index = Object.values(SiteIcons.name).indexOf(name);
     this.liveAuxHandle(), this.getLiveIcons()?.[index]?.click();
   },

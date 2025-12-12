@@ -32,7 +32,7 @@ export default class SiteIcons {
       .catch((e) => console.error("加载远程配置失败", e));
   }
 
-  static getIcons(domain) {
+  static getIcons(domain = location.host) {
     if (!Storage.ICONS_SELECTOR.get()) this.loadRemote();
     return this.selectors[domain];
   }
