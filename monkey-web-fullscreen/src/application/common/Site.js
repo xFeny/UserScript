@@ -16,8 +16,8 @@ export default class Site {
   };
 
   static _siteRegex = {
-    tencent: /v.qq.com\/x/,
     acFun: /acfun.cn\/v/,
+    tencent: /v.qq.com\/x/,
     qiyi: /iqiyi.com\/v_*/,
     mgtv: /www.mgtv.com\/b/,
     douyu: /v.douyu.com\/show/,
