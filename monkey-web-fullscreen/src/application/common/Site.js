@@ -1,3 +1,4 @@
+import Tools from "./Tools";
 import Consts from "./Consts";
 import Storage from "./Storage";
 
@@ -26,10 +27,9 @@ export default class Site {
   };
 
   static {
-    this._createSiteTests();
-    this._convertGmMatchToRegex();
     const selectors = Storage.ICONS_SELECTOR.get();
     selectors ? (this.selectors = selectors) : this._loadRemote();
+    Tools.microTask(() => (this._createSiteTests(), this._convertGmMatchToRegex()));
   }
 
   static getIcons(domain = location.host) {
