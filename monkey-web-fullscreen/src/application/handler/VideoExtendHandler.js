@@ -8,10 +8,15 @@ import Storage from "../common/Storage";
  * 视频一些额外处理
  */
 export default {
-  async triggerRelevantElement(video) {
-    // 某些网站需要点击相关元素，才会加载视频，如：https://www.dadalv.cc、https://www.pipilv.cc
-    const element = Tools.query("body > #start");
-    element && video ? element.remove?.() : element && element.click?.();
+  setupContentLoadedListener() {
+    document.addEventListener("DOMContentLoaded", () => {
+      // 某些网站需要点击相关元素，才会加载视频
+      // 如：https://www.jddzx.cc、https://www.dadalv.cc、https://www.pipilv.cc
+      const element = document.querySelector("body > #start, #play-button-overlay");
+      if (element) setTimeout(() => element.click?.());
+
+      this.setFakeBiliUser();
+    });
   },
   async removeRelevantElements() {
     // 防止网站的播放进度，对脚本的进度恢复造成影响，如：https://skr.skr1.cc:666
@@ -19,16 +24,12 @@ export default {
     const element = Tools.query(".ec-no, .conplaying, .choice-true, .close-btn, .closeclick");
     if (element) element.click?.(), element.remove?.();
   },
-  removeLoginPopups() {
-    this.removeBiliLogin(), this.removeTencentLogin();
-  },
-  removeTencentLogin: () => Site.isTencent() && Tools.query("#login_win")?.remove(),
-  removeBiliLogin() {
-    if (!Site.isBili() || this.BiliTimerID || unsafeWindow.UserStatus?.userInfo?.isLogin) return;
+  setFakeBiliUser() {
+    if (!Site.isBili() || unsafeWindow.UserStatus?.userInfo?.isLogin) return;
 
-    // 处理B站未登录观看视频1分钟左右的登录弹窗
-    this.BiliTimerID = setInterval(() => {
-      if (unsafeWindow.__BiliUser__?.cache?.data?.isLogin) clearInterval(this.BiliTimerID);
+    // 解决：B站未登录观看视频约1分钟弹出登录框问题
+    const timer = setInterval(() => {
+      if (this.player && unsafeWindow.__BiliUser__?.cache?.data?.isLogin) clearInterval(timer);
       unsafeWindow.__BiliUser__.cache.data.isLogin = true;
       unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
     }, Consts.THREE_SEC);

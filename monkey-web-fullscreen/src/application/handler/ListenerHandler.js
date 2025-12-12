@@ -29,6 +29,7 @@ export default {
     this.observeWebFullscreenChange();
     this.setupIgnoreUrlsChangeListener();
     this.setupShadowVideoEventListeners();
+    this.setupContentLoadedListener();
   },
   setupDocumentObserver() {
     // 示例网站：https://nkvod.me、https://www.lkvod.com
@@ -48,16 +49,15 @@ export default {
   },
   setupVideoDetector() {
     this.docElement = document.documentElement;
-    this.observeDoc?.disconnect(), clearTimeout(this.obsTimer);
-    this.observeDoc = Tools.createObserver(document, () => {
+    this.obsDoc?.disconnect(), clearTimeout(this.obsTimer);
+    this.obsDoc = Tools.createObserver(document, () => {
       if (Tools.isThrottle("detector", 100)) return;
-      if (this.topWin) return this.observeDoc?.disconnect();
+      if (this.topWin) return this.obsDoc?.disconnect();
 
       const video = this.getVideo();
       if (video?.offsetWidth) this.setCurrentVideo(video);
-      this.removeLoginPopups(), this.triggerRelevantElement(video);
     });
-    this.obsTimer = setTimeout(() => this.observeDoc?.disconnect(), Consts.ONE_SEC * 5);
+    this.obsTimer = setTimeout(() => this.obsDoc?.disconnect(), Consts.ONE_SEC * 5);
   },
   setCurrentVideo(video) {
     if (!video || this.player === video) return;
