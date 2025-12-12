@@ -50,13 +50,14 @@ export default {
     this.docElement = document.documentElement;
     this.observeDoc?.disconnect(), clearTimeout(this.obsTimer);
     this.observeDoc = Tools.createObserver(document, () => {
+      if (Tools.isThrottle("detector", 100)) return;
       if (this.topWin) return this.observeDoc?.disconnect();
 
       const video = this.getVideo();
       if (video?.offsetWidth) this.setCurrentVideo(video);
       this.removeLoginPopups(), this.triggerRelevantElement(video);
     });
-    this.obsTimer = setTimeout(() => this.observeDoc?.disconnect(), Consts.ONE_SEC * 10);
+    this.obsTimer = setTimeout(() => this.observeDoc?.disconnect(), Consts.ONE_SEC * 5);
   },
   setCurrentVideo(video) {
     if (!video || this.player === video) return;

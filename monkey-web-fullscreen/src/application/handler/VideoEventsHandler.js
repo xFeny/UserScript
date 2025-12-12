@@ -9,6 +9,7 @@ export default {
       const { video } = e.detail;
       if (!video || video.hasAttribute("received")) return;
       this.setupVideoEventListeners(video), video.setAttribute("received", true);
+      if (!this.player) this.setCurrentVideo(video);
     });
   },
   setupVideoEventListeners(video) {
