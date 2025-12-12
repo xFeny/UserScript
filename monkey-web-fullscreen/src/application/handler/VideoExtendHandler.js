@@ -29,7 +29,7 @@ export default {
 
     // 解决：B站未登录观看视频约1分钟弹出登录框问题
     const timer = setInterval(() => {
-      if (this.player && unsafeWindow.__BiliUser__?.cache?.data?.isLogin) clearInterval(timer);
+      if (Tools.isOverLimit("__BiliUser__", 3)) clearInterval(timer);
       unsafeWindow.__BiliUser__.cache.data.isLogin = true;
       unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
     }, Consts.THREE_SEC);
