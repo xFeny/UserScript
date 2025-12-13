@@ -18,7 +18,7 @@ export default {
       if (video || target.matches("video, fake-video")) this[event.type](target);
     };
 
-    ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "ended"].forEach((type) => {
+    ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "pause", "ended"].forEach((type) => {
       (video ?? document).addEventListener(type, handleEvent, true);
     });
   },
@@ -52,6 +52,10 @@ export default {
   playing(video) {
     this.setCurrentVideo(video);
     this.initPlaySettings(video);
+  },
+  pause() {
+    // 稀饭动漫（https://dm.xifanacg.com）
+    Tools.query(".ec-no")?.click();
   },
   ended(video) {
     this.autoExitWebFullscreen();

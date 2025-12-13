@@ -110,12 +110,12 @@ export default {
   clearCachedTime(video) {
     if (this.topWin) Storage.PLAY_TIME.del(this.getCacheTimeKey(video));
   },
-  getCacheTimeKey(video, { src, duration, __duration } = video) {
+  getCacheTimeKey(video, { duration, __duration } = video) {
     if (video._mfs_cacheTKey) return video._mfs_cacheTKey;
 
-    const srcHash = src && !src.startsWith("blob:") ? Tools.hashCode(new URL(src).pathname) : Consts.EMPTY;
+    const currNum = this.getCurrentEpisodeNumber();
     const baseKey = `${this.topWin.urlHash}_${Math.floor(__duration || duration)}`;
-    const cacheTimeKey = srcHash ? `${srcHash}_${baseKey}` : baseKey;
+    const cacheTimeKey = currNum ? `${baseKey}_${currNum}` : baseKey;
     video._mfs_cacheTKey = cacheTimeKey;
 
     return cacheTimeKey;

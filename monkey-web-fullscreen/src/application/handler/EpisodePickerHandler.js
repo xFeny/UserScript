@@ -72,8 +72,12 @@ export default {
       },
     });
   },
+  getCurrentEpisodeNumber() {
+    const selector = Storage.CURRENT_EPISODE.get(this.topWin.host);
+    return selector ? this.getEpisodeNumber(Tools.query(selector)) : null;
+  },
   getCurrentEpisodeBySelector() {
-    const num = this.getEpisodeNumber(Tools.query(Storage.CURRENT_EPISODE.get(location.host)));
+    const num = this.getCurrentEpisodeNumber();
     const current = this.getEpisodeWrapper(Tools.query(Storage.CURRENT_EPISODE.get(location.host)));
     const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(Storage.RELATIVE_EPISODE.get(location.host))));
     return episodes.includes(current) ? current : episodes.find((el) => this.getEpisodeNumber(el) === num);
