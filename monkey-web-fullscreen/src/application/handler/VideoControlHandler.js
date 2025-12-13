@@ -113,9 +113,9 @@ export default {
   getCacheTimeKey(video, { duration, __duration } = video) {
     if (video._mfs_cacheTKey) return video._mfs_cacheTKey;
 
-    const currNum = this.getCurrentEpisodeNumber();
+    const currNumber = this.getCurrentEpisodeNumber();
     const baseKey = `${this.topWin.urlHash}_${Math.floor(__duration || duration)}`;
-    const cacheTimeKey = currNum ? `${baseKey}_${currNum}` : baseKey;
+    const cacheTimeKey = currNumber ? `${baseKey}_${currNumber}` : baseKey;
     video._mfs_cacheTKey = cacheTimeKey;
 
     return cacheTimeKey;
