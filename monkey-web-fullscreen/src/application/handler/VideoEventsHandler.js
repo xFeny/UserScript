@@ -6,6 +6,16 @@ import Tools from "../common/Tools";
 export default {
   videoEvtMap: new WeakMap(), // 存储：video -> handler（仅用于video事件解绑）
   videoEvents: ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "pause", "ended"],
+  setupVideoListeners(video) {
+    const handleEvent = (event) => {
+      const target = video ?? event.target;
+      if (video || target.matches("video, fake-video")) this[event.type](target);
+    };
+
+    this.videoEvents.forEach((type) => (video ?? document).addEventListener(type, handleEvent, true));
+
+    if (video && !this.videoEvtMap.has(video)) this.videoEvtMap.set(video, handleEvent);
+  },
   setupShadowVideoListeners() {
     // 绑定视频相关事件监听
     document.addEventListener("shadow-video", (e) => {
@@ -17,16 +27,6 @@ export default {
 
     // 移除视频相关事件监听
     document.addEventListener("shadow-video-remove", (e) => this.removeVideoListeners(e.detail.video));
-  },
-  setupVideoListeners(video) {
-    const handleEvent = (event) => {
-      const target = video ?? event.target;
-      if (video || target.matches("video, fake-video")) this[event.type](target);
-    };
-
-    this.videoEvents.forEach((type) => (video ?? document).addEventListener(type, handleEvent, true));
-
-    if (video && !this.videoEvtMap.has(video)) this.videoEvtMap.set(video, handleEvent);
   },
   removeVideoListeners(video) {
     if (!video || !this.videoEvtMap.has(video)) return;
