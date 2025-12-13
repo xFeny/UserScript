@@ -83,8 +83,8 @@ export default {
     this.setCurrentTime(Math.min(Number(this.player.currentTime) + second, this.player.duration));
   },
   cachePlayTime(video) {
+    if (Tools.isThrottle("cacheTime", Consts.ONE_SEC) || Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
     if (video !== this.player || !this.topWin || video.paused || video.duration < 120 || this.isLive()) return;
-    if (Tools.isThrottle("cacheTime", Consts.ONE_SEC)) return;
 
     // 禁用记忆、距离结束10秒，清除记忆缓存
     if (Storage.NOT_CACHE_TIME.get() || this.remainTime(video) <= 10) return this.clearCachedTime(video);
