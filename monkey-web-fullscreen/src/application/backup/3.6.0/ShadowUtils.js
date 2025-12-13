@@ -19,6 +19,17 @@ export function isDocument(node) {
 }
 
 /**
+ * 判断节点是否为真正游离的元素
+ * @param {Node} node - 待判断的节点（通常来自mutation.removedNodes）
+ * @returns {boolean} - true=游离元素，false=非游离/非元素节点
+ */
+export function isDetachedElement(node) {
+  if (!node || !isElement(node)) return false;
+  // 不在主DOM树中 + 不在任意Shadow DOM中 = 真正游离
+  return !document.body.contains(node) && !(node.getRootNode() instanceof ShadowRoot);
+}
+
+/**
  * 获取节点的 ShadowRoot（影子根）
  * 优先从自定义属性_shadowRoot 获取，若不存在则从标准 shadowRoot 属性获取
  * @param {Element} node 要获取 ShadowRoot 的元素节点
@@ -86,6 +97,26 @@ export function querySelector(selector, subject = document) {
 }
 
 /**
+ * 递归查询元素（含所有层级Shadow DOM）
+ * @param {string} selector - CSS选择器
+ * @param {Node|ShadowRoot} [root=document] - 根节点
+ * @returns {HTMLElement[]} 匹配元素数组
+ */
+function _querySelectorAll(selector, root = document) {
+  const results = new Set();
+  const stack = [root];
+
+  while (stack.length) {
+    const node = stack.pop();
+    node.querySelectorAll?.(selector)?.forEach((el) => results.add(el));
+    [...(node.children || node.childNodes)].reverse().forEach((child) => isElement(child) && stack.push(child));
+    getRoot(node) && stack.push(getRoot(node));
+  }
+
+  return [...results];
+}
+
+/**
  * 在给定节点的 DOM 中查询所有匹配的元素，遇到 shadow root 时会自动深入查询。
  *
  * @param selector 要查询的 CSS 选择器
@@ -93,6 +124,8 @@ export function querySelector(selector, subject = document) {
  * @return 找到的所有匹配元素集合
  */
 export function querySelectorAll(selector, subject = document) {
+  if (isDetachedElement(subject)) return _querySelectorAll(selector, subject);
+
   const results = [...subject.querySelectorAll(selector)];
   const shadowRoots = [...getShadowRoots(subject, true)];
   for (const root of shadowRoots) {
