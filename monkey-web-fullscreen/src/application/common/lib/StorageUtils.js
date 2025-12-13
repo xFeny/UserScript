@@ -79,9 +79,7 @@ export class TimedStorage extends StorageItem {
       instance.fuzzyHandle(instance.name, (key) => {
         // 调用父类get方法获取原始数据
         const data = StorageItem.prototype.get.call(instance, key);
-        if (data?.expires && data.expires < Date.now()) {
-          StorageItem.prototype.del.call(instance, key);
-        }
+        if (data?.expires && data.expires < Date.now()) StorageItem.prototype.del.call(instance, key);
       });
     });
   }
