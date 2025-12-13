@@ -122,7 +122,7 @@ export default {
   },
   async clearMultiVideoCacheTime() {
     if (!Tools.isMultiVideo()) return;
-    const pattern = new RegExp(`${Storage.PLAY_TIME.name}.*${this.topWin.urlHash}`);
+    const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
     const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
     if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
   },
