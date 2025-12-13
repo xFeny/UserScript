@@ -16,7 +16,7 @@ export default class Site {
     "v.qq.com": { full: ".txp_btn_fullscreen", webFull: ".txp_btn_fake", danmaku: ".barrage-switch", next: ".txp_btn_next_u" },
   };
 
-  static _siteRegex = {
+  static _siteRegExps = {
     acFun: /acfun.cn\/v/,
     tencent: /v.qq.com\/x/,
     qiyi: /iqiyi.com\/v_*/,
@@ -37,8 +37,8 @@ export default class Site {
     return this.selectors[domain];
   }
 
-  static isMatch() {
-    return this.siteRegex.some((m) => m.test(location.href.replace(location.search, Consts.EMPTY)));
+  static isGmMatch() {
+    return this.gmMatches.some((m) => m.test(location.href.replace(location.search, Consts.EMPTY)));
   }
 
   static _loadRemote() {
@@ -58,7 +58,7 @@ export default class Site {
   static _convertGmMatchToRegex() {
     const { matches, includes: excluded } = GM_info.script;
     const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
-    this.siteRegex = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
+    this.gmMatches = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
   }
 
   /**
@@ -66,7 +66,7 @@ export default class Site {
    * 如：isMgtv()、isDouyu()、isBili()、isBiliLive() 等
    */
   static _createSiteTests() {
-    Object.entries(this._siteRegex).forEach(([name, regex]) => {
+    Object.entries(this._siteRegExps).forEach(([name, regex]) => {
       const methodName = `is${name.charAt(0).toUpperCase()}${name.slice(1)}`;
       if (!this[methodName]) this[methodName] = () => regex.test(location.href);
     });

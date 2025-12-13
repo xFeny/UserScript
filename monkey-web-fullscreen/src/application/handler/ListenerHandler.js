@@ -35,7 +35,7 @@ export default {
     // 示例网站：https://nkvod.me、https://www.lkvod.com
     new MutationObserver(() => {
       if (this.docElement === document.documentElement) return;
-      this.init(true), document.head.append(scriptStyle.cloneNode(true));
+      this.init(true), document.head.append(gmStyle.cloneNode(true));
     }).observe(document, { childList: true });
   },
   setupVisibleListener() {

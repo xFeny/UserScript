@@ -36,7 +36,7 @@ export default {
 
     // 菜单配置项
     const configs = [
-      { title: `此站${isAutoSite ? "禁" : "启"}用自动网页全屏`, cache: IS_SITE_AUTO, isHidden: Site.isMatch(), fn: siteFun },
+      { title: `此站${isAutoSite ? "禁" : "启"}用自动网页全屏`, cache: IS_SITE_AUTO, isHidden: Site.isGmMatch(), fn: siteFun },
       { title: "删除此站剧集选择器", cache: CURRENT_EPISODE, isHidden: !CURRENT_EPISODE.get(host), fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() },
@@ -164,7 +164,7 @@ export default {
       { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_SPEED, attrs: ["send", "delay"] },
       { name: "memory", text: "禁用 记忆倍速", cache: Storage.NOT_CACHE_SPEED, attrs: ["send"] },
       { name: "time", text: "禁用 记忆播放位置", cache: Storage.NOT_CACHE_TIME },
-      { name: "fit", text: "禁用 自动网页全屏", cache: Storage.IS_AUTO_DEF, isHide: !Site.isMatch() },
+      { name: "fit", text: "禁用 自动网页全屏", cache: Storage.IS_AUTO_DEF, isHide: !Site.isGmMatch() },
       { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.IS_INVISIBLE_PAUSE },
       { name: "volume", text: "禁用 音量默认百分百", cache: Storage.IS_MAX_VOLUME },
       { name: "next", text: "启用 自动切换至下集", cache: Storage.IS_AUTO_NEXT },
@@ -220,7 +220,7 @@ export default {
   genIgnoreItems() {
     const { CUSTOM_WEB_FULL, NEXT_IGNORE_URLS, FULL_IGNORE_URLS } = Storage;
     const configs = [
-      { name: "customRule", text: "自定义此站网页全屏规则", cache: CUSTOM_WEB_FULL, isHide: Site.isMatch(), useHost: true },
+      { name: "customRule", text: "自定义此站网页全屏规则", cache: CUSTOM_WEB_FULL, isHide: Site.isGmMatch(), useHost: true },
       { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: NEXT_IGNORE_URLS },
       { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: FULL_IGNORE_URLS },
     ];

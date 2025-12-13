@@ -24,7 +24,7 @@ declare const Site: {
    * 当前URL是否匹配GM脚本的@match规则
    * @returns 是否匹配
    */
-  isMatch(): boolean;
+  isGmMatch(): boolean;
 
   /** 是否为AcFun视频页 */
   isAcFun(): boolean;

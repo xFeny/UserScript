@@ -107,7 +107,7 @@ export default defineConfig({
             const styleAdded = Symbol("styleAdded");
             const style = document.createElement("style");
             style.textContent = cssText;
-            window.scriptStyle = style;
+            window.gmStyle = style;
 
             // 向 Shadow DOM 插入样式
             document.addEventListener("shadow-attached", (e) => {

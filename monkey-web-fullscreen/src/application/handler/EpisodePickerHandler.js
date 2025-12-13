@@ -15,7 +15,7 @@ import Swal from "sweetalert2";
  */
 export default {
   setupPickerEpisodeListener() {
-    if (Site.isMatch() || this.hasPickerListener) return;
+    if (Site.isGmMatch() || this.hasPickerListener) return;
     this.hasPickerListener = true;
 
     const handle = (event, { target, ctrlKey, altKey, isTrusted } = event) => {
