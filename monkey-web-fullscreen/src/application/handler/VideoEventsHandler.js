@@ -4,6 +4,7 @@ import Tools from "../common/Tools";
  * 视频监听事件逻辑处理
  */
 export default {
+  videoEvents: ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "pause", "ended"],
   setupShadowVideoEventListeners() {
     document.addEventListener("shadow-video", (e) => {
       const { video } = e.detail;
@@ -18,9 +19,7 @@ export default {
       if (video || target.matches("video, fake-video")) this[event.type](target);
     };
 
-    ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "pause", "ended"].forEach((type) => {
-      (video ?? document).addEventListener(type, handleEvent, true);
-    });
+    this.videoEvents.forEach((type) => (video ?? document).addEventListener(type, handleEvent, true));
   },
   loadedmetadata(video) {
     this.autoWebFullscreen(video);
