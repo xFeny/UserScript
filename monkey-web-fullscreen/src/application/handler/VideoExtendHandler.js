@@ -8,12 +8,12 @@ import Storage from "../common/Storage";
  * 视频一些额外处理
  */
 export default {
-  setupContentLoadedListener() {
-    document.addEventListener("DOMContentLoaded", () => {
+  setupLoadEventListener() {
+    window.addEventListener("load", () => {
       // 某些网站需要点击相关元素，才会加载视频
-      // 如：https://www.jddzx.cc、https://www.dadalv.cc、https://www.pipilv.cc
+      // 如：https://www.dadaqu.cc、https://www.jddzx.cc
       const element = document.querySelector("body > #start, #play-button-overlay");
-      if (element) setTimeout(() => element.click?.());
+      if (element) element.click?.();
 
       this.setFakeBiliUser();
     });
@@ -29,7 +29,7 @@ export default {
 
     // 解决：B站未登录观看视频约1分钟弹出登录框问题
     const timer = setInterval(() => {
-      if (Tools.isOverLimit("__BiliUser__", 3)) clearInterval(timer);
+      if (Tools.isOverLimit("__BiliUser__", 2)) clearInterval(timer);
       unsafeWindow.__BiliUser__.cache.data.isLogin = true;
       unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
     }, Consts.THREE_SEC);

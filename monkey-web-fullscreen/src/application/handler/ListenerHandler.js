@@ -29,7 +29,7 @@ export default {
     this.observeWebFullscreenChange();
     this.setupIgnoreUrlsChangeListener();
     this.setupShadowVideoEventListeners();
-    this.setupContentLoadedListener();
+    this.setupLoadEventListener();
   },
   setupDocumentObserver() {
     // 示例网站：https://nkvod.me、https://www.lkvod.com
