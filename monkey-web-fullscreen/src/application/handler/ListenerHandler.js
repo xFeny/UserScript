@@ -21,14 +21,14 @@ export default {
     this.setupVisibleListener();
     this.setupMouseMoveListener();
     this.setupFullscreenListener();
-    this.setupVideoEventListeners();
+    this.setupVideoListeners();
 
     if (isNonFirst) return;
     this.setupDocumentObserver();
     this.observeFullscreenChange();
     this.observeWebFullscreenChange();
     this.setupIgnoreUrlsChangeListener();
-    this.setupShadowVideoEventListeners();
+    this.setupShadowVideoListeners();
     this.setupLoadEventListener();
   },
   setupDocumentObserver() {

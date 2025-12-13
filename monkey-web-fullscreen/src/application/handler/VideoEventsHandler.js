@@ -4,22 +4,36 @@ import Tools from "../common/Tools";
  * 视频监听事件逻辑处理
  */
 export default {
+  videoEvtMap: new WeakMap(), // 存储：video -> handler（仅用于video事件解绑）
   videoEvents: ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "pause", "ended"],
-  setupShadowVideoEventListeners() {
+  setupShadowVideoListeners() {
+    // 绑定视频相关事件监听
     document.addEventListener("shadow-video", (e) => {
       const { video } = e.detail;
       if (!video || video.hasAttribute("received")) return;
-      this.setupVideoEventListeners(video), video.setAttribute("received", true);
+      this.setupVideoListeners(video), video.setAttribute("received", true);
       if (!this.player) this.setCurrentVideo(video);
     });
+
+    // 移除视频相关事件监听
+    document.addEventListener("shadow-video-remove", (e) => this.removeVideoListeners(e.detail.video));
   },
-  setupVideoEventListeners(video) {
+  setupVideoListeners(video) {
     const handleEvent = (event) => {
       const target = video ?? event.target;
       if (video || target.matches("video, fake-video")) this[event.type](target);
     };
 
     this.videoEvents.forEach((type) => (video ?? document).addEventListener(type, handleEvent, true));
+
+    if (video && !this.videoEvtMap.has(video)) this.videoEvtMap.set(video, handleEvent);
+  },
+  removeVideoListeners(video) {
+    if (!video || !this.videoEvtMap.has(video)) return;
+
+    this.videoEvents.forEach((type) => video.removeEventListener(type, this.videoEvtMap.get(video), true));
+    video.removeAttribute("received");
+    this.videoEvtMap.delete(video);
   },
   loadedmetadata(video) {
     this.autoWebFullscreen(video);
