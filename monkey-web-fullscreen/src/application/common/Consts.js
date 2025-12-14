@@ -11,7 +11,7 @@ export default Object.freeze({
   THREE_SEC: 3000,
   DEF_SPEED: 1,
   MAX_SPEED: 16,
-  MIN_SPEED: 0.0625,
+  MIN_SPEED: 0.1,
   webFull: "webFullscreen",
   FAKE_VIDEO: "fake-video",
   WEBFULL_PARENT_DEPTH: 20,
