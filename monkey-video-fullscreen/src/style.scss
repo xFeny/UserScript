@@ -1,0 +1,72 @@
+/** 视频网页全屏相关样式 START **/
+::part(webFullscreen),
+[part*="webFullscreen"],
+body[part*="webFullscreen"] [part*="webFullscreen"] {
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  zoom: normal !important;
+  border: none !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  position: fixed !important;
+  transform: none !important;
+  max-width: none !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+  transition: none !important;
+  z-index: 2147483646 !important;
+  background-color: #000 !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  display: flex !important;
+}
+
+/** 隐藏后面的兄弟元素 */
+[part*="webFullscreen"] ~ *:not(.monkey-web-fullscreen) {
+  display: none !important;
+}
+
+/** 增强选择器优先级 **/
+[part*="webFullscreen"] video,
+body[part*="webFullscreen"] [part*="webFullscreen"] video {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  border: none !important;
+  height: clamp(calc(100vh - 100%), 100vh, 100%) !important;
+  object-fit: contain !important;
+}
+/** 视频网页全屏相关样式 END **/
+
+/** 视频左上角此终显示倍速 **/
+.__rate-keep-show {
+  color: #e0e0e0;
+  top: 5px !important;
+  left: 5px !important;
+  text-indent: 0 !important;
+  font-size: 12px !important;
+  position: absolute !important;
+  pointer-events: none !important;
+  display: inline-block !important;
+  transform-origin: top !important;
+  transform: scale(0.917) !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  /** 防止被隐藏 **/
+  z-index: 2147483647 !important;
+  opacity: 1 !important;
+
+  /** 防止被隐藏 **/
+  &::after {
+    top: 50% !important;
+    left: 50% !important;
+    content: "-" !important;
+    position: fixed !important;
+    text-shadow: none !important;
+    color: transparent !important;
+    pointer-events: none !important;
+    display: inline-block !important;
+    background-color: transparent !important;
+  }
+}
