@@ -10,7 +10,7 @@ export default unsafeWindow.FyStorage = {
   /** 网页全屏相关：自定义此站网页全屏规则 */
   CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", ""),
   /** 网页全屏相关：禁用`@match`网址自动网页全屏 */
-  IS_AUTO_DEF: new StorageItem("DISABLE_DEFAULT_AUTO", false, false, Boolean),
+  NO_AUTO_DEF: new StorageItem("DISABLE_DEFAULT_AUTO", false, false, Boolean),
   /** 网页全屏相关：此站启/禁用自动网页全屏 */
   IS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, Boolean),
 

@@ -19,7 +19,7 @@ export default {
   async autoWebFullscreen(video) {
     if (!this.topWin || !video.offsetWidth || this.player !== video) return;
     if (video._mfs_hasWebFull || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
-    if ((Site.isGmMatch() && this.isAutoDefault()) || (!Site.isGmMatch() && !this.isAutoSite())) return;
+    if ((Site.isGmMatch() && this.noAutoDefault()) || (!Site.isGmMatch() && !this.isAutoSite())) return;
     if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWide")) return (video._mfs_hasWebFull = true);
     if (await this.isWebFull(video)) return (video._mfs_hasWebFull = true);
 

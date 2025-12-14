@@ -10,8 +10,8 @@ const { IS_SITE_AUTO, CURRENT_EPISODE } = Storage;
  * 脚本菜单相关逻辑处理
  */
 export default {
+  noAutoDefault: () => Storage.NO_AUTO_DEF.get(),
   isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
-  isAutoDefault: () => Storage.IS_AUTO_DEF.get(),
   isDisableSpeed: () => Storage.DISABLE_SPEED.get(),
   isDisableZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
   isAutoSite: () => IS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
@@ -164,7 +164,7 @@ export default {
       { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_SPEED, attrs: ["send", "delay"] },
       { name: "memory", text: "禁用 记忆倍速", cache: Storage.NOT_CACHE_SPEED, attrs: ["send"] },
       { name: "time", text: "禁用 记忆播放位置", cache: Storage.NOT_CACHE_TIME },
-      { name: "fit", text: "禁用 自动网页全屏", cache: Storage.IS_AUTO_DEF, isHide: !Site.isGmMatch() },
+      { name: "fit", text: "禁用 自动网页全屏", cache: Storage.NO_AUTO_DEF, isHide: !Site.isGmMatch() },
       { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.IS_INVISIBLE_PAUSE },
       { name: "volume", text: "禁用 音量默认百分百", cache: Storage.IS_MAX_VOLUME },
       { name: "next", text: "启用 自动切换至下集", cache: Storage.IS_AUTO_NEXT },
