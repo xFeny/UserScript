@@ -22,6 +22,7 @@ export default {
     this.setupDocumentObserver();
     this.observeFullscreenChange();
     this.observeWebFullscreenChange();
+    this.setupIgnoreUrlsChangeListener();
     this.setupShadowVideoListeners();
   },
   setupDocumentObserver() {
@@ -82,11 +83,10 @@ export default {
         observedValue.isFullscreen = value;
 
         // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
-        !isFullscreen && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
+        !value && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
       },
     });
   },
-
   observeWebFullscreenChange() {
     const handle = () => Tools.scrollTop(this.fsWrapper.scrollY);
     Object.defineProperty(this, "fsWrapper", {

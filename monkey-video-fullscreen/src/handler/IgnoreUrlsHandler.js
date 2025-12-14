@@ -16,16 +16,15 @@ export default {
   },
   initializeIgnoreUrls() {
     // 「自动网页全屏」忽略URL处理
-    const fullUrls = this.processIgnoreUrls(Storage.IGNORE_URLS);
-    this.fullUrlFilter = new URLBlacklist(fullUrls);
+    const urls = this.processIgnoreUrls(Storage.IGNORE_URLS);
+    this.urlFilter = new URLBlacklist(urls);
   },
   isIgnoreUrl() {
-    const isHomePage = location.pathname == "/";
-    const isBlocked = this.fullUrlFilter?.isBlocked(this.topWin.url);
-    return this.topWin ? isBlocked || isHomePage : false;
+    const isBlocked = this.urlFilter?.isBlocked(this.topWin?.url ?? location.href);
+    return isBlocked || location.pathname == "/";
   },
   processIgnoreUrls(cache) {
-    const urlsStr = cache.get() ?? "";
+    const urlsStr = cache.get(this.topWin?.host ?? location.host) ?? "";
     const existUrls = urlsStr.split(/[;\n]/).filter((e) => e.trim());
 
     // 返回用户配置的URL

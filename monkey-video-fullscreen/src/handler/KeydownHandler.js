@@ -7,7 +7,6 @@ import Keyboard from "../common/Keyboard";
  * 快捷键和消息相关逻辑处理
  */
 export default {
-  isInputFocus: (event) => Tools.isInputable(event.composedPath()[0]),
   dispatchShortcutKey(code, bypass) {
     const key = this.processShortcutKey({ code });
     Tools.postMessage(window.top, { key, bypass });
@@ -28,7 +27,7 @@ export default {
   },
   handleKeydown(event, { key, code, isTrusted } = event) {
     // Tools.log("键盘事件：", { key, code });
-    if (this.noVideo() || this.isInputFocus(event)) return;
+    if (this.noVideo() || Tools.isInputable(event.composedPath()[0])) return;
     if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
 
     Tools.preventDefault(event);

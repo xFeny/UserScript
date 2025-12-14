@@ -29,32 +29,32 @@ export default {
     );
   },
   registMenuCommand() {
-    const host = location.host;
-    const isAutoSite = this.isAutoSite();
-    const siteFun = ({ cache }) => cache.set(host, !cache.get(host));
-    const delPicker = () => Storage.CURRENT_EPISODE.del(host) & Storage.RELATIVE_EPISODE.del(host);
+    const siteTitle = `此站${this.isAutoSite() ? "禁" : "启"}用自动网页全屏`;
+    const siteFun = ({ host, cache }) => cache.set(host, !cache.get(host));
+    const delPicker = ({ host }) => Storage.CURRENT_EPISODE.del(host) & Storage.RELATIVE_EPISODE.del(host);
 
     // 菜单配置项
     const configs = [
-      { title: `此站${isAutoSite ? "禁" : "启"}用自动网页全屏`, cache: IS_SITE_AUTO, isHidden: Site.isGmMatch(), fn: siteFun },
-      { title: "删除此站剧集选择器", cache: CURRENT_EPISODE, isHidden: !CURRENT_EPISODE.get(host), fn: delPicker },
+      { title: siteTitle, cache: IS_SITE_AUTO, useHost: true, isHidden: Site.isGmMatch(), fn: siteFun },
+      { title: "删除此站剧集选择器", cache: CURRENT_EPISODE, useHost: true, isHidden: !CURRENT_EPISODE.get(host), fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() },
       // { title: "还原默认", cache: { name: "RESET" }, isHidden: false, fn: this.restoreDefaultSetting },
     ];
 
     // 注册菜单项
-    configs.forEach(({ title, host, cache, isHidden, fn }) => {
+    configs.forEach(({ title, useHost, cache, isHidden, fn }) => {
       const id = `${cache.name}_MENU_ID`;
       GM_unregisterMenuCommand(this[id]);
       if (isHidden) return;
 
+      const host = useHost ? location.host : Consts.EMPTY;
       this[id] = GM_registerMenuCommand(title, () => {
         if (fn) return fn.call(this, { host, cache, title }); // 自定义逻辑
 
         // 弹出输入框对话框
         const input = prompt(title, host ? cache.get(host) : cache.get());
-        if (!isNaN(input) && cache.parser(input)) host ? cache.set(host, input) : cache.set(input);
+        if (input && cache.parser(input)) host ? cache.set(host, input) : cache.set(input);
       });
     });
   },
