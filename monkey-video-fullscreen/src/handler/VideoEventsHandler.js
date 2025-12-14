@@ -19,16 +19,16 @@ export default {
     this.autoWebFullscreen(video);
   },
   loadeddata(video) {
-    this.initVideoProps(video);
+    this?.initVideoProps(video);
   },
   timeupdate(video) {
     if (isNaN(video.duration)) return;
     if (!this.player) this.playing(video);
     this.autoWebFullscreen(video);
-    this.resumeRateKeepDisplay();
+    this?.resumeRateKeepDisplay();
   },
   playing(video) {
     this.setCurrentVideo(video);
-    this.applyCachedPlayRate(video);
+    this?.applyCachedPlayRate(video);
   },
 };
