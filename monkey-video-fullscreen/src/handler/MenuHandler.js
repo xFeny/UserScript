@@ -3,13 +3,11 @@ import Tools from "../common/Tools";
 import Storage from "../common/Storage";
 import Consts from "../common/Consts";
 
-const { THIS_SITE_AUTO } = Storage;
-
 /**
  * 脚本菜单相关逻辑处理
  */
 export default {
-  isAutoSite: () => THIS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
+  isAutoSite: () => Storage.THIS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
     this.setupMenuChangeListener();
@@ -17,14 +15,15 @@ export default {
     this.hasMenu = true;
   },
   setupMenuChangeListener() {
-    [THIS_SITE_AUTO.name + location.host].forEach((key) => GM_addValueChangeListener(key, () => this.registMenuCommand()));
+    const key = Storage.THIS_SITE_AUTO.name + location.host;
+    GM_addValueChangeListener(key, () => this.registMenuCommand());
   },
   registMenuCommand() {
     const siteFun = ({ host, cache }) => cache.set(host, !cache.get(host));
 
     // 菜单配置项
     const configs = [
-      { title: I18n.t(this.isAutoSite() ? "disable" : "enable"), cache: THIS_SITE_AUTO, useHost: true, fn: siteFun },
+      { title: I18n.t(this.isAutoSite() ? "disable" : "enable"), cache: Storage.THIS_SITE_AUTO, useHost: true, fn: siteFun },
       { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS, useHost: true },
       { title: I18n.t("custom"), cache: Storage.CUSTOM_CONTAINER },
       { title: I18n.t("step"), cache: Storage.SPEED_STEP },

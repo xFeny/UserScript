@@ -7,12 +7,11 @@ import Storage from "../common/Storage";
 export default {
   setupIgnoreUrlsChangeListener() {
     this.initializeIgnoreUrls();
-    [Storage.IGNORE_URLS.name].forEach((key) =>
-      GM_addValueChangeListener(key, (_, oldVal, newVal) => {
-        if (oldVal === newVal) return; // 防止无限循环
-        this.initializeIgnoreUrls();
-      })
-    );
+
+    GM_addValueChangeListener(Storage.IGNORE_URLS.name, (_, oldVal, newVal) => {
+      if (oldVal === newVal) return; // 防止无限循环
+      this.initializeIgnoreUrls();
+    });
   },
   initializeIgnoreUrls() {
     // 「自动网页全屏」忽略URL处理
