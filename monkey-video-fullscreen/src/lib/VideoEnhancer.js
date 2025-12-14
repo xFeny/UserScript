@@ -54,25 +54,7 @@ class VideoEnhancer {
     const videos = Tools.querys("video:not([received])");
     if (!videos.length) return;
 
-    this.watchShadowVideoRemoval(); // Shadow有视频元素时，才监控视频元素的移除情况
     videos.forEach((video) => Tools.emitCustomEvent("shadow-video", { video }));
-  }
-
-  static watchShadowVideoRemoval() {
-    if (this.watchShadowVideo) return;
-
-    this.watchShadowVideo = Tools.createObserver(document, (mutations) => {
-      mutations.forEach(({ removedNodes }) => {
-        if (!removedNodes.length) return;
-
-        // 遍历所有移除的节点，查找处理包含video的节点
-        Array.from(removedNodes).forEach((node) => {
-          if (!(node instanceof Element)) return;
-          const videos = node.matches("video") ? [node] : Tools.querys("video", node);
-          videos.forEach((video) => Tools.emitCustomEvent("shadow-video-remove", { video }));
-        });
-      });
-    });
   }
 }
 
