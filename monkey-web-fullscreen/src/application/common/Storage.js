@@ -7,7 +7,7 @@ export default unsafeWindow.FyStorage = {
   /** 缓存远端`@match`网址的相关图标选择器 */
   ICONS_SELECTOR: new TimedStorage("ICONS_SELECTOR", ""),
 
-  /** 网页全屏相关：自定义此站网页全屏规则 */
+  /** 网页全屏相关：自定义此站视频容器 */
   CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", ""),
   /** 网页全屏相关：禁用`@match`网址自动网页全屏 */
   NO_AUTO_DEF: new StorageItem("DISABLE_DEFAULT_AUTO", false, false, Boolean),

@@ -37,8 +37,8 @@ export default {
     const configs = [
       { title: siteTitle, cache: IS_SITE_AUTO, useHost: true, isHidden: Site.isGmMatch(), fn: siteFun },
       { title: "删除此站剧集选择器", cache: CURRENT_EPISODE, useHost: true, isHidden: !CURRENT_EPISODE.get(host), fn: delPicker },
-      { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
-      { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() },
+      { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: this.shortcutKeysPopup },
+      { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: this.settingPopup },
       // { title: "还原默认", cache: { name: "RESET" }, isHidden: false, fn: this.restoreDefaultSetting },
     ];
 
@@ -220,7 +220,7 @@ export default {
   genIgnoreItems() {
     const { CUSTOM_WEB_FULL, NEXT_IGNORE_URLS, FULL_IGNORE_URLS } = Storage;
     const configs = [
-      { name: "customRule", text: "自定义此站网页全屏规则", cache: CUSTOM_WEB_FULL, isHide: Site.isGmMatch(), useHost: true },
+      { name: "customRule", text: "自定义此站视频容器", cache: CUSTOM_WEB_FULL, isHide: Site.isGmMatch(), useHost: true },
       { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: NEXT_IGNORE_URLS },
       { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: FULL_IGNORE_URLS },
     ];
