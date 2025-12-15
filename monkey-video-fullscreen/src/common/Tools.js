@@ -14,7 +14,7 @@ export default {
   getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
   isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
   preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
-  emitCustomEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
+  emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
   isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
   sendToIFrames(data) {
     this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
