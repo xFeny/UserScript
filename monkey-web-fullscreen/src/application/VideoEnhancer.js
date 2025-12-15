@@ -68,8 +68,10 @@ class VideoEnhancer {
     if (!videos.length) return;
 
     videos.forEach((video) => {
+      const root = video.getRootNode();
+      if (!(root instanceof ShadowRoot)) return;
       Tools.emitEvent("shadow-video", { video });
-      Tools.emitEvent("addStyle", { shadowRoot: video.getRootNode() });
+      Tools.emitEvent("addStyle", { shadowRoot: root });
     });
   }
 }
