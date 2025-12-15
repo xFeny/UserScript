@@ -26,7 +26,7 @@ export default {
     return isDynamic;
   },
   initVideoProps(video) {
-    // 清理视频元素上脚本自定义的_mfs_前缀私有属性，避免残留状态干扰
+    if (!Tools.isAttached(this.player)) delete this.player;
     Object.keys(video).forEach((k) => k.startsWith("_mfs_") && delete video[k]);
 
     // 设置默认一些值

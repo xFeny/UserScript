@@ -29,6 +29,7 @@ export default {
     );
   },
   registMenuCommand() {
+    const noPicker = !CURRENT_EPISODE.get(location.host);
     const siteTitle = `此站${this.isAutoSite() ? "禁" : "启"}用自动网页全屏`;
     const siteFun = ({ host, cache }) => cache.set(host, !cache.get(host));
     const delPicker = ({ host }) => Storage.CURRENT_EPISODE.del(host) & Storage.RELATIVE_EPISODE.del(host);
@@ -36,7 +37,7 @@ export default {
     // 菜单配置项
     const configs = [
       { title: siteTitle, cache: IS_SITE_AUTO, useHost: true, isHidden: Site.isGmMatch(), fn: siteFun },
-      { title: "删除此站剧集选择器", cache: CURRENT_EPISODE, useHost: true, isHidden: !CURRENT_EPISODE.get(host), fn: delPicker },
+      { title: "删除此站剧集选择器", cache: CURRENT_EPISODE, useHost: true, isHidden: noPicker, fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: this.shortcutKeysPopup },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: this.settingPopup },
       // { title: "还原默认", cache: { name: "RESET" }, isHidden: false, fn: this.restoreDefaultSetting },

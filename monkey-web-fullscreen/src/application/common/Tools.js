@@ -22,6 +22,7 @@ export default unsafeWindow.FyTools = {
   isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
   preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
   emitCustomEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
+  isAttached: (el) => !el || document.contains(el) || el.getRootNode?.() instanceof ShadowRoot,
   isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
   hasCls: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
   delCls: (el, ...classes) => el?.classList.remove(...classes),
