@@ -27,10 +27,10 @@ export default {
     const fullUrls = this.processIgnoreUrls(Storage.FULL_IGNORE_URLS, this.defFullIgnore);
     this.fullUrlFilter = new URLBlacklist(fullUrls);
   },
-  isNextIgnoreUrl() {
+  isIgnoreNext() {
     return this.nextUrlFilter?.isBlocked(this.topWin?.url ?? location.href);
   },
-  isFullIgnoreUrl() {
+  isIgnoreWide() {
     return this.fullUrlFilter?.isBlocked(this.topWin?.url ?? location.href);
   },
   processIgnoreUrls(cache, defaultUrls) {

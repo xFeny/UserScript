@@ -11,17 +11,16 @@ export default {
   autoNextEpisode(video) {
     if (video.duration < 300 || video._mfs_hasTriedAutoNext || !Storage.IS_AUTO_NEXT.get()) return;
     if (Tools.isThrottle("autoNext", Consts.TWO_SEC) || this.remainTime(video) > Storage.NEXT_ADVANCE_SEC.get()) return;
-    if (this.isNextIgnoreUrl()) return (video._mfs_hasTriedAutoNext = true);
+    if (this.isIgnoreNext()) return (video._mfs_hasTriedAutoNext = true);
 
     this.dispatchShortcutKey(Keyboard.N);
     video._mfs_hasTriedAutoNext = true;
   },
   async autoWebFullscreen(video) {
     if (!this.topWin || !video.offsetWidth || this.player !== video) return;
-    if (video._mfs_hasWebFull || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
+    if (video._mfs_isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
     if ((Site.isGmMatch() && this.noAutoDefault()) || (!Site.isGmMatch() && !this.isAutoSite())) return;
-    if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWide")) return (video._mfs_hasWebFull = true);
-    if (await this.isWebFull(video)) return (video._mfs_hasWebFull = true);
+    if (this.isIgnoreWide() || (await this.isWebFull(video)) || Tools.isOverLimit("autoWide")) return (video._mfs_isWide = true);
 
     // 发送网页全屏消息
     this.dispatchShortcutKey(Keyboard.P);
