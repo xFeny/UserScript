@@ -54,7 +54,7 @@ export default {
 
         // 弹出输入框对话框
         const input = prompt(title, host ? cache.get(host) : cache.get());
-        if (input && cache.parser(input)) host ? cache.set(host, input) : cache.set(input);
+        host ? cache.set(host, input) : cache.set(input);
       });
     });
   },

@@ -31,8 +31,8 @@ export default {
   timeupdate(video) {
     if (isNaN(video.duration)) return;
 
-    if (!video._mfs_hasPlayInited) this.initPlaySettings(video);
     if (!this.player) this.setCurrentVideo(video);
+    if (!video._mfs_hasInited) this.initVideoPlay(video);
 
     this.resumeRateKeepDisplay();
     this.removeRelevantElements(video);
@@ -50,7 +50,7 @@ export default {
   },
   playing(video) {
     this.setCurrentVideo(video);
-    this.initPlaySettings(video);
+    this.initVideoPlay(video);
   },
   pause() {
     // 稀饭动漫（https://dm.xifanacg.com）

@@ -41,9 +41,9 @@ export default {
     this.removeRateKeepDisplay(video);
     this.removeProgressElement();
   },
-  initPlaySettings(video) {
+  initVideoPlay(video) {
     if (!this.player) return;
-    video._mfs_hasPlayInited = true;
+    video._mfs_hasInited = true;
     this.applyCachedPlayRate(video);
     this.playbackRateKeepDisplay();
     this.applyCachedTime(video);

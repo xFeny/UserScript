@@ -62,11 +62,11 @@ export default {
   setCurrentVideo(video) {
     if (!video || this.player === video) return;
     if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // player播放中
-    if ((!Site.isMgtv() && video.offsetWidth < 240) || this.isBackgroundVideo(video)) return;
+    if (video.offsetWidth < 240 || this.isBackgroundVideo(video)) return;
 
     this.player = video;
     this.setVideoInfo(video);
-    this.observeVideoSrcChange(video);
+    this.observeVideoChanges(video);
   },
   setVideoInfo(video) {
     const isLive = Object.is(video.duration, Infinity);
@@ -88,7 +88,7 @@ export default {
     window.topWin = this.topWin = topWin;
     Tools.sendToIFrames({ topWin });
   },
-  observeVideoSrcChange(video) {
+  observeVideoChanges(video) {
     if (video.hasAttribute("observed")) return;
     video.setAttribute("observed", true);
 
@@ -100,6 +100,13 @@ export default {
         isFake ? (this._src = value) : setter(value);
         if ((isFake || this === that.player) && value) handleChange(this);
       },
+    });
+
+    // 监听视频元素是否被移除，若移除的是`this.player`元素，清理引用
+    const observer = Tools.createObserver(video.parentNode, () => {
+      if (document.contains(video)) return;
+      if (this.player === video) delete this.player;
+      observer.disconnect();
     });
   },
   setupMouseMoveListener() {
