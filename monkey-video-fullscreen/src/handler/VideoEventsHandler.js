@@ -34,5 +34,6 @@ export default {
   initVideoProps(video) {
     delete video.__isWide;
     Tools.resetLimit("autoWide");
+    if (!Tools.isAttached(this.player)) delete this.player;
   },
 };
