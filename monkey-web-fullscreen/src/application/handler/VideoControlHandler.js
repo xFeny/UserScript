@@ -42,7 +42,7 @@ export default {
     this.removeProgressElement();
   },
   initVideoPlay(video) {
-    if (!this.player) return;
+    if (!this.player || video._mfs_hasInited) return;
     video._mfs_hasInited = true;
     this.applyCachedPlayRate(video);
     this.playbackRateKeepDisplay();

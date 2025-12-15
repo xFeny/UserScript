@@ -30,9 +30,7 @@ export default {
   },
   timeupdate(video) {
     if (isNaN(video.duration)) return;
-
-    if (!this.player) this.setCurrentVideo(video);
-    if (!video._mfs_hasInited) this.initVideoPlay(video);
+    if (!this.player) this.playing(video);
 
     this.resumeRateKeepDisplay();
     this.removeRelevantElements(video);
