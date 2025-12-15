@@ -1,10 +1,11 @@
-import Tools from "../../common/Tools";
+import Consts from "../common/Consts";
+import Tools from "../common/Tools";
 
 /**
  * 视频监听事件逻辑处理
  */
 export default {
-  videoEvtMap: new WeakMap(), // 存储：video -> handler（仅用于video事件解绑）
+  videoEvtMap: new Map(), // 存储：video -> handler（仅用于video事件解绑）
   videoEvents: ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "pause", "ended"],
   setupVideoListeners(video) {
     const handleEvent = (event) => {
@@ -13,27 +14,29 @@ export default {
     };
 
     this.videoEvents.forEach((type) => (video ?? document).addEventListener(type, handleEvent, true));
-
     if (video && !this.videoEvtMap.has(video)) this.videoEvtMap.set(video, handleEvent);
+
+    // 定时清理已脱离文档的video元素
+    if (this.videoEvtMap.size > 1 && !this.cleanupTimer) {
+      this.cleanupTimer = setInterval(() => this.cleanupDetachedVideos(), Consts.THREE_SEC * 10);
+    }
   },
   setupShadowVideoListeners() {
-    // 绑定视频相关事件监听
     document.addEventListener("shadow-video", (e) => {
       const { video } = e.detail;
       if (!video || video.hasAttribute("received")) return;
       this.setupVideoListeners(video), video.setAttribute("received", true);
       if (!this.player) this.setCurrentVideo(video);
     });
-
-    // 移除视频相关事件监听
-    document.addEventListener("shadow-video-remove", (e) => this.removeVideoListeners(e.detail.video));
   },
-  removeVideoListeners(video) {
-    if (!video || !this.videoEvtMap.has(video)) return;
-
-    this.videoEvents.forEach((type) => video.removeEventListener(type, this.videoEvtMap.get(video), true));
-    video.removeAttribute("received");
-    this.videoEvtMap.delete(video);
+  cleanupDetachedVideos() {
+    this.videoEvtMap.forEach((handler, video) => {
+      if (Tools.isAttached(video)) return;
+      this.videoEvents.forEach((type) => video.removeEventListener(type, handler, true));
+      this.videoEvtMap.delete(video);
+      video.removeAttribute("received");
+      // Tools.log("清理已脱离文档的video元素", video);
+    });
   },
   loadedmetadata(video) {
     this.autoWebFullscreen(video);
