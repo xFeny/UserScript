@@ -3,9 +3,9 @@ import monkey, { util, cdn } from "vite-plugin-monkey";
 import AutoImport from "unplugin-auto-import/vite";
 import cleanup from "rollup-plugin-cleanup";
 
-const description = ["支持所有H5视频的通用(网页)全屏功能"];
-const description_tw = ["支持所有H5視頻的通用(網頁)全屏功能"];
-const description_en = ["Universal (web) full-screen feature supporting all H5 videos"];
+const description = ["通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏"];
+const description_tw = ["通用(網頁)全屏，快捷鍵：P-網頁全屏，Enter-全屏"];
+const description_en = ["Universal (Web) Full Screen; Shortcut keys: P-Web Fullscreen, Enter-Fullscreen"];
 
 // https://vitejs.dev/config/
 export default defineConfig({
