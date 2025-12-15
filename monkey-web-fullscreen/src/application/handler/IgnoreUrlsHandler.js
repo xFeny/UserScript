@@ -8,7 +8,7 @@ import Storage from "../common/Storage";
  */
 export default {
   defNextIgnore: ["https://www.youtube.com/watch", "https://www.bilibili.com/video", "https://www.bilibili.com/list"],
-  defFullIgnore: ["https://www.youtube.com/shorts", "https://www.youtube.com", "https://www.bilibili.com"],
+  defFullIgnore: ["https://www.youtube.com/results", "https://www.youtube.com/shorts"],
   setupIgnoreUrlsChangeListener() {
     this.initializeIgnoreUrls();
     [Storage.FULL_IGNORE_URLS.name, Storage.NEXT_IGNORE_URLS.name].forEach((key) =>
@@ -28,10 +28,10 @@ export default {
     this.fullUrlFilter = new URLBlacklist(fullUrls);
   },
   isNextIgnoreUrl() {
-    return this.topWin ? this.nextUrlFilter?.isBlocked(this.topWin.url) : false;
+    return this.nextUrlFilter?.isBlocked(this.topWin?.url ?? location.href);
   },
   isFullIgnoreUrl() {
-    return this.topWin ? this.fullUrlFilter?.isBlocked(this.topWin.url) : false;
+    return this.fullUrlFilter?.isBlocked(this.topWin?.url ?? location.href);
   },
   processIgnoreUrls(cache, defaultUrls) {
     const urlsStr = cache.get() ?? "";
