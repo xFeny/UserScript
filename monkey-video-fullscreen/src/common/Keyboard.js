@@ -4,10 +4,7 @@
  * value 填写的是键盘事件的`code`值
  */
 export default Object.freeze({
-  A: "KeyA",
   P: "KeyP",
-  S: "KeyS",
-  Z: "KeyZ",
   Enter: "Enter",
   NumEnter: "NumpadEnter",
 });

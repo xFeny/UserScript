@@ -44,15 +44,12 @@ export default {
   execHotKeyActions({ key, isTrusted }) {
     // Tools.log("按下的键：", { key, isTrusted });
     const dict = {
-      A: () => this?.adjustPlaybackRate(Storage.SPEED_STEP.get()),
-      S: () => this?.adjustPlaybackRate(-Storage.SPEED_STEP.get()),
-      Z: () => this?.setPlaybackRate(Consts.DEF_SPEED),
       P: () => this.toggleWebFullscreen(isTrusted),
       ENTER: () => this.toggleFullscreen(),
     };
 
     // 执行函数
-    dict[key]?.() ?? (Tools.isNumber(key) && this?.setPlaybackRate(key));
+    dict[key]?.();
   },
   handleMessage(data) {
     // Tools.log(location.href, "接收到消息：", data);

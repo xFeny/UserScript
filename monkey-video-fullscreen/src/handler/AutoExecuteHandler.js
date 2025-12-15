@@ -8,8 +8,8 @@ import Keyboard from "../common/Keyboard";
 export default {
   async autoWebFullscreen(video) {
     if (!this.topWin || !video.offsetWidth || this.player !== video) return;
-    if (video._mfs_isWide || !this.isAutoSite() || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
-    if ((await this.isWebFull(video)) || this.isIgnoreUrl() || Tools.isOverLimit("autoWide")) return (video._mfs_isWide = true);
+    if (video.__isWide || !this.isAutoSite() || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
+    if ((await this.isWebFull(video)) || this.isIgnoreUrl() || Tools.isOverLimit("autoWide")) return (video.__isWide = true);
 
     // 发送网页全屏消息
     this.dispatchShortcutKey(Keyboard.P);

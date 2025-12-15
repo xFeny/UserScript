@@ -5,6 +5,7 @@ import Storage from "../common/Storage";
  * 处理：自动网页全屏时忽略的网址
  */
 export default {
+  defIgnore: ["https://www.youtube.com/results", "https://www.youtube.com/shorts"],
   setupIgnoreUrlsChangeListener() {
     this.initializeIgnoreUrls();
 
@@ -15,18 +16,21 @@ export default {
   },
   initializeIgnoreUrls() {
     // 「自动网页全屏」忽略URL处理
-    const urls = this.processIgnoreUrls(Storage.IGNORE_URLS);
+    const urls = this.processIgnoreUrls(Storage.IGNORE_URLS, this.defIgnore);
     this.urlFilter = new URLBlacklist(urls);
   },
   isIgnoreUrl() {
-    const isBlocked = this.urlFilter?.isBlocked(this.topWin?.url ?? location.href);
-    return isBlocked || location.pathname == "/";
+    return this.urlFilter?.isBlocked(this.topWin?.url ?? location.href);
   },
-  processIgnoreUrls(cache) {
-    const urlsStr = cache.get(this.topWin?.host ?? location.host) ?? "";
+  processIgnoreUrls(cache, defaultUrls) {
+    const urlsStr = cache.get() ?? "";
     const existUrls = urlsStr.split(/[;\n]/).filter((e) => e.trim());
 
     // 返回用户配置的URL
-    return existUrls.length ? existUrls : [];
+    if (existUrls.length) return existUrls;
+
+    // 设置默认值
+    cache.set(defaultUrls.join(";\n"));
+    return defaultUrls;
   },
 };

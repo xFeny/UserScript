@@ -32,6 +32,9 @@ export default class URLBlacklist {
       const parsedUrl = new URL(url);
       const normalizedPath = this.normalizePath(parsedUrl.pathname);
 
+      // 首页（根路径/）默认加入黑名单
+      if (normalizedPath === "/") return true;
+
       // 检查是否与黑名单中的任何条目匹配
       return this.blacklist.some((entry) => {
         // 首先匹配主机名

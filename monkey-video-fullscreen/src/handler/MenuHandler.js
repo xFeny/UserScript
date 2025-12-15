@@ -1,7 +1,8 @@
 import I18n from "../common/I18n";
 import Tools from "../common/Tools";
-import Storage from "../common/Storage";
 import Consts from "../common/Consts";
+import Storage from "../common/Storage";
+import Swal from "sweetalert2";
 
 /**
  * 脚本菜单相关逻辑处理
@@ -19,14 +20,13 @@ export default {
     GM_addValueChangeListener(key, () => this.registMenuCommand());
   },
   registMenuCommand() {
-    const siteFun = ({ host, cache }) => cache.set(host, !cache.get(host));
+    const siteFn = ({ host, cache }) => cache.set(host, !cache.get(host));
 
     // 菜单配置项
     const configs = [
-      { title: I18n.t(this.isAutoSite() ? "disable" : "enable"), cache: Storage.THIS_SITE_AUTO, useHost: true, fn: siteFun },
-      { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS, useHost: true },
+      { title: I18n.t(this.isAutoSite() ? "disAuto" : "enAuto"), cache: Storage.THIS_SITE_AUTO, useHost: true, fn: siteFn },
+      { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS, fn: this.ignoreUrlsPopup },
       { title: I18n.t("custom"), cache: Storage.CUSTOM_CONTAINER },
-      { title: I18n.t("step"), cache: Storage.SPEED_STEP },
     ];
 
     // 注册菜单项
@@ -43,6 +43,22 @@ export default {
         const input = prompt(title, host ? cache.get(host) : cache.get());
         if (input && cache.parser(input)) host ? cache.set(host, input) : cache.set(input);
       });
+    });
+  },
+  ignoreUrlsPopup({ title, cache }) {
+    Swal.fire({
+      width: 410,
+      title: title,
+      showCancelButton: true,
+      cancelButtonText: "关闭",
+      showConfirmButton: false,
+      input: "textarea",
+      customClass: { container: "monkey-web-fullscreen" },
+      didOpen(popup) {
+        const textarea = Tools.query("textarea", popup);
+        textarea.oninput = () => cache.set(textarea.value); // 保存输入值
+        textarea.value = cache.get(); // 赋值
+      },
     });
   },
 };

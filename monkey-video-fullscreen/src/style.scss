@@ -40,33 +40,41 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 }
 /** 视频网页全屏相关样式 END **/
 
-/** 视频左上角此终显示倍速 **/
-.__rate-keep-show {
-  color: #e0e0e0;
-  top: 5px !important;
-  left: 5px !important;
-  text-indent: 0 !important;
-  font-size: 12px !important;
-  position: absolute !important;
-  pointer-events: none !important;
-  display: inline-block !important;
-  transform-origin: top !important;
-  transform: scale(0.917) !important;
-  font-family: Arial, Helvetica, sans-serif !important;
-  /** 防止被隐藏 **/
+.monkey-web-fullscreen {
   z-index: 2147483647 !important;
-  opacity: 1 !important;
 
-  /** 防止被隐藏 **/
-  &::after {
-    top: 50% !important;
-    left: 50% !important;
-    content: "-" !important;
-    position: fixed !important;
-    text-shadow: none !important;
-    color: transparent !important;
-    pointer-events: none !important;
-    display: inline-block !important;
-    background-color: transparent !important;
+  * {
+    box-sizing: border-box !important;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+  }
+
+  .swal2-cancel {
+    background-color: #757575 !important;
+  }
+
+  textarea {
+    color: #333;
+    border-radius: 3px;
+    width: 100% !important;
+    resize: none !important;
+    font-size: 12px !important;
+    padding: 3px 5px !important;
+    box-shadow: none !important;
+    min-height: 10rem !important;
+    border: 1px solid #cbd5e1 !important;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+
+    &:focus {
+      outline: none !important;
+      border-color: #3b82f6 !important;
+    }
   }
 }

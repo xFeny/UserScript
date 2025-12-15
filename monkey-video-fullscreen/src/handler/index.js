@@ -1,14 +1,12 @@
 import Listen from "./ListenerHandler";
 import Keydown from "./KeydownHandler";
 import Events from "./VideoEventsHandler";
-import Control from "./VideoControlHandler";
 import WebFull from "./WebFullScreenHandler";
 import Automatic from "./AutoExecuteHandler";
-import Extend from "./VideoExtendHandler";
 import Ignore from "./IgnoreUrlsHandler";
 import Menu from "./MenuHandler";
 
-const handlers = [Listen, Keydown, Events, Control, WebFull, Automatic, Extend, Ignore, Menu];
+const handlers = [Listen, Keydown, Events, WebFull, Automatic, Ignore, Menu];
 
 const App = {};
 handlers.forEach((handler) => {
