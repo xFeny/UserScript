@@ -5,7 +5,7 @@ import Storage from "../common/Storage";
  * 处理：自动网页全屏时忽略的网址
  */
 export default {
-  defIgnore: ["https://www.youtube.com/results", "https://www.youtube.com/shorts"],
+  defIgnore: ["https://www.youtube.com/results", "https://www.youtube.com/shorts", "https://www.bilibili.com/anime"],
   setupIgnoreUrlsChangeListener() {
     this.initializeIgnoreUrls();
 
