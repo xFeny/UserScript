@@ -22,7 +22,6 @@ export default unsafeWindow.FyTools = {
   isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
   preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
   emitCustomEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
-  isAttached: (el) => !el || document.contains(el) || el.getRootNode?.() instanceof ShadowRoot,
   isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
   hasCls: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
   delCls: (el, ...classes) => el?.classList.remove(...classes),
@@ -207,5 +206,15 @@ export default unsafeWindow.FyTools = {
     if (!eles || !prop) return;
     const fn = val ? "setProperty" : "removeProperty";
     [].concat(eles).forEach((el) => el?.style?.[fn]?.(prop, val, priority));
+  },
+  /**
+   * 检测DOM元素是否仍挂载在活跃文档树中（兼容开放Shadow DOM）
+   * @param {HTMLElement} el 待检测的DOM元素
+   * @returns {boolean} true=元素挂载；false=元素已脱离
+   */
+  isAttached(el) {
+    if (!el) return false;
+    const root = el.getRootNode?.();
+    return el.isConnected && (!root || !(root instanceof ShadowRoot) || root.host.isConnected);
   },
 };
