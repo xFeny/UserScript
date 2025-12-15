@@ -53,7 +53,10 @@ export default {
     container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
     // 父元素链的长度超过预设的阈值，视频容器“脱离”其原始DOM结构
     container instanceof HTMLIFrameElement || parents.length < Consts.WEBFULL_PARENT_DEPTH
-      ? parents.forEach((el) => Tools.setPart(el, Consts.webFull))
+      ? parents.forEach((el) => {
+          Tools.emitEvent("addStyle", { shadowRoot: el.getRootNode() });
+          Tools.setPart(el, Consts.webFull);
+        })
       : this.detachForFullscreen();
 
     // 滚动到视频容器位置，解决微博网页全屏后，在退出时不在原始位置问题

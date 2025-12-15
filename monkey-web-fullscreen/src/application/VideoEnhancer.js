@@ -54,7 +54,6 @@ class VideoEnhancer {
       if (this._shadowRoot) return this._shadowRoot;
 
       const shadowRoot = (this._shadowRoot = this.__attachShadow.call(this, options));
-      Tools.emitCustomEvent("shadow-attached", { shadowRoot });
       VideoEnhancer.detectShadowVideoElement();
 
       return shadowRoot;
@@ -66,7 +65,12 @@ class VideoEnhancer {
   static detectShadowVideoElement() {
     if (Tools.isThrottle("shadow", 100)) return;
     const videos = Tools.querys("video:not([received])");
-    if (videos.length) videos.forEach((video) => Tools.emitCustomEvent("shadow-video", { video }));
+    if (!videos.length) return;
+
+    videos.forEach((video) => {
+      Tools.emitEvent("shadow-video", { video });
+      Tools.emitEvent("addStyle", { shadowRoot: video.getRootNode() });
+    });
   }
 }
 
