@@ -1,3 +1,5 @@
+import Tools from "../common/Tools";
+
 /**
  * 视频监听事件逻辑处理
  */

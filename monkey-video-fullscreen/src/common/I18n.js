@@ -6,6 +6,7 @@ export default class I18n {
       disAuto: "禁用自动网页全屏",
       ignore: "自动时忽略的网址",
       custom: "自定义视频容器",
+      close: "关闭",
     },
     // 繁体中文（可扩展）
     zh_TW: {
@@ -13,6 +14,7 @@ export default class I18n {
       disAuto: "禁用自動網頁全屏",
       ignore: "自動時忽略的網址",
       custom: "自定義視頻容器",
+      close: "關閉",
     },
     // 英文
     en: {
@@ -20,6 +22,7 @@ export default class I18n {
       disAuto: "Disable automatic web full-screen",
       ignore: "Exclude URLs from auto full-screen",
       custom: "Custom video container",
+      close: "close",
     },
   };
 

@@ -26,7 +26,7 @@ export default {
     const configs = [
       { title: I18n.t(this.isAutoSite() ? "disAuto" : "enAuto"), cache: Storage.THIS_SITE_AUTO, useHost: true, fn: siteFn },
       { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS, fn: this.ignoreUrlsPopup },
-      { title: I18n.t("custom"), cache: Storage.CUSTOM_CONTAINER },
+      { title: I18n.t("custom"), cache: Storage.CUSTOM_CONTAINER, useHost: true },
     ];
 
     // 注册菜单项
@@ -41,21 +41,21 @@ export default {
 
         // 弹出输入框对话框
         const input = prompt(title, host ? cache.get(host) : cache.get());
-        if (input && cache.parser(input)) host ? cache.set(host, input) : cache.set(input);
+        host ? cache.set(host, input) : cache.set(input);
       });
     });
   },
   ignoreUrlsPopup({ title, cache }) {
     Swal.fire({
-      width: 410,
+      width: 350,
       title: title,
       showCancelButton: true,
-      cancelButtonText: "关闭",
       showConfirmButton: false,
-      input: "textarea",
+      cancelButtonText: I18n.t("close"),
+      html: Tools.safeHTML('<textarea id="ignoreUrls" spellcheck="false"></textarea>'),
       customClass: { container: "monkey-web-fullscreen" },
       didOpen(popup) {
-        const textarea = Tools.query("textarea", popup);
+        const textarea = Tools.query("#ignoreUrls", popup);
         textarea.oninput = () => cache.set(textarea.value); // 保存输入值
         textarea.value = cache.get(); // 赋值
       },
