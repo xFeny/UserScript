@@ -99,7 +99,7 @@ export default class BasicStorage {
   static cleanExpired() {
     this.instances.forEach((instance) => {
       instance.fuzzyHandle(instance.name, (key) => {
-        const data = BasicStorage.prototype.get.call(instance, key);
+        const data = BasicStorage.prototype._get.call(instance, key);
         if (data?.expires && data.expires < Date.now()) BasicStorage.prototype.del.call(instance, key);
       });
     });
