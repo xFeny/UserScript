@@ -14,12 +14,7 @@ export default {
     };
 
     this.videoEvents.forEach((type) => (video ?? document).addEventListener(type, handleEvent, true));
-    if (video && !this.videoEvtMap.has(video)) this.videoEvtMap.set(video, handleEvent);
-
-    // 定时清理已脱离文档的video元素
-    if (this.videoEvtMap.size > 1 && !this.cleanupTimer) {
-      this.cleanupTimer = setInterval(() => this.cleanupDetachedVideos(), Consts.THREE_SEC * 10);
-    }
+    if (video) this.videoEvtMap.set(video, handleEvent), this.initCleanupTimer();
   },
   setupShadowVideoListeners() {
     document.addEventListener("shadow-video", (e) => {
@@ -28,6 +23,10 @@ export default {
       this.setupVideoListeners(video), video.setAttribute("received", true);
       if (!this.player) this.setCurrentVideo(video);
     });
+  },
+  initCleanupTimer() {
+    if (this.cleanupTimer || this.videoEvtMap.size <= 1) return;
+    this.cleanupTimer = setInterval(() => this.cleanupDetachedVideos(), Consts.THREE_SEC * 10);
   },
   cleanupDetachedVideos() {
     this.videoEvtMap.forEach((handler, video) => {
