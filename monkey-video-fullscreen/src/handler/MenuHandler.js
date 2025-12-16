@@ -20,7 +20,7 @@ export default {
     GM_addValueChangeListener(key, () => this.registMenuCommand());
   },
   registMenuCommand() {
-    const siteFn = ({ host, cache }) => cache.set(host, !cache.get(host));
+    const siteFn = ({ host, cache }) => cache.set(!cache.get(host), host);
 
     // 菜单配置项
     const configs = [
@@ -41,7 +41,7 @@ export default {
 
         // 弹出输入框对话框
         const input = prompt(title, host ? cache.get(host) : cache.get());
-        host ? cache.set(host, input) : cache.set(input);
+        host ? cache.set(input, host) : cache.set(input);
       });
     });
   },
