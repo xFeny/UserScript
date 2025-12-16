@@ -2,7 +2,7 @@
  * 基础存储类
  */
 export default class BasicStorage {
-  static instances = [];
+  static #instances = [];
 
   /**
    * 构造函数 - 初始化存储实例
@@ -16,8 +16,8 @@ export default class BasicStorage {
     Object.assign(this, { name, defVal, useLocalStore, parser, splice });
     this.storage = useLocalStore ? localStorage : { getItem: GM_getValue, setItem: GM_setValue, removeItem: GM_deleteValue };
 
-    BasicStorage.instances.push(this);
-    if (BasicStorage.instances.length === 1) requestIdleCallback(() => BasicStorage.cleanExpired());
+    BasicStorage.#instances.push(this);
+    if (BasicStorage.#instances.length === 1) requestIdleCallback(() => BasicStorage.cleanExpired());
   }
 
   /**
@@ -27,7 +27,7 @@ export default class BasicStorage {
    * @returns {string} 最终拼接后的键名
    * @throws {Error} 当requireKey为true且suffix为空时抛出错误
    */
-  _getFinalKey(suffix = "", requireKey = false) {
+  #getFinalKey(suffix = "", requireKey = false) {
     if (requireKey && [null, undefined].includes(suffix)) throw new Error("键名拼接时，suffix（第二个参数）不能为空");
     if (suffix.startsWith(this.name)) return suffix;
     return this.splice ? this.name + suffix : this.name;
@@ -41,7 +41,7 @@ export default class BasicStorage {
    */
   set(value, key, expires) {
     const val = expires ? JSON.stringify({ value, expires: Date.now() + expires * 864e5 }) : value;
-    this.storage.setItem(this._getFinalKey(key, true), val);
+    this.storage.setItem(this.#getFinalKey(key, true), val);
   }
 
   /**
@@ -50,7 +50,7 @@ export default class BasicStorage {
    * @returns {any} 解析后的有效数据 | 默认值
    */
   get(key) {
-    const data = this._get(this._getFinalKey(key));
+    const data = this.#get(this.#getFinalKey(key));
     return !data?.value ? data : data.expires > Date.now() ? data.value : this.defVal;
   }
 
@@ -59,7 +59,7 @@ export default class BasicStorage {
    * @param {string} key - 最终存储键名
    * @returns {any} 解析后的数据 | 默认值
    */
-  _get(key) {
+  #get(key) {
     const value = this.storage.getItem(key);
     try {
       return JSON.parse(value) ?? this.defVal;
@@ -73,7 +73,7 @@ export default class BasicStorage {
    * @param {string} [key] - 键名后缀（可选，不传则删除基础名对应数据）
    */
   del(key) {
-    this.storage.removeItem(this._getFinalKey(key));
+    this.storage.removeItem(this.#getFinalKey(key));
   }
 
   fuzzyGet(pattern) {
@@ -97,10 +97,9 @@ export default class BasicStorage {
    * 遍历所有实例，模糊匹配实例基础名，校验过期时间并删除过期数据
    */
   static cleanExpired() {
-    this.instances.forEach((instance) => {
+    this.#instances.forEach((instance) => {
       instance.fuzzyHandle(instance.name, (key) => {
-        const data = BasicStorage.prototype._get.call(instance, key);
-        if (data?.expires && data.expires < Date.now()) BasicStorage.prototype.del.call(instance, key);
+        if (instance.#get(key)?.expires < Date.now()) instance.del(key);
       });
     });
   }
