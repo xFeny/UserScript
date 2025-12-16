@@ -48,7 +48,7 @@ export default {
         }
       },
       confirmCallback(value) {
-        Storage.CURRENT_EPISODE.set(location.host, value);
+        Storage.CURRENT_EPISODE.set(value, location.host);
         Tools.notyf("继续拾取元素 ＼(＞０＜)／");
       },
     });
@@ -67,7 +67,7 @@ export default {
         }
       },
       confirmCallback(value) {
-        Storage.RELATIVE_EPISODE.set(location.host, value);
+        Storage.RELATIVE_EPISODE.set(value, location.host);
         Tools.notyf("操作完成 []~(￣▽￣)~* 干杯");
       },
     });

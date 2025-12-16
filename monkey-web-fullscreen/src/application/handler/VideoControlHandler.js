@@ -89,7 +89,7 @@ export default {
     // 禁用记忆、距离结束10秒，清除记忆缓存
     if (Storage.NOT_CACHE_TIME.get() || this.remainTime(video) <= 10) return this.clearCachedTime(video);
 
-    Storage.PLAY_TIME.set(this.getCacheTimeKey(video), Number(video.currentTime) - 1, Storage.STORAGE_DAYS.get());
+    Storage.PLAY_TIME.set(Number(video.currentTime) - 1, this.getCacheTimeKey(video), Storage.STORAGE_DAYS.get());
     this.clearMultiVideoCacheTime(); // 清除页面内多视频的播放进度存储，如：抖音网页版
   },
   applyCachedTime(video) {

@@ -47,7 +47,7 @@ export default class Site {
       .then((res) => {
         const remoteConf = JSON.parse(res.responseText ?? "{}");
         this.selectors = { ...this.selectors, ...remoteConf };
-        Storage.ICONS_SELECTOR.set(Consts.EMPTY, this.selectors, 1 / 3); // 缓存8小时
+        Storage.ICONS_SELECTOR.set(this.selectors, Consts.EMPTY, 1 / 3); // 缓存8小时
       })
       .catch((e) => console.error("加载远程配置失败", e));
   }

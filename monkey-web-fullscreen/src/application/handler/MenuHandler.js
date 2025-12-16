@@ -31,7 +31,7 @@ export default {
   registMenuCommand() {
     const noPicker = !CURRENT_EPISODE.get(location.host);
     const siteTitle = `此站${this.isAutoSite() ? "禁" : "启"}用自动网页全屏`;
-    const siteFun = ({ host, cache }) => cache.set(host, !cache.get(host));
+    const siteFun = ({ host, cache }) => cache.set(!cache.get(host), host);
     const delPicker = ({ host }) => Storage.CURRENT_EPISODE.del(host) & Storage.RELATIVE_EPISODE.del(host);
 
     // 菜单配置项
@@ -55,7 +55,7 @@ export default {
 
         // 弹出输入框对话框
         const input = prompt(title, host ? cache.get(host) : cache.get());
-        host ? cache.set(host, input) : cache.set(input);
+        host ? cache.set(input, host) : cache.set(input);
       });
     });
   },
@@ -153,7 +153,7 @@ export default {
             const { host, send, delay } = this.dataset;
             const value = Object.is(this.type, "checkbox") ? this.checked : this.value;
             if (send) Tools.postMessage(window, { [`toggle_${this.name}`]: value });
-            const setCache = () => (host ? cache.set(host, value) : cache.set(value));
+            const setCache = () => (host ? cache.set(value, host) : cache.set(value));
             delay ? setTimeout(setCache, 50) : setCache();
           });
         });
