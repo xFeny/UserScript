@@ -1,4 +1,4 @@
-import { querySelector, querySelectorAll } from "./lib/ShadowUtils";
+import { isElement, querySelector, querySelectorAll } from "./lib/ShadowUtils";
 import { Notyf } from "notyf";
 import Consts from "./Consts";
 
@@ -175,12 +175,12 @@ export default unsafeWindow.FyTools = {
     return Array.from({ length: nodes.snapshotLength }, (_, i) => nodes.snapshotItem(i)).filter((el) => !el.matches("script"));
   },
   setPart(node, value) {
-    if (!(node instanceof Element)) return;
+    if (!isElement(node)) return;
     const parts = node?.getAttribute("part")?.split(/\s+/) ?? [];
     node?.setAttribute("part", [...new Set([...parts, value])].join(" ").trim());
   },
   delPart(node, value) {
-    if (!(node instanceof Element)) return;
+    if (!isElement(node)) return;
     const parts = (node?.getAttribute("part")?.split(/\s+/) ?? []).filter((v) => v !== value);
     node?.setAttribute("part", parts.join(" ").trim());
   },

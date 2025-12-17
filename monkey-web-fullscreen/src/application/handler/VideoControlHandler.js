@@ -3,6 +3,7 @@ import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
 import VideoEnhancer from "../VideoEnhancer";
+import { isElement } from "../common/lib/ShadowUtils";
 
 /**
  * 视频控制相关逻辑处理
@@ -243,7 +244,7 @@ export default {
       const el = document.createElement("div");
       el.setAttribute("class", "monkey-toast");
       if (isRemove) Tools.query(".monkey-toast")?.remove();
-      content instanceof Element ? el.appendChild(content) : (el.innerHTML = content);
+      isElement(content) ? el.appendChild(content) : (el.innerHTML = content);
 
       (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2, false)).prepend(el), resolve(el);
       setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.HALF_SEC)), duration);

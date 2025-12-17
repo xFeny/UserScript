@@ -23,8 +23,7 @@ export default class URLBlacklist {
 
   normalizePath(path) {
     // 移除末尾的斜杠（除了根路径）
-    if (path.length > 1 && path.endsWith("/")) return path.slice(0, -1);
-    return path;
+    return path.length > 1 && path.endsWith("/") ? path.slice(0, -1) : path;
   }
 
   isBlocked(url) {
