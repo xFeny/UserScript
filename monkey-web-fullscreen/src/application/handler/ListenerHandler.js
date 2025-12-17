@@ -21,6 +21,7 @@ export default {
     this.setupVisibleListener();
     this.setupMouseMoveListener();
     this.setupFullscreenListener();
+    this.setupDoubleClickListener();
     this.setupVideoListeners();
 
     if (isNonFirst) return;
@@ -103,11 +104,16 @@ export default {
   },
   setupMouseMoveListener() {
     let timer = null;
-    const handleEvent = ({ type, isTrusted }) => {
+    const handleEvent = ({ type, isTrusted, clientX, clientY }) => {
       if (!isTrusted || this.noVideo() || Tools.isThrottle(type, 100)) return;
 
       clearTimeout(timer), this.toggleCursor();
       timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
+
+      // 获取鼠标光标位置是否有视频元素
+      const elements = document.elementsFromPoint(clientX, clientY);
+      const video = elements.find((el) => el.matches("video"));
+      if (video) this.createDblclickElement(video);
     };
 
     document.addEventListener("mousemove", (e) => handleEvent(e));
@@ -166,5 +172,30 @@ export default {
         });
       },
     });
+  },
+  /**
+   * 双击视频侧边元素
+   */
+  setupDoubleClickListener() {
+    document.addEventListener("dblclick", (event, { target } = event) => {
+      if (!Tools.hasCls(target, "edge-dblclick")) return;
+
+      delete this.player;
+      this.setCurrentVideo(target.video);
+
+      // 视频元素可能是在`iframe`中，需要等待返回顶级窗口信息才能执行网页全屏
+      Tools.sleep(30).then(() => this.dispatchShortcutKey(Keyboard.P));
+    });
+  },
+  createDblclickElement(video) {
+    const container = this.findVideoParentContainer(video, 4, false);
+    if (video.leftArea) return container.prepend(video.leftArea, video.rightArea);
+
+    // 复用创建逻辑，通过 Object.assign 简化元素初始化
+    const createEdge = () => Object.assign(document.createElement("div"), { className: "edge-dblclick", video });
+
+    // 解构赋值批量创建边缘元素
+    [video.leftArea, video.rightArea] = [createEdge(), createEdge()];
+    container.prepend(video.leftArea, video.rightArea);
   },
 };
