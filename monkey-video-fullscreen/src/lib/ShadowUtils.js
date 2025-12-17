@@ -4,9 +4,7 @@
  * @param node 要测试的节点
  * @return 布尔值，表示该节点是否为元素节点
  */
-export function isElement(node) {
-  return node instanceof Element;
-}
+export const isElement = (node) => node instanceof Element;
 
 /**
  * 判断给定节点是否为文档节点。
@@ -14,9 +12,7 @@ export function isElement(node) {
  * @param node 要测试的节点
  * @return 布尔值，表示该节点是否为文档节点
  */
-export function isDocument(node) {
-  return node instanceof Document;
-}
+export const isDocument = (node) => node instanceof Document;
 
 /**
  * 获取节点的 ShadowRoot（影子根）
@@ -24,10 +20,7 @@ export function isDocument(node) {
  * @param {Element} node 要获取 ShadowRoot 的元素节点
  * @return {ShadowRoot|null} 元素的影子根，若不存在则返回 null
  */
-function getRoot(node) {
-  if (!node) return null;
-  return node._shadowRoot ?? node.shadowRoot;
-}
+export const getSRoot = (node) => node?._shadowRoot ?? node?.shadowRoot ?? null;
 
 /**
  * 遍历给定节点，查找所有子元素中包含的 shadow root。
@@ -39,7 +32,7 @@ function getRoot(node) {
 export function* getShadowRoots(node, deep = false) {
   if (!node || (!isElement(node) && !isDocument(node))) return;
 
-  if (isElement(node) && getRoot(node)) yield getRoot(node);
+  if (isElement(node) && getSRoot(node)) yield getSRoot(node);
 
   const doc = isDocument(node) ? node : node.getRootNode({ composed: true });
   if (!doc.createTreeWalker) return;
@@ -48,12 +41,12 @@ export function* getShadowRoots(node, deep = false) {
   const toWalk = [node];
   while ((currentNode = toWalk.pop())) {
     const walker = doc.createTreeWalker(currentNode, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_DOCUMENT_FRAGMENT, {
-      acceptNode: (child) => (isElement(child) && getRoot(child) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP),
+      acceptNode: (child) => (isElement(child) && getSRoot(child) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP),
     });
 
     let walkerNode = walker.nextNode();
     while (walkerNode) {
-      const shadowRoot = getRoot(walkerNode);
+      const shadowRoot = getSRoot(walkerNode);
       if (isElement(walkerNode) && shadowRoot) {
         if (deep) toWalk.push(shadowRoot);
         yield shadowRoot;

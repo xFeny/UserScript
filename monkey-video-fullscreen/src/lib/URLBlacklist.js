@@ -23,8 +23,7 @@ export default class URLBlacklist {
 
   normalizePath(path) {
     // 移除末尾的斜杠（除了根路径）
-    if (path.length > 1 && path.endsWith("/")) return path.slice(0, -1);
-    return path;
+    return path.length > 1 && path.endsWith("/") ? path.slice(0, -1) : path;
   }
 
   isBlocked(url) {
@@ -32,7 +31,7 @@ export default class URLBlacklist {
       const parsedUrl = new URL(url);
       const normalizedPath = this.normalizePath(parsedUrl.pathname);
 
-      // 首页（根路径/）默认加入黑名单
+      // 默认屏蔽首页（根路径/）
       if (normalizedPath === "/") return true;
 
       // 检查是否与黑名单中的任何条目匹配
