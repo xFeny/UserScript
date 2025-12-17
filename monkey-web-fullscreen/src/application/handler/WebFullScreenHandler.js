@@ -97,9 +97,7 @@ export default {
 
     // 清理相关变量
     this.videoParents.clear();
-    this.fsPlaceholder = null;
-    this.fsWrapper = null;
-    this.fsParent = null;
+    this.fsPlaceholder = this.fsWrapper = this.fsParent = null;
   },
   getVideoHostContainer() {
     if (this.player) return this.getVideoContainer();

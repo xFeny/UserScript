@@ -80,8 +80,6 @@ export default class Clock {
   destroy() {
     this.stop();
     this.element?.remove();
-    this.dateInstance = null;
-    this.container = null;
-    this.element = null;
+    this.dateInstance = this.container = this.element = null;
   }
 }
