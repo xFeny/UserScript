@@ -1,16 +1,17 @@
 /**
  * 基础存储类
+ * 支持 localStorage/GM API、过期时间、模糊操作
  */
 export default class BasicStorage {
   static #instances = [];
 
   /**
-   * 构造函数 - 初始化存储实例
-   * @param {string} name - 存储键名前缀/基础键名（核心标识）
-   * @param {any} defVal - 获取数据失败/过期时的默认值
-   * @param {boolean} [useLocalStore=false] - 存储源选择：true=localStorage，false=GM_* API
-   * @param {Function} [parser=(v) => v] - 数据解析函数，处理从存储中读取的值
-   * @param {boolean} [splice=false] - 键名拼接策略：true=基础名+后缀，false=固定使用基础名
+   * 构造函数
+   * @param {string} name 存储键名前缀
+   * @param {any} defVal 默认值
+   * @param {boolean} [useLocalStore=false] 是否使用localStorage（默认GM API）
+   * @param {Function} [parser=(v) => v] 数据解析函数
+   * @param {boolean} [splice=false] 是否拼接键名（前缀+后缀）
    */
   constructor(name, defVal, useLocalStore = false, parser = (v) => v, splice = false) {
     Object.assign(this, { name, defVal, useLocalStore, parser, splice });
@@ -21,9 +22,9 @@ export default class BasicStorage {
   }
 
   /**
-   * 内部方法 - 生成最终存储键名
-   * @param {string} [suffix=""] - 键名后缀（用于拼接）
-   * @param {boolean} [requireKey=false] - 是否强制要求suffix非空（set方法必传，get/del可选）
+   * 生成最终键名
+   * @param {string} [suffix=""] 后缀
+   * @param {boolean} [requireKey=false] 是否强制非空
    * @returns {string} 最终拼接后的键名
    * @throws {Error} 当requireKey为true且suffix为空时抛出错误
    */
@@ -34,10 +35,10 @@ export default class BasicStorage {
   }
 
   /**
-   * 存储数据（支持设置过期时间）
-   * @param {any} value - 要存储的值
-   * @param {string} key - 键名后缀（最终键名由基础名+该后缀拼接）
-   * @param {number} [expires] - 过期天数：不传则永久存储
+   * 存储数据（支持过期天数）
+   * @param {any} value 存储值
+   * @param {string} key 键名后缀（最终键名由基础名+该后缀拼接）
+   * @param {number} [expires] 过期天数（不传永久）
    */
   set(value, key, expires) {
     const val = expires ? JSON.stringify({ value, expires: Date.now() + expires * 864e5 }) : value;
@@ -46,7 +47,7 @@ export default class BasicStorage {
 
   /**
    * 获取数据（自动校验过期时间）
-   * @param {string} [key] - 键名后缀（可选，不传则使用基础名）
+   * @param {string} [key] 键名后缀（可选，不传则使用基础名）
    * @returns {any} 解析后的有效数据 | 默认值
    */
   get(key) {
@@ -55,8 +56,8 @@ export default class BasicStorage {
   }
 
   /**
-   * 内部方法 - 读取并解析存储数据（核心读取逻辑）
-   * @param {string} key - 最终存储键名
+   * 读取并解析存储数据
+   * @param {string} key 最终存储键名
    * @returns {any} 解析后的数据 | 默认值
    */
   #get(key) {
@@ -70,7 +71,7 @@ export default class BasicStorage {
 
   /**
    * 删除指定键名的数据
-   * @param {string} [key] - 键名后缀（可选，不传则删除基础名对应数据）
+   * @param {string} [key] 键名后缀（可选，不传则删除基础名对应数据）
    */
   del(key) {
     this.storage.removeItem(this.#getFinalKey(key));
@@ -93,8 +94,7 @@ export default class BasicStorage {
   }
 
   /**
-   * 静态方法 - 批量清理所有实例的过期数据
-   * 遍历所有实例，模糊匹配实例基础名，校验过期时间并删除过期数据
+   * 清理所有实例的过期数据
    */
   static cleanExpired() {
     this.#instances.forEach((instance) => {
