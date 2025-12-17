@@ -78,3 +78,21 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     }
   }
 }
+
+.edge-dblclick {
+  cursor: pointer;
+  left: 0 !important;
+  top: 50% !important;
+  width: 30px !important;
+  height: 60% !important;
+  position: absolute !important;
+  z-index: 2147483647 !important;
+  transform: translateY(-50%) !important;
+  background-color: transparent !important;
+  opacity: 0 !important;
+
+  &:nth-child(2) {
+    right: 0 !important;
+    left: auto !important;
+  }
+}

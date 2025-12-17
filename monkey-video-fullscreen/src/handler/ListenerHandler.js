@@ -15,6 +15,7 @@ export default {
   init(isNonFirst = false) {
     this.setupVideoDetector();
     this.setupKeydownListener();
+    this.setupMouseMoveListener();
     this.setupFullscreenListener();
     this.setupVideoListeners();
 
@@ -24,6 +25,7 @@ export default {
     this.observeWebFullscreenChange();
     this.setupIgnoreUrlsChangeListener();
     this.setupShadowVideoListeners();
+    this.setupDoubleClickListener();
   },
   setupDocumentObserver() {
     // 示例网站：https://nkvod.me、https://www.lkvod.com
@@ -100,5 +102,42 @@ export default {
         }
       },
     });
+  },
+  setupMouseMoveListener() {
+    document.addEventListener("mousemove", ({ type, isTrusted, clientX, clientY }) => {
+      if (!isTrusted || Tools.isThrottle(type, 100)) return;
+
+      // 获取鼠标光标位置是否有视频元素
+      const elements = document.elementsFromPoint(clientX, clientY);
+      const video = elements.find((el) => el.matches("video"));
+      if (video) this.setEdgeDoubleClick(video);
+    });
+  },
+  setupDoubleClickListener() {
+    document.addEventListener("dblclick", (event, { target } = event) => {
+      if (!target.classList.contains("edge-dblclick")) return;
+
+      delete this.player;
+      this.setCurrentVideo(target.video);
+      Tools.sleep(30).then(() => this.dispatchShortcutKey(Keyboard.P));
+    });
+  },
+  setEdgeDoubleClick(video) {
+    const vidWrap = this.findVideoParentContainer(video, 5, false);
+    if (video.leftEdge) return vidWrap.prepend(video.leftEdge, video.rightEdge);
+
+    const createEl = () => {
+      const el = document.createElement("div");
+      el.className = "edge-dblclick";
+      el.video = video;
+      return el;
+    };
+
+    // 创建左右边缘元素并挂载到video对象
+    video.leftEdge = createEl();
+    video.rightEdge = createEl();
+
+    // 插入到容器中
+    vidWrap.prepend(video.leftEdge, video.rightEdge);
   },
 };
