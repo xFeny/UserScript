@@ -25,7 +25,6 @@ export default {
     this.observeWebFullscreenChange();
     this.setupIgnoreUrlsChangeListener();
     this.setupShadowVideoListeners();
-    this.setupDoubleClickListener();
   },
   setupDocumentObserver() {
     // 示例网站：https://nkvod.me、https://www.lkvod.com
@@ -105,39 +104,34 @@ export default {
   },
   setupMouseMoveListener() {
     document.addEventListener("mousemove", ({ type, isTrusted, clientX, clientY }) => {
-      if (!isTrusted || Tools.isThrottle(type, 100)) return;
+      if (!isTrusted || Tools.isThrottle(type, 200)) return;
 
       // 获取鼠标光标位置是否有视频元素
       const elements = document.elementsFromPoint(clientX, clientY);
       const video = elements.find((el) => el.matches("video"));
-      if (video) this.setEdgeDoubleClick(video);
+      if (video) this.createEdgeClickElement(video);
     });
   },
-  setupDoubleClickListener() {
-    document.addEventListener("dblclick", (event, { target } = event) => {
-      if (!target.classList.contains("edge-dblclick")) return;
+  createEdgeClickElement(video) {
+    const container = this.findVideoParentContainer(video.parentNode, 4, false);
+    if (video.leftArea) return container.prepend(video.leftArea, video.rightArea);
 
-      delete this.player;
-      this.setCurrentVideo(target.video);
-      Tools.sleep(30).then(() => this.dispatchShortcutKey(Keyboard.P));
-    });
-  },
-  setEdgeDoubleClick(video) {
-    const vidWrap = this.findVideoParentContainer(video, 5, false);
-    if (video.leftEdge) return vidWrap.prepend(video.leftEdge, video.rightEdge);
-
-    const createEl = () => {
-      const el = document.createElement("div");
-      el.className = "edge-dblclick";
-      el.video = video;
-      return el;
+    // 复用创建逻辑，通过 Object.assign 简化元素初始化
+    const createEdge = () => {
+      return Object.assign(document.createElement("div"), {
+        video,
+        className: "video-edge-click",
+        ondblclick: (e) => {
+          delete this.player;
+          Tools.preventDefault(e);
+          this.setCurrentVideo(e.target.video);
+          Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
+        },
+      });
     };
 
-    // 创建左右边缘元素并挂载到video对象
-    video.leftEdge = createEl();
-    video.rightEdge = createEl();
-
-    // 插入到容器中
-    vidWrap.prepend(video.leftEdge, video.rightEdge);
+    // 解构赋值批量创建边缘元素
+    [video.leftArea, video.rightArea] = [createEdge(), createEdge()];
+    container.prepend(video.leftArea, video.rightArea);
   },
 };

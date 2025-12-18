@@ -29,7 +29,7 @@
 // @run-at             document-start
 // ==/UserScript==
 
-(n=>{const o=Symbol("styleAdded"),e=document.createElement("style");e.textContent=n,window.gmStyle=e,document.addEventListener("addStyle",r=>{const{shadowRoot:t}=r.detail;t[o]||t instanceof Document||(t.prepend(e.cloneNode(!0)),t[o]=!0)}),(GM_addStyle??(()=>document.head.append(e.cloneNode(!0))))(n)})(' @charset "UTF-8";::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen]~*:not(.monkey-web-fullscreen){display:none!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;font-size:12px!important;padding:3px 5px!important;box-shadow:none!important;min-height:8rem!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen textarea:focus{outline:none!important;border-color:#3b82f6!important} ');
+(n=>{const o=Symbol("styleAdded"),t=document.createElement("style");t.textContent=n,window.gmStyle=t,document.addEventListener("addStyle",r=>{const{shadowRoot:e}=r.detail;e[o]||e instanceof Document||(e.prepend(t.cloneNode(!0)),e[o]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(n)})(' @charset "UTF-8";::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen]~*:not(.monkey-web-fullscreen){display:none!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;font-size:12px!important;padding:3px 5px!important;box-shadow:none!important;min-height:8rem!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen textarea:focus{outline:none!important;border-color:#3b82f6!important}.video-edge-click{cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAipJREFUSEutlTFoFEEUhr+3nKhFwMouKIqNFhYixC6m0E5UMFhI0F4UBY1GbzPZQyVJF7BSUBCNuZBLaWVMp6LYaaWiSBAtFLSKhH2yc3thd2/nbk6cbtl//n/+ef97I/SwNOJZApeQg77bxBeY4DRCUwHvfd7A/yKgExiEbWzghlzlfdFdJwd6k92scQnls4xjWntzDjTiHnAaeEnMETF8z4q4BFLyOrAHuC8hZ8oFmqdoAZ+whWNyjtUWOD1AUuR1ggL5WyoMyxjvSgXsPWdFhHmpMtwpCBrxGtgHtJHbQJRtXhcR3kiVkS4CSXT7qDCSPbnTQS+x9cF6xVQNm4DtbGZFRvntQ9yTAzUMEjS7GHiMcEeqLPkISdr+gwVwLmo6SR+r/CpgPgB3iamL4aNLrFxAmZZxLhd6YBY46SBqAHPENMSwlsV41cDGt8YQytMu1/IFmCVmUQwvnDF1kWhkx8dOn7sHloipeTuwLiKuALc8BRLYcnmjzbCRn0wDP7KDSw07CEiK23kJ34BHwO02ATVsJeABcCgZehIyUCj2AnDcofAKqKfFtsnKT9Mau1AeAvutvZKXSyM7m+baBISzBDTkGl+dKdKIReCoi9zWwVAhsLnvzxAtE3NYDH+KwnkHzQdnLzEXxPCpQ5omIdcnoxIyVYbvKUUtAjUMEPA8/V4h4IBcJ+mBkpvrlgjHf41s0w0BMxJy3kXzTw5sLSY4gXAK4aJU3dH9C5MTtb2fy3n/AAAAAElFTkSuQmCC),pointer!important;top:0!important;left:0!important;width:30px!important;height:80%!important;position:absolute!important;z-index:2147483647!important;background-color:transparent!important;opacity:0!important}.video-edge-click:nth-child(2){right:0!important;left:auto!important}:has(>.video-edge-click){position:relative} ');
 
 (function (Swal) {
   'use strict';
@@ -255,6 +255,7 @@
     init(isNonFirst = false) {
       this.setupVideoDetector();
       this.setupKeydownListener();
+      this.setupMouseMoveListener();
       this.setupFullscreenListener();
       this.setupVideoListeners();
       if (isNonFirst) return;
@@ -333,6 +334,32 @@
           }
         }
       });
+    },
+    setupMouseMoveListener() {
+      document.addEventListener("mousemove", ({ type, isTrusted, clientX, clientY }) => {
+        if (!isTrusted || Tools.isThrottle(type, 200)) return;
+        const elements = document.elementsFromPoint(clientX, clientY);
+        const video = elements.find((el) => el.matches("video"));
+        if (video) this.createEdgeClickElement(video);
+      });
+    },
+    createEdgeClickElement(video) {
+      const container = this.findVideoParentContainer(video.parentNode, 4, false);
+      if (video.leftArea) return container.prepend(video.leftArea, video.rightArea);
+      const createEdge = () => {
+        return Object.assign(document.createElement("div"), {
+          video,
+          className: "video-edge-click",
+          ondblclick: (e) => {
+            delete this.player;
+            Tools.preventDefault(e);
+            this.setCurrentVideo(e.target.video);
+            Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
+          }
+        });
+      };
+      [video.leftArea, video.rightArea] = [createEdge(), createEdge()];
+      container.prepend(video.leftArea, video.rightArea);
     }
   };
   class BasicStorage {
@@ -451,6 +478,7 @@
         const { video } = e.detail;
         if (!video || video.hasAttribute("received")) return;
         this.setupVideoListeners(video), video.setAttribute("received", true);
+        Tools.microTask(() => this.createEdgeClickElement(video));
         if (!this.player) this.setCurrentVideo(video);
       });
     },
