@@ -18,8 +18,8 @@ export default {
       const { video } = e.detail;
       if (!video || video.hasAttribute("received")) return;
       this.setupVideoListeners(video), video.setAttribute("received", true);
+      Tools.microTask(() => this.createEdgeClickElement(video));
       if (!this.player) this.setCurrentVideo(video);
-      this.createEdgeClickElement(video);
     });
   },
   loadedmetadata(video) {
