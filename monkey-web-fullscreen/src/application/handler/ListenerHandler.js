@@ -184,9 +184,7 @@ export default {
         ondblclick: (e) => {
           delete this.player;
           this.setCurrentVideo(e.target.video);
-
-          // 视频元素可能是在`iframe`中，需要等待返回顶级窗口信息才能执行网页全屏
-          Tools.sleep(30).then(() => this.dispatchShortcutKey(Keyboard.P));
+          Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P));
         },
       });
     };
