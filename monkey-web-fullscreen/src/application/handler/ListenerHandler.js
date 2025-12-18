@@ -112,7 +112,7 @@ export default {
       // 获取鼠标光标位置是否有视频元素
       const elements = document.elementsFromPoint(clientX, clientY);
       const video = elements.find((el) => el.matches("video"));
-      if (video) this.createDblclickElement(video);
+      if (video) this.createEdgeClickElement(video);
     };
 
     document.addEventListener("mousemove", (e) => handleEvent(e));
@@ -172,7 +172,7 @@ export default {
       },
     });
   },
-  createDblclickElement(video) {
+  createEdgeClickElement(video) {
     const container = this.findVideoParentContainer(video.parentNode, 4, false);
     if (video.leftArea) return container.prepend(video.leftArea, video.rightArea);
 
@@ -180,7 +180,7 @@ export default {
     const createEdge = () => {
       return Object.assign(document.createElement("div"), {
         video,
-        className: "edge-dblclick",
+        className: "video-edge-click",
         ondblclick: (e) => {
           delete this.player;
           this.setCurrentVideo(e.target.video);
