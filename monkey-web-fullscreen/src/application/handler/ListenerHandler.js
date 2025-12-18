@@ -182,6 +182,7 @@ export default {
         className: "video-edge-click",
         ondblclick: (e) => {
           delete this.player;
+          Tools.preventDefault(e);
           this.setCurrentVideo(e.target.video);
           Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
         },
