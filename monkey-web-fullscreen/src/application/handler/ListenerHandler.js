@@ -103,7 +103,7 @@ export default {
   setupMouseMoveListener() {
     let timer = null;
     const handleEvent = ({ type, isTrusted, clientX, clientY }) => {
-      if (!isTrusted || this.noVideo() || Tools.isThrottle(type, 100)) return;
+      if (!isTrusted || this.noVideo() || Tools.isThrottle(type, 200)) return;
 
       clearTimeout(timer), this.toggleCursor();
       timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
@@ -114,7 +114,7 @@ export default {
       if (video) this.createEdgeClickElement(video);
     };
 
-    document.addEventListener("mousemove", (e) => handleEvent(e));
+    document.addEventListener("mousemove", (e) => handleEvent(e), { passive: true });
     document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleEvent(e));
   },
   toggleCursor(hide = false, cls = "__hc") {
