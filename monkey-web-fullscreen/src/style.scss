@@ -508,7 +508,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   user-select: none !important;
   opacity: 0 !important;
 
-  &:nth-child(2) {
+  &.right {
     right: 0 !important;
     left: auto !important;
   }

@@ -176,10 +176,10 @@ export default {
     if (video.leftArea) return container.prepend(video.leftArea, video.rightArea);
 
     // 复用创建逻辑，通过 Object.assign 简化元素初始化
-    const createEdge = () => {
+    const createEdge = (clas = "") => {
       return Object.assign(document.createElement("div"), {
         video,
-        className: "video-edge-click",
+        className: `video-edge-click ${clas}`,
         ondblclick: (e) => {
           delete this.player;
           Tools.preventDefault(e);
@@ -190,7 +190,7 @@ export default {
     };
 
     // 解构赋值批量创建边缘元素
-    [video.leftArea, video.rightArea] = [createEdge(), createEdge()];
+    [video.leftArea, video.rightArea] = [createEdge(), createEdge("right")];
     container.prepend(video.leftArea, video.rightArea);
   },
 };
