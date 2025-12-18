@@ -19,6 +19,7 @@ export default {
       if (!video || video.hasAttribute("received")) return;
       this.setupVideoListeners(video), video.setAttribute("received", true);
       if (!this.player) this.setCurrentVideo(video);
+      this.createEdgeClickElement(video);
     });
   },
   loadedmetadata(video) {
