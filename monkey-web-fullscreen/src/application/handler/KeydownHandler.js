@@ -17,9 +17,9 @@ export default {
     const zoomKeys = !this.isDisableZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
     if (isNumberKey || isOverrideKey || preventKeys || (altKey && zoomKeys)) Tools.preventDefault(event);
   },
-  dispatchShortcutKey(code, bypass) {
+  dispatchShortcutKey(code, { bypass = false, isTrusted = false } = {}) {
     const key = this.processShortcutKey({ code });
-    Tools.postMessage(window.top, { key, bypass });
+    Tools.postMessage(window.top, { key, bypass, isTrusted });
   },
   processShortcutKey({ key, code, ctrlKey, shiftKey, altKey }) {
     code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);

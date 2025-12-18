@@ -155,7 +155,7 @@ export default {
       if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
       if (this.isInputFocus(event) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
       if (type === "keyup") return Tools.preventDefault(event); // 防止 keyup 事件触发
-      Tools.preventDefault(event), this.dispatchShortcutKey(code, true);
+      Tools.preventDefault(event), this.dispatchShortcutKey(code, { bypass: true });
     };
     Object.defineProperty(this, "fsWrapper", {
       get: () => observedValue.fsWrapper,
@@ -184,7 +184,7 @@ export default {
         ondblclick: (e) => {
           delete this.player;
           this.setCurrentVideo(e.target.video);
-          Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P));
+          Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
         },
       });
     };
