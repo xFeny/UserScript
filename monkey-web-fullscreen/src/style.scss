@@ -514,6 +514,6 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 }
 
 /** 为侧边双击元素的父元素设置相对定位 */
-:has(.edge-dblclick) {
+:has(> .edge-dblclick) {
   position: relative;
 }
