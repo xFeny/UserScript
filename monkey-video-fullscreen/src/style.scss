@@ -90,6 +90,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   position: absolute !important;
   z-index: 2147483647 !important;
   background-color: transparent !important;
+  user-select: none !important;
   opacity: 0 !important;
 
   &:nth-child(2) {
