@@ -174,8 +174,14 @@ export default {
     });
   },
   createEdgeClickElement(video) {
-    const container = this.findVideoParentContainer(Tools.getParent(video), 4, false);
-    if (getComputedStyle(container).position === "static") Tools.setStyle(container, "position", "relative");
+    const parentNode = video.parentNode;
+    const sroot = video.getRootNode() instanceof ShadowRoot;
+    const container = sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
+
+    // 避免元素定位异常
+    if (container instanceof Element && getComputedStyle(container).position === "static") {
+      Tools.setStyle(container, "position", "relative");
+    }
 
     // 已创建过，复用元素
     if (video.leftArea) return container.prepend(video.leftArea, video.rightArea);
