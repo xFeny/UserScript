@@ -122,11 +122,12 @@ export default {
   videoParents: new Set(),
   findVideoParentContainer(container, maxLevel = 4, track = true) {
     container = container ?? Tools.getParent(this.player);
+    if (!container.offsetHeight) container = Tools.getParent(container); // Youtube 存在这样的问题
     const { offsetWidth: cw, offsetHeight: ch } = container;
     if (track) this.videoParents.clear(); // 仅网页全屏时
 
     // 循环向上查找与初始元素宽高相等的父元素
-    for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
+    for (let parent = container, level = 0; parent && level < maxLevel; parent = Tools.getParent(parent), level++) {
       if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
       if (this.hasExplicitlySize(parent)) return container;
       if (track) this.videoParents.add(parent);
@@ -138,7 +139,7 @@ export default {
     const style = element.style;
     const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
     return ["width", "height"].some((prop) => {
-      const value = style.getPropertyValue(prop);
+      const value = style?.getPropertyValue(prop);
       return value && sizeRegex.test(value);
     });
   },
