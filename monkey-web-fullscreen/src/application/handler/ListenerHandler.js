@@ -172,7 +172,7 @@ export default {
     });
   },
   createEdgeClickElement(video) {
-    const container = this.findVideoParentContainer(video.parentNode, 4, false);
+    const container = this.findVideoParentContainer(Tools.getParent(video), 4, false);
     if (video.leftArea) return container.prepend(video.leftArea, video.rightArea);
 
     // 复用创建逻辑，通过 Object.assign 简化元素初始化

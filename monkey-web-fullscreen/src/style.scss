@@ -513,8 +513,3 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
     left: auto !important;
   }
 }
-
-/** 为侧边双击元素的父元素设置相对定位 */
-:has(> .video-edge-click) {
-  position: relative;
-}
