@@ -29,7 +29,7 @@
 // @run-at             document-start
 // ==/UserScript==
 
-(n=>{const o=Symbol("styleAdded"),t=document.createElement("style");t.textContent=n,window.gmStyle=t,document.addEventListener("addStyle",r=>{const{shadowRoot:e}=r.detail;e[o]||e instanceof Document||(e.prepend(t.cloneNode(!0)),e[o]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(n)})(' @charset "UTF-8";::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen]~*:not(.monkey-web-fullscreen){display:none!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;font-size:12px!important;padding:3px 5px!important;box-shadow:none!important;min-height:8rem!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen textarea:focus{outline:none!important;border-color:#3b82f6!important}.video-edge-click{cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAipJREFUSEutlTFoFEEUhr+3nKhFwMouKIqNFhYixC6m0E5UMFhI0F4UBY1GbzPZQyVJF7BSUBCNuZBLaWVMp6LYaaWiSBAtFLSKhH2yc3thd2/nbk6cbtl//n/+ef97I/SwNOJZApeQg77bxBeY4DRCUwHvfd7A/yKgExiEbWzghlzlfdFdJwd6k92scQnls4xjWntzDjTiHnAaeEnMETF8z4q4BFLyOrAHuC8hZ8oFmqdoAZ+whWNyjtUWOD1AUuR1ggL5WyoMyxjvSgXsPWdFhHmpMtwpCBrxGtgHtJHbQJRtXhcR3kiVkS4CSXT7qDCSPbnTQS+x9cF6xVQNm4DtbGZFRvntQ9yTAzUMEjS7GHiMcEeqLPkISdr+gwVwLmo6SR+r/CpgPgB3iamL4aNLrFxAmZZxLhd6YBY46SBqAHPENMSwlsV41cDGt8YQytMu1/IFmCVmUQwvnDF1kWhkx8dOn7sHloipeTuwLiKuALc8BRLYcnmjzbCRn0wDP7KDSw07CEiK23kJ34BHwO02ATVsJeABcCgZehIyUCj2AnDcofAKqKfFtsnKT9Mau1AeAvutvZKXSyM7m+baBISzBDTkGl+dKdKIReCoi9zWwVAhsLnvzxAtE3NYDH+KwnkHzQdnLzEXxPCpQ5omIdcnoxIyVYbvKUUtAjUMEPA8/V4h4IBcJ+mBkpvrlgjHf41s0w0BMxJy3kXzTw5sLSY4gXAK4aJU3dH9C5MTtb2fy3n/AAAAAElFTkSuQmCC),pointer!important;top:0!important;left:0!important;width:30px!important;height:80%!important;position:absolute!important;z-index:2147483647!important;background-color:transparent!important;user-select:none!important;opacity:0!important}.video-edge-click:nth-child(2){right:0!important;left:auto!important}:has(>.video-edge-click){position:relative} ');
+(n=>{const o=Symbol("styleAdded"),t=document.createElement("style");t.textContent=n,window.gmStyle=t,document.addEventListener("addStyle",r=>{const{shadowRoot:e}=r.detail;e[o]||e instanceof Document||(e.prepend(t.cloneNode(!0)),e[o]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(n)})(' @charset "UTF-8";::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen]~*:not(.monkey-web-fullscreen){display:none!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;font-size:12px!important;padding:3px 5px!important;box-shadow:none!important;min-height:8rem!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen textarea:focus{outline:none!important;border-color:#3b82f6!important}.video-edge-click{cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAipJREFUSEutlTFoFEEUhr+3nKhFwMouKIqNFhYixC6m0E5UMFhI0F4UBY1GbzPZQyVJF7BSUBCNuZBLaWVMp6LYaaWiSBAtFLSKhH2yc3thd2/nbk6cbtl//n/+ef97I/SwNOJZApeQg77bxBeY4DRCUwHvfd7A/yKgExiEbWzghlzlfdFdJwd6k92scQnls4xjWntzDjTiHnAaeEnMETF8z4q4BFLyOrAHuC8hZ8oFmqdoAZ+whWNyjtUWOD1AUuR1ggL5WyoMyxjvSgXsPWdFhHmpMtwpCBrxGtgHtJHbQJRtXhcR3kiVkS4CSXT7qDCSPbnTQS+x9cF6xVQNm4DtbGZFRvntQ9yTAzUMEjS7GHiMcEeqLPkISdr+gwVwLmo6SR+r/CpgPgB3iamL4aNLrFxAmZZxLhd6YBY46SBqAHPENMSwlsV41cDGt8YQytMu1/IFmCVmUQwvnDF1kWhkx8dOn7sHloipeTuwLiKuALc8BRLYcnmjzbCRn0wDP7KDSw07CEiK23kJ34BHwO02ATVsJeABcCgZehIyUCj2AnDcofAKqKfFtsnKT9Mau1AeAvutvZKXSyM7m+baBISzBDTkGl+dKdKIReCoi9zWwVAhsLnvzxAtE3NYDH+KwnkHzQdnLzEXxPCpQ5omIdcnoxIyVYbvKUUtAjUMEPA8/V4h4IBcJ+mBkpvrlgjHf41s0w0BMxJy3kXzTw5sLSY4gXAK4aJU3dH9C5MTtb2fy3n/AAAAAElFTkSuQmCC),pointer!important;left:0!important;top:3%!important;width:30px!important;height:75%!important;position:absolute!important;z-index:2147483647!important;background-color:transparent!important;user-select:none!important;opacity:0!important}.video-edge-click.right{right:0!important;left:auto!important} ');
 
 (function (Swal) {
   'use strict';
@@ -344,12 +344,12 @@
       });
     },
     createEdgeClickElement(video) {
-      const container = this.findVideoParentContainer(video.parentNode, 4, false);
+      const container = this.findVideoParentContainer(Tools.getParent(video), 4, false);
       if (video.leftArea) return container.prepend(video.leftArea, video.rightArea);
-      const createEdge = () => {
+      const createEdge = (clas = "") => {
         return Object.assign(document.createElement("div"), {
           video,
-          className: "video-edge-click",
+          className: `video-edge-click ${clas}`,
           ondblclick: (e) => {
             delete this.player;
             Tools.preventDefault(e);
@@ -358,72 +358,14 @@
           }
         });
       };
-      [video.leftArea, video.rightArea] = [createEdge(), createEdge()];
+      [video.leftArea, video.rightArea] = [createEdge(), createEdge("right")];
       container.prepend(video.leftArea, video.rightArea);
     }
   };
-  class BasicStorage {
-    static #instances = [];
-    constructor(name, defVal, useLocalStore = false, parser = (v) => v, splice = false) {
-      Object.assign(this, { name, defVal, useLocalStore, parser, splice });
-      this.storage = useLocalStore ? localStorage : { getItem: _GM_getValue, setItem: _GM_setValue, removeItem: _GM_deleteValue };
-      BasicStorage.#instances.push(this);
-      if (BasicStorage.#instances.length === 1) requestIdleCallback(() => BasicStorage.cleanExpired());
-    }
-    #getFinalKey(suffix = "", requireKey = false) {
-      if (requireKey && [null, void 0].includes(suffix)) throw new Error("键名拼接时，suffix（第二个参数）不能为空");
-      if (suffix.startsWith(this.name)) return suffix;
-      return this.splice ? this.name + suffix : this.name;
-    }
-    set(value, key, expires) {
-      const val = expires ? JSON.stringify({ value, expires: Date.now() + expires * 864e5 }) : value;
-      this.storage.setItem(this.#getFinalKey(key, true), val);
-    }
-    get(key) {
-      const data = this.#get(this.#getFinalKey(key));
-      return !data?.value ? data : data.expires > Date.now() ? data.value : this.defVal;
-    }
-    #get(key) {
-      const value = this.storage.getItem(key);
-      try {
-        return JSON.parse(value) ?? this.defVal;
-      } catch {
-        return this.parser(value ?? this.defVal);
-      }
-    }
-    del(key) {
-      this.storage.removeItem(this.#getFinalKey(key));
-    }
-    fuzzyGet(pattern) {
-      const result = {};
-      this.fuzzyHandle(pattern, (key) => result[key] = this.storage.getItem(key));
-      return result;
-    }
-    fuzzyDel(pattern) {
-      this.fuzzyHandle(pattern, (key) => this.storage.removeItem(key));
-    }
-    fuzzyHandle(pattern, callback) {
-      const keys = Object.is(this.storage, localStorage) ? Object.keys(localStorage) : _GM_listValues();
-      const keyMatcher = pattern instanceof RegExp ? (key) => pattern.test(key) : (key) => key.includes(pattern);
-      keys.filter(keyMatcher).forEach(callback);
-    }
-    static cleanExpired() {
-      this.#instances.forEach((instance) => {
-        instance.fuzzyHandle(instance.name, (key) => {
-          if (instance.#get(key)?.expires < Date.now()) instance.del(key);
-        });
-      });
-    }
-  }
-  const Storage = _unsafeWindow.FyStorage = {
-    CUSTOM_CONTAINER: new BasicStorage("CUSTOM_CONTAINER_", "", false, void 0, true),
-    THIS_SITE_AUTO: new BasicStorage("THIS_SITE_AUTO_", false, false, Boolean, true),
-    IGNORE_URLS: new BasicStorage("IGNORE_URLS", "")
-  };
   const Keydown = {
-    dispatchShortcutKey(code, bypass) {
+    dispatchShortcutKey(code, { isTrusted = false } = {}) {
       const key = this.processShortcutKey({ code });
-      Tools.postMessage(window.top, { key, bypass });
+      Tools.postMessage(window.top, { key, isTrusted });
     },
     processShortcutKey({ key, code, ctrlKey, shiftKey, altKey }) {
       code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
@@ -501,6 +443,64 @@
       Tools.resetLimit("autoWide");
       if (!Tools.isAttached(this.player)) delete this.player;
     }
+  };
+  class BasicStorage {
+    static #instances = [];
+    constructor(name, defVal, useLocalStore = false, parser = (v) => v, splice = false) {
+      Object.assign(this, { name, defVal, useLocalStore, parser, splice });
+      this.storage = useLocalStore ? localStorage : { getItem: _GM_getValue, setItem: _GM_setValue, removeItem: _GM_deleteValue };
+      BasicStorage.#instances.push(this);
+      if (BasicStorage.#instances.length === 1) requestIdleCallback(() => BasicStorage.cleanExpired());
+    }
+    #getFinalKey(suffix = "", requireKey = false) {
+      if (requireKey && [null, void 0].includes(suffix)) throw new Error("键名拼接时，suffix（第二个参数）不能为空");
+      if (suffix.startsWith(this.name)) return suffix;
+      return this.splice ? this.name + suffix : this.name;
+    }
+    set(value, key, expires) {
+      const val = expires ? JSON.stringify({ value, expires: Date.now() + expires * 864e5 }) : value;
+      this.storage.setItem(this.#getFinalKey(key, true), val);
+    }
+    get(key) {
+      const data = this.#get(this.#getFinalKey(key));
+      return !data?.value ? data : data.expires > Date.now() ? data.value : this.defVal;
+    }
+    #get(key) {
+      const value = this.storage.getItem(key);
+      try {
+        return JSON.parse(value) ?? this.defVal;
+      } catch {
+        return this.parser(value ?? this.defVal);
+      }
+    }
+    del(key) {
+      this.storage.removeItem(this.#getFinalKey(key));
+    }
+    fuzzyGet(pattern) {
+      const result = {};
+      this.fuzzyHandle(pattern, (key) => result[key] = this.storage.getItem(key));
+      return result;
+    }
+    fuzzyDel(pattern) {
+      this.fuzzyHandle(pattern, (key) => this.storage.removeItem(key));
+    }
+    fuzzyHandle(pattern, callback) {
+      const keys = Object.is(this.storage, localStorage) ? Object.keys(localStorage) : _GM_listValues();
+      const keyMatcher = pattern instanceof RegExp ? (key) => pattern.test(key) : (key) => key.includes(pattern);
+      keys.filter(keyMatcher).forEach(callback);
+    }
+    static cleanExpired() {
+      this.#instances.forEach((instance) => {
+        instance.fuzzyHandle(instance.name, (key) => {
+          if (instance.#get(key)?.expires < Date.now()) instance.del(key);
+        });
+      });
+    }
+  }
+  const Storage = _unsafeWindow.FyStorage = {
+    CUSTOM_CONTAINER: new BasicStorage("CUSTOM_CONTAINER_", "", false, void 0, true),
+    THIS_SITE_AUTO: new BasicStorage("THIS_SITE_AUTO_", false, false, Boolean, true),
+    IGNORE_URLS: new BasicStorage("IGNORE_URLS", "")
   };
   const WebFull = {
     toggleFullscreen() {
@@ -584,9 +584,10 @@
     videoParents: /* @__PURE__ */ new Set(),
     findVideoParentContainer(container, maxLevel = 4, track = true) {
       container = container ?? Tools.getParent(this.player);
+      if (!container.offsetHeight) container = Tools.getParent(container);
       const { offsetWidth: cw, offsetHeight: ch } = container;
       if (track) this.videoParents.clear();
-      for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
+      for (let parent = container, level = 0; parent && level < maxLevel; parent = Tools.getParent(parent), level++) {
         if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
         if (this.hasExplicitlySize(parent)) return container;
         if (track) this.videoParents.add(parent);
@@ -597,7 +598,7 @@
       const style = element.style;
       const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
       return ["width", "height"].some((prop) => {
-        const value = style.getPropertyValue(prop);
+        const value = style?.getPropertyValue(prop);
         return value && sizeRegex.test(value);
       });
     },
