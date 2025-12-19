@@ -59,7 +59,7 @@ export default {
     this.obsTimer = setTimeout(() => this.obsDoc?.disconnect(), Consts.ONE_SEC * 5);
   },
   setCurrentVideo(video) {
-    if (!video || this.player === video || video.offsetWidth < 240 || this.isBackgroundVideo(video)) return;
+    if (!video || this.player === video || video.offsetWidth < 260 || this.isBackgroundVideo(video)) return;
     if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // this.player 播放中
 
     this.player = video;
