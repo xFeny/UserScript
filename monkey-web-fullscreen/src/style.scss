@@ -53,16 +53,6 @@ body[part*="webFullscreen"] [part*="webFullscreen"] {
   display: none !important;
 }
 
-[part*="webFullscreen"] {
-  /** 为 control 做特殊处理 */
-  .vjs-control-bar,
-  .ytp-chrome-bottom,
-  .ytp-chapter-hover-container {
-    left: 0 !important;
-    width: 100vw !important;
-  }
-}
-
 /** 增强选择器优先级 **/
 [part*="webFullscreen"] video,
 body[part*="webFullscreen"] [part*="webFullscreen"] video {
