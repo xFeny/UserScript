@@ -51,6 +51,12 @@ export default unsafeWindow.FyTools = {
     // 判断是否需要节流，true = 需要节流（不执行），false = 可以执行
     return diff >= gap ? this.freqTimes.set(key, now) && false : true;
   },
+  throttle(fn, wait) {
+    let last = 0;
+    return function (...args) {
+      if (Date.now() - last >= wait) (last = Date.now()), fn.apply(this, args);
+    };
+  },
   limitCountMap: new Map(),
   isOverLimit(key = "default", maxCount = 5) {
     const count = this.limitCountMap.get(key) ?? 0;

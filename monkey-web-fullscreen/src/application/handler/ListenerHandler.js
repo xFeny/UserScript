@@ -102,19 +102,18 @@ export default {
   },
   setupMouseMoveListener() {
     let timer = null;
-    const handleEvent = ({ type, isTrusted, clientX, clientY }) => {
-      if (!isTrusted || this.noVideo() || Tools.isThrottle(type, 200)) return;
-
-      clearTimeout(timer), this.toggleCursor();
-      timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
+    const handleEvent = ({ clientX, clientY }) => {
+      if (!this.noVideo()) {
+        clearTimeout(timer), this.toggleCursor();
+        timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
+      }
 
       if (!Storage.ENABLE_EDGE_CLICK.get()) return;
       const video = this.getVideoForCoordinate(clientX, clientY);
-      video && Tools.microTask(() => this.createEdgeClickElement(video)); // 利用微任务的 “幂等性”，避免重复创建元素
+      video && this.createEdgeClickElement(video);
     };
 
-    document.addEventListener("mousemove", (e) => handleEvent(e), { passive: true });
-    document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleEvent(e));
+    document.addEventListener("mousemove", Tools.throttle(handleEvent, 300), { passive: true });
   },
   toggleCursor(hide = false, cls = "__hc") {
     if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
