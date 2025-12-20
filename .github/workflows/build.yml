@@ -32,6 +32,11 @@ jobs:
           cd monkey-web-fullscreen
           pnpm install
           pnpm build
+      - name: Build monkey-video-fullscreen
+        run: |
+          cd monkey-video-fullscreen
+          pnpm install
+          pnpm build
       - name: Build monkey-scrollbar
         run: |
           cd monkey-scrollbar
