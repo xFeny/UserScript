@@ -44,7 +44,7 @@ System.set("user:beautifier", (()=>{const _=beautifier;('default' in _)||(_.defa
 System.set("user:jsmind", (()=>{const _=jsmind;('default' in _)||(_.default=_);return _})());
 System.set("user:dom-to-image", (()=>{const _=domtoimage;('default' in _)||(_.default=_);return _})());
 
-System.register("./__entry.js", ['./__monkey.entry-mVzcWPux.js'], (function (exports, module) {
+System.register("./__entry.js", ['./__monkey.entry-CYSHb-BY.js'], (function (exports, module) {
 	'use strict';
 	return {
 		setters: [null],
@@ -56,7 +56,7 @@ System.register("./__entry.js", ['./__monkey.entry-mVzcWPux.js'], (function (exp
 	};
 }));
 
-System.register("./__monkey.entry-mVzcWPux.js", [], (function (exports, module) {
+System.register("./__monkey.entry-CYSHb-BY.js", [], (function (exports, module) {
   'use strict';
   return {
     execute: (function () {
@@ -725,8 +725,8 @@ System.register("./__monkey.entry-mVzcWPux.js", [], (function (exports, module) 
         }
       });
       const URL$1 = exports("d", {
+        EXAMPLE_JSON: "https://pastebin.com/raw/c6kXS9Vf",
         JSON_CRACK_WIDGET: "https://jsoncrack.feny.ink/widget",
-        EXAMPLE_JSON: "https://fetch-api.feny.ink/example.json",
         LAYUI_JS: "https://unpkg.com/layui@2.7.6/dist/layui.js"
       });
       const layout = `
@@ -808,7 +808,7 @@ System.register("./__monkey.entry-mVzcWPux.js", [], (function (exports, module) 
         window.addEventListener("keydown", ({ code, altKey }) => altKey && code === "KeyJ" && openInTab());
         const innerText = document.body.innerText;
         const { rawText, jsonpFun } = Utils.matchJsonp(innerText);
-        if (!Utils.isJSON(rawText)) return __vitePreload(() => module.import('./index-CRU5kx1y-DF4k62c_.js'), void 0 );
+        if (!Utils.isJSON(rawText)) return __vitePreload(() => module.import('./index-D_4ZLSio-BtOCbpRm.js'), void 0 );
         _unsafeWindow.RAW_TEXT = rawText;
         _unsafeWindow.GLOBAL_JSONP_FUN = jsonpFun;
         _unsafeWindow.GLOBAL_JSON = Utils.parse(_unsafeWindow.RAW_TEXT);
@@ -822,9 +822,9 @@ System.register("./__monkey.entry-mVzcWPux.js", [], (function (exports, module) 
           document.body.insertAdjacentHTML("afterbegin", layout);
           const temp = Utils.query('template[data-for="viewFormater"]');
           Utils.query(".toolbar").innerHTML = temp.innerHTML;
-          await __vitePreload(() => module.import('./index-B83qYQJ4-B9OCatEo.js'), void 0 );
-          __vitePreload(() => module.import('./index-DCU8AbqW-Ch2ZzcdO.js'), void 0 );
-          __vitePreload(() => module.import('./index-BYvs8qv7-NWOLsZI9.js'), void 0 );
+          await __vitePreload(() => module.import('./index-DD94hAxE-D1eUeifO.js'), void 0 );
+          __vitePreload(() => module.import('./index-BxySEv1i-D_PDa3oV.js'), void 0 );
+          __vitePreload(() => module.import('./index-D0V4wvmP-CG0IuMi1.js'), void 0 );
         });
       })();
 
@@ -832,7 +832,7 @@ System.register("./__monkey.entry-mVzcWPux.js", [], (function (exports, module) 
   };
 }));
 
-System.register("./index-CRU5kx1y-DF4k62c_.js", ['highlight.js', 'beautifier', './__monkey.entry-mVzcWPux.js'], (function (exports, module) {
+System.register("./index-D_4ZLSio-BtOCbpRm.js", ['highlight.js', 'beautifier', './__monkey.entry-CYSHb-BY.js'], (function (exports, module) {
   'use strict';
   var hljs, css_beautify, js_beautify, Utils;
   return {
@@ -891,7 +891,7 @@ System.register("./index-CRU5kx1y-DF4k62c_.js", ['highlight.js', 'beautifier', '
   };
 }));
 
-System.register("./index-B83qYQJ4-B9OCatEo.js", ['./__monkey.entry-mVzcWPux.js', './tippy.esm-D1eoMe9a-Bn9PjR6Y.js'], (function (exports, module) {
+System.register("./index-DD94hAxE-D1eUeifO.js", ['./__monkey.entry-CYSHb-BY.js', './tippy.esm-D1eoMe9a-Bn9PjR6Y.js'], (function (exports, module) {
   'use strict';
   var Utils, _unsafeWindow, _GM_getValue, _GM_setValue, _GM_setClipboard, tippy;
   return {
@@ -1295,7 +1295,7 @@ System.register("./index-B83qYQJ4-B9OCatEo.js", ['./__monkey.entry-mVzcWPux.js',
   };
 }));
 
-System.register("./index-DCU8AbqW-Ch2ZzcdO.js", ['./tippy.esm-D1eoMe9a-Bn9PjR6Y.js', './__monkey.entry-mVzcWPux.js'], (function (exports, module) {
+System.register("./index-BxySEv1i-D_PDa3oV.js", ['./tippy.esm-D1eoMe9a-Bn9PjR6Y.js', './__monkey.entry-CYSHb-BY.js'], (function (exports, module) {
 	'use strict';
 	var tippy, Utils;
 	return {
@@ -1317,7 +1317,7 @@ System.register("./index-DCU8AbqW-Ch2ZzcdO.js", ['./tippy.esm-D1eoMe9a-Bn9PjR6Y.
 	};
 }));
 
-System.register("./index-BYvs8qv7-NWOLsZI9.js", ['./tippy.esm-D1eoMe9a-Bn9PjR6Y.js', 'jsmind', 'dom-to-image', './__monkey.entry-mVzcWPux.js'], (function (exports, module) {
+System.register("./index-D0V4wvmP-CG0IuMi1.js", ['./tippy.esm-D1eoMe9a-Bn9PjR6Y.js', 'jsmind', 'dom-to-image', './__monkey.entry-CYSHb-BY.js'], (function (exports, module) {
   'use strict';
   var tippy, require$$0, require$$1, Utils, _unsafeWindow, _GM_getValue, URL$1, _GM_setClipboard, _GM_setValue, _GM;
   return {

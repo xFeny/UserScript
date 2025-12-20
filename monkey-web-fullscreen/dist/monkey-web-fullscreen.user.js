@@ -2,7 +2,7 @@
 // @name               视频自动网页全屏｜倍速播放
 // @name:zh-TW         視頻自動網頁全屏｜倍速播放
 // @namespace          http://tampermonkey.net/
-// @version            3.6.0
+// @version            3.7.0
 // @author             Feny
 // @description        支持所有H5视频的增强脚本，通用网页全屏｜倍速调节，对微博 / 推特 / Instagram / Facebook等多视频平台均适用；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / 搜狐视频 / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @description:zh-TW  支持所有H5视频的增强脚本，通用網頁全屏｜倍速調節，对微博 / 推特 / Instagram / Facebook等平臺均適用；B站(含直播) / 騰訊視頻 / 優酷 / 愛奇藝 / 芒果TV / 搜狐視頻 / AcFun 默認自動網頁全屏，其他網站可手動開啓；自動網頁全屏 + 記憶倍速 + 下集切換，減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
@@ -66,35 +66,28 @@
 // @note               *://*/*
 // ==/UserScript==
 
-(o=>{const n=Symbol("styleAdded"),t=document.createElement("style");t.textContent=o,window.gmStyle=t,document.addEventListener("shadow-attached",r=>{const{shadowRoot:e}=r.detail;e[n]||requestAnimationFrame(()=>{e.prepend(t.cloneNode(!0)),e[n]=!0})}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(o)})(' @charset "UTF-8";.monkey-toast{line-height:normal;left:10px!important;bottom:16%!important;color:#fff!important;font-size:13px!important;padding:6px 10px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.monkey-toast span{display:inline!important}::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen]~*:not(.monkey-web-fullscreen){display:none!important}[part*=webFullscreen] .vjs-control-bar,[part*=webFullscreen] .ytp-chrome-bottom,[part*=webFullscreen] .ytp-chapter-hover-container{left:0!important;width:100vw!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important;transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc{cursor:none!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-tabs-header{display:flex;position:relative;margin-bottom:15px;font-size:15px!important;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;cursor:pointer;color:#64748b;font-weight:500;text-align:center;padding:12px 10px;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;visibility:visible;background-color:#3b82f6;border-radius:2px 2px 0 0}.monkey-web-fullscreen .swal2-tab:hover:not(.active){color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%;padding:0 5px;min-height:325px}.monkey-web-fullscreen .swal2-tab-panel{display:none}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 5px!important;padding:0 0 5px!important;float:none!important;height:30px!important;color:#666!important;display:flex!important;font-size:14px!important;line-height:30px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text],.monkey-web-fullscreen .__menu input[type=number]{color:#333;border-radius:3px;border:1px solid #cbd5e1!important;text-align:center!important;line-height:12px!important;font-size:12px!important;padding:0 3px!important;height:23px!important;width:75px!important}.monkey-web-fullscreen .__menu input[type=text]:focus,.monkey-web-fullscreen .__menu input[type=number]:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:38px!important;height:18px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:12px!important;height:12px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen .others-sett{margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f5f5f5}.monkey-web-fullscreen .others-sett:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .others-sett p{margin-bottom:3px;color:#333!important;font-size:13px!important;text-align:left!important}.monkey-web-fullscreen .others-sett textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;height:70px!important;font-size:12px!important;padding:3px 5px!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen .others-sett textarea:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th{font-weight:600!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:2147483647!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap>:not(.bpx-player-dm-tip){display:none!important}#buffer,#install,#fd_tips,#a1 #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,.dplayer-resume-tip,[id*=player] #tips,#player #loading-box,.dplayer-comment-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}.Clock,.__time-progress,.__rate-keep-show{color:#e0e0e0;text-indent:0!important;text-shadow:0 0 2px #000;position:absolute!important;pointer-events:none!important;font-family:Arial,Helvetica,sans-serif!important;z-index:2147483647!important;opacity:1!important}.Clock:after,.__time-progress:after,.__rate-keep-show:after{top:50%!important;left:50%!important;content:"-"!important;position:fixed!important;text-shadow:none!important;color:transparent!important;pointer-events:none!important;display:inline-block!important;background-color:transparent!important}.Clock{top:10px!important;right:20px!important;width:auto!important;height:auto!important;font-size:20px!important;line-height:20px!important;font-weight:700!important;text-align:right!important;background-color:transparent!important}.Clock.smaller{font-size:16px!important;line-height:16px!important}.__time-progress{top:30px!important;right:20px!important;font-size:12.5px!important;line-height:12.5px!important}.__time-progress b{font-size:12px!important;line-height:12px!important;display:inline-block!important;transform:scale(.75)!important;vertical-align:middle!important}.__time-progress.smaller{top:26px!important;transform:scale(.817)!important;transform-origin:top right}.__rate-keep-show{color:#c9c9c9;top:5px!important;left:5px!important;font-size:12px!important;box-shadow:none!important;display:inline-block!important;transform:scale(.917)!important;transform-origin:top} ');
+(e=>{const n=Symbol("styleAdded"),t=document.createElement("style");t.textContent=e,window.gmStyle=t,document.addEventListener("addStyle",r=>{const{shadowRoot:o}=r.detail;o[n]||o instanceof Document||(o.prepend(t.cloneNode(!0)),o[n]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(e)})(' @charset "UTF-8";.monkey-toast{line-height:normal;left:10px!important;bottom:16%!important;color:#fff!important;font-size:13px!important;padding:6px 10px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.monkey-toast span{display:inline!important}::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen]~*:not(.monkey-web-fullscreen){display:none!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important;transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc{cursor:none!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-tabs-header{display:flex;position:relative;margin-bottom:15px;font-size:15px!important;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;cursor:pointer;color:#64748b;font-weight:500;text-align:center;padding:12px 10px;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;visibility:visible;background-color:#3b82f6;border-radius:2px 2px 0 0}.monkey-web-fullscreen .swal2-tab:hover:not(.active){color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%;padding:0 5px;min-height:325px}.monkey-web-fullscreen .swal2-tab-panel{display:none}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 5px!important;padding:0 0 5px!important;float:none!important;height:30px!important;color:#666!important;display:flex!important;font-size:14px!important;line-height:30px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text],.monkey-web-fullscreen .__menu input[type=number]{color:#333;border-radius:3px;border:1px solid #cbd5e1!important;text-align:center!important;line-height:12px!important;font-size:12px!important;padding:0 3px!important;height:23px!important;width:75px!important}.monkey-web-fullscreen .__menu input[type=text]:focus,.monkey-web-fullscreen .__menu input[type=number]:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:38px!important;height:18px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:12px!important;height:12px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen .others-sett{margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f5f5f5}.monkey-web-fullscreen .others-sett:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .others-sett p{margin-bottom:3px;color:#333!important;font-size:13px!important;text-align:left!important}.monkey-web-fullscreen .others-sett textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;height:70px!important;font-size:12px!important;padding:3px 5px!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen .others-sett textarea:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th{font-weight:600!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:2147483647!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap>:not(.bpx-player-dm-tip){display:none!important}#buffer,#install,#fd_tips,#a1 #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,.dplayer-resume-tip,[id*=player] #tips,#player #loading-box,.dplayer-comment-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}.Clock,.__time-progress,.__rate-keep-show{color:#e0e0e0;text-indent:0!important;text-shadow:0 0 2px #000;position:absolute!important;pointer-events:none!important;font-family:Arial,Helvetica,sans-serif!important;z-index:2147483647!important;opacity:1!important}.Clock:after,.__time-progress:after,.__rate-keep-show:after{top:50%!important;left:50%!important;content:"-"!important;position:fixed!important;text-shadow:none!important;color:transparent!important;pointer-events:none!important;display:inline-block!important;background-color:transparent!important}.Clock{top:10px!important;right:20px!important;width:auto!important;height:auto!important;font-size:20px!important;line-height:20px!important;font-weight:700!important;text-align:right!important;background-color:transparent!important}.Clock.smaller{font-size:16px!important;line-height:16px!important}.__time-progress{top:30px!important;right:20px!important;font-size:12.5px!important;line-height:12.5px!important}.__time-progress b{font-size:12px!important;line-height:12px!important;display:inline-block!important;transform:scale(.75)!important;vertical-align:middle!important}.__time-progress.smaller{top:26px!important;transform:scale(.817)!important;transform-origin:top right}.__rate-keep-show{color:#c9c9c9;top:5px!important;left:5px!important;font-size:12px!important;box-shadow:none!important;line-height:12px!important;display:inline-block!important;transform:scale(.917)!important;transform-origin:top}.video-edge-click{cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAipJREFUSEutlTFoFEEUhr+3nKhFwMouKIqNFhYixC6m0E5UMFhI0F4UBY1GbzPZQyVJF7BSUBCNuZBLaWVMp6LYaaWiSBAtFLSKhH2yc3thd2/nbk6cbtl//n/+ef97I/SwNOJZApeQg77bxBeY4DRCUwHvfd7A/yKgExiEbWzghlzlfdFdJwd6k92scQnls4xjWntzDjTiHnAaeEnMETF8z4q4BFLyOrAHuC8hZ8oFmqdoAZ+whWNyjtUWOD1AUuR1ggL5WyoMyxjvSgXsPWdFhHmpMtwpCBrxGtgHtJHbQJRtXhcR3kiVkS4CSXT7qDCSPbnTQS+x9cF6xVQNm4DtbGZFRvntQ9yTAzUMEjS7GHiMcEeqLPkISdr+gwVwLmo6SR+r/CpgPgB3iamL4aNLrFxAmZZxLhd6YBY46SBqAHPENMSwlsV41cDGt8YQytMu1/IFmCVmUQwvnDF1kWhkx8dOn7sHloipeTuwLiKuALc8BRLYcnmjzbCRn0wDP7KDSw07CEiK23kJ34BHwO02ATVsJeABcCgZehIyUCj2AnDcofAKqKfFtsnKT9Mau1AeAvutvZKXSyM7m+baBISzBDTkGl+dKdKIReCoi9zWwVAhsLnvzxAtE3NYDH+KwnkHzQdnLzEXxPCpQ5omIdcnoxIyVYbvKUUtAjUMEPA8/V4h4IBcJ+mBkpvrlgjHf41s0w0BMxJy3kXzTw5sLSY4gXAK4aJU3dH9C5MTtb2fy3n/AAAAAElFTkSuQmCC),pointer!important;left:0!important;top:3%!important;width:30px!important;height:75%!important;position:absolute!important;z-index:2147483647!important;background-color:transparent!important;user-select:none!important;opacity:0!important}.video-edge-click.right{right:0!important;left:auto!important} ');
 
 (function (notyf, Swal) {
   'use strict';
 
-  function isElement(node) {
-    return node instanceof Element;
-  }
-  function isDocument(node) {
-    return node instanceof Document;
-  }
-  function getRoot(node) {
-    if (!node) return null;
-    return node._shadowRoot ?? node.shadowRoot;
-  }
+  const isElement = (node) => node instanceof Element;
+  const isDocument = (node) => node instanceof Document;
+  const getSRoot = (node) => node?._shadowRoot ?? node?.shadowRoot ?? null;
   function* getShadowRoots(node, deep = false) {
     if (!node || !isElement(node) && !isDocument(node)) return;
-    if (isElement(node) && getRoot(node)) yield getRoot(node);
+    if (isElement(node) && getSRoot(node)) yield getSRoot(node);
     const doc = isDocument(node) ? node : node.getRootNode({ composed: true });
     if (!doc.createTreeWalker) return;
     let currentNode;
     const toWalk = [node];
     while (currentNode = toWalk.pop()) {
       const walker = doc.createTreeWalker(currentNode, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_DOCUMENT_FRAGMENT, {
-        acceptNode: (child) => isElement(child) && getRoot(child) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+        acceptNode: (child) => isElement(child) && getSRoot(child) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
       });
       let walkerNode = walker.nextNode();
       while (walkerNode) {
-        const shadowRoot = getRoot(walkerNode);
+        const shadowRoot = getSRoot(walkerNode);
         if (isElement(walkerNode) && shadowRoot) {
           if (deep) toWalk.push(shadowRoot);
           yield shadowRoot;
@@ -132,7 +125,7 @@
     THREE_SEC: 3e3,
     DEF_SPEED: 1,
     MAX_SPEED: 16,
-    MIN_SPEED: 0.0625,
+    MIN_SPEED: 0.1,
     webFull: "webFullscreen",
     FAKE_VIDEO: "fake-video",
     WEBFULL_PARENT_DEPTH: 20,
@@ -168,8 +161,8 @@
     log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
     getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
     isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
-    preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
-    emitCustomEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
+    preventDefault: (event) => (event.preventDefault(), event.stopPropagation(), event.stopImmediatePropagation()),
+    emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
     isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
     hasCls: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
     delCls: (el, ...classes) => el?.classList.remove(...classes),
@@ -303,12 +296,12 @@
       return Array.from({ length: nodes.snapshotLength }, (_, i) => nodes.snapshotItem(i)).filter((el) => !el.matches("script"));
     },
     setPart(node, value) {
-      if (!(node instanceof Element)) return;
+      if (!isElement(node)) return;
       const parts = node?.getAttribute("part")?.split(/\s+/) ?? [];
       node?.setAttribute("part", [.../* @__PURE__ */ new Set([...parts, value])].join(" ").trim());
     },
     delPart(node, value) {
-      if (!(node instanceof Element)) return;
+      if (!isElement(node)) return;
       const parts = (node?.getAttribute("part")?.split(/\s+/) ?? []).filter((v) => v !== value);
       node?.setAttribute("part", parts.join(" ").trim());
     },
@@ -334,6 +327,11 @@
       if (!eles || !prop) return;
       const fn = val ? "setProperty" : "removeProperty";
       [].concat(eles).forEach((el) => el?.style?.[fn]?.(prop, val, priority));
+    },
+    isAttached(el) {
+      if (!el) return false;
+      const root = el.getRootNode?.();
+      return el.isConnected && (!root || !(root instanceof ShadowRoot) || root.host.isConnected);
     }
   };
   class VideoEnhancer {
@@ -379,7 +377,6 @@
       Element.prototype.attachShadow = function(options) {
         if (this._shadowRoot) return this._shadowRoot;
         const shadowRoot = this._shadowRoot = this.__attachShadow.call(this, options);
-        Tools.emitCustomEvent("shadow-attached", { shadowRoot });
         VideoEnhancer.detectShadowVideoElement();
         return shadowRoot;
       };
@@ -388,30 +385,47 @@
     static detectShadowVideoElement() {
       if (Tools.isThrottle("shadow", 100)) return;
       const videos = Tools.querys("video:not([received])");
-      if (videos.length) videos.forEach((video) => Tools.emitCustomEvent("shadow-video", { video }));
+      if (!videos.length) return;
+      videos.forEach((video) => {
+        const root = video.getRootNode();
+        if (!(root instanceof ShadowRoot)) return;
+        Tools.emitEvent("shadow-video", { video });
+        Tools.emitEvent("addStyle", { shadowRoot: root });
+      });
     }
   }
   VideoEnhancer.hackAttachShadow();
-  class StorageItem {
-    constructor(name, defVal, useLocalStore = false, parser = (v) => v) {
-      this.name = name;
-      this.defVal = defVal;
-      this.parser = parser;
+  class BasicStorage {
+    static #instances = [];
+    constructor(name, defVal, useLocalStore = false, parser = (v) => v, splice = false) {
+      Object.assign(this, { name, defVal, useLocalStore, parser, splice });
       this.storage = useLocalStore ? localStorage : { getItem: _GM_getValue, setItem: _GM_setValue, removeItem: _GM_deleteValue };
+      BasicStorage.#instances.push(this);
+      if (BasicStorage.#instances.length === 1) requestIdleCallback(() => BasicStorage.cleanExpired());
     }
-    set(value, key = this.name) {
-      this.storage.setItem(key, value);
+    #getFinalKey(suffix = "", requireKey = false) {
+      if (requireKey && [null, void 0].includes(suffix)) throw new Error("键名拼接时，suffix（第二个参数）不能为空");
+      if (suffix.startsWith(this.name)) return suffix;
+      return this.splice ? this.name + suffix : this.name;
     }
-    get(key = this.name) {
+    set(value, key, expires) {
+      const val = expires ? JSON.stringify({ value, expires: Date.now() + expires * 864e5 }) : value;
+      this.storage.setItem(this.#getFinalKey(key, true), val);
+    }
+    get(key) {
+      const data = this.#get(this.#getFinalKey(key));
+      return !data?.value ? data : data.expires > Date.now() ? data.value : this.defVal;
+    }
+    #get(key) {
       const value = this.storage.getItem(key);
       try {
-        return this.parser(JSON.parse(value) ?? this.defVal);
+        return JSON.parse(value) ?? this.defVal;
       } catch {
         return this.parser(value ?? this.defVal);
       }
     }
-    del(key = this.name) {
-      this.storage.removeItem(key);
+    del(key) {
+      this.storage.removeItem(this.#getFinalKey(key));
     }
     fuzzyGet(pattern) {
       const result = {};
@@ -426,125 +440,49 @@
       const keyMatcher = pattern instanceof RegExp ? (key) => pattern.test(key) : (key) => key.includes(pattern);
       keys.filter(keyMatcher).forEach(callback);
     }
-  }
-  class TimedStorage extends StorageItem {
-    static instances = [];
-    constructor(name, defVal, useLocalStore, parser) {
-      super(name, defVal, useLocalStore, parser);
-      TimedStorage.instances.push(this);
-      if (TimedStorage.instances.length === 1) requestIdleCallback(() => TimedStorage.cleanExpired());
-    }
-    set(suffix, value, expires) {
-      if (suffix == null) throw new Error("suffix 不能为空");
-      const val = expires ? JSON.stringify({ value, expires: Date.now() + expires * 864e5 }) : value;
-      super.set(val, this.name + suffix);
-    }
-    get(suffix = "") {
-      const data = super.get(this.name + suffix);
-      return !data?.value ? data : data.expires > Date.now() ? data.value : this.defVal;
-    }
-    del(suffix = "") {
-      super.del(this.name + suffix);
-    }
     static cleanExpired() {
-      this.instances.forEach((instance) => {
+      this.#instances.forEach((instance) => {
         instance.fuzzyHandle(instance.name, (key) => {
-          const data = StorageItem.prototype.get.call(instance, key);
-          if (data?.expires && data.expires < Date.now()) {
-            StorageItem.prototype.del.call(instance, key);
-          }
+          if (instance.#get(key)?.expires < Date.now()) instance.del(key);
         });
       });
     }
   }
   const Storage = _unsafeWindow.FyStorage = {
-    ICONS_SELECTOR: new TimedStorage("ICONS_SELECTOR", ""),
-    CUSTOM_WEB_FULL: new TimedStorage("CUSTOM_WEB_FULL_", ""),
-    IS_AUTO_DEF: new StorageItem("DISABLE_DEFAULT_AUTO", false, false, Boolean),
-    IS_SITE_AUTO: new TimedStorage("ENABLE_THIS_SITE_AUTO_", false, false, Boolean),
-    SPEED_STEP: new StorageItem("PLAY_RATE_STEP", 0.25, false, parseFloat),
-    DISABLE_SPEED: new StorageItem("CLOSE_PLAY_RATE", false, false, Boolean),
-    RATE_KEEP_SHOW: new StorageItem("RATE_KEEP_SHOW", false, false, Boolean),
-    NOT_CACHE_SPEED: new StorageItem("DISABLE_MEMORY_SPEED", false, false, Boolean),
-    CACHED_SPEED: new StorageItem("FENY_SCRIPTS_V_PLAYBACK_RATE", 1, true, parseFloat),
-    PRESET_SPEED: new StorageItem("PRESET_SPEED", "1.15,1.45,1.75", false, (value) => value.split(",")),
-    SKIP_INTERVAL: new StorageItem("VIDEO_SKIP_INTERVAL", 5, false, Number),
-    ZERO_KEY_SKIP_INTERVAL: new StorageItem("ZERO_KEY_SKIP_INTERVAL", 30, false, Number),
-    OVERRIDE_KEY: new StorageItem("OVERRIDE_KEYBOARD", false, false, Boolean),
-    DISABLE_ZOOM_MOVE: new StorageItem("DISABLE_ZOOM_MOVE", true, false, Boolean),
-    MOVING_DISTANCE: new StorageItem("MOVING_DISTANCE", 10, false, Number),
-    ZOOM_PERCENT: new StorageItem("ZOOM_PERCENT", 10, false, Number),
-    IS_AUTO_NEXT: new StorageItem("ENABLE_AUTO_NEXT_EPISODE", false, false, Boolean),
-    NEXT_ADVANCE_SEC: new StorageItem("AUTO_NEXT_ADVANCE_SECONDS", 75, false, Number),
-    RELATIVE_EPISODE: new TimedStorage("RELATIVE_EPISODE_SELECTOR_", ""),
-    CURRENT_EPISODE: new TimedStorage("CURRENT_EPISODE_SELECTOR_", ""),
-    USE_SMALL_FONT: new StorageItem("USE_SMALLER_FONT", false, false, Boolean),
-    DISABLE_CLOCK: new StorageItem("DISABLE_CLOCK", false, false, Boolean),
-    PAGE_CLOCK: new StorageItem("UNFULL_CLOCK", false, false, Boolean),
-    CLOCK_COLOR: new StorageItem("CLOCK_COLOR", "#e0e0e0"),
-    NOT_CACHE_TIME: new StorageItem("DISABLE_MEMORY_TIME", false, false, Boolean),
-    STORAGE_DAYS: new StorageItem("STORAGE_DAYS", 7, false, parseFloat),
-    PLAY_TIME: new TimedStorage("PLAY_TIME_", 0, true),
-    NEXT_IGNORE_URLS: new StorageItem("NEXT_IGNORE_URLS", ""),
-    FULL_IGNORE_URLS: new StorageItem("FULL_IGNORE_URLS", ""),
-    IS_INVISIBLE_PAUSE: new StorageItem("DISABLE_INVISIBLE_PAUSE", false, false, Boolean),
-    IS_MAX_VOLUME: new StorageItem("DISABLE_DEF_MAX_VOLUME", false, false, Boolean),
-    DISABLE_SCREENSHOT: new StorageItem("DISABLE_SCREENSHOT", true, false, Boolean)
+    ICONS_SELECTOR: new BasicStorage("ICONS_SELECTOR", null),
+    CUSTOM_WEB_FULL: new BasicStorage("CUSTOM_WEB_FULL_", "", false, String, true),
+    NO_AUTO_DEF: new BasicStorage("DISABLE_DEFAULT_AUTO", false, false, Boolean),
+    IS_SITE_AUTO: new BasicStorage("ENABLE_THIS_SITE_AUTO_", false, false, Boolean, true),
+    ENABLE_EDGE_CLICK: new BasicStorage("ENABLE_EDGE_CLICK", false, false, Boolean),
+    SPEED_STEP: new BasicStorage("PLAY_RATE_STEP", 0.25, false, parseFloat),
+    DISABLE_SPEED: new BasicStorage("CLOSE_PLAY_RATE", false, false, Boolean),
+    RATE_KEEP_SHOW: new BasicStorage("RATE_KEEP_SHOW", false, false, Boolean),
+    NOT_CACHE_SPEED: new BasicStorage("DISABLE_MEMORY_SPEED", false, false, Boolean),
+    CACHED_SPEED: new BasicStorage("FENY_SCRIPTS_V_PLAYBACK_RATE", 1, true, parseFloat),
+    PRESET_SPEED: new BasicStorage("PRESET_SPEED", "1.15,1.45,1.75", false, (value) => value.split(",")),
+    SKIP_INTERVAL: new BasicStorage("VIDEO_SKIP_INTERVAL", 5, false, Number),
+    ZERO_KEY_SKIP_INTERVAL: new BasicStorage("ZERO_KEY_SKIP_INTERVAL", 30, false, Number),
+    OVERRIDE_KEY: new BasicStorage("OVERRIDE_KEYBOARD", false, false, Boolean),
+    DISABLE_ZOOM_MOVE: new BasicStorage("DISABLE_ZOOM_MOVE", true, false, Boolean),
+    MOVING_DISTANCE: new BasicStorage("MOVING_DISTANCE", 10, false, Number),
+    ZOOM_PERCENT: new BasicStorage("ZOOM_PERCENT", 10, false, Number),
+    IS_AUTO_NEXT: new BasicStorage("ENABLE_AUTO_NEXT_EPISODE", false, false, Boolean),
+    NEXT_ADVANCE_SEC: new BasicStorage("AUTO_NEXT_ADVANCE_SECONDS", 75, false, Number),
+    RELATIVE_EPISODE: new BasicStorage("RELATIVE_EPISODE_SELECTOR_", "", false, String, true),
+    CURRENT_EPISODE: new BasicStorage("CURRENT_EPISODE_SELECTOR_", "", false, String, true),
+    USE_SMALL_FONT: new BasicStorage("USE_SMALLER_FONT", false, false, Boolean),
+    DISABLE_CLOCK: new BasicStorage("DISABLE_CLOCK", false, false, Boolean),
+    PAGE_CLOCK: new BasicStorage("UNFULL_CLOCK", false, false, Boolean),
+    CLOCK_COLOR: new BasicStorage("CLOCK_COLOR", "#e0e0e0"),
+    NOT_CACHE_TIME: new BasicStorage("DISABLE_MEMORY_TIME", false, false, Boolean),
+    STORAGE_DAYS: new BasicStorage("STORAGE_DAYS", 7, false, parseFloat),
+    PLAY_TIME: new BasicStorage("PLAY_TIME_", 0, true, void 0, true),
+    NEXT_IGNORE_URLS: new BasicStorage("NEXT_IGNORE_URLS", ""),
+    FULL_IGNORE_URLS: new BasicStorage("FULL_IGNORE_URLS", ""),
+    IS_INVISIBLE_PAUSE: new BasicStorage("DISABLE_INVISIBLE_PAUSE", false, false, Boolean),
+    IS_MAX_VOLUME: new BasicStorage("DISABLE_DEF_MAX_VOLUME", false, false, Boolean),
+    DISABLE_SCREENSHOT: new BasicStorage("DISABLE_SCREENSHOT", true, false, Boolean)
   };
-  class Site {
-    static icons = { full: "full", webFull: "webFull", next: "next", danmaku: "danmaku" };
-    static selectors = {
-      "live.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled" },
-      "tv.sohu.com": { webFull: ".x-pagefs-btn", danmaku: ".tm-tmbtn", next: ".x-next-btn" },
-      "v.douyu.com": { webFull: ".ControllerBar-PageFull-Icon", danmaku: ".BarrageSwitch-icon" },
-      "v.youku.com": { webFull: "#webfullscreen-icon", danmaku: "#barrage-switch", next: ".kui-next-icon-0" },
-      "www.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled", next: ".btn-next-part div" },
-      "www.mgtv.com": { webFull: ".webfullscreenBtn i", danmaku: "div[class*='danmuSwitch']", next: ".icon-next" },
-      "www.iqiyi.com": { webFull: "[class*=videofullBtn]", danmaku: "[class*=danmuBtnSet] div", next: "[class*=playNext]" },
-      "www.bilibili.com": { full: ".bpx-player-ctrl-full", webFull: ".bpx-player-ctrl-web", next: ".bpx-player-ctrl-next" },
-      "v.qq.com": { full: ".txp_btn_fullscreen", webFull: ".txp_btn_fake", danmaku: ".barrage-switch", next: ".txp_btn_next_u" }
-    };
-    static _siteRegExps = {
-      acFun: /acfun.cn\/v/,
-      tencent: /v.qq.com\/x/,
-      qiyi: /iqiyi.com\/v_*/,
-      mgtv: /www.mgtv.com\/b/,
-      douyu: /v.douyu.com\/show/,
-      bili: /bilibili.com\/video/,
-      biliLive: /live.bilibili.com\/*/
-    };
-    static {
-      const selectors = Storage.ICONS_SELECTOR.get();
-      selectors ? this.selectors = selectors : this._loadRemote();
-      Tools.microTask(() => (this._createSiteTests(), this._convertGmMatchToRegex()));
-    }
-    static getIcons(domain = location.host) {
-      if (!Storage.ICONS_SELECTOR.get()) this._loadRemote();
-      return this.selectors[domain];
-    }
-    static isGmMatch() {
-      return this.gmMatches.some((m) => m.test(location.href.replace(location.search, Consts.EMPTY)));
-    }
-    static _loadRemote() {
-      const url = "https://gitee.com/xfeny/UserScript/raw/dev/monkey-web-fullscreen/src/IconsSelector.json";
-      _GM.xmlHttpRequest({ url, timeout: 3e3 }).then((res) => {
-        const remoteConf = JSON.parse(res.responseText ?? "{}");
-        this.selectors = { ...this.selectors, ...remoteConf };
-        Storage.ICONS_SELECTOR.set(Consts.EMPTY, this.selectors, 1 / 3);
-      }).catch((e) => console.error("加载远程配置失败", e));
-    }
-    static _convertGmMatchToRegex() {
-      const { matches, includes: excluded } = _GM_info.script;
-      const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
-      this.gmMatches = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
-    }
-    static _createSiteTests() {
-      Object.entries(this._siteRegExps).forEach(([name, regex]) => {
-        const methodName = `is${name.charAt(0).toUpperCase()}${name.slice(1)}`;
-        if (!this[methodName]) this[methodName] = () => regex.test(location.href);
-      });
-    }
-  }
   const Keyboard = Object.freeze({
     A: "KeyA",
     D: "KeyD",
@@ -613,9 +551,8 @@
       this.obsTimer = setTimeout(() => this.obsDoc?.disconnect(), Consts.ONE_SEC * 5);
     },
     setCurrentVideo(video) {
-      if (!video || this.player === video) return;
+      if (!video || this.player === video || video.offsetWidth < 260 || this.isBackgroundVideo(video)) return;
       if (this.player && !this.player.paused && !isNaN(this.player.duration)) return;
-      if (!Site.isMgtv() && video.offsetWidth < 240 || this.isBackgroundVideo(video)) return;
       this.player = video;
       this.setVideoInfo(video);
       this.observeVideoSrcChange(video);
@@ -654,12 +591,15 @@
     },
     setupMouseMoveListener() {
       let timer = null;
-      const handleEvent = ({ type, isTrusted }) => {
-        if (!isTrusted || this.noVideo() || Tools.isThrottle(type, 100)) return;
+      const handleEvent = ({ type, isTrusted, clientX, clientY }) => {
+        if (!isTrusted || this.noVideo() || Tools.isThrottle(type, 200)) return;
         clearTimeout(timer), this.toggleCursor();
         timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
+        if (!Storage.ENABLE_EDGE_CLICK.get()) return;
+        const video = this.getVideoForCoordinate(clientX, clientY);
+        video && Tools.microTask(() => this.createEdgeClickElement(video));
       };
-      document.addEventListener("mousemove", (e) => handleEvent(e));
+      document.addEventListener("mousemove", (e) => handleEvent(e), { passive: true });
       document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleEvent(e));
     },
     toggleCursor(hide = false, cls = "__hc") {
@@ -693,7 +633,7 @@
         if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
         if (this.isInputFocus(event) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
         if (type === "keyup") return Tools.preventDefault(event);
-        Tools.preventDefault(event), this.dispatchShortcutKey(code, true);
+        Tools.preventDefault(event), this.dispatchShortcutKey(code, { bypass: true });
       };
       Object.defineProperty(this, "fsWrapper", {
         get: () => observedValue.fsWrapper,
@@ -709,8 +649,93 @@
           });
         }
       });
+    },
+    getVideoForCoordinate(clientX, clientY) {
+      return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
+    },
+    createEdgeClickElement(video) {
+      if (!Storage.ENABLE_EDGE_CLICK.get()) return;
+      const parentNode = video.parentNode;
+      const sroot = video.getRootNode() instanceof ShadowRoot;
+      const container = sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
+      if (container instanceof Element && getComputedStyle(container).position === "static") {
+        Tools.setStyle(container, "position", "relative");
+      }
+      if (video.leftArea) return container.prepend(video.leftArea, video.rightArea);
+      const createEdge = (clas = "") => {
+        return Object.assign(document.createElement("div"), {
+          video,
+          className: `video-edge-click ${clas}`,
+          ondblclick: (e) => {
+            delete this.player;
+            Tools.preventDefault(e);
+            this.setCurrentVideo(e.target.video);
+            Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
+          }
+        });
+      };
+      [video.leftArea, video.rightArea] = [createEdge(), createEdge("right")];
+      container.prepend(video.leftArea, video.rightArea);
+    },
+    removeEdgeClickElements() {
+      if (Storage.ENABLE_EDGE_CLICK.get()) return;
+      Tools.querys(".video-edge-click").forEach((el) => el.remove());
     }
   };
+  class Site {
+    static icons = { full: "full", webFull: "webFull", next: "next", danmaku: "danmaku" };
+    static selectors = {
+      "live.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled" },
+      "tv.sohu.com": { webFull: ".x-pagefs-btn", danmaku: ".tm-tmbtn", next: ".x-next-btn" },
+      "v.douyu.com": { webFull: ".ControllerBar-PageFull-Icon", danmaku: ".BarrageSwitch-icon" },
+      "v.youku.com": { webFull: "#webfullscreen-icon", danmaku: "#barrage-switch", next: ".kui-next-icon-0" },
+      "www.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled", next: ".btn-next-part div" },
+      "www.mgtv.com": { webFull: ".webfullscreenBtn i", danmaku: "div[class*='danmuSwitch']", next: ".icon-next" },
+      "www.iqiyi.com": { webFull: "[class*=videofullBtn]", danmaku: "[class*=danmuBtnSet] div", next: "[class*=playNext]" },
+      "www.bilibili.com": { full: ".bpx-player-ctrl-full", webFull: ".bpx-player-ctrl-web", next: ".bpx-player-ctrl-next" },
+      "v.qq.com": { full: ".txp_btn_fullscreen", webFull: ".txp_btn_fake", danmaku: ".barrage-switch", next: ".txp_btn_next_u" }
+    };
+    static _siteRegExps = {
+      acFun: /acfun.cn\/v/,
+      tencent: /v.qq.com\/x/,
+      qiyi: /iqiyi.com\/v_*/,
+      mgtv: /www.mgtv.com\/b/,
+      douyu: /v.douyu.com\/show/,
+      bili: /bilibili.com\/video/,
+      biliLive: /live.bilibili.com\/*/
+    };
+    static {
+      const selectors = Storage.ICONS_SELECTOR.get();
+      selectors ? this.selectors = selectors : this._loadRemote();
+      Tools.microTask(() => (this._createSiteTests(), this._convertGmMatchToRegex()));
+    }
+    static getIcons(domain = location.host) {
+      if (!Storage.ICONS_SELECTOR.get()) this._loadRemote();
+      return this.selectors[domain];
+    }
+    static isGmMatch() {
+      return this.gmMatches.some((m) => m.test(location.href.replace(location.search, Consts.EMPTY)));
+    }
+    static _loadRemote() {
+      const url = "https://gitee.com/xfeny/UserScript/raw/dev/monkey-web-fullscreen/src/IconsSelector.json";
+      _GM.xmlHttpRequest({ url, timeout: 3e3 }).then((res) => {
+        const remoteConf = JSON.parse(res.responseText ?? "{}");
+        this.selectors = { ...this.selectors, ...remoteConf };
+        Storage.ICONS_SELECTOR.set(this.selectors, Consts.EMPTY, 1 / 3);
+      }).catch((e) => console.error("加载远程配置失败", e));
+    }
+    static _convertGmMatchToRegex() {
+      const { matches, includes: excluded } = _GM_info.script;
+      const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
+      this.gmMatches = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
+    }
+    static _createSiteTests() {
+      Object.entries(this._siteRegExps).forEach(([name, regex]) => {
+        const methodName = `is${name.charAt(0).toUpperCase()}${name.slice(1)}`;
+        if (!this[methodName]) this[methodName] = () => regex.test(location.href);
+      });
+    }
+  }
   const Keydown = {
     isInputFocus: (event) => Tools.isInputable(event.composedPath()[0]),
     preventDefault(event, { code, altKey } = event) {
@@ -721,9 +746,9 @@
       const zoomKeys = !this.isDisableZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
       if (isNumberKey || isOverrideKey || preventKeys || altKey && zoomKeys) Tools.preventDefault(event);
     },
-    dispatchShortcutKey(code, bypass) {
+    dispatchShortcutKey(code, { bypass = false, isTrusted = false } = {}) {
       const key = this.processShortcutKey({ code });
-      Tools.postMessage(window.top, { key, bypass });
+      Tools.postMessage(window.top, { key, bypass, isTrusted });
     },
     processShortcutKey({ key, code, ctrlKey, shiftKey, altKey }) {
       code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
@@ -797,9 +822,10 @@
       if ("toggle_clockAlways" in data) this.changeTimeElementDisplay();
       if ("toggle_smallerFont" in data) this.toggleTimeElementClass(data.toggle_smallerFont);
       if ("toggle_color" in data) this.setTimeElementColor(data.toggle_color);
-      if (data?.toggle_speed) this.setPlaybackRate(Consts.DEF_SPEED);
+      if ("toggle_edgeClick" in data) this.removeEdgeClickElements();
       if (data?.toggle_memory) this.delCachedPlayRate();
       if (data?.toggle_zoom) this.resetVideoTransform();
+      if (data?.toggle_speed) this.setPlaybackRate(Consts.DEF_SPEED);
     }
   };
   const Events = {
@@ -816,6 +842,7 @@
         const { video } = e.detail;
         if (!video || video.hasAttribute("received")) return;
         this.setupVideoListeners(video), video.setAttribute("received", true);
+        Tools.microTask(() => this.createEdgeClickElement(video));
         if (!this.player) this.setCurrentVideo(video);
       });
     },
@@ -828,8 +855,7 @@
     },
     timeupdate(video) {
       if (isNaN(video.duration)) return;
-      if (!video._mfs_hasPlayInited) this.initPlaySettings(video);
-      if (!this.player) this.setCurrentVideo(video);
+      if (!this.player) this.playing(video);
       this.resumeRateKeepDisplay();
       this.removeRelevantElements(video);
       this.autoWebFullscreen(video);
@@ -844,7 +870,7 @@
     },
     playing(video) {
       this.setCurrentVideo(video);
-      this.initPlaySettings(video);
+      this.initVideoPlay(video);
     },
     pause() {
       Tools.query(".ec-no")?.click();
@@ -868,6 +894,7 @@
       return isDynamic;
     },
     initVideoProps(video) {
+      if (!Tools.isAttached(this.player)) delete this.player;
       Object.keys(video).forEach((k) => k.startsWith("_mfs_") && delete video[k]);
       video.__duration = video.duration;
       video.tsr = { ...Consts.DEF_TSR };
@@ -876,9 +903,9 @@
       this.removeRateKeepDisplay(video);
       this.removeProgressElement();
     },
-    initPlaySettings(video) {
-      if (!this.player) return;
-      video._mfs_hasPlayInited = true;
+    initVideoPlay(video) {
+      if (!this.player || video._mfs_hasInited) return;
+      video._mfs_hasInited = true;
       this.applyCachedPlayRate(video);
       this.playbackRateKeepDisplay();
       this.applyCachedTime(video);
@@ -917,7 +944,7 @@
       if (Tools.isThrottle("cacheTime", Consts.ONE_SEC) || Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
       if (video !== this.player || !this.topWin || video.paused || video.duration < 120 || this.isLive()) return;
       if (Storage.NOT_CACHE_TIME.get() || this.remainTime(video) <= 10) return this.clearCachedTime(video);
-      Storage.PLAY_TIME.set(this.getCacheTimeKey(video), Number(video.currentTime) - 1, Storage.STORAGE_DAYS.get());
+      Storage.PLAY_TIME.set(Number(video.currentTime) - 1, this.getCacheTimeKey(video), Storage.STORAGE_DAYS.get());
       this.clearMultiVideoCacheTime();
     },
     applyCachedTime(video) {
@@ -945,7 +972,7 @@
     },
     async clearMultiVideoCacheTime() {
       if (!Tools.isMultiVideo()) return;
-      const pattern = new RegExp(`${Storage.PLAY_TIME.name}.*${this.topWin.urlHash}`);
+      const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
       const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
       if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
     },
@@ -1117,7 +1144,10 @@
       const parents = Tools.getParents(container, true);
       container.top = container.top ?? Tools.getElementRect(container).top;
       container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
-      container instanceof HTMLIFrameElement || parents.length < Consts.WEBFULL_PARENT_DEPTH ? parents.forEach((el) => Tools.setPart(el, Consts.webFull)) : this.detachForFullscreen();
+      container instanceof HTMLIFrameElement || parents.length < Consts.WEBFULL_PARENT_DEPTH ? parents.forEach((el) => {
+        Tools.emitEvent("addStyle", { shadowRoot: el.getRootNode() });
+        Tools.setPart(el, Consts.webFull);
+      }) : this.detachForFullscreen();
       Tools.scrollTop(container.scrollY + container.top);
       this.ensureWebFullscreen();
     },
@@ -1141,9 +1171,7 @@
       requestAnimationFrame(() => Tools.scrollTop(scrollY));
       setTimeout(() => Tools.setStyle(document.documentElement, "scroll-behavior"), 100);
       this.videoParents.clear();
-      this.fsPlaceholder = null;
-      this.fsWrapper = null;
-      this.fsParent = null;
+      this.fsPlaceholder = this.fsWrapper = this.fsParent = null;
     },
     getVideoHostContainer() {
       if (this.player) return this.getVideoContainer();
@@ -1181,9 +1209,10 @@
     videoParents: /* @__PURE__ */ new Set(),
     findVideoParentContainer(container, maxLevel = 4, track = true) {
       container = container ?? Tools.getParent(this.player);
+      if (!container.offsetHeight) container = Tools.getParent(container);
       const { offsetWidth: cw, offsetHeight: ch } = container;
       if (track) this.videoParents.clear();
-      for (let parent = container, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
+      for (let parent = container, level = 0; parent && level < maxLevel; parent = Tools.getParent(parent), level++) {
         if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
         if (this.hasExplicitlySize(parent)) return container;
         if (track) this.videoParents.add(parent);
@@ -1194,7 +1223,7 @@
       const style = element.style;
       const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
       return ["width", "height"].some((prop) => {
-        const value = style.getPropertyValue(prop);
+        const value = style?.getPropertyValue(prop);
         return value && sizeRegex.test(value);
       });
     },
@@ -1212,16 +1241,15 @@
     autoNextEpisode(video) {
       if (video.duration < 300 || video._mfs_hasTriedAutoNext || !Storage.IS_AUTO_NEXT.get()) return;
       if (Tools.isThrottle("autoNext", Consts.TWO_SEC) || this.remainTime(video) > Storage.NEXT_ADVANCE_SEC.get()) return;
-      if (this.isNextIgnoreUrl()) return video._mfs_hasTriedAutoNext = true;
+      if (this.isIgnoreNext()) return video._mfs_hasTriedAutoNext = true;
       this.dispatchShortcutKey(Keyboard.N);
       video._mfs_hasTriedAutoNext = true;
     },
     async autoWebFullscreen(video) {
       if (!this.topWin || !video.offsetWidth || this.player !== video) return;
-      if (video._mfs_hasWebFull || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
-      if (Site.isGmMatch() && this.isAutoDefault() || !Site.isGmMatch() && !this.isAutoSite()) return;
-      if (this.isFullIgnoreUrl() || Tools.isOverLimit("autoWide")) return video._mfs_hasWebFull = true;
-      if (await this.isWebFull(video)) return video._mfs_hasWebFull = true;
+      if (video._mfs_isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
+      if (Site.isGmMatch() && this.noAutoDefault() || !Site.isGmMatch() && !this.isAutoSite()) return;
+      if (this.isIgnoreWide() || await this.isWebFull(video) || Tools.isOverLimit("autoWide")) return video._mfs_isWide = true;
       this.dispatchShortcutKey(Keyboard.P);
     },
     async isWebFull(video) {
@@ -1354,7 +1382,7 @@
           }
         },
         confirmCallback(value) {
-          Storage.CURRENT_EPISODE.set(location.host, value);
+          Storage.CURRENT_EPISODE.set(value, location.host);
           Tools.notyf("继续拾取元素 ＼(＞０＜)／");
         }
       });
@@ -1373,7 +1401,7 @@
           }
         },
         confirmCallback(value) {
-          Storage.RELATIVE_EPISODE.set(location.host, value);
+          Storage.RELATIVE_EPISODE.set(value, location.host);
           Tools.notyf("操作完成 []~(￣▽￣)~* 干杯");
         }
       });
@@ -1461,9 +1489,7 @@
     destroy() {
       this.stop();
       this.element?.remove();
-      this.dateInstance = null;
-      this.container = null;
-      this.element = null;
+      this.dateInstance = this.container = this.element = null;
     }
   }
   const Extend = {
@@ -1586,13 +1612,13 @@
       }).filter(Boolean);
     }
     normalizePath(path) {
-      if (path.length > 1 && path.endsWith("/")) return path.slice(0, -1);
-      return path;
+      return path.length > 1 && path.endsWith("/") ? path.slice(0, -1) : path;
     }
     isBlocked(url) {
       try {
         const parsedUrl = new URL(url);
         const normalizedPath = this.normalizePath(parsedUrl.pathname);
+        if (normalizedPath === "/") return true;
         return this.blacklist.some((entry) => {
           if (parsedUrl.hostname !== entry.hostname) return false;
           if (entry.pathname === "/") return normalizedPath === "/";
@@ -1606,7 +1632,7 @@
   }
   const Ignore = {
     defNextIgnore: ["https://www.youtube.com/watch", "https://www.bilibili.com/video", "https://www.bilibili.com/list"],
-    defFullIgnore: ["https://www.youtube.com/shorts", "https://www.youtube.com", "https://www.bilibili.com"],
+    defFullIgnore: ["https://www.youtube.com/results", "https://www.youtube.com/shorts"],
     setupIgnoreUrlsChangeListener() {
       this.initializeIgnoreUrls();
       [Storage.FULL_IGNORE_URLS.name, Storage.NEXT_IGNORE_URLS.name].forEach(
@@ -1622,11 +1648,11 @@
       const fullUrls = this.processIgnoreUrls(Storage.FULL_IGNORE_URLS, this.defFullIgnore);
       this.fullUrlFilter = new URLBlacklist(fullUrls);
     },
-    isNextIgnoreUrl() {
-      return this.topWin ? this.nextUrlFilter?.isBlocked(this.topWin.url) : false;
+    isIgnoreNext() {
+      return this.nextUrlFilter?.isBlocked(this.topWin?.url ?? location.href);
     },
-    isFullIgnoreUrl() {
-      return this.topWin ? this.fullUrlFilter?.isBlocked(this.topWin.url) : false;
+    isIgnoreWide() {
+      return this.fullUrlFilter?.isBlocked(this.topWin?.url ?? location.href);
     },
     processIgnoreUrls(cache, defaultUrls) {
       const urlsStr = cache.get() ?? "";
@@ -1638,8 +1664,8 @@
   };
   const { IS_SITE_AUTO, CURRENT_EPISODE } = Storage;
   const Menu = {
+    noAutoDefault: () => Storage.NO_AUTO_DEF.get(),
     isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
-    isAutoDefault: () => Storage.IS_AUTO_DEF.get(),
     isDisableSpeed: () => Storage.DISABLE_SPEED.get(),
     isDisableZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
     isAutoSite: () => IS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
@@ -1657,24 +1683,25 @@
       );
     },
     registMenuCommand() {
-      const host = location.host;
-      const isAutoSite = this.isAutoSite();
-      const siteFun = ({ cache }) => cache.set(host, !cache.get(host));
-      const delPicker = () => Storage.CURRENT_EPISODE.del(host) & Storage.RELATIVE_EPISODE.del(host);
+      const noPicker = !CURRENT_EPISODE.get(location.host);
+      const siteTitle = `此站${this.isAutoSite() ? "禁" : "启"}用自动网页全屏`;
+      const siteFun = ({ host, cache }) => cache.set(!cache.get(host), host);
+      const delPicker = ({ host }) => Storage.CURRENT_EPISODE.del(host) & Storage.RELATIVE_EPISODE.del(host);
       const configs = [
-        { title: `此站${isAutoSite ? "禁" : "启"}用自动网页全屏`, cache: IS_SITE_AUTO, isHidden: Site.isGmMatch(), fn: siteFun },
-        { title: "删除此站剧集选择器", cache: CURRENT_EPISODE, isHidden: !CURRENT_EPISODE.get(host), fn: delPicker },
-        { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: () => this.shortcutKeysPopup() },
-        { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: () => this.settingPopup() }
+        { title: siteTitle, cache: IS_SITE_AUTO, useHost: true, isHidden: Site.isGmMatch(), fn: siteFun },
+        { title: "删除此站剧集选择器", cache: CURRENT_EPISODE, useHost: true, isHidden: noPicker, fn: delPicker },
+        { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: this.shortcutKeysPopup },
+        { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: this.settingPopup }
       ];
-      configs.forEach(({ title, host: host2, cache, isHidden, fn }) => {
+      configs.forEach(({ title, useHost, cache, isHidden, fn }) => {
         const id = `${cache.name}_MENU_ID`;
         _GM_unregisterMenuCommand(this[id]);
         if (isHidden) return;
+        const host = useHost ? location.host : Consts.EMPTY;
         this[id] = _GM_registerMenuCommand(title, () => {
-          if (fn) return fn.call(this, { host: host2, cache, title });
-          const input = prompt(title, host2 ? cache.get(host2) : cache.get());
-          if (!isNaN(input) && cache.parser(input)) host2 ? cache.set(host2, input) : cache.set(input);
+          if (fn) return fn.call(this, { host, cache, title });
+          const input = prompt(title, host ? cache.get(host) : cache.get());
+          host ? cache.set(input, host) : cache.set(input);
         });
       });
     },
@@ -1765,7 +1792,7 @@
               const { host, send, delay } = this.dataset;
               const value = Object.is(this.type, "checkbox") ? this.checked : this.value;
               if (send) Tools.postMessage(window, { [`toggle_${this.name}`]: value });
-              const setCache = () => host ? cache.set(host, value) : cache.set(value);
+              const setCache = () => host ? cache.set(value, host) : cache.set(value);
               delay ? setTimeout(setCache, 50) : setCache();
             });
           });
@@ -1777,7 +1804,7 @@
         { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_SPEED, attrs: ["send", "delay"] },
         { name: "memory", text: "禁用 记忆倍速", cache: Storage.NOT_CACHE_SPEED, attrs: ["send"] },
         { name: "time", text: "禁用 记忆播放位置", cache: Storage.NOT_CACHE_TIME },
-        { name: "fit", text: "禁用 自动网页全屏", cache: Storage.IS_AUTO_DEF, isHide: !Site.isGmMatch() },
+        { name: "fit", text: "禁用 自动网页全屏", cache: Storage.NO_AUTO_DEF, isHide: !Site.isGmMatch() },
         { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.IS_INVISIBLE_PAUSE },
         { name: "volume", text: "禁用 音量默认百分百", cache: Storage.IS_MAX_VOLUME },
         { name: "next", text: "启用 自动切换至下集", cache: Storage.IS_AUTO_NEXT },
@@ -1797,7 +1824,8 @@
         { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK },
         { name: "clockAlways", text: "启用 非全屏显示时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
         { name: "smallerFont", text: "启用 小字号显示时间", cache: Storage.USE_SMALL_FONT, attrs: ["send"] },
-        { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] }
+        { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },
+        { name: "edgeClick", text: "启用 侧边双击网页全屏", cache: Storage.ENABLE_EDGE_CLICK, attrs: ["send"] }
       ].filter(({ isHidden }) => !isHidden);
       const renderItem = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
@@ -1827,7 +1855,7 @@
     genIgnoreItems() {
       const { CUSTOM_WEB_FULL, NEXT_IGNORE_URLS, FULL_IGNORE_URLS } = Storage;
       const configs = [
-        { name: "customRule", text: "自定义此站网页全屏规则", cache: CUSTOM_WEB_FULL, isHide: Site.isGmMatch(), useHost: true },
+        { name: "customRule", text: "自定义此站视频容器", cache: CUSTOM_WEB_FULL, isHide: Site.isGmMatch(), useHost: true },
         { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: NEXT_IGNORE_URLS },
         { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: FULL_IGNORE_URLS }
       ];
