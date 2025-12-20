@@ -107,13 +107,24 @@ export default {
       if (!isTrusted || Tools.isThrottle(type, 200)) return;
 
       // 获取鼠标光标位置是否有视频元素
-      const elements = document.elementsFromPoint(clientX, clientY);
-      const video = elements.find((el) => el.matches("video"));
-      if (video) this.createEdgeClickElement(video);
+      const video = this.getVideoForCoordinate(clientX, clientY);
+      video && Tools.microTask(() => this.createEdgeClickElement(video)); // 利用微任务的 “幂等性”，避免重复创建元素
     });
   },
+  getVideoForCoordinate(clientX, clientY) {
+    return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
+  },
   createEdgeClickElement(video) {
-    const container = this.findVideoParentContainer(Tools.getParent(video), 4, false);
+    const parentNode = video.parentNode;
+    const sroot = video.getRootNode() instanceof ShadowRoot;
+    const container = sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
+
+    // 避免元素定位异常
+    if (container instanceof Element && getComputedStyle(container).position === "static") {
+      Tools.setStyle(container, "position", "relative");
+    }
+
+    // 已创建过，复用元素
     if (video.leftArea) return container.prepend(video.leftArea, video.rightArea);
 
     // 复用创建逻辑，通过 Object.assign 简化元素初始化

@@ -338,13 +338,20 @@
     setupMouseMoveListener() {
       document.addEventListener("mousemove", ({ type, isTrusted, clientX, clientY }) => {
         if (!isTrusted || Tools.isThrottle(type, 200)) return;
-        const elements = document.elementsFromPoint(clientX, clientY);
-        const video = elements.find((el) => el.matches("video"));
-        if (video) this.createEdgeClickElement(video);
+        const video = this.getVideoForCoordinate(clientX, clientY);
+        video && Tools.microTask(() => this.createEdgeClickElement(video));
       });
     },
+    getVideoForCoordinate(clientX, clientY) {
+      return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
+    },
     createEdgeClickElement(video) {
-      const container = this.findVideoParentContainer(Tools.getParent(video), 4, false);
+      const parentNode = video.parentNode;
+      const sroot = video.getRootNode() instanceof ShadowRoot;
+      const container = sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
+      if (container instanceof Element && getComputedStyle(container).position === "static") {
+        Tools.setStyle(container, "position", "relative");
+      }
       if (video.leftArea) return container.prepend(video.leftArea, video.rightArea);
       const createEdge = (clas = "") => {
         return Object.assign(document.createElement("div"), {
