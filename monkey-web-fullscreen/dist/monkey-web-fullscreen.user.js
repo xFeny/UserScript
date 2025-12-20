@@ -2,7 +2,7 @@
 // @name               视频自动网页全屏｜倍速播放
 // @name:zh-TW         視頻自動網頁全屏｜倍速播放
 // @namespace          http://tampermonkey.net/
-// @version            3.7.0
+// @version            3.7.1
 // @author             Feny
 // @description        支持所有H5视频的增强脚本，通用网页全屏｜倍速调节，对微博 / 推特 / Instagram / Facebook等多视频平台均适用；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / 搜狐视频 / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @description:zh-TW  支持所有H5视频的增强脚本，通用網頁全屏｜倍速調節，对微博 / 推特 / Instagram / Facebook等平臺均適用；B站(含直播) / 騰訊視頻 / 優酷 / 愛奇藝 / 芒果TV / 搜狐視頻 / AcFun 默認自動網頁全屏，其他網站可手動開啓；自動網頁全屏 + 記憶倍速 + 下集切換，減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
@@ -189,6 +189,12 @@
     isThrottle(key = "throttle", gap = 300) {
       const { now, diff } = this._getTimeDiff(key);
       return diff >= gap ? this.freqTimes.set(key, now) && false : true;
+    },
+    throttle(fn, wait) {
+      let last = 0;
+      return function(...args) {
+        if (Date.now() - last >= wait) last = Date.now(), fn.apply(this, args);
+      };
     },
     limitCountMap: /* @__PURE__ */ new Map(),
     isOverLimit(key = "default", maxCount = 5) {
@@ -591,16 +597,16 @@
     },
     setupMouseMoveListener() {
       let timer = null;
-      const handleEvent = ({ type, isTrusted, clientX, clientY }) => {
-        if (!isTrusted || this.noVideo() || Tools.isThrottle(type, 200)) return;
-        clearTimeout(timer), this.toggleCursor();
-        timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
+      const handleEvent = ({ clientX, clientY }) => {
+        if (!this.noVideo()) {
+          clearTimeout(timer), this.toggleCursor();
+          timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
+        }
         if (!Storage.ENABLE_EDGE_CLICK.get()) return;
         const video = this.getVideoForCoordinate(clientX, clientY);
-        video && Tools.microTask(() => this.createEdgeClickElement(video));
+        video && this.createEdgeClickElement(video);
       };
-      document.addEventListener("mousemove", (e) => handleEvent(e), { passive: true });
-      document.addEventListener("mouseover", (e) => e.target.matches("video, iframe") && handleEvent(e));
+      document.addEventListener("mousemove", Tools.throttle(handleEvent, 300), { passive: true });
     },
     toggleCursor(hide = false, cls = "__hc") {
       if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
