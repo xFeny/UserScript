@@ -112,9 +112,10 @@ export default {
     if ("toggle_clockAlways" in data) this.changeTimeElementDisplay(); // 非全屏显示时间
     if ("toggle_smallerFont" in data) this.toggleTimeElementClass(data.toggle_smallerFont); // 小字号显示时间
     if ("toggle_color" in data) this.setTimeElementColor(data.toggle_color); // 时间颜色
+    if ("toggle_edgeClick" in data) this.removeEdgeClickElements(); // 禁用侧边双击
 
-    if (data?.toggle_speed) this.setPlaybackRate(Consts.DEF_SPEED); // 禁用倍速调节
     if (data?.toggle_memory) this.delCachedPlayRate(); // 禁用记忆倍速
     if (data?.toggle_zoom) this.resetVideoTransform(); // 禁用缩放
+    if (data?.toggle_speed) this.setPlaybackRate(Consts.DEF_SPEED); // 禁用倍速调节
   },
 };

@@ -108,11 +108,10 @@ export default {
       clearTimeout(timer), this.toggleCursor();
       timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
 
-      // 获取鼠标光标位置是否有视频元素
+      if (!Storage.ENABLE_EDGE_CLICK.get()) return;
       const elements = document.elementsFromPoint(clientX, clientY);
       const video = elements.find((el) => el.matches("video"));
-
-      // 利用微任务的 “幂等性”，解决重复创建元素
+      // 利用微任务的 “幂等性”，避免重复创建元素
       video && Tools.microTask(() => this.createEdgeClickElement(video));
     };
 
@@ -174,6 +173,8 @@ export default {
     });
   },
   createEdgeClickElement(video) {
+    if (!Storage.ENABLE_EDGE_CLICK.get()) return;
+
     const parentNode = video.parentNode;
     const sroot = video.getRootNode() instanceof ShadowRoot;
     const container = sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
@@ -203,5 +204,9 @@ export default {
     // 解构赋值批量创建边缘元素
     [video.leftArea, video.rightArea] = [createEdge(), createEdge("right")];
     container.prepend(video.leftArea, video.rightArea);
+  },
+  removeEdgeClickElements() {
+    if (Storage.ENABLE_EDGE_CLICK.get()) return;
+    Tools.querys(".video-edge-click").forEach((el) => el.remove());
   },
 };

@@ -188,6 +188,7 @@ export default {
       { name: "clockAlways", text: "启用 非全屏显示时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
       { name: "smallerFont", text: "启用 小字号显示时间", cache: Storage.USE_SMALL_FONT, attrs: ["send"] },
       { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },
+      { name: "edgeClick", text: "启用 侧边双击网页全屏", cache: Storage.ENABLE_EDGE_CLICK, attrs: ["send"] },
     ].filter(({ isHidden }) => !isHidden);
 
     const renderItem = ({ text, dataset, name, value }) => `
