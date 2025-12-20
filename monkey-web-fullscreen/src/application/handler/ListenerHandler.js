@@ -109,10 +109,8 @@ export default {
       timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
 
       if (!Storage.ENABLE_EDGE_CLICK.get()) return;
-      const elements = document.elementsFromPoint(clientX, clientY);
-      const video = elements.find((el) => el.matches("video"));
-      // 利用微任务的 “幂等性”，避免重复创建元素
-      video && Tools.microTask(() => this.createEdgeClickElement(video));
+      const video = this.getVideoForCoordinate(clientX, clientY);
+      video && Tools.microTask(() => this.createEdgeClickElement(video)); // 利用微任务的 “幂等性”，避免重复创建元素
     };
 
     document.addEventListener("mousemove", (e) => handleEvent(e), { passive: true });
@@ -171,6 +169,9 @@ export default {
         });
       },
     });
+  },
+  getVideoForCoordinate(clientX, clientY) {
+    return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
   },
   createEdgeClickElement(video) {
     if (!Storage.ENABLE_EDGE_CLICK.get()) return;
