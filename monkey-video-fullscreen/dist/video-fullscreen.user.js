@@ -4,7 +4,7 @@
 // @name:zh-TW         視頻網頁全屏
 // @name:en            Video webpage fullscreen
 // @namespace          npm/vite-plugin-monkey
-// @version            3.7.0
+// @version            3.7.1
 // @author             Feny
 // @description        通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可双击网页全屏
 // @description:zh     通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可双击网页全屏
@@ -123,6 +123,12 @@
     isThrottle(key = "throttle", gap = 300) {
       const { now, diff } = this._getTimeDiff(key);
       return diff >= gap ? this.freqTimes.set(key, now) && false : true;
+    },
+    throttle(fn, wait) {
+      let last = 0;
+      return function(...args) {
+        if (Date.now() - last >= wait) last = Date.now(), fn.apply(this, args);
+      };
     },
     limitCountMap: /* @__PURE__ */ new Map(),
     isOverLimit(key = "default", maxCount = 5) {
@@ -336,11 +342,11 @@
       });
     },
     setupMouseMoveListener() {
-      document.addEventListener("mousemove", ({ type, isTrusted, clientX, clientY }) => {
-        if (!isTrusted || Tools.isThrottle(type, 200)) return;
+      const handleEvent = ({ clientX, clientY }) => {
         const video = this.getVideoForCoordinate(clientX, clientY);
-        video && Tools.microTask(() => this.createEdgeClickElement(video));
-      });
+        video && this.createEdgeClickElement(video);
+      };
+      document.addEventListener("mousemove", Tools.throttle(handleEvent, 300), { passive: true });
     },
     getVideoForCoordinate(clientX, clientY) {
       return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
