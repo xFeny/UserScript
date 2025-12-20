@@ -103,13 +103,12 @@ export default {
     });
   },
   setupMouseMoveListener() {
-    document.addEventListener("mousemove", ({ type, isTrusted, clientX, clientY }) => {
-      if (!isTrusted || Tools.isThrottle(type, 200)) return;
-
-      // 获取鼠标光标位置是否有视频元素
+    const handleEvent = ({ clientX, clientY }) => {
       const video = this.getVideoForCoordinate(clientX, clientY);
-      video && Tools.microTask(() => this.createEdgeClickElement(video)); // 利用微任务的 “幂等性”，避免重复创建元素
-    });
+      video && this.createEdgeClickElement(video);
+    };
+
+    document.addEventListener("mousemove", Tools.throttle(handleEvent, 300), { passive: true });
   },
   getVideoForCoordinate(clientX, clientY) {
     return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
