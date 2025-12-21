@@ -21,7 +21,6 @@
 // @grant              GM_deleteValue
 // @grant              GM_getResourceText
 // @grant              GM_getValue
-// @grant              GM_listValues
 // @grant              GM_registerMenuCommand
 // @grant              GM_setValue
 // @grant              GM_unregisterMenuCommand
@@ -248,7 +247,6 @@
   var _GM_addValueChangeListener = /* @__PURE__ */ (() => typeof GM_addValueChangeListener != "undefined" ? GM_addValueChangeListener : void 0)();
   var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
   var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
-  var _GM_listValues = /* @__PURE__ */ (() => typeof GM_listValues != "undefined" ? GM_listValues : void 0)();
   var _GM_registerMenuCommand = /* @__PURE__ */ (() => typeof GM_registerMenuCommand != "undefined" ? GM_registerMenuCommand : void 0)();
   var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
   var _GM_unregisterMenuCommand = /* @__PURE__ */ (() => typeof GM_unregisterMenuCommand != "undefined" ? GM_unregisterMenuCommand : void 0)();
@@ -458,12 +456,9 @@
     }
   };
   class BasicStorage {
-    static #instances = [];
     constructor(name, defVal, useLocalStore = false, parser = (v) => v, splice = false) {
       Object.assign(this, { name, defVal, useLocalStore, parser, splice });
       this.storage = useLocalStore ? localStorage : { getItem: _GM_getValue, setItem: _GM_setValue, removeItem: _GM_deleteValue };
-      BasicStorage.#instances.push(this);
-      if (BasicStorage.#instances.length === 1) requestIdleCallback(() => BasicStorage.cleanExpired());
     }
     #getFinalKey(suffix = "", requireKey = false) {
       if (requireKey && [null, void 0].includes(suffix)) throw new Error("键名拼接时，suffix（第二个参数）不能为空");
@@ -488,26 +483,6 @@
     }
     del(key) {
       this.storage.removeItem(this.#getFinalKey(key));
-    }
-    fuzzyGet(pattern) {
-      const result = {};
-      this.fuzzyHandle(pattern, (key) => result[key] = this.storage.getItem(key));
-      return result;
-    }
-    fuzzyDel(pattern) {
-      this.fuzzyHandle(pattern, (key) => this.storage.removeItem(key));
-    }
-    fuzzyHandle(pattern, callback) {
-      const keys = Object.is(this.storage, localStorage) ? Object.keys(localStorage) : _GM_listValues();
-      const keyMatcher = pattern instanceof RegExp ? (key) => pattern.test(key) : (key) => key.includes(pattern);
-      keys.filter(keyMatcher).forEach(callback);
-    }
-    static cleanExpired() {
-      this.#instances.forEach((instance) => {
-        instance.fuzzyHandle(instance.name, (key) => {
-          if (instance.#get(key)?.expires < Date.now()) instance.del(key);
-        });
-      });
     }
   }
   const Storage = _unsafeWindow.FyStorage = {
