@@ -567,6 +567,7 @@
       window.videoInfo = this.videoInfo = videoInfo;
       if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iframeSrc: location.href } });
       Tools.microTask(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
+      this.getVideoIFrame()?.focus();
       this.sendTopWinInfo();
     },
     sendTopWinInfo() {
