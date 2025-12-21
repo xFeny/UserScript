@@ -102,18 +102,22 @@ export default {
   },
   setupMouseMoveListener() {
     let timer = null;
-    const handleEvent = ({ clientX, clientY }) => {
+    const handle = ({ type, clientX, clientY }) => {
+      if (Tools.isThrottle(type, 300)) return;
+
+      // 有视频信息时才切换鼠标光标的显隐
       if (!this.noVideo()) {
         clearTimeout(timer), this.toggleCursor();
         timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
       }
 
+      // 是否创建侧边双击网页全屏元素
       if (!Storage.ENABLE_EDGE_CLICK.get()) return;
       const video = this.getVideoForCoordinate(clientX, clientY);
       video && this.createEdgeClickElement(video);
     };
 
-    document.addEventListener("mousemove", Tools.throttle(handleEvent, 300), { passive: true });
+    document.addEventListener("mousemove", handle, { passive: true });
   },
   toggleCursor(hide = false, cls = "__hc") {
     if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));

@@ -103,12 +103,13 @@ export default {
     });
   },
   setupMouseMoveListener() {
-    const handleEvent = ({ clientX, clientY }) => {
+    const handle = ({ type, clientX, clientY }) => {
+      if (Tools.isThrottle(type, 300)) return;
       const video = this.getVideoForCoordinate(clientX, clientY);
       video && this.createEdgeClickElement(video);
     };
 
-    document.addEventListener("mousemove", Tools.throttle(handleEvent, 300), { passive: true });
+    document.addEventListener("mousemove", handle, { passive: true });
   },
   getVideoForCoordinate(clientX, clientY) {
     return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
