@@ -10,10 +10,10 @@ import Extend from "./handler/VideoExtendHandler";
 import Ignore from "./handler/IgnoreUrlsHandler";
 import Menu from "./handler/MenuHandler";
 
-const handlers = [Listen, Keydown, Events, Control, WebFull, Automatic, Episode, EpisodePicker, Extend, Ignore, Menu];
 unsafeWindow.AUTO_WEB_FULLSCREEN = window.App = {};
 
 // 合并处理器方法到App并绑定上下文
+const handlers = [Listen, Keydown, Events, Control, WebFull, Automatic, Episode, EpisodePicker, Extend, Ignore, Menu];
 handlers.forEach((handler) => {
   const entries = Object.entries(handler);
   for (const [key, value] of entries) {
