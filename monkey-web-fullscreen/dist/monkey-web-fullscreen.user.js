@@ -190,12 +190,6 @@
       const { now, diff } = this._getTimeDiff(key);
       return diff >= gap ? this.freqTimes.set(key, now) && false : true;
     },
-    throttle(fn, wait) {
-      let last = 0;
-      return function(...args) {
-        if (Date.now() - last >= wait) last = Date.now(), fn.apply(this, args);
-      };
-    },
     limitCountMap: /* @__PURE__ */ new Map(),
     isOverLimit(key = "default", maxCount = 5) {
       const count = this.limitCountMap.get(key) ?? 0;
@@ -597,7 +591,8 @@
     },
     setupMouseMoveListener() {
       let timer = null;
-      const handleEvent = ({ clientX, clientY }) => {
+      const handle = ({ type, clientX, clientY }) => {
+        if (Tools.isThrottle(type, 300)) return;
         if (!this.noVideo()) {
           clearTimeout(timer), this.toggleCursor();
           timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
@@ -606,7 +601,7 @@
         const video = this.getVideoForCoordinate(clientX, clientY);
         video && this.createEdgeClickElement(video);
       };
-      document.addEventListener("mousemove", Tools.throttle(handleEvent, 300), { passive: true });
+      document.addEventListener("mousemove", handle, { passive: true });
     },
     toggleCursor(hide = false, cls = "__hc") {
       if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
@@ -1887,8 +1882,8 @@
       return { html, cacheMap };
     }
   };
-  const handlers = [Listen, Keydown, Events, Control, WebFull, Automatic, Episode, EpisodePicker, Extend, Ignore, Menu];
   _unsafeWindow.AUTO_WEB_FULLSCREEN = window.App = {};
+  const handlers = [Listen, Keydown, Events, Control, WebFull, Automatic, Episode, EpisodePicker, Extend, Ignore, Menu];
   handlers.forEach((handler) => {
     const entries = Object.entries(handler);
     for (const [key, value] of entries) {

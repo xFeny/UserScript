@@ -123,12 +123,6 @@
       const { now, diff } = this._getTimeDiff(key);
       return diff >= gap ? this.freqTimes.set(key, now) && false : true;
     },
-    throttle(fn, wait) {
-      let last = 0;
-      return function(...args) {
-        if (Date.now() - last >= wait) last = Date.now(), fn.apply(this, args);
-      };
-    },
     limitCountMap: /* @__PURE__ */ new Map(),
     isOverLimit(key = "default", maxCount = 5) {
       const count = this.limitCountMap.get(key) ?? 0;
@@ -340,11 +334,12 @@
       });
     },
     setupMouseMoveListener() {
-      const handleEvent = ({ clientX, clientY }) => {
+      const handle = ({ type, clientX, clientY }) => {
+        if (Tools.isThrottle(type, 300)) return;
         const video = this.getVideoForCoordinate(clientX, clientY);
         video && this.createEdgeClickElement(video);
       };
-      document.addEventListener("mousemove", Tools.throttle(handleEvent, 300), { passive: true });
+      document.addEventListener("mousemove", handle, { passive: true });
     },
     getVideoForCoordinate(clientX, clientY) {
       return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
@@ -485,7 +480,7 @@
       this.storage.removeItem(this.#getFinalKey(key));
     }
   }
-  const Storage = _unsafeWindow.FyStorage = {
+  const Storage = {
     CUSTOM_CONTAINER: new BasicStorage("CUSTOM_CONTAINER_", "", false, void 0, true),
     THIS_SITE_AUTO: new BasicStorage("THIS_SITE_AUTO_", false, false, Boolean, true),
     IGNORE_URLS: new BasicStorage("IGNORE_URLS", "")
@@ -754,8 +749,8 @@
       });
     }
   };
-  const handlers = [Listen, Keydown, Events, WebFull, Automatic, Ignore, Menu];
   const App = {};
+  const handlers = [Listen, Keydown, Events, WebFull, Automatic, Ignore, Menu];
   handlers.forEach((handler) => {
     const entries = Object.entries(handler);
     for (const [key, value] of entries) {
