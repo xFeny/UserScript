@@ -52,7 +52,7 @@ export default {
   },
   delCachedPlayRate: () => Storage.CACHED_SPEED.del(),
   remainTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
-  playToggle: (video) => (Site.isDouyu() ? video?.click() : video?.paused ? video?.play() : video?.pause()),
+  playToggle: (video) => (Site.isDouyu() ? video?.click() : video?.[video?.paused ? "play" : "pause"]()),
   tryPlay: (video) => video?.paused && (Site.isDouyu() ? video?.click() : video?.play()),
   setPlaybackRate(playRate, show = true) {
     if (!this.player || isNaN(this.player.duration) || this.player.ended || this.isLive()) return;
