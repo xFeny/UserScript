@@ -3,8 +3,6 @@
  * 支持 localStorage/GM API、过期时间、模糊操作
  */
 export default class BasicStorage {
-  static #instances = [];
-
   /**
    * 构造函数
    * @param {string} name 存储键名前缀
@@ -16,9 +14,6 @@ export default class BasicStorage {
   constructor(name, defVal, useLocalStore = false, parser = (v) => v, splice = false) {
     Object.assign(this, { name, defVal, useLocalStore, parser, splice });
     this.storage = useLocalStore ? localStorage : { getItem: GM_getValue, setItem: GM_setValue, removeItem: GM_deleteValue };
-
-    BasicStorage.#instances.push(this);
-    if (BasicStorage.#instances.length === 1) requestIdleCallback(() => BasicStorage.cleanExpired());
   }
 
   /**
@@ -75,32 +70,5 @@ export default class BasicStorage {
    */
   del(key) {
     this.storage.removeItem(this.#getFinalKey(key));
-  }
-
-  fuzzyGet(pattern) {
-    const result = {};
-    this.fuzzyHandle(pattern, (key) => (result[key] = this.storage.getItem(key)));
-    return result;
-  }
-
-  fuzzyDel(pattern) {
-    this.fuzzyHandle(pattern, (key) => this.storage.removeItem(key));
-  }
-
-  fuzzyHandle(pattern, callback) {
-    const keys = Object.is(this.storage, localStorage) ? Object.keys(localStorage) : GM_listValues();
-    const keyMatcher = pattern instanceof RegExp ? (key) => pattern.test(key) : (key) => key.includes(pattern);
-    keys.filter(keyMatcher).forEach(callback);
-  }
-
-  /**
-   * 清理所有实例的过期数据
-   */
-  static cleanExpired() {
-    this.#instances.forEach((instance) => {
-      instance.fuzzyHandle(instance.name, (key) => {
-        if (instance.#get(key)?.expires < Date.now()) instance.del(key);
-      });
-    });
   }
 }
