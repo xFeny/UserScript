@@ -6,7 +6,6 @@ export default class Site {
   static icons = { full: "full", webFull: "webFull", next: "next", danmaku: "danmaku" };
   static selectors = {
     "live.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled" },
-    "tv.sohu.com": { webFull: ".x-pagefs-btn", danmaku: ".tm-tmbtn", next: ".x-next-btn" },
     "v.douyu.com": { webFull: ".ControllerBar-PageFull-Icon", danmaku: ".BarrageSwitch-icon" },
     "v.youku.com": { webFull: "#webfullscreen-icon", danmaku: "#barrage-switch", next: ".kui-next-icon-0" },
     "www.acfun.cn": { webFull: ".fullscreen-web", danmaku: ".danmaku-enabled", next: ".btn-next-part div" },

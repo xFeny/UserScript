@@ -43,11 +43,5 @@
     "webFull": ".txp_btn_fake",
     "danmaku": ".barrage-switch",
     "next": ".txp_btn_next_u"
-  },
-  "tv.sohu.com": {
-    "full": ".x-fullscreen-btn",
-    "webFull": ".x-pagefs-btn",
-    "danmaku": ".tm-tmbtn",
-    "next": ".x-next-btn"
   }
 }
