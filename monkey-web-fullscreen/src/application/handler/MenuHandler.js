@@ -167,6 +167,7 @@ export default {
       { name: "time", text: "禁用 记忆播放位置", cache: Storage.NOT_CACHE_TIME },
       { name: "fit", text: "禁用 自动网页全屏", cache: Storage.NO_AUTO_DEF, isHide: !Site.isGmMatch() },
       { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.IS_INVISIBLE_PAUSE },
+      { name: "tryPlay", text: "禁用 尝试自动播放", cache: Storage.DISABLE_TRY_PLAY },
       { name: "volume", text: "禁用 音量默认百分百", cache: Storage.IS_MAX_VOLUME },
       { name: "next", text: "启用 自动切换至下集", cache: Storage.IS_AUTO_NEXT },
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEY },

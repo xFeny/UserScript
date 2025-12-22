@@ -16,6 +16,9 @@ export default unsafeWindow.FyStorage = {
   /** 网页全屏相关：启/禁用侧边双击网页全屏 */
   ENABLE_EDGE_CLICK: new BasicStorage("ENABLE_EDGE_CLICK", false, false, Boolean),
 
+  /** 播放相关：禁用尝试自动播放 */
+  DISABLE_TRY_PLAY: new BasicStorage("DISABLE_TRY_PLAY", false, false, Boolean),
+
   /** 倍速相关：倍速步进 */
   SPEED_STEP: new BasicStorage("PLAY_RATE_STEP", 0.25, false, parseFloat),
   /** 倍速相关：禁用倍速调节 */

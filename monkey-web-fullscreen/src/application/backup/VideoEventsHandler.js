@@ -58,8 +58,8 @@ export default {
     this.videoProgress(video);
   },
   canplay(video) {
-    if (video._mfs_hasTryPlay || Tools.isMultiVideo()) return;
-    video._mfs_hasTryPlay = true;
+    if (video._mfs_tryPlay || Tools.isMultiVideo()) return;
+    video._mfs_tryPlay = true;
     this.tryPlay(video);
   },
   playing(video) {

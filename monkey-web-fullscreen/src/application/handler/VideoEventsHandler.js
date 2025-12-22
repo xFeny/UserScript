@@ -1,3 +1,4 @@
+import Storage from "../common/Storage";
 import Tools from "../common/Tools";
 
 /**
@@ -24,6 +25,7 @@ export default {
   },
   loadedmetadata(video) {
     this.autoWebFullscreen(video);
+    if (!this.player) this.playing(video);
     Tools.querys('[id*="loading"]').forEach((el) => !Tools.query("video", el) && Tools.addCls(el, "_noplayer"));
   },
   loadeddata(video) {
@@ -43,13 +45,14 @@ export default {
     this.videoProgress(video);
   },
   canplay(video) {
-    if (video._mfs_hasTryPlay || Tools.isMultiVideo()) return;
-    video._mfs_hasTryPlay = true;
+    if (!Tools.isVisible(video) || Storage.DISABLE_TRY_PLAY.get()) return;
+    if (video._mfs_tryPlay || Tools.isMultiVideo()) return;
+    video._mfs_tryPlay = true;
     this.tryPlay(video);
   },
   playing(video) {
     this.setCurrentVideo(video);
-    this.initVideoPlay(video);
+    Tools.sleep(10).then(() => this.initVideoPlay(video));
   },
   pause() {
     // 稀饭动漫（https://dm.xifanacg.com）
