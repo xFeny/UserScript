@@ -190,14 +190,14 @@ export default {
     }
 
     // 已创建过，复用元素
-    if (video.leftArea) return container.prepend(video.leftArea, video.rightArea);
+    if (video.lArea) return container.prepend(video.lArea, video.rArea);
 
     // 复用创建逻辑，通过 Object.assign 简化元素初始化
     const createEdge = (clas = "") => {
       return Object.assign(document.createElement("div"), {
         video,
         className: `video-edge-click ${clas}`,
-        ondblclick: (e) => {
+        [Storage.SW_CLICK_TYPE.get() ? "onclick" : "ondblclick"]: (e) => {
           delete this.player;
           Tools.preventDefault(e);
           this.setCurrentVideo(e.target.video);
@@ -207,11 +207,10 @@ export default {
     };
 
     // 解构赋值批量创建边缘元素
-    [video.leftArea, video.rightArea] = [createEdge(), createEdge("right")];
-    container.prepend(video.leftArea, video.rightArea);
+    [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
+    container.prepend(video.lArea, video.rArea);
   },
   removeEdgeClickElements() {
-    if (Storage.ENABLE_EDGE_CLICK.get()) return;
-    Tools.querys(".video-edge-click").forEach((el) => el.remove());
+    Tools.querys(".video-edge-click").forEach((el) => (el.remove(), delete el.video.lArea, delete el.video.rArea));
   },
 };

@@ -13,8 +13,10 @@ export default unsafeWindow.FyStorage = {
   NO_AUTO_DEF: new BasicStorage("DISABLE_DEFAULT_AUTO", false, false, Boolean),
   /** 网页全屏相关：此站启/禁用自动网页全屏 */
   IS_SITE_AUTO: new BasicStorage("ENABLE_THIS_SITE_AUTO_", false, false, Boolean, true),
-  /** 网页全屏相关：启/禁用侧边双击网页全屏 */
+  /** 网页全屏相关：启/禁用侧边触发网页全屏 */
   ENABLE_EDGE_CLICK: new BasicStorage("ENABLE_EDGE_CLICK", false, false, Boolean),
+  /** 网页全屏相关：切换为侧边单击网页全屏 */
+  SW_CLICK_TYPE: new BasicStorage("SW_CLICK_TYPE", false, false, Boolean),
 
   /** 播放相关：禁用尝试自动播放 */
   DISABLE_TRY_PLAY: new BasicStorage("DISABLE_TRY_PLAY", false, false, Boolean),

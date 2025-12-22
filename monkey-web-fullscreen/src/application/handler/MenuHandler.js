@@ -186,10 +186,11 @@ export default {
       { name: "pic", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
       { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, attrs: ["send"] },
       { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK },
-      { name: "clockAlways", text: "启用 非全屏显示时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
-      { name: "smallerFont", text: "启用 小字号显示时间", cache: Storage.USE_SMALL_FONT, attrs: ["send"] },
+      { name: "clockAlw", text: "启用 非全屏显示时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
+      { name: "smallFont", text: "启用 小字号显示时间", cache: Storage.USE_SMALL_FONT, attrs: ["send"] },
       { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },
-      { name: "edgeClick", text: "启用 侧边双击网页全屏", cache: Storage.ENABLE_EDGE_CLICK, attrs: ["send"] },
+      { name: "edgeClk", text: "启用 侧边触发网页全屏", cache: Storage.ENABLE_EDGE_CLICK, attrs: ["send"] },
+      { name: "swClkType", text: "启用 侧边单击网页全屏", cache: Storage.SW_CLICK_TYPE, attrs: ["send"] },
     ].filter(({ isHidden }) => !isHidden);
 
     const renderItem = ({ text, dataset, name, value }) => `

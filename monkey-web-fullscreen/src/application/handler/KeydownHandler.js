@@ -109,10 +109,10 @@ export default {
   handleSettMessage(data) {
     // 处理在 “更多设置” 中操作功能切换（启用/禁用）时发来的消息
     if ("toggle_rateKeep" in data) this.playbackRateKeepDisplay(); // 左上角常显倍速
-    if ("toggle_clockAlways" in data) this.changeTimeElementDisplay(); // 非全屏显示时间
-    if ("toggle_smallerFont" in data) this.toggleTimeElementClass(data.toggle_smallerFont); // 小字号显示时间
+    if ("toggle_clockAlw" in data) this.changeTimeElementDisplay(); // 非全屏显示时间
     if ("toggle_color" in data) this.setTimeElementColor(data.toggle_color); // 时间颜色
-    if ("toggle_edgeClick" in data) this.removeEdgeClickElements(); // 禁用侧边双击
+    if ("toggle_smallFont" in data) this.toggleTimeElementClass(data.toggle_smallFont); // 小字号显示时间
+    if ("toggle_edgeClk" in data || "toggle_swClkType" in data) this.removeEdgeClickElements(); // 禁用侧边双击
 
     if (data?.toggle_memory) this.delCachedPlayRate(); // 禁用记忆倍速
     if (data?.toggle_zoom) this.resetVideoTransform(); // 禁用缩放
