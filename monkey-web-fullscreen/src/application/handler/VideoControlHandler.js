@@ -57,7 +57,7 @@ export default {
   tryPlay: (video) => video?.paused && (Site.isDouyu() ? video?.click() : video?.play()),
   setPlaybackRate(playRate, show = true) {
     if (!this.player || isNaN(this.player.duration) || this.player.ended || this.isLive()) return;
-    if (!playRate || this.isDisableSpeed() || Number(this.player.playbackRate) === playRate) return;
+    if (!playRate || this.isDisableSpeed() || +this.player.playbackRate === +playRate) return;
 
     // 设置倍速
     VideoEnhancer.setPlaybackRate(this.player, playRate);
@@ -74,10 +74,7 @@ export default {
   applyCachedPlayRate(video) {
     if (video._mfs_hasApplyCRate) return;
     if (Storage.NOT_CACHE_SPEED.get()) return this.delCachedPlayRate();
-
-    const playRate = Storage.CACHED_SPEED.get();
-    if (Consts.DEF_SPEED === playRate || Number(video.playbackRate) === playRate) return;
-    this.setPlaybackRate(playRate)?.then(() => (video._mfs_hasApplyCRate = true));
+    this.setPlaybackRate(Storage.CACHED_SPEED.get())?.then(() => (video._mfs_hasApplyCRate = true));
   },
   skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
     if (!this.player || this.isLive() || this.player.ended) return;
@@ -230,13 +227,10 @@ export default {
     if (this.player) this.player.controls = !this.player.controls;
   },
   customToast(startText, colorText, endText, duration, isRemove) {
+    // 最终呈现：<span>正在以<span class="cText">1.15x</span>倍速播放</span>
     const span = document.createElement("span");
-    span.appendChild(document.createTextNode(startText));
-    const child = span.cloneNode(true);
-    child.textContent = colorText;
-    child.setAttribute("style", "margin:0 3px!important;color:#FF5F00!important;");
-    span.appendChild(child);
-    span.appendChild(document.createTextNode(endText));
+    const child = Object.assign(span.cloneNode(true), { textContent: colorText, className: "cText" });
+    span.append(document.createTextNode(startText), child, document.createTextNode(endText));
     return this.showToast(span, duration, isRemove);
   },
   showToast(content, duration = Consts.THREE_SEC, isRemove = true) {
