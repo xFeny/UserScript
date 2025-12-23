@@ -138,22 +138,22 @@ export default {
       customClass: { container: "monkey-web-fullscreen" },
       didOpen(popup) {
         // 处理Tabs切换
-        popup.addEventListener("click", ({ target: tab }) => {
+        popup.onclick = ({ target: tab }) => {
           if (!tab.matches(".swal2-tab")) return;
           Tools.querys(".active", popup).forEach((el) => Tools.delCls(el, "active"));
           Tools.query(`#${tab.dataset.id}`, popup).classList.add("active");
           tab.classList.add("active");
-        });
+        };
 
         // 输入事件监听
-        popup.addEventListener("input", ({ target: t }) => {
+        popup.oninput = ({ target: t }) => {
           const cache = cacheMap[t.name];
           const { host, send, delay } = t.dataset;
           const value = Object.is(t.type, "checkbox") ? t.checked : t.value;
           if (send) Tools.postMessage(window, { [`sw_${t.name}`]: value });
           const setCache = () => (host ? cache.set(value, host) : cache.set(value));
           delay ? setTimeout(setCache, 50) : setCache();
-        });
+        };
       },
     });
   },
