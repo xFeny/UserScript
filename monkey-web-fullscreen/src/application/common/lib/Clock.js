@@ -20,12 +20,7 @@ export default class Clock {
   constructor(container, options) {
     if (!container) throw new Error("时钟创建失败：container不能为空");
     this.options = Object.assign(this.options, options);
-
-    this.dateInstance = new Date();
     this.container = container;
-    this.animationId = null;
-    this.isRunning = false;
-
     this.initClockElement();
     this.start();
   }
@@ -57,10 +52,8 @@ export default class Clock {
   update() {
     if (!this.isRunning) return; // 防止停止后仍执行
 
-    this.dateInstance.setTime(Date.now());
-    this.element.textContent = this.formatTime(this.dateInstance);
+    this.element.textContent = this.formatTime(new Date());
     if (!this.container.contains(this.element)) this.container.prepend(this.element);
-    this.animationId = requestAnimationFrame(() => this.update());
   }
 
   start() {
@@ -68,18 +61,19 @@ export default class Clock {
 
     this.isRunning = true; // 先标记运行状态，避免重复执行
     this.element.style.setProperty("display", "unset");
+    this.intervalId = setInterval(() => this.update(), 500);
     this.update();
   }
 
   stop(hide = false) {
     this.isRunning = false; // 优先标记停止，阻断update循环
-    if (this.animationId) cancelAnimationFrame(this.animationId), (this.animationId = null);
+    if (this.intervalId) clearInterval(this.intervalId), delete this.intervalId;
     if (hide) this.element?.style.setProperty("display", "none");
   }
 
   destroy() {
     this.stop();
     this.element?.remove();
-    this.dateInstance = this.container = this.element = null;
+    this.container = this.element = null;
   }
 }
