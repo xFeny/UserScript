@@ -114,10 +114,10 @@ export default {
         <div class="swal2-tabs">
           <!-- Tabs 标题栏 -->
           <div class="swal2-tabs-header">
-              <div class="swal2-tab active" data-tab="tab1">播放设置</div>
-              <div class="swal2-tab" data-tab="tab2">辅助设置</div>
-              <div class="swal2-tab" data-tab="tab3">参数设置</div>
-              <div class="swal2-tab" data-tab="tab4">其他设置</div>
+              <div class="swal2-tab active" data-id="tab1">播放设置</div>
+              <div class="swal2-tab" data-id="tab2">辅助设置</div>
+              <div class="swal2-tab" data-id="tab3">参数设置</div>
+              <div class="swal2-tab" data-id="tab4">其他设置</div>
           </div>
           <!-- Tabs 内容区 -->
           <div class="swal2-tabs-content">
@@ -137,25 +137,22 @@ export default {
       html: Tools.safeHTML(modalHtml),
       customClass: { container: "monkey-web-fullscreen" },
       didOpen(popup) {
-        // 为Tabs绑定切换事件
-        Tools.querys(".swal2-tab", popup).forEach((tab) => {
-          tab.addEventListener("click", () => {
-            Tools.querys(".swal2-tab, .swal2-tab-panel", popup).forEach((el) => el.classList.remove("active"));
-            Tools.query(`#${tab.dataset.tab}`, popup).classList.add("active");
-            tab.classList.add("active");
-          });
+        // 处理Tabs切换
+        popup.addEventListener("click", ({ target: tab }) => {
+          if (!tab.matches(".swal2-tab")) return;
+          Tools.querys(".active", popup).forEach((el) => Tools.delCls(el, "active"));
+          Tools.query(`#${tab.dataset.id}`, popup).classList.add("active");
+          tab.classList.add("active");
         });
 
-        // 为input、textarea绑定事件
-        Tools.querys(".__menu input, textarea", popup).forEach((ele) => {
-          ele.addEventListener("input", function () {
-            const cache = cacheMap[this.name];
-            const { host, send, delay } = this.dataset;
-            const value = Object.is(this.type, "checkbox") ? this.checked : this.value;
-            if (send) Tools.postMessage(window, { [`sw_${this.name}`]: value });
-            const setCache = () => (host ? cache.set(value, host) : cache.set(value));
-            delay ? setTimeout(setCache, 50) : setCache();
-          });
+        // 输入事件监听
+        popup.addEventListener("input", ({ target: t }) => {
+          const cache = cacheMap[t.name];
+          const { host, send, delay } = t.dataset;
+          const value = Object.is(t.type, "checkbox") ? t.checked : t.value;
+          if (send) Tools.postMessage(window, { [`sw_${t.name}`]: value });
+          const setCache = () => (host ? cache.set(value, host) : cache.set(value));
+          delay ? setTimeout(setCache, 50) : setCache();
         });
       },
     });
