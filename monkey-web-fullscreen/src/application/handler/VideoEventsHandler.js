@@ -24,9 +24,9 @@ export default {
     });
   },
   loadedmetadata(video) {
-    this.autoWebFullscreen(video);
     if (!this.player) this.playing(video);
-    Tools.querys('[id*="loading"]').forEach((el) => !Tools.query("video", el) && Tools.addCls(el, "_noplayer"));
+    this.autoWebFullscreen(video);
+    this.hideLoadingElement();
   },
   loadeddata(video) {
     this.initVideoProps(video);
