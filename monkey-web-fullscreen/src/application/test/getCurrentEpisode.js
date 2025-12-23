@@ -104,18 +104,20 @@
 
   function getAllEpisodes(element) {
     if (!element) return;
+
     const numSet = new Set();
     const eleName = element.tagName;
     const eleClass = Array.from(element.classList);
     const sibling = findSibling(element, eleName);
     const children = Array.from(sibling?.parentElement.children);
+
     return children.filter((ele) => {
       const num = getEpisodeNumber(ele);
       const currClass = Array.from(ele.classList).filter((cls) => !["on", "cur", "active"].includes(cls));
       const hasSameClass = eleClass.some((value) => currClass.includes(value));
       const isMatch = currClass.length ? hasSameClass : ele.tagName === eleName;
-      if (!isMatch || !num || numSet.has(num)) return false;
-      return numSet.add(num); // 过滤重复的集数
+      if (!isMatch || !num || numSet.has(ele.innerText)) return false;
+      return numSet.add(ele.innerText); // 过滤重复的集数
     });
   }
 

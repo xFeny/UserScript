@@ -60,23 +60,34 @@ export default {
     // 当 leftSmall || rightLarge 的结果与 isPrev 的布尔值相同时，返回 prev，当两者不同时，返回 next。
     return (leftSmall || rightLarge) === isPrev ? episodes[index - 1] : episodes[index + 1];
   },
+  /**
+   * 获取所有匹配的剧集元素（去重）
+   * 匹配规则：
+   *   - 查找`element`所在位置的所有兄弟元素
+   *   - 过滤掉：无集数、集数重复、标签名与`element`不一样
+   * @param {HTMLElement} element - 参考剧集元素
+   * @returns {HTMLElement[]} 过滤后的剧集元素数组
+   */
   getAllEpisodes(element) {
     if (!element) return [];
+
     const numSet = new Set(); // 用于过滤重复的集数
     const eleName = element.tagName;
     const eleClass = Array.from(element.classList);
     const sibling = Tools.findSibling(element, eleName);
     const children = Array.from(sibling?.parentElement?.children ?? []);
+
     return children.filter((ele) => {
       const num = this.getEpisodeNumber(ele);
       const currClass = Array.from(ele.classList).filter((cls) => !["on", "cur", "active"].includes(cls));
       const hasSameClass = eleClass.some((value) => currClass.includes(value));
       const isMatch = currClass.length ? hasSameClass : ele.tagName === eleName;
-      if (!isMatch || !num || numSet.has(num)) return false;
-      return numSet.add(num);
+      if (!isMatch || !num || numSet.has(ele.innerText)) return false;
+      return numSet.add(ele.innerText);
     });
   },
   jumpToTargetEpisode(element) {
+    if (Tools.isTopWin()) Tools.notyf("尝试切换下集...");
     const stack = [element].filter(Boolean);
     while (stack.length > 0) {
       const current = stack.pop();
