@@ -129,7 +129,5 @@ export default {
   changeTimeElementDisplay() {
     this.setupPlayerClock(), this.videoProgress(this.player, true);
   },
-  hideLoadingElement() {
-    Tools.querys('[id*="loading"]').forEach((el) => !Tools.query("video", el) && Tools.addCls(el, "_noplayer"));
-  },
+  hideLoadingElement: () => Tools.querys("#loading").forEach((el) => !Tools.query("video", el) && Tools.addCls(el, "hide")),
 };
