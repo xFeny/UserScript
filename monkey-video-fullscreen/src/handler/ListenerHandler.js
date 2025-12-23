@@ -125,7 +125,7 @@ export default {
     }
 
     // 已创建过，复用元素
-    if (video.leftArea) return container.prepend(video.leftArea, video.rightArea);
+    if (video.lArea) return container.prepend(video.lArea, video.rArea);
 
     // 复用创建逻辑，通过 Object.assign 简化元素初始化
     const createEdge = (clas = "") => {
@@ -142,7 +142,7 @@ export default {
     };
 
     // 解构赋值批量创建边缘元素
-    [video.leftArea, video.rightArea] = [createEdge(), createEdge("right")];
-    container.prepend(video.leftArea, video.rightArea);
+    [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
+    container.prepend(video.lArea, video.rArea);
   },
 };
