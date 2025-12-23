@@ -237,19 +237,16 @@ export default {
     return this.generateCommonItems(configs, renderItem);
   },
   generateCommonItems(baseConfigs, renderItem) {
-    const getDataset = (attrs = [], host) =>
-      attrs.length ? attrs.map((key) => `data-${key}="${key === "host" ? host : true}"`).join(" ") : Consts.EMPTY;
+    const getDataset = (attrs = [], host) => attrs.map((key) => `data-${key}="${key === "host" ? host : true}"`).join(" ");
 
     const filteredConfigs = baseConfigs.filter(({ isHide }) => !isHide);
     const processedConfigs = filteredConfigs.map((config) => {
-      const { cache, attrs, useHost } = config;
+      const { cache, attrs = [], useHost } = config;
       const host = useHost ? location.host : Consts.EMPTY;
       const value = useHost ? cache.get(location.host) : cache.get();
 
-      const _attrs = Array.isArray(attrs) ? [...attrs] : [];
-      if (useHost && !_attrs.includes("host")) _attrs.push("host");
-
-      return { ...config, value, host, dataset: getDataset(_attrs, location.host) };
+      if (useHost && !attrs.includes("host")) attrs.push("host");
+      return { ...config, host, value, dataset: getDataset(attrs, location.host) };
     });
 
     // 生成HTML字符串
