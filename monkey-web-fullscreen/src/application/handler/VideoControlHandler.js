@@ -19,6 +19,7 @@ export default {
     // 记录默认时长，用于判断是否为动态时长
     const { duration, __duration } = video;
     if (!__duration) video.__duration = duration;
+    if (__duration > 120 && __duration < 432e2) return false; // 时长在2分钟~12小时之间，判定为固定时长（非动态）
 
     const isDynamic = Math.floor(duration) > Math.floor(__duration);
     if (isDynamic) video._mfs_isDynamic = true; // 为true，后续不再重新计算
