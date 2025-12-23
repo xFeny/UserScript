@@ -19,8 +19,8 @@ export default {
     });
   },
   loadedmetadata(video) {
-    this.autoWebFullscreen(video);
     if (!this.player) this.playing(video);
+    this.autoWebFullscreen(video);
   },
   loadeddata(video) {
     this.initVideoProps(video);
