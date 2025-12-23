@@ -152,7 +152,7 @@ export default {
             const cache = cacheMap[this.name];
             const { host, send, delay } = this.dataset;
             const value = Object.is(this.type, "checkbox") ? this.checked : this.value;
-            if (send) Tools.postMessage(window, { [`toggle_${this.name}`]: value });
+            if (send) Tools.postMessage(window, { [`sw_${this.name}`]: value });
             const setCache = () => (host ? cache.set(value, host) : cache.set(value));
             delay ? setTimeout(setCache, 50) : setCache();
           });

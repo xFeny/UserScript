@@ -108,14 +108,14 @@ export default {
   },
   handleSettMessage(data) {
     // 处理在 “更多设置” 中操作功能切换（启用/禁用）时发来的消息
-    if ("toggle_rateKeep" in data) this.playbackRateKeepDisplay(); // 左上角常显倍速
-    if ("toggle_clockAlw" in data) this.changeTimeElementDisplay(); // 非全屏显示时间
-    if ("toggle_color" in data) this.setTimeElementColor(data.toggle_color); // 时间颜色
-    if ("toggle_smallFont" in data) this.toggleTimeElementClass(data.toggle_smallFont); // 小字号显示时间
-    if ("toggle_edgeClk" in data || "toggle_swClkType" in data) this.removeEdgeClickElements(); // 禁用侧边双击
+    if ("sw_rateKeep" in data) this.playbackRateKeepDisplay(); // 左上角常显倍速
+    if ("sw_clockAlw" in data) this.changeTimeElementDisplay(); // 非全屏显示时间
+    if ("sw_color" in data) this.setTimeElementColor(data.sw_color); // 时间颜色
+    if ("sw_smallFont" in data) this.toggleTimeElementClass(data.sw_smallFont); // 小字号显示时间
+    if ("sw_edgeClk" in data || "sw_swClkType" in data) this.removeEdgeClickElements(); // 禁用侧边双击
 
-    if (data?.toggle_memory) this.delCachedPlayRate(); // 禁用记忆倍速
-    if (data?.toggle_zoom) this.resetVideoTransform(); // 禁用缩放
-    if (data?.toggle_speed) this.setPlaybackRate(Consts.DEF_SPEED); // 禁用倍速调节
+    if (data?.sw_memory) this.delCachedPlayRate(); // 禁用记忆倍速
+    if (data?.sw_zoom) this.resetVideoTransform(); // 禁用缩放
+    if (data?.sw_speed) this.setPlaybackRate(Consts.DEF_SPEED); // 禁用倍速调节
   },
 };
