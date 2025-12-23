@@ -20,6 +20,7 @@ export default {
   },
   loadedmetadata(video) {
     this.autoWebFullscreen(video);
+    if (!this.player) this.playing(video);
   },
   loadeddata(video) {
     this.initVideoProps(video);
