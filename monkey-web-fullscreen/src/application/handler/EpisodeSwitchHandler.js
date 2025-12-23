@@ -87,7 +87,6 @@ export default {
     });
   },
   jumpToTargetEpisode(element) {
-    if (Tools.isTopWin()) Tools.notyf("尝试切换下集...");
     const stack = [element].filter(Boolean);
     while (stack.length > 0) {
       const current = stack.pop();
