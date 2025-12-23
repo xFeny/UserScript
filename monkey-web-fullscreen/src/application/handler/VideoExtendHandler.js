@@ -130,8 +130,6 @@ export default {
     this.setupPlayerClock(), this.videoProgress(this.player, true);
   },
   hideLoadingElement() {
-    Tools.microTask(() => {
-      Tools.querys('[id*="loading"]').forEach((el) => !Tools.query("video", el) && Tools.addCls(el, "_noplayer"));
-    });
+    Tools.querys('[id*="loading"]').forEach((el) => !Tools.query("video", el) && Tools.addCls(el, "_noplayer"));
   },
 };
