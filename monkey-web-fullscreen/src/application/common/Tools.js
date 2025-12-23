@@ -21,6 +21,7 @@ export default unsafeWindow.FyTools = {
   getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
   isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
   preventDefault: (event) => (event.preventDefault(), event.stopPropagation(), event.stopImmediatePropagation()),
+  createElement: (tagName, attrs = {}) => Object.assign(document.createElement(tagName), attrs),
   emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
   isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
   hasCls: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),

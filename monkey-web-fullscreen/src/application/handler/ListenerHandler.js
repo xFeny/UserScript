@@ -194,7 +194,7 @@ export default {
 
     // 复用创建逻辑，通过 Object.assign 简化元素初始化
     const createEdge = (clas = "") => {
-      return Object.assign(document.createElement("div"), {
+      return Tools.createElement("div", {
         video,
         className: `video-edge-click ${clas}`,
         [Storage.SW_CLICK_TYPE.get() ? "onclick" : "ondblclick"]: (e) => {

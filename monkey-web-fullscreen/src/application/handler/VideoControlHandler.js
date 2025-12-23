@@ -200,10 +200,9 @@ export default {
   async captureScreenshot() {
     if (!this.player || Storage.DISABLE_SCREENSHOT.get()) return;
 
+    const { videoWidth, videoHeight } = this.player;
     this.player.setAttribute("crossorigin", "anonymous");
-    const canvas = document.createElement("canvas");
-    canvas.height = this.player.videoHeight;
-    canvas.width = this.player.videoWidth;
+    const canvas = Tools.createElement("canvas", { width: videoWidth, height: videoHeight });
     const ctx = canvas.getContext("2d");
 
     try {
@@ -211,11 +210,11 @@ export default {
       const url = URL.createObjectURL(await new Promise((resolve) => canvas.toBlob(resolve, "image/png")));
       GM_download({ url, name: `视频截图_${Date.now()}.png`, onload: () => URL.revokeObjectURL(url) });
     } catch (e) {
-      Tools.setStyle(canvas, "max-width", "98vw");
+      Tools.setStyle(canvas, "max-width", "97vw");
       const popup = window.open(Consts.EMPTY, "_blank", "width=1000,height=570,top=130,left=270");
       popup.document.title = "鼠标右键选择「图片另存为」";
       popup.document.body.appendChild(canvas);
-      console.debug(e);
+      console.error(e);
     }
   },
   freezeVideoFrame(isPrev) {
@@ -229,15 +228,14 @@ export default {
   customToast(startText, colorText, endText, duration, isRemove) {
     // 最终呈现：<span>正在以<span class="cText">1.15x</span>倍速播放</span>
     const span = document.createElement("span");
-    const child = Object.assign(span.cloneNode(true), { textContent: colorText, className: "cText" });
+    const child = Tools.createElement("span", { textContent: colorText, className: "cText" });
     span.append(document.createTextNode(startText), child, document.createTextNode(endText));
     return this.showToast(span, duration, isRemove);
   },
   showToast(content, duration = Consts.THREE_SEC, isRemove = true) {
     return new Promise((resolve) => {
-      const el = document.createElement("div");
-      el.setAttribute("class", "monkey-toast");
       if (isRemove) Tools.query(".monkey-toast")?.remove();
+      const el = Tools.createElement("div", { className: "monkey-toast" });
       content instanceof Element ? el.appendChild(content) : (el.innerHTML = content);
 
       (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2, false)).prepend(el), resolve(el);
@@ -260,7 +258,7 @@ export default {
       this.player.__trans = this.player.__trans ?? getComputedStyle(this.player)?.getPropertyValue("transform");
       Tools.setStyle(this.player, "--deftsr", this.player.__trans);
     } catch (e) {
-      console.debug(e);
+      console.error(e);
     }
 
     // transform 变换值

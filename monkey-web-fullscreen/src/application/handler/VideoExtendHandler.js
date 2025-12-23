@@ -80,12 +80,8 @@ export default {
     const textNode = document.createTextNode("00:00");
     element.textNode = textNode;
 
-    // 创建百分号
-    const percent = document.createElement("b");
-    percent.textContent = "%";
-
     this.progressNode = element;
-    element.append(textNode, percent);
+    element.append(textNode, Tools.createElement("b", { textContent: "%" }));
     this.toggleTimeElementClass(Storage.USE_SMALL_FONT.get());
 
     return element;
@@ -109,9 +105,7 @@ export default {
     this.rateKeepElement?.remove();
   },
   createDisplayElement(clss, color) {
-    const element = document.createElement("div");
-    Tools.setStyle(element, "color", color);
-    element.classList.add(clss);
+    const element = Tools.createElement("div", { className: clss, style: `color: ${color}` });
     this.prependElement(element);
     return element;
   },
