@@ -9,12 +9,12 @@ import Keyboard from "../common/Keyboard";
  */
 export default {
   autoNextEpisode(video) {
-    if (video.duration < 300 || video._mfs_hasTriedAutoNext || !Storage.IS_AUTO_NEXT.get()) return;
-    if (Tools.isThrottle("autoNext", Consts.HALF_SEC) || this.remainTime(video) > Storage.NEXT_ADVANCE_SEC.get()) return;
-    if (this.isIgnoreNext()) return (video._mfs_hasTriedAutoNext = true);
+    if (video.duration < 300 || video._mfs_hasTriedNext || this.remainTime(video) > Storage.NEXT_ADVANCE_SEC.get()) return;
+    if (!Storage.IS_AUTO_NEXT.get() || Tools.isThrottle("autoNext", Consts.HALF_SEC)) return;
+    if (this.isIgnoreNext()) return (video._mfs_hasTriedNext = true);
 
     this.dispatchShortcutKey(Keyboard.N);
-    video._mfs_hasTriedAutoNext = true;
+    video._mfs_hasTriedNext = true;
   },
   async autoWebFullscreen(video) {
     if (!this.topWin || !video.offsetWidth || this.player !== video) return;
