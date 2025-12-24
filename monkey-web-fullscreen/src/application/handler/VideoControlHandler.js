@@ -43,9 +43,7 @@ export default {
     this.removeProgressElement();
   },
   initVideoPlay(video) {
-    if (!this.player || video._mfs_hasInited) return;
-    video._mfs_hasInited = true;
-    this.applyCachedPlayRate(video);
+    this.applyCachedPlayRate();
     this.playbackRateKeepDisplay();
     this.applyCachedTime(video);
     this.setupPlayerClock();
@@ -71,10 +69,8 @@ export default {
     const playRate = Math.max(Consts.MIN_SPEED, Number(this.player.playbackRate) + step);
     this.setPlaybackRate(Math.min(Consts.MAX_SPEED, playRate));
   },
-  applyCachedPlayRate(video) {
-    if (video._mfs_hasApplyCRate) return;
-    if (Storage.NOT_CACHE_SPEED.get()) return this.delCachedPlayRate();
-    this.setPlaybackRate(Storage.CACHED_SPEED.get())?.then(() => (video._mfs_hasApplyCRate = true));
+  applyCachedPlayRate() {
+    Storage.NOT_CACHE_SPEED.get() ? this.delCachedPlayRate() : this.setPlaybackRate(Storage.CACHED_SPEED.get());
   },
   skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
     if (!this.player || this.isLive() || this.player.ended) return;
