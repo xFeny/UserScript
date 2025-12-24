@@ -69,8 +69,8 @@ export default {
     if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
     Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
 
-    requestAnimationFrame(() => Tools.scrollTop(scrollY)); // 滚动到原始位置
-    setTimeout(() => Tools.setStyle(document.documentElement, "scroll-behavior"), 100);
+    // 滚动到全屏前位置、恢复默认滚动效果
+    requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(document.documentElement, "scroll-behavior")));
 
     // 清理相关变量
     this.videoParents.clear();
