@@ -10,7 +10,7 @@ import Keyboard from "../common/Keyboard";
 export default {
   autoNextEpisode(video) {
     if (video.duration < 300 || video._mfs_hasTriedAutoNext || !Storage.IS_AUTO_NEXT.get()) return;
-    if (Tools.isThrottle("autoNext", Consts.TWO_SEC) || this.remainTime(video) > Storage.NEXT_ADVANCE_SEC.get()) return;
+    if (Tools.isThrottle("autoNext", Consts.HALF_SEC) || this.remainTime(video) > Storage.NEXT_ADVANCE_SEC.get()) return;
     if (this.isIgnoreNext()) return (video._mfs_hasTriedAutoNext = true);
 
     this.dispatchShortcutKey(Keyboard.N);
