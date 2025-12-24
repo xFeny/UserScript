@@ -43,9 +43,14 @@ export default {
     this.removeProgressElement();
   },
   initVideoPlay(video) {
+    if (video._mfs_hasInited) return;
+    video._mfs_hasInited = true;
+
+    // ====== 应用缓存数据 ======
     this.applyCachedPlayRate();
-    this.playbackRateKeepDisplay();
     this.applyCachedTime(video);
+
+    this.playbackRateKeepDisplay();
     this.setupPlayerClock();
     this.setBiliQuality();
   },
