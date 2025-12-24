@@ -2,7 +2,7 @@
 // @name               视频自动网页全屏｜倍速播放
 // @name:zh-TW         視頻自動網頁全屏｜倍速播放
 // @namespace          http://tampermonkey.net/
-// @version            3.7.2
+// @version            3.7.3
 // @author             Feny
 // @description        支持所有H5视频的增强脚本，通用网页全屏｜倍速调节，对微博 / 推特 / Instagram / Facebook等多视频平台均适用；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @description:zh-TW  支持所有H5视频的增强脚本，通用網頁全屏｜倍速調節，对微博 / 推特 / Instagram / Facebook等平臺均適用；B站(含直播) / 騰訊視頻 / 優酷 / 愛奇藝 / 芒果TV / AcFun 默認自動網頁全屏，其他網站可手動開啓；自動網頁全屏 + 記憶倍速 + 下集切換，減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
@@ -65,7 +65,7 @@
 // @note               *://*/*
 // ==/UserScript==
 
-(e=>{const n=Symbol("styleAdded"),t=document.createElement("style");t.textContent=e,window.gmStyle=t,document.addEventListener("addStyle",r=>{const{shadowRoot:o}=r.detail;o[n]||o instanceof Document||(o.prepend(t.cloneNode(!0)),o[n]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(e)})(' @charset "UTF-8";.monkey-toast{line-height:normal;left:10px!important;bottom:16%!important;color:#fff!important;font-size:13px!important;padding:6px 10px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.monkey-toast span{display:inline!important}::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen]~*:not(.monkey-web-fullscreen){display:none!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important;transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc{cursor:none!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-tabs-header{display:flex;position:relative;margin-bottom:15px;font-size:15px!important;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;cursor:pointer;color:#64748b;font-weight:500;text-align:center;padding:12px 10px;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;visibility:visible;background-color:#3b82f6;border-radius:2px 2px 0 0}.monkey-web-fullscreen .swal2-tab:hover:not(.active){color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%;padding:0 5px;min-height:325px}.monkey-web-fullscreen .swal2-tab-panel{display:none}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 5px!important;padding:0 0 5px!important;float:none!important;height:30px!important;color:#666!important;display:flex!important;font-size:14px!important;line-height:30px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text],.monkey-web-fullscreen .__menu input[type=number]{color:#333;border-radius:3px;border:1px solid #cbd5e1!important;text-align:center!important;line-height:12px!important;font-size:12px!important;padding:0 3px!important;height:23px!important;width:75px!important}.monkey-web-fullscreen .__menu input[type=text]:focus,.monkey-web-fullscreen .__menu input[type=number]:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:38px!important;height:18px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:12px!important;height:12px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen .others-sett{margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f5f5f5}.monkey-web-fullscreen .others-sett:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .others-sett p{margin-bottom:3px;color:#333!important;font-size:13px!important;text-align:left!important}.monkey-web-fullscreen .others-sett textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;height:70px!important;font-size:12px!important;padding:3px 5px!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen .others-sett textarea:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th{font-weight:600!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:2147483647!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap>:not(.bpx-player-dm-tip){display:none!important}#buffer,#install,#fd_tips,#a1 #tips,.player-overlay,.memory-play-wrap,.atom-notice-click,#loading._noplayer,.dplayer-resume-tip,[id*=player] #tips,#player #loading-box,.dplayer-comment-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}.Clock,.__time-progress,.__rate-keep-show{color:#e0e0e0;text-indent:0!important;text-shadow:0 0 2px #000;position:absolute!important;pointer-events:none!important;font-family:Arial,Helvetica,sans-serif!important;z-index:2147483647!important;opacity:1!important}.Clock:after,.__time-progress:after,.__rate-keep-show:after{top:50%!important;left:50%!important;content:"-"!important;position:fixed!important;text-shadow:none!important;color:transparent!important;pointer-events:none!important;display:inline-block!important;background-color:transparent!important}.Clock{top:10px!important;right:20px!important;width:auto!important;height:auto!important;font-size:20px!important;line-height:20px!important;font-weight:700!important;text-align:right!important;background-color:transparent!important}.Clock.smaller{font-size:16px!important;line-height:16px!important}.__time-progress{top:30px!important;right:20px!important;font-size:12.5px!important;line-height:12.5px!important}.__time-progress b{font-size:12px!important;line-height:12px!important;display:inline-block!important;transform:scale(.75)!important;vertical-align:middle!important}.__time-progress.smaller{top:26px!important;transform:scale(.817)!important;transform-origin:top right}.__rate-keep-show{color:#c9c9c9;top:5px!important;left:5px!important;font-size:12px!important;box-shadow:none!important;line-height:12px!important;display:inline-block!important;transform:scale(.917)!important;transform-origin:top}.video-edge-click{cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC),pointer!important;left:0!important;top:6%!important;width:25px!important;height:70%!important;position:absolute!important;z-index:2147483647!important;background-color:transparent!important;user-select:none!important;opacity:0!important}.video-edge-click.right{right:0!important;left:auto!important} ');
+(e=>{const n=Symbol("styleAdded"),t=document.createElement("style");t.textContent=e,window.gmStyle=t,document.addEventListener("addStyle",r=>{const{shadowRoot:o}=r.detail;o[n]||o instanceof Document||(o.prepend(t.cloneNode(!0)),o[n]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(e)})(' @charset "UTF-8";.monkey-toast{line-height:normal;left:10px!important;bottom:16%!important;color:#fff!important;font-size:13px!important;padding:6px 10px!important;border-radius:5px!important;position:absolute!important;z-index:2147483647!important;font-weight:400!important;transition:opacity .3s ease-in!important;background:#000000bf!important}.monkey-toast span{display:inline!important}.monkey-toast .cText{margin:0 3px!important;color:#ff5f00!important}::part(webFullscreen),[part*=webFullscreen],body[part*=webFullscreen] [part*=webFullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[part*=webFullscreen]~*:not(.monkey-web-fullscreen){display:none!important}[part*=webFullscreen] video,body[part*=webFullscreen] [part*=webFullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;height:clamp(100vh - 100%,100vh,100%)!important;object-fit:contain!important;transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--moveX, 0),var(--moveY, 0))!important}.__hc{cursor:none!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .hide{display:none!important}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen #__picker:focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-tabs-header{display:flex;position:relative;margin-bottom:15px;font-size:15px!important;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;cursor:pointer;color:#64748b;font-weight:500;text-align:center;padding:12px 10px;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;visibility:visible;background-color:#3b82f6;border-radius:2px 2px 0 0}.monkey-web-fullscreen .swal2-tab:hover:not(.active){color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%;padding:0 5px;min-height:325px}.monkey-web-fullscreen .swal2-tab-panel{display:none}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 5px!important;padding:0 0 5px!important;float:none!important;height:30px!important;color:#666!important;display:flex!important;font-size:14px!important;line-height:30px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text],.monkey-web-fullscreen .__menu input[type=number]{color:#333;border-radius:3px;border:1px solid #cbd5e1!important;text-align:center!important;line-height:12px!important;font-size:12px!important;padding:0 3px!important;height:23px!important;width:75px!important}.monkey-web-fullscreen .__menu input[type=text]:focus,.monkey-web-fullscreen .__menu input[type=number]:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:38px!important;height:18px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:12px!important;height:12px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen .others-sett{margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f5f5f5}.monkey-web-fullscreen .others-sett:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .others-sett p{margin-bottom:3px;color:#333!important;font-size:13px!important;text-align:left!important}.monkey-web-fullscreen .others-sett textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;height:70px!important;font-size:12px!important;padding:3px 5px!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen .others-sett textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen .others-sett textarea:focus{outline:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th{font-weight:600!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #e5e6eb!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.notyf{z-index:2147483647!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.login-tip,.login-guide,.live-room-app #sidebar-vm,.lite-room .bili-mini-mask,.live-room-app #prehold-nav-vm,.live-room-app #shop-popover-vm,.risk-captcha-adapt .bili-mini-mask,#bilibili-player .bpx-player-toast-wrap,#bilibili-player .bpx-player-cmd-dm-wrap,#bilibili-player .bpx-player-dialog-wrap>:not(.bpx-player-dm-tip){display:none!important}#buffer,#install,#fd_tips,#a1 #tips,#loading.hide,.player-overlay,.memory-play-wrap,.atom-notice-click,.dplayer-resume-tip,[id*=player] #tips,#player #loading-box,.dplayer-comment-box,.dplayer-notice strong,.air-player-loading-box,.art-layer-autoPlayback,.art-layer-auto-playback,.invoke-app-floating-tips,.invoke-app-san-container{display:none!important}.Clock,.__time-progress,.__rate-keep-show{color:#e0e0e0;text-indent:0!important;text-shadow:0 0 2px #000;position:absolute!important;pointer-events:none!important;font-family:Arial,Helvetica,sans-serif!important;z-index:2147483647!important;opacity:1!important}.Clock:after,.__time-progress:after,.__rate-keep-show:after{top:50%!important;left:50%!important;content:"-"!important;position:fixed!important;text-shadow:none!important;color:transparent!important;pointer-events:none!important;display:inline-block!important;background-color:transparent!important}.Clock{top:10px!important;right:20px!important;width:auto!important;height:auto!important;font-size:20px!important;line-height:20px!important;font-weight:700!important;text-align:right!important;background-color:transparent!important}.Clock.smaller{font-size:16px!important;line-height:16px!important}.__time-progress{top:30px!important;right:20px!important;font-size:12.5px!important;line-height:12.5px!important}.__time-progress b{font-size:12px!important;line-height:12px!important;display:inline-block!important;transform:scale(.75)!important;vertical-align:middle!important}.__time-progress.smaller{top:26px!important;transform:scale(.817)!important;transform-origin:top right}.__rate-keep-show{color:#c9c9c9;top:5px!important;left:5px!important;font-size:12px!important;box-shadow:none!important;line-height:12px!important;display:inline-block!important;transform:scale(.917)!important;transform-origin:top}.video-edge-click{cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC),pointer!important;left:0!important;top:6%!important;width:25px!important;height:70%!important;position:absolute!important;z-index:2147483647!important;background-color:transparent!important;user-select:none!important;opacity:0!important}.video-edge-click.right{right:0!important;left:auto!important} ');
 
 (function (notyf, Swal) {
   'use strict';
@@ -161,6 +161,7 @@
     getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
     isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
     preventDefault: (event) => (event.preventDefault(), event.stopPropagation(), event.stopImmediatePropagation()),
+    createElement: (tagName, attrs = {}) => Object.assign(document.createElement(tagName), attrs),
     emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
     isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
     hasCls: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
@@ -361,8 +362,7 @@
             return descs.get ? descs.get.call(this, original.get.call(this)) : original.get.call(this);
           },
           set(value) {
-            const oldVal = original.get.call(this);
-            descs.set ? descs.set.call(this, value, original.set.bind(this), oldVal) : original.set.call(this, value);
+            descs.set ? descs.set.call(this, value, original.set.bind(this)) : original.set.call(this, value);
           },
           configurable: true
         });
@@ -666,7 +666,7 @@
       }
       if (video.lArea) return container.prepend(video.lArea, video.rArea);
       const createEdge = (clas = "") => {
-        return Object.assign(document.createElement("div"), {
+        return Tools.createElement("div", {
           video,
           className: `video-edge-click ${clas}`,
           [Storage.SW_CLICK_TYPE.get() ? "onclick" : "ondblclick"]: (e) => {
@@ -707,17 +707,17 @@
     };
     static {
       const selectors = Storage.ICONS_SELECTOR.get();
-      selectors ? this.selectors = selectors : this._loadRemote();
-      Tools.microTask(() => (this._createSiteTests(), this._convertGmMatchToRegex()));
+      selectors ? this.selectors = selectors : this.#loadRemote();
+      Tools.microTask(() => (this.#createSiteTests(), this.#convertGmMatchToRegex()));
     }
     static getIcons(domain = location.host) {
-      if (!Storage.ICONS_SELECTOR.get()) this._loadRemote();
+      if (!Storage.ICONS_SELECTOR.get()) this.#loadRemote();
       return this.selectors[domain];
     }
     static isGmMatch() {
       return this.gmMatches.some((m) => m.test(location.href.replace(location.search, Consts.EMPTY)));
     }
-    static _loadRemote() {
+    static #loadRemote() {
       const url = "https://gitee.com/xfeny/UserScript/raw/dev/monkey-web-fullscreen/src/IconsSelector.json";
       _GM.xmlHttpRequest({ url, timeout: 3e3 }).then((res) => {
         const remoteConf = JSON.parse(res.responseText ?? "{}");
@@ -725,12 +725,12 @@
         Storage.ICONS_SELECTOR.set(this.selectors, Consts.EMPTY, 1 / 3);
       }).catch((e) => console.error("加载远程配置失败", e));
     }
-    static _convertGmMatchToRegex() {
+    static #convertGmMatchToRegex() {
       const { matches, includes: excluded } = _GM_info.script;
       const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
       this.gmMatches = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
     }
-    static _createSiteTests() {
+    static #createSiteTests() {
       Object.entries(this._siteRegExps).forEach(([name, regex]) => {
         const methodName = `is${name.charAt(0).toUpperCase()}${name.slice(1)}`;
         if (!this[methodName]) this[methodName] = () => regex.test(location.href);
@@ -819,14 +819,14 @@
       this.processEvent(data);
     },
     handleSettMessage(data) {
-      if ("toggle_rateKeep" in data) this.playbackRateKeepDisplay();
-      if ("toggle_clockAlw" in data) this.changeTimeElementDisplay();
-      if ("toggle_color" in data) this.setTimeElementColor(data.toggle_color);
-      if ("toggle_smallFont" in data) this.toggleTimeElementClass(data.toggle_smallFont);
-      if ("toggle_edgeClk" in data || "toggle_swClkType" in data) this.removeEdgeClickElements();
-      if (data?.toggle_memory) this.delCachedPlayRate();
-      if (data?.toggle_zoom) this.resetVideoTransform();
-      if (data?.toggle_speed) this.setPlaybackRate(Consts.DEF_SPEED);
+      if ("sw_rateKeep" in data) this.playbackRateKeepDisplay();
+      if ("sw_clockAlw" in data) this.changeTimeElementDisplay();
+      if ("sw_color" in data) this.setTimeElementColor(data.sw_color);
+      if ("sw_smallFont" in data) this.toggleTimeElementClass(data.sw_smallFont);
+      if ("sw_edgeClk" in data || "sw_swClkType" in data) this.removeEdgeClickElements();
+      if (data?.sw_memory) this.delCachedPlayRate();
+      if (data?.sw_zoom) this.resetVideoTransform();
+      if (data?.sw_speed) this.setPlaybackRate(Consts.DEF_SPEED);
     }
   };
   const Events = {
@@ -848,9 +848,9 @@
       });
     },
     loadedmetadata(video) {
-      this.autoWebFullscreen(video);
       if (!this.player) this.playing(video);
-      Tools.querys('[id*="loading"]').forEach((el) => !Tools.query("video", el) && Tools.addCls(el, "_noplayer"));
+      this.autoWebFullscreen(video);
+      this.hideLoadingElement();
     },
     loadeddata(video) {
       this.initVideoProps(video);
@@ -873,7 +873,7 @@
     },
     playing(video) {
       this.setCurrentVideo(video);
-      Tools.sleep(10).then(() => this.initVideoPlay(video));
+      Tools.sleep(30).then(() => this.initVideoPlay(video));
     },
     pause() {
       Tools.query(".ec-no")?.click();
@@ -892,6 +892,7 @@
       if (video._mfs_isDynamic || video.currentTime > video.__duration) return true;
       const { duration, __duration } = video;
       if (!__duration) video.__duration = duration;
+      if (__duration > 120 && __duration < 43200) return false;
       const isDynamic = Math.floor(duration) > Math.floor(__duration);
       if (isDynamic) video._mfs_isDynamic = true;
       return isDynamic;
@@ -921,7 +922,7 @@
     tryPlay: (video) => video?.paused && (Site.isDouyu() ? video?.click() : video?.play()),
     setPlaybackRate(playRate, show = true) {
       if (!this.player || isNaN(this.player.duration) || this.player.ended || this.isLive()) return;
-      if (!playRate || this.isDisableSpeed() || Number(this.player.playbackRate) === playRate) return;
+      if (!playRate || this.isDisableSpeed() || +this.player.playbackRate === +playRate) return;
       VideoEnhancer.setPlaybackRate(this.player, playRate);
       if (show) this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
       this.playbackRateKeepDisplay();
@@ -935,9 +936,7 @@
     applyCachedPlayRate(video) {
       if (video._mfs_hasApplyCRate) return;
       if (Storage.NOT_CACHE_SPEED.get()) return this.delCachedPlayRate();
-      const playRate = Storage.CACHED_SPEED.get();
-      if (Consts.DEF_SPEED === playRate || Number(video.playbackRate) === playRate) return;
-      this.setPlaybackRate(playRate)?.then(() => video._mfs_hasApplyCRate = true);
+      this.setPlaybackRate(Storage.CACHED_SPEED.get())?.then(() => video._mfs_hasApplyCRate = true);
     },
     skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
       if (!this.player || this.isLive() || this.player.ended) return;
@@ -1041,21 +1040,20 @@
     },
     async captureScreenshot() {
       if (!this.player || Storage.DISABLE_SCREENSHOT.get()) return;
+      const { videoWidth, videoHeight } = this.player;
       this.player.setAttribute("crossorigin", "anonymous");
-      const canvas = document.createElement("canvas");
-      canvas.height = this.player.videoHeight;
-      canvas.width = this.player.videoWidth;
+      const canvas = Tools.createElement("canvas", { width: videoWidth, height: videoHeight });
       const ctx = canvas.getContext("2d");
       try {
         ctx.drawImage(this.player, 0, 0, canvas.width, canvas.height);
         const url = URL.createObjectURL(await new Promise((resolve) => canvas.toBlob(resolve, "image/png")));
         _GM_download({ url, name: `视频截图_${Date.now()}.png`, onload: () => URL.revokeObjectURL(url) });
       } catch (e) {
-        Tools.setStyle(canvas, "max-width", "98vw");
+        Tools.setStyle(canvas, "max-width", "97vw");
         const popup = window.open(Consts.EMPTY, "_blank", "width=1000,height=570,top=130,left=270");
         popup.document.title = "鼠标右键选择「图片另存为」";
         popup.document.body.appendChild(canvas);
-        console.debug(e);
+        console.error(e);
       }
     },
     freezeVideoFrame(isPrev) {
@@ -1068,19 +1066,14 @@
     },
     customToast(startText, colorText, endText, duration, isRemove) {
       const span = document.createElement("span");
-      span.appendChild(document.createTextNode(startText));
-      const child = span.cloneNode(true);
-      child.textContent = colorText;
-      child.setAttribute("style", "margin:0 3px!important;color:#FF5F00!important;");
-      span.appendChild(child);
-      span.appendChild(document.createTextNode(endText));
+      const child = Tools.createElement("span", { textContent: colorText, className: "cText" });
+      span.append(document.createTextNode(startText), child, document.createTextNode(endText));
       return this.showToast(span, duration, isRemove);
     },
     showToast(content, duration = Consts.THREE_SEC, isRemove = true) {
       return new Promise((resolve) => {
-        const el = document.createElement("div");
-        el.setAttribute("class", "monkey-toast");
         if (isRemove) Tools.query(".monkey-toast")?.remove();
+        const el = Tools.createElement("div", { className: "monkey-toast" });
         content instanceof Element ? el.appendChild(content) : el.innerHTML = content;
         (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2, false)).prepend(el), resolve(el);
         setTimeout(() => (el.style.opacity = 0, setTimeout(() => el.remove(), Consts.HALF_SEC)), duration);
@@ -1099,7 +1092,7 @@
         this.player.__trans = this.player.__trans ?? getComputedStyle(this.player)?.getPropertyValue("transform");
         Tools.setStyle(this.player, "--deftsr", this.player.__trans);
       } catch (e) {
-        console.debug(e);
+        console.error(e);
       }
       Tools.setStyle(this.player, name, value);
       return this;
@@ -1171,8 +1164,7 @@
       Tools.setStyle(document.documentElement, "scroll-behavior", "auto", "important");
       if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
       Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
-      requestAnimationFrame(() => Tools.scrollTop(scrollY));
-      setTimeout(() => Tools.setStyle(document.documentElement, "scroll-behavior"), 100);
+      requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(document.documentElement, "scroll-behavior")));
       this.videoParents.clear();
       this.fsPlaceholder = this.fsWrapper = this.fsParent = null;
     },
@@ -1316,12 +1308,11 @@
       const sibling = Tools.findSibling(element, eleName);
       const children = Array.from(sibling?.parentElement?.children ?? []);
       return children.filter((ele) => {
-        const num = this.getEpisodeNumber(ele);
         const currClass = Array.from(ele.classList).filter((cls) => !["on", "cur", "active"].includes(cls));
         const hasSameClass = eleClass.some((value) => currClass.includes(value));
         const isMatch = currClass.length ? hasSameClass : ele.tagName === eleName;
-        if (!isMatch || !num || numSet.has(num)) return false;
-        return numSet.add(num);
+        if (!isMatch || numSet.has(ele.innerText)) return false;
+        return numSet.add(ele.innerText);
       });
     },
     jumpToTargetEpisode(element) {
@@ -1446,10 +1437,7 @@
     constructor(container, options) {
       if (!container) throw new Error("时钟创建失败：container不能为空");
       this.options = Object.assign(this.options, options);
-      this.dateInstance = /* @__PURE__ */ new Date();
       this.container = container;
-      this.animationId = null;
-      this.isRunning = false;
       this.initClockElement();
       this.start();
     }
@@ -1473,26 +1461,25 @@
     }
     update() {
       if (!this.isRunning) return;
-      this.dateInstance.setTime(Date.now());
-      this.element.textContent = this.formatTime(this.dateInstance);
+      this.element.textContent = this.formatTime(/* @__PURE__ */ new Date());
       if (!this.container.contains(this.element)) this.container.prepend(this.element);
-      this.animationId = requestAnimationFrame(() => this.update());
     }
     start() {
       if (this.isRunning) return;
       this.isRunning = true;
       this.element.style.setProperty("display", "unset");
+      this.intervalId = setInterval(() => this.update(), 500);
       this.update();
     }
     stop(hide = false) {
       this.isRunning = false;
-      if (this.animationId) cancelAnimationFrame(this.animationId), this.animationId = null;
+      if (this.intervalId) clearInterval(this.intervalId), delete this.intervalId;
       if (hide) this.element?.style.setProperty("display", "none");
     }
     destroy() {
       this.stop();
       this.element?.remove();
-      this.dateInstance = this.container = this.element = null;
+      this.container = this.element = null;
     }
   }
   const Extend = {
@@ -1510,11 +1497,10 @@
     },
     setFakeBiliUser() {
       if (!Site.isBili() || _unsafeWindow.UserStatus?.userInfo?.isLogin) return;
-      const timer = setInterval(() => {
-        if (Tools.isOverLimit("__BiliUser__", 2)) clearInterval(timer);
+      Tools.sleep(Consts.THREE_SEC).then(() => {
         _unsafeWindow.__BiliUser__.cache.data.isLogin = true;
         _unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
-      }, Consts.THREE_SEC);
+      });
     },
     setBiliQuality() {
       if (!Site.isBili() || !document.cookie.includes("DedeUserID") || !_unsafeWindow.player) return;
@@ -1553,10 +1539,8 @@
       const element = this.createDisplayElement("__time-progress", Storage.CLOCK_COLOR.get());
       const textNode = document.createTextNode("00:00");
       element.textNode = textNode;
-      const percent = document.createElement("b");
-      percent.textContent = "%";
       this.progressNode = element;
-      element.append(textNode, percent);
+      element.append(textNode, Tools.createElement("b", { textContent: "%" }));
       this.toggleTimeElementClass(Storage.USE_SMALL_FONT.get());
       return element;
     },
@@ -1578,9 +1562,7 @@
       this.rateKeepElement?.remove();
     },
     createDisplayElement(clss, color) {
-      const element = document.createElement("div");
-      Tools.setStyle(element, "color", color);
-      element.classList.add(clss);
+      const element = Tools.createElement("div", { className: clss, style: `color: ${color}` });
       this.prependElement(element);
       return element;
     },
@@ -1597,7 +1579,8 @@
     },
     changeTimeElementDisplay() {
       this.setupPlayerClock(), this.videoProgress(this.player, true);
-    }
+    },
+    hideLoadingElement: () => Tools.querys("#loading").forEach((el) => !Tools.query("video", el) && Tools.addCls(el, "hide"))
   };
   class URLBlacklist {
     constructor(blacklist) {
@@ -1760,10 +1743,10 @@
         <div class="swal2-tabs">
           <!-- Tabs 标题栏 -->
           <div class="swal2-tabs-header">
-              <div class="swal2-tab active" data-tab="tab1">播放设置</div>
-              <div class="swal2-tab" data-tab="tab2">辅助设置</div>
-              <div class="swal2-tab" data-tab="tab3">参数设置</div>
-              <div class="swal2-tab" data-tab="tab4">其他设置</div>
+              <div class="swal2-tab active" data-id="tab1">播放设置</div>
+              <div class="swal2-tab" data-id="tab2">辅助设置</div>
+              <div class="swal2-tab" data-id="tab3">参数设置</div>
+              <div class="swal2-tab" data-id="tab4">其他设置</div>
           </div>
           <!-- Tabs 内容区 -->
           <div class="swal2-tabs-content">
@@ -1782,23 +1765,20 @@
         html: Tools.safeHTML(modalHtml),
         customClass: { container: "monkey-web-fullscreen" },
         didOpen(popup) {
-          Tools.querys(".swal2-tab", popup).forEach((tab) => {
-            tab.addEventListener("click", () => {
-              Tools.querys(".swal2-tab, .swal2-tab-panel", popup).forEach((el) => el.classList.remove("active"));
-              Tools.query(`#${tab.dataset.tab}`, popup).classList.add("active");
-              tab.classList.add("active");
-            });
-          });
-          Tools.querys(".__menu input, textarea", popup).forEach((ele) => {
-            ele.addEventListener("input", function() {
-              const cache = cacheMap[this.name];
-              const { host, send, delay } = this.dataset;
-              const value = Object.is(this.type, "checkbox") ? this.checked : this.value;
-              if (send) Tools.postMessage(window, { [`toggle_${this.name}`]: value });
-              const setCache = () => host ? cache.set(value, host) : cache.set(value);
-              delay ? setTimeout(setCache, 50) : setCache();
-            });
-          });
+          popup.onclick = ({ target: tab }) => {
+            if (!tab.matches(".swal2-tab")) return;
+            Tools.querys(".active", popup).forEach((el) => Tools.delCls(el, "active"));
+            Tools.query(`#${tab.dataset.id}`, popup).classList.add("active");
+            tab.classList.add("active");
+          };
+          popup.oninput = ({ target: t }) => {
+            const cache = cacheMap[t.name];
+            const { host, send, delay } = t.dataset;
+            const value = Object.is(t.type, "checkbox") ? t.checked : t.value;
+            if (send) Tools.postMessage(window, { [`sw_${t.name}`]: value });
+            const setCache = () => host ? cache.set(value, host) : cache.set(value);
+            delay ? setTimeout(setCache, 50) : setCache();
+          };
         }
       });
     },
@@ -1871,15 +1851,14 @@
       return this.generateCommonItems(configs, renderItem);
     },
     generateCommonItems(baseConfigs, renderItem) {
-      const getDataset = (attrs = [], host) => attrs.length ? attrs.map((key) => `data-${key}="${key === "host" ? host : true}"`).join(" ") : Consts.EMPTY;
+      const getDataset = (attrs = [], host) => attrs.map((key) => `data-${key}="${key === "host" ? host : true}"`).join(" ");
       const filteredConfigs = baseConfigs.filter(({ isHide }) => !isHide);
       const processedConfigs = filteredConfigs.map((config) => {
-        const { cache, attrs, useHost } = config;
+        const { cache, attrs = [], useHost } = config;
         const host = useHost ? location.host : Consts.EMPTY;
         const value = useHost ? cache.get(location.host) : cache.get();
-        const _attrs = Array.isArray(attrs) ? [...attrs] : [];
-        if (useHost && !_attrs.includes("host")) _attrs.push("host");
-        return { ...config, value, host, dataset: getDataset(_attrs, location.host) };
+        if (useHost && !attrs.includes("host")) attrs.push("host");
+        return { ...config, host, value, dataset: getDataset(attrs, location.host) };
       });
       const html = processedConfigs.map((config) => renderItem(config)).join(Consts.EMPTY);
       const cacheMap = Object.fromEntries(processedConfigs.map((item) => [item.name, item.cache]));
