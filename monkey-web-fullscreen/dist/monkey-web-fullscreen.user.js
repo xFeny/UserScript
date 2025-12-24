@@ -908,11 +908,11 @@
       this.removeProgressElement();
     },
     initVideoPlay(video) {
-      if (!this.player || video._mfs_hasInited) return;
+      if (video._mfs_hasInited) return;
       video._mfs_hasInited = true;
-      this.applyCachedPlayRate(video);
-      this.playbackRateKeepDisplay();
+      this.applyCachedPlayRate();
       this.applyCachedTime(video);
+      this.playbackRateKeepDisplay();
       this.setupPlayerClock();
       this.setBiliQuality();
     },
@@ -933,10 +933,8 @@
       const playRate = Math.max(Consts.MIN_SPEED, Number(this.player.playbackRate) + step);
       this.setPlaybackRate(Math.min(Consts.MAX_SPEED, playRate));
     },
-    applyCachedPlayRate(video) {
-      if (video._mfs_hasApplyCRate) return;
-      if (Storage.NOT_CACHE_SPEED.get()) return this.delCachedPlayRate();
-      this.setPlaybackRate(Storage.CACHED_SPEED.get())?.then(() => video._mfs_hasApplyCRate = true);
+    applyCachedPlayRate() {
+      Storage.NOT_CACHE_SPEED.get() ? this.delCachedPlayRate() : this.setPlaybackRate(Storage.CACHED_SPEED.get());
     },
     skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
       if (!this.player || this.isLive() || this.player.ended) return;
@@ -1244,14 +1242,14 @@
       if (!this.topWin || !video.offsetWidth || this.player !== video) return;
       if (video._mfs_isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
       if (Site.isGmMatch() && this.noAutoDefault() || !Site.isGmMatch() && !this.isAutoSite()) return;
-      if (this.isIgnoreWide() || await this.isWebFull(video) || Tools.isOverLimit("autoWide")) return video._mfs_isWide = true;
+      if (this.isIgnoreWide() || Tools.isOverLimit("autoWide") || await this.isWebFull(video)) return video._mfs_isWide = true;
       this.dispatchShortcutKey(Keyboard.P);
     },
     async isWebFull(video) {
       const isWebFull = video.offsetWidth >= this.topWin.viewWidth;
       if (!isWebFull) return false;
       await Tools.sleep(Consts.HALF_SEC);
-      return video.offsetWidth >= this.topWin.viewWidth;
+      return video?.offsetWidth >= this.topWin?.viewWidth;
     },
     autoExitWebFullscreen() {
       if (!Site.isBili() && !Site.isAcFun()) return;
