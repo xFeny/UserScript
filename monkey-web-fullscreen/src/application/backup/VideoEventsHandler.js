@@ -14,32 +14,33 @@ export default {
     };
 
     this.videoEvents.forEach((type) => (video ?? document).addEventListener(type, handleEvent, true));
-    if (video) this.videoEvtMap.set(video, handleEvent), this.initCleanupTimer();
+    if (video) this.videoEvtMap.set(video, handleEvent), this.cleanupDetachedVideos();
   },
   setupShadowVideoListeners() {
     document.addEventListener("shadow-video", (e) => {
       const { video } = e.detail;
       if (!video || video.hasAttribute("received")) return;
       this.setupVideoListeners(video), video.setAttribute("received", true);
+      Tools.microTask(() => this.createEdgeClickElement(video));
       if (!this.player) this.setCurrentVideo(video);
     });
   },
-  initCleanupTimer() {
-    if (this.cleanupTimer || this.videoEvtMap.size <= 1) return;
-    this.cleanupTimer = setInterval(() => this.cleanupDetachedVideos(), Consts.THREE_SEC * 10);
-  },
   cleanupDetachedVideos() {
-    this.videoEvtMap.forEach((handler, video) => {
-      if (Tools.isAttached(video)) return;
-      this.videoEvents.forEach((type) => video.removeEventListener(type, handler, true));
-      this.videoEvtMap.delete(video);
-      video.removeAttribute("received");
-      // Tools.log("清理已脱离文档的video元素", video);
-    });
+    if (this.cleanupTimer || this.videoEvtMap.size <= 1) return;
+    this.cleanupTimer = setInterval(() => {
+      this.videoEvtMap.forEach((handler, video) => {
+        if (Tools.isAttached(video)) return;
+        this.videoEvents.forEach((type) => video.removeEventListener(type, handler, true));
+        this.videoEvtMap.delete(video);
+        video.removeAttribute("received");
+        // Tools.log("清理已脱离文档的video元素", video);
+      });
+    }, Consts.THREE_SEC * 10);
   },
   loadedmetadata(video) {
+    if (!this.player) this.playing(video);
     this.autoWebFullscreen(video);
-    Tools.querys('[id*="loading"]').forEach((el) => !Tools.query("video", el) && Tools.addCls(el, "_noplayer"));
+    this.hideLoadingElement();
   },
   loadeddata(video) {
     this.initVideoProps(video);
@@ -58,13 +59,14 @@ export default {
     this.videoProgress(video);
   },
   canplay(video) {
+    if (!Tools.isVisible(video) || Storage.DISABLE_TRY_PLAY.get()) return;
     if (video._mfs_tryPlay || Tools.isMultiVideo()) return;
     video._mfs_tryPlay = true;
     this.tryPlay(video);
   },
   playing(video) {
     this.setCurrentVideo(video);
-    this.initVideoPlay(video);
+    Tools.sleep(30).then(() => this.initVideoPlay(video));
   },
   pause() {
     // 稀饭动漫（https://dm.xifanacg.com）
