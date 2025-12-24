@@ -20,7 +20,7 @@ export default {
     if (!this.topWin || !video.offsetWidth || this.player !== video) return;
     if (video._mfs_isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
     if ((Site.isGmMatch() && this.noAutoDefault()) || (!Site.isGmMatch() && !this.isAutoSite())) return;
-    if (this.isIgnoreWide() || (await this.isWebFull(video)) || Tools.isOverLimit("autoWide")) return (video._mfs_isWide = true);
+    if (this.isIgnoreWide() || Tools.isOverLimit("autoWide") || (await this.isWebFull(video))) return (video._mfs_isWide = true);
 
     // 发送网页全屏消息
     this.dispatchShortcutKey(Keyboard.P);
@@ -29,7 +29,7 @@ export default {
     const isWebFull = video.offsetWidth >= this.topWin.viewWidth;
     if (!isWebFull) return false;
     await Tools.sleep(Consts.HALF_SEC);
-    return video.offsetWidth >= this.topWin.viewWidth;
+    return video?.offsetWidth >= this.topWin?.viewWidth; // 加可选链，避免报错
   },
   autoExitWebFullscreen() {
     if (!Site.isBili() && !Site.isAcFun()) return;
