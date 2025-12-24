@@ -28,11 +28,10 @@ export default {
     if (!Site.isBili() || unsafeWindow.UserStatus?.userInfo?.isLogin) return;
 
     // 解决：B站未登录观看视频约1分钟弹出登录框问题
-    const timer = setInterval(() => {
-      if (Tools.isOverLimit("__BiliUser__", 2)) clearInterval(timer);
+    Tools.sleep(Consts.THREE_SEC).then(() => {
       unsafeWindow.__BiliUser__.cache.data.isLogin = true;
       unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
-    }, Consts.THREE_SEC);
+    });
   },
   setBiliQuality() {
     if (!Site.isBili() || !document.cookie.includes("DedeUserID") || !unsafeWindow.player) return;
