@@ -27,12 +27,12 @@ export default class Site {
 
   static {
     const selectors = Storage.ICONS_SELECTOR.get();
-    selectors ? (this.selectors = selectors) : this._loadRemote();
-    Tools.microTask(() => (this._createSiteTests(), this._convertGmMatchToRegex()));
+    selectors ? (this.selectors = selectors) : this.#loadRemote();
+    Tools.microTask(() => (this.#createSiteTests(), this.#convertGmMatchToRegex()));
   }
 
   static getIcons(domain = location.host) {
-    if (!Storage.ICONS_SELECTOR.get()) this._loadRemote();
+    if (!Storage.ICONS_SELECTOR.get()) this.#loadRemote();
     return this.selectors[domain];
   }
 
@@ -40,7 +40,7 @@ export default class Site {
     return this.gmMatches.some((m) => m.test(location.href.replace(location.search, Consts.EMPTY)));
   }
 
-  static _loadRemote() {
+  static #loadRemote() {
     const url = "https://gitee.com/xfeny/UserScript/raw/dev/monkey-web-fullscreen/src/IconsSelector.json";
     GM.xmlHttpRequest({ url, timeout: 3000 })
       .then((res) => {
@@ -54,7 +54,7 @@ export default class Site {
   /**
    * 将 GM 脚本的 @match 规则转换为 JS 正则表达式数组
    */
-  static _convertGmMatchToRegex() {
+  static #convertGmMatchToRegex() {
     const { matches, includes: excluded } = GM_info.script;
     const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
     this.gmMatches = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
@@ -64,7 +64,7 @@ export default class Site {
    * 动态生成站点检测方法（统一为 isXXX 格式）
    * 如：isMgtv()、isDouyu()、isBili()、isBiliLive() 等
    */
-  static _createSiteTests() {
+  static #createSiteTests() {
     Object.entries(this._siteRegExps).forEach(([name, regex]) => {
       const methodName = `is${name.charAt(0).toUpperCase()}${name.slice(1)}`;
       if (!this[methodName]) this[methodName] = () => regex.test(location.href);
