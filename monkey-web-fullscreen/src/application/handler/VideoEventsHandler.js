@@ -52,7 +52,7 @@ export default {
   },
   playing(video) {
     this.setCurrentVideo(video);
-    Tools.sleep(10).then(() => this.initVideoPlay(video));
+    Tools.sleep(30).then(() => this.initVideoPlay(video));
   },
   pause() {
     // 稀饭动漫（https://dm.xifanacg.com）
