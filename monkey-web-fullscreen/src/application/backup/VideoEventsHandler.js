@@ -38,6 +38,7 @@ export default {
     }, Consts.THREE_SEC * 10);
   },
   loadedmetadata(video) {
+    if (video.matches("fake-video")) this.loadeddata(video);
     if (!this.player) this.playing(video);
     this.autoWebFullscreen(video);
     this.hideLoadingElement();
