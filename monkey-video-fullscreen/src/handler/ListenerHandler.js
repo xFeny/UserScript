@@ -13,7 +13,7 @@ export default {
   isBackgroundVideo: (video) => video?.muted && video?.loop,
   getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
   init(isNonFirst = false) {
-    this.setupVideoDetector();
+    this.body = document.body;
     this.setupKeydownListener();
     this.setupMouseMoveListener();
     this.setupFullscreenListener();
@@ -26,24 +26,15 @@ export default {
     this.setupIgnoreUrlsChangeListener();
     this.setupShadowVideoListeners();
   },
+  /**
+   * 解决 document.write 导致监听失效问题
+   * 网站：https://nkvod.me、https://www.lkvod.com
+   */
   setupDocumentObserver() {
-    // 示例网站：https://nkvod.me、https://www.lkvod.com
     new MutationObserver(() => {
-      if (this.docElement === document.documentElement) return;
+      if (this.body === document.body) return;
       this.init(true), document.head.append(gmStyle.cloneNode(true));
     }).observe(document, { childList: true });
-  },
-  setupVideoDetector() {
-    this.docElement = document.documentElement;
-    this.obsDoc?.disconnect(), clearTimeout(this.obsTimer);
-    this.obsDoc = Tools.createObserver(document, () => {
-      if (Tools.isThrottle("detector", 100)) return;
-      if (this.topWin) return this.obsDoc?.disconnect();
-
-      const video = this.getVideo();
-      if (video?.offsetWidth) this.setCurrentVideo(video);
-    });
-    this.obsTimer = setTimeout(() => this.obsDoc?.disconnect(), Consts.ONE_SEC * 5);
   },
   setCurrentVideo(video) {
     if (!video || this.player === video || video.offsetWidth < 240 || this.isBackgroundVideo(video)) return;

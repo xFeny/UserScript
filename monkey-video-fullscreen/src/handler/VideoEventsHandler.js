@@ -25,7 +25,6 @@ export default {
   },
   timeupdate(video) {
     if (isNaN(video.duration)) return;
-    if (!this.player) this.playing(video);
     this.autoWebFullscreen(video);
   },
   playing(video) {
