@@ -40,7 +40,7 @@ return new Promise(async (resolve) => {
 
     GM_notification({
       url,
-      timeout: 3000,
+      timeout: 5000,
       title: "定时脚本通知",
       text: "视频自动网页全屏｜倍速播放脚本 有新的反馈",
       onclick: () => {
