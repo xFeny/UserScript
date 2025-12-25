@@ -4,7 +4,7 @@ import Tools from "../common/Tools";
  * 视频监听事件逻辑处理
  */
 export default {
-  videoEvents: ["loadedmetadata", "loadeddata", "timeupdate", "playing"],
+  videoEvents: ["loadedmetadata", "timeupdate", "playing"],
   setupVideoListeners(video) {
     const handleEvent = (event) => this[event.type](video ?? event.target);
     this.videoEvents.forEach((type) => (video ?? document).addEventListener(type, handleEvent, true));
@@ -19,11 +19,9 @@ export default {
     });
   },
   loadedmetadata(video) {
+    this.initVideoProps(video);
     if (!this.player) this.playing(video);
     this.autoWebFullscreen(video);
-  },
-  loadeddata(video) {
-    this.initVideoProps(video);
   },
   timeupdate(video) {
     if (isNaN(video.duration)) return;
