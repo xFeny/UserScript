@@ -4,7 +4,7 @@
 // @name:zh-TW         視頻網頁全屏
 // @name:en            Video webpage fullscreen
 // @namespace          npm/vite-plugin-monkey
-// @version            3.7.2
+// @version            3.7.3
 // @author             Feny
 // @description        通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可双击网页全屏
 // @description:zh     通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可双击网页全屏
@@ -251,7 +251,7 @@
     isBackgroundVideo: (video) => video?.muted && video?.loop,
     getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
     init(isNonFirst = false) {
-      this.setupVideoDetector();
+      this.body = document.body;
       this.setupKeydownListener();
       this.setupMouseMoveListener();
       this.setupFullscreenListener();
@@ -265,20 +265,9 @@
     },
     setupDocumentObserver() {
       new MutationObserver(() => {
-        if (this.docElement === document.documentElement) return;
+        if (this.body === document.body) return;
         this.init(true), document.head.append(gmStyle.cloneNode(true));
       }).observe(document, { childList: true });
-    },
-    setupVideoDetector() {
-      this.docElement = document.documentElement;
-      this.obsDoc?.disconnect(), clearTimeout(this.obsTimer);
-      this.obsDoc = Tools.createObserver(document, () => {
-        if (Tools.isThrottle("detector", 100)) return;
-        if (this.topWin) return this.obsDoc?.disconnect();
-        const video = this.getVideo();
-        if (video?.offsetWidth) this.setCurrentVideo(video);
-      });
-      this.obsTimer = setTimeout(() => this.obsDoc?.disconnect(), Consts.ONE_SEC * 5);
     },
     setCurrentVideo(video) {
       if (!video || this.player === video || video.offsetWidth < 240 || this.isBackgroundVideo(video)) return;
@@ -416,7 +405,7 @@
     }
   };
   const Events = {
-    videoEvents: ["loadedmetadata", "loadeddata", "timeupdate", "playing"],
+    videoEvents: ["loadedmetadata", "timeupdate", "playing"],
     setupVideoListeners(video) {
       const handleEvent = (event) => this[event.type](video ?? event.target);
       this.videoEvents.forEach((type) => (video ?? document).addEventListener(type, handleEvent, true));
@@ -431,15 +420,11 @@
       });
     },
     loadedmetadata(video) {
-      if (!this.player) this.playing(video);
-      this.autoWebFullscreen(video);
-    },
-    loadeddata(video) {
       this.initVideoProps(video);
+      if (!this.player) this.playing(video);
     },
     timeupdate(video) {
       if (isNaN(video.duration)) return;
-      if (!this.player) this.playing(video);
       this.autoWebFullscreen(video);
     },
     playing(video) {
@@ -598,8 +583,8 @@
   const Automatic = {
     async autoWebFullscreen(video) {
       if (!this.topWin || !video.offsetWidth || this.player !== video) return;
-      if (video.__isWide || !this.isAutoSite() || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
-      if (await this.isWebFull(video) || this.isIgnoreUrl() || Tools.isOverLimit("autoWide")) return video.__isWide = true;
+      if (video.__isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC) || !this.isAutoSite()) return;
+      if (this.isIgnoreUrl() || await this.isWebFull(video) || Tools.isOverLimit("autoWide")) return video.__isWide = true;
       this.dispatchShortcutKey(Keyboard.P);
     },
     async isWebFull(video) {

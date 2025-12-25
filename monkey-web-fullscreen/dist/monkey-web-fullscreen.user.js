@@ -2,7 +2,7 @@
 // @name               视频自动网页全屏｜倍速播放
 // @name:zh-TW         視頻自動網頁全屏｜倍速播放
 // @namespace          http://tampermonkey.net/
-// @version            3.7.3
+// @version            3.7.4
 // @author             Feny
 // @description        支持所有H5视频的增强脚本，通用网页全屏｜倍速调节，对微博 / 推特 / Instagram / Facebook等多视频平台均适用；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @description:zh-TW  支持所有H5视频的增强脚本，通用網頁全屏｜倍速調節，对微博 / 推特 / Instagram / Facebook等平臺均適用；B站(含直播) / 騰訊視頻 / 優酷 / 愛奇藝 / 芒果TV / AcFun 默認自動網頁全屏，其他網站可手動開啓；自動網頁全屏 + 記憶倍速 + 下集切換，減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
@@ -848,6 +848,7 @@
       });
     },
     loadedmetadata(video) {
+      if (video.matches("fake-video")) this.loadeddata(video);
       if (!this.player) this.playing(video);
       this.autoWebFullscreen(video);
       this.hideLoadingElement();
@@ -1242,7 +1243,7 @@
       if (!this.topWin || !video.offsetWidth || this.player !== video) return;
       if (video._mfs_isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
       if (Site.isGmMatch() && this.noAutoDefault() || !Site.isGmMatch() && !this.isAutoSite()) return;
-      if (this.isIgnoreWide() || Tools.isOverLimit("autoWide") || await this.isWebFull(video)) return video._mfs_isWide = true;
+      if (this.isIgnoreWide() || await this.isWebFull(video) || Tools.isOverLimit("autoWide")) return video._mfs_isWide = true;
       this.dispatchShortcutKey(Keyboard.P);
     },
     async isWebFull(video) {
