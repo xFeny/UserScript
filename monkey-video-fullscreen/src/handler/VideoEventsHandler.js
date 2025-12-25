@@ -21,7 +21,6 @@ export default {
   loadedmetadata(video) {
     this.initVideoProps(video);
     if (!this.player) this.playing(video);
-    this.autoWebFullscreen(video);
   },
   timeupdate(video) {
     if (isNaN(video.duration)) return;
