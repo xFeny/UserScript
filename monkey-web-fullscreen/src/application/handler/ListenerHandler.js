@@ -201,9 +201,8 @@ export default {
         video,
         className: `video-edge-click ${clas}`,
         onclick: (e) => {
-          delete this.player;
           Tools.preventDefault(e);
-          this.setCurrentVideo(e.target.video);
+          if (!this.fsWrapper) delete this.player, this.setCurrentVideo(e.target.video);
           Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
         },
       });
