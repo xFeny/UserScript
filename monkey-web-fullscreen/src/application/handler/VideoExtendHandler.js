@@ -65,7 +65,7 @@ export default {
     const timeLeft = this.formatTime(duration - video.currentTime);
 
     const element = this.createProgressElement(); // 创建相关元素
-    element.textNode.textContent = `${timeLeft} / ${percent}`;
+    element.firstChild.textContent = `${timeLeft} / ${percent}`;
     this.prependElement(element);
   },
   createProgressElement() {
@@ -73,13 +73,8 @@ export default {
 
     // 创建播放进度元素
     const element = this.createDisplayElement("__time-progress", Storage.CLOCK_COLOR.get());
-
-    // 创建文本节点，并挂载到element
-    const textNode = document.createTextNode("00:00");
-    element.textNode = textNode;
-
+    element.append(document.createTextNode("00:00"), Tools.createElement("b", { textContent: "%" }));
     this.progressNode = element;
-    element.append(textNode, Tools.createElement("b", { textContent: "%" }));
 
     return element;
   },
