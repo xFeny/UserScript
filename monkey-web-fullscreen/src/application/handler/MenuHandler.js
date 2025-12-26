@@ -162,7 +162,6 @@ export default {
       { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_SPEED, attrs: ["send", "delay"] },
       { name: "memory", text: "禁用 记忆倍速", cache: Storage.NOT_CACHE_SPEED, attrs: ["send"] },
       { name: "time", text: "禁用 记忆播放位置", cache: Storage.NOT_CACHE_TIME },
-      { name: "fit", text: "禁用 自动网页全屏", cache: Storage.NO_AUTO_DEF, isHide: !Site.isGmMatch() },
       { name: "tabs", text: "禁用 不可见时暂停", cache: Storage.IS_INVISIBLE_PAUSE },
       { name: "tryPlay", text: "禁用 尝试自动播放", cache: Storage.DISABLE_TRY_PLAY },
       { name: "next", text: "启用 自动切换至下集", cache: Storage.IS_AUTO_NEXT },
@@ -179,13 +178,13 @@ export default {
   },
   genAssistItems() {
     const configs = [
+      { name: "fit", text: "禁用 默认自动", cache: Storage.NO_AUTO_DEF },
       { name: "pic", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
       { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, attrs: ["send"] },
       { name: "clock", text: "禁用 全屏时显示时间", cache: Storage.DISABLE_CLOCK },
       { name: "clockAlw", text: "启用 非全屏显示时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
       { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },
-      { name: "edgeClk", text: "启用 侧边触发网页全屏", cache: Storage.ENABLE_EDGE_CLICK, attrs: ["send"] },
-      { name: "swClkType", text: "启用 侧边单击网页全屏", cache: Storage.SW_CLICK_TYPE, attrs: ["send"] },
+      { name: "edgeClk", text: "启用 侧边单击网页全屏", cache: Storage.ENABLE_EDGE_CLICK, attrs: ["send"] },
     ].filter(({ isHidden }) => !isHidden);
 
     const renderItem = ({ text, dataset, name, value }) => `

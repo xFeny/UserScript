@@ -200,7 +200,7 @@ export default {
       return Tools.createElement("div", {
         video,
         className: `video-edge-click ${clas}`,
-        [Storage.SW_CLICK_TYPE.get() ? "onclick" : "ondblclick"]: (e) => {
+        onclick: (e) => {
           delete this.player;
           Tools.preventDefault(e);
           this.setCurrentVideo(e.target.video);

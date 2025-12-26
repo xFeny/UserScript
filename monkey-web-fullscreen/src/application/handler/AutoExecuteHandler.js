@@ -19,7 +19,7 @@ export default {
   async autoWebFullscreen(video) {
     if (!this.topWin || !video.offsetWidth || this.player !== video) return;
     if (video._mfs_isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
-    if ((Site.isGmMatch() && this.noAutoDefault()) || (!Site.isGmMatch() && !this.isAutoSite())) return;
+    if (Site.isGmMatch() ? this.noAutoDefault() : !this.isAutoSite()) return;
     if (this.isIgnoreWide() || (await this.isWebFull(video)) || Tools.isOverLimit("autoWide")) return (video._mfs_isWide = true);
 
     // 发送网页全屏消息
