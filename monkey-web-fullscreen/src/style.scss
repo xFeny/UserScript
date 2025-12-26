@@ -443,37 +443,27 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   right: 20px !important;
   width: auto !important;
   height: auto !important;
-  font-size: 20px !important;
-  line-height: 20px !important;
+  font-size: 17.5px !important;
+  line-height: 17.5px !important;
   font-weight: bold !important;
   text-align: right !important;
   background-color: transparent !important;
-
-  &.smaller {
-    font-size: 16px !important;
-    line-height: 16px !important;
-  }
 }
 
 /** 全屏模式下的播放进度 **/
 .__time-progress {
-  top: 30px !important;
+  top: 27px !important;
   right: 20px !important;
-  font-size: 12.5px !important;
-  line-height: 12.5px !important;
+  font-size: 12px !important;
+  line-height: 12px !important;
+  transform: scale(0.895) !important;
+  transform-origin: top right !important;
 
   & b {
-    font-size: 12px !important;
-    line-height: 12px !important;
+    font-size: inherit !important;
     display: inline-block !important;
     transform: scale(0.75) !important;
-    vertical-align: middle !important;
-  }
-
-  &.smaller {
-    top: 26px !important;
-    transform: scale(0.817) !important;
-    transform-origin: top right;
+    vertical-align: text-bottom !important;
   }
 }
 
@@ -486,7 +476,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
   box-shadow: none !important;
   line-height: 12px !important;
   display: inline-block !important;
-  transform: scale(0.917) !important;
+  transform: scale(0.9) !important;
   transform-origin: top;
 }
 

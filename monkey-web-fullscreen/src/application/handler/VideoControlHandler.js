@@ -33,7 +33,6 @@ export default {
     // 设置默认一些值
     video.__duration = video.duration;
     video.tsr = { ...Consts.DEF_TSR };
-    if (!Storage.IS_MAX_VOLUME.get()) video.volume = 1;
 
     // 重置次数限制
     Tools.resetLimit("rateKeep", "autoWide");

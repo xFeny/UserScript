@@ -49,7 +49,6 @@ export default {
     if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(this.player.parentNode).start();
 
     this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
-    this.toggleTimeElementClass(Storage.USE_SMALL_FONT.get());
   },
   getRealDuration(video) {
     if (!Site.isQiyi()) return video.duration;
@@ -81,7 +80,6 @@ export default {
 
     this.progressNode = element;
     element.append(textNode, Tools.createElement("b", { textContent: "%" }));
-    this.toggleTimeElementClass(Storage.USE_SMALL_FONT.get());
 
     return element;
   },
@@ -111,10 +109,6 @@ export default {
   prependElement(element, target) {
     const container = target ?? this.player?.parentNode;
     if (element && !container?.contains(element)) container?.prepend(element);
-  },
-  toggleTimeElementClass(addClass, clss = "smaller") {
-    if (addClass) return Tools.addCls(this.Clock?.element, clss), Tools.addCls(this.progressNode, clss);
-    Tools.delCls(this.Clock?.element, clss), Tools.delCls(this.progressNode, clss);
   },
   setTimeElementColor(color) {
     Tools.setStyle([this.progressNode, this.Clock?.element], "color", color);

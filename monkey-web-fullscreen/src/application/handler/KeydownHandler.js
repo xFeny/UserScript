@@ -111,7 +111,6 @@ export default {
     if ("sw_rateKeep" in data) this.playbackRateKeepDisplay(); // 左上角常显倍速
     if ("sw_clockAlw" in data) this.changeTimeElementDisplay(); // 非全屏显示时间
     if ("sw_color" in data) this.setTimeElementColor(data.sw_color); // 时间颜色
-    if ("sw_smallFont" in data) this.toggleTimeElementClass(data.sw_smallFont); // 小字号显示时间
     if ("sw_edgeClk" in data || "sw_swClkType" in data) this.removeEdgeClickElements(); // 禁用侧边双击
 
     if (data?.sw_memory) this.delCachedPlayRate(); // 禁用记忆倍速

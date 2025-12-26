@@ -57,8 +57,6 @@ export default unsafeWindow.FyStorage = {
   /** 下集切换相关：自定义下集切换—集数列表中的任意一集 拾取的CSS选择器 */
   CURRENT_EPISODE: new BasicStorage("CURRENT_EPISODE_SELECTOR_", "", false, String, true),
 
-  /** 时间显示相关：小字号显示时间 */
-  USE_SMALL_FONT: new BasicStorage("USE_SMALLER_FONT", false, false, Boolean),
   /** 时间显示相关：禁用全屏时间显示 */
   DISABLE_CLOCK: new BasicStorage("DISABLE_CLOCK", false, false, Boolean),
   /** 时间显示相关：非全屏模式下显示时间 */
@@ -80,8 +78,6 @@ export default unsafeWindow.FyStorage = {
 
   /** 其他：禁用标签页隐藏暂停 */
   IS_INVISIBLE_PAUSE: new BasicStorage("DISABLE_INVISIBLE_PAUSE", false, false, Boolean),
-  /** 其他：禁用音量默认百分百 */
-  IS_MAX_VOLUME: new BasicStorage("DISABLE_DEF_MAX_VOLUME", false, false, Boolean),
   /** 其他：禁用视频截图 */
   DISABLE_SCREENSHOT: new BasicStorage("DISABLE_SCREENSHOT", true, false, Boolean),
 };
