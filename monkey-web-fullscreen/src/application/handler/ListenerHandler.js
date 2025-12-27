@@ -187,31 +187,35 @@ export default {
     const sroot = video.getRootNode() instanceof ShadowRoot;
     const container = sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
 
+    // 父容器未发生变化，不更新位置
+    if (video.edgeContainer === container) return;
+
     // 避免元素定位异常
     if (container instanceof Element && getComputedStyle(container).position === "static") {
       Tools.setStyle(container, "position", "relative");
     }
 
-    // 已创建过，复用元素
+    // 已创建过侧边元素，重新插入到父容器中
     if (video.lArea) return container.prepend(video.lArea, video.rArea);
 
-    // 复用创建逻辑，通过 Object.assign 简化元素初始化
+    // 复用元素创建逻辑
     const createEdge = (clas = "") => {
-      return Tools.createElement("div", {
-        video,
-        className: `video-edge-click ${clas}`,
-        onclick: (e) => {
-          Tools.preventDefault(e);
-          const vid = e.target.video;
-          if (this.player !== vid) delete this.player, this.setCurrentVideo(vid);
-          Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
-        },
-      });
+      const element = Tools.createElement("div", { video, className: `video-edge-click ${clas}` });
+
+      element.onclick = (e) => {
+        Tools.preventDefault(e);
+        const vid = e.target.video;
+        if (this.player !== vid) delete this.player, this.setCurrentVideo(vid);
+        Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
+      };
+
+      return element;
     };
 
     // 解构赋值批量创建边缘元素
     [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
     container.prepend(video.lArea, video.rArea);
+    video.edgeContainer = container;
   },
   removeEdgeClickElements() {
     Tools.querys(".video-edge-click").forEach((el) => (el.remove(), delete el.video.lArea, delete el.video.rArea));
