@@ -4,12 +4,12 @@
 // @name:zh-TW         視頻網頁全屏
 // @name:en            Video webpage fullscreen
 // @namespace          npm/vite-plugin-monkey
-// @version            3.7.3
+// @version            3.7.4
 // @author             Feny
-// @description        通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可双击网页全屏
-// @description:zh     通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可双击网页全屏
-// @description:zh-TW  通用(網頁)全屏，快捷鍵：P-網頁全屏，Enter-全屏；視頻左右兩側可雙擊網頁全屏
-// @description:en     Universal (Web) Full Screen; Shortcut keys: P-Web Fullscreen, Enter-Fullscreen; You can double-click on either side of the video to make the webpage full screen.
+// @description        通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可單击网页全屏
+// @description:zh     通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可單击网页全屏
+// @description:zh-TW  通用(網頁)全屏，快捷鍵：P-網頁全屏，Enter-全屏；視頻左右兩側可單擊網頁全屏
+// @description:en     Universal (Web) Full Screen; Shortcut keys: P-Web Fullscreen, Enter-Fullscreen; You can click on either side of the video to make the webpage full screen.
 // @license            GPL-3.0-only
 // @icon               data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAABNNJREFUeF7tm09oHFUcx79vNtkElgQDwYMgaUJulVhIwXoIFAvtQRAPXnopQXZfchD00ksPKoh4KUQJksx7C4UUihREcvFQhB70UMmuYhXBGMRDmrAJ+Wf+2MSwP/kNb5fNZrPzkt3ZzCT7IIfszve93+/z+/NmZmcEzvkQ59x/HAIgpXwI4AoRrRHR9XQ6nWNIUsonAF6zAHZfKXWLj0smk72O4/xloQER3dZa3zW6m47jPLDRAbihlHrEx46MjHxORO9b6DYB/EJE6gAAKSWViR8ppW7wZ8PDwy/E4/E/ALzot4AQ4q7rureNUdeI6Ds/DX9PRLe01vcN8DsAPrXQ5WKx2PWJiYmnRjcN4C0LnXdIEYCU8ihhMaKpVOqSEOJnm8lLIyqlTALQNrrSiEopWcPaqoOInra3tw+Nj4//YyD8CuAVP105gGcAXqokKo2olPJtAN/YTF4WUY4mR9Vv5IQQQ67r/mmc4ey55icCUMzW0dHRC/l8/jcACT9daQaUp/8BbVlEPwAw5je5+X5IKfWDKYcHRHTTT8cRFUJcVkr9Z0rvJwC9fjoApf3nquM4j/001gBMjb6jtf7aOGPbcHL5fP5yOp2eNxG1babFiB6n9EqzNZVKDQsh7lWDcCwAPJFxJmucsWo4HFGt9ausMen5o00zLY3ocUoPwHtKqS+NjR8D+OgoCMcGACD3/Pnzi1NTUysmPb+3bDjFiCaTSav0NEZ/opT60DhjXXpCiDdd1/3WZOs9Ihqu2N8KH1bYAo/MnNKImvTkGvdtOACUUmqEJ7ZJz4IBQoh3Xdf1UllKyb2HQfgOIcRF13V/N+s9FkJcLRedJAO8OYhoWmvNOwIbdZyd4Y7W+jOb9Cwz9g2llNfUpJS8C3lr+4xcIpHoHRsb+9eUHusvlGpODMBA+EJr7UVDSmmdnrwTaK2/8kvPcuccx+mdnJz825QeO3PJj4AQ4onruq/zcZVKr3kt4EfwrH9fzICZmZlDDeKsO8/+FQFkMpmqZ4JnFUYTQCGyzQxolkCzBzSb4Fnt9NX8au4CjdoFOjo6EI/HEYvFsLW1hZ2dnVAkXOAZ0NLSgv7+fiQSB6+Wt7e3kcvlsLa2dqogAgfQ19eHrq6uI51kAAyCgZzGCBzAwMAAWltbfX1jCEtLS9jb2/M9tp4HBA5gcHDQ2l52niEwjEaNUAEoON3I/hBKAAUQjegPoQZQABFkf4gEAAYRVH+IDICg+kPkABRALC4uYmFhoebNIrIA2PN6QIg0gM3NTczOztaUBZEGwJ5ns97vtCcekQawsbGBubm5EzvPwkgDOLc9YH9/H/Pz81hZWakp+pHMgOXlZe9iaXd3t2bnIwVgfX3du1Lkzl/PEfoewLfOOOKrq6v19Ls4V2gBcJ2z4/xHFNwd+1ACqHedV0udUAEIqs5PFYDNPcGg6/xUAVS7K9yoOj9VALx4T08Puru7i3bk83nvJKae+/lJt4jAe0DBsM7OTrS1tXn/8r0+jn4YRsMAhMHZSjY0ARSoNB+RaT4i03xEJrgT7rB2wEbcEQqx755pxV0gm80+I6KKL02F3Yla7Ct9VnhaCGH9vl0ti4ZJe+Bx+fO4FR56XyCTyTwkoitCiJfDFKk621L51dk6LxKJ6c79GyP/A7T+4JsF5qmXAAAAAElFTkSuQmCC
 // @match              *://*/*
@@ -337,24 +337,24 @@
       const parentNode = video.parentNode;
       const sroot = video.getRootNode() instanceof ShadowRoot;
       const container = sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
+      if (video.edgeContainer === container) return;
       if (container instanceof Element && getComputedStyle(container).position === "static") {
         Tools.setStyle(container, "position", "relative");
       }
       if (video.lArea) return container.prepend(video.lArea, video.rArea);
       const createEdge = (clas = "") => {
-        return Object.assign(document.createElement("div"), {
-          video,
-          className: `video-edge-click ${clas}`,
-          ondblclick: (e) => {
-            delete this.player;
-            Tools.preventDefault(e);
-            this.setCurrentVideo(e.target.video);
-            Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
-          }
-        });
+        const element = Object.assign(document.createElement("div"), { video, className: `video-edge-click ${clas}` });
+        element.onclick = (e) => {
+          Tools.preventDefault(e);
+          const vid = e.target.video;
+          if (this.player !== vid) delete this.player, this.setCurrentVideo(vid);
+          Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
+        };
+        return element;
       };
       [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
       container.prepend(video.lArea, video.rArea);
+      video.edgeContainer = container;
     }
   };
   const Keydown = {
