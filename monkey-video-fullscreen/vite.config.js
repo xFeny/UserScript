@@ -3,11 +3,11 @@ import monkey, { util, cdn } from "vite-plugin-monkey";
 import AutoImport from "unplugin-auto-import/vite";
 import cleanup from "rollup-plugin-cleanup";
 
-const description = ["通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏", "视频左右两侧可双击网页全屏"];
-const description_tw = ["通用(網頁)全屏，快捷鍵：P-網頁全屏，Enter-全屏", "視頻左右兩側可雙擊網頁全屏"];
+const description = ["通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏", "视频左右两侧可單击网页全屏"];
+const description_tw = ["通用(網頁)全屏，快捷鍵：P-網頁全屏，Enter-全屏", "視頻左右兩側可單擊網頁全屏"];
 const description_en = [
   "Universal (Web) Full Screen; Shortcut keys: P-Web Fullscreen, Enter-Fullscreen",
-  "You can double-click on either side of the video to make the webpage full screen.",
+  "You can click on either side of the video to make the webpage full screen.",
 ];
 
 // https://vitejs.dev/config/
@@ -24,7 +24,7 @@ export default defineConfig({
       entry: "src/main.js",
       userscript: {
         author: "Feny",
-        version: "3.7.3",
+        version: "3.7.4",
         match: ["*://*/*"],
         license: "GPL-3.0-only",
         name: "视频网页全屏",
