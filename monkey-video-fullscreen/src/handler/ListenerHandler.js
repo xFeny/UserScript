@@ -111,7 +111,7 @@ export default {
     const container = sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
 
     // 父容器未发生变化，不更新位置
-    if (video.edgeContainer === container) return;
+    if (video.lArea?.parentNode === container) return;
 
     // 避免元素定位异常
     if (container instanceof Element && getComputedStyle(container).position === "static") {
@@ -138,6 +138,5 @@ export default {
     // 解构赋值批量创建边缘元素
     [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
     container.prepend(video.lArea, video.rArea);
-    video.edgeContainer = container;
   },
 };
