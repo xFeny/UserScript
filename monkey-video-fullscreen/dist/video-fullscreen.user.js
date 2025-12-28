@@ -6,8 +6,8 @@
 // @namespace          npm/vite-plugin-monkey
 // @version            3.7.4
 // @author             Feny
-// @description        通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可單击网页全屏
-// @description:zh     通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可單击网页全屏
+// @description        通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可单击网页全屏
+// @description:zh     通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可单击网页全屏
 // @description:zh-TW  通用(網頁)全屏，快捷鍵：P-網頁全屏，Enter-全屏；視頻左右兩側可單擊網頁全屏
 // @description:en     Universal (Web) Full Screen; Shortcut keys: P-Web Fullscreen, Enter-Fullscreen; You can click on either side of the video to make the webpage full screen.
 // @license            GPL-3.0-only
@@ -337,7 +337,7 @@
       const parentNode = video.parentNode;
       const sroot = video.getRootNode() instanceof ShadowRoot;
       const container = sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
-      if (video.edgeContainer === container) return;
+      if (video.lArea?.parentNode === container) return;
       if (container instanceof Element && getComputedStyle(container).position === "static") {
         Tools.setStyle(container, "position", "relative");
       }
@@ -354,7 +354,6 @@
       };
       [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
       container.prepend(video.lArea, video.rArea);
-      video.edgeContainer = container;
     }
   };
   const Keydown = {

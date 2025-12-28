@@ -658,7 +658,7 @@
       const parentNode = video.parentNode;
       const sroot = video.getRootNode() instanceof ShadowRoot;
       const container = sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
-      if (video.edgeContainer === container) return;
+      if (video.lArea?.parentNode === container) return;
       if (container instanceof Element && getComputedStyle(container).position === "static") {
         Tools.setStyle(container, "position", "relative");
       }
@@ -675,7 +675,6 @@
       };
       [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
       container.prepend(video.lArea, video.rArea);
-      video.edgeContainer = container;
     },
     removeEdgeClickElements() {
       Tools.querys(".video-edge-click").forEach((el) => (el.remove(), delete el.video.lArea, delete el.video.rArea));
