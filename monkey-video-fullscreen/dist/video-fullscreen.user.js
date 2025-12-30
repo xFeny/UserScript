@@ -4,7 +4,7 @@
 // @name:zh-TW         視頻網頁全屏
 // @name:en            Video webpage fullscreen
 // @namespace          npm/vite-plugin-monkey
-// @version            3.7.4
+// @version            3.8.0
 // @author             Feny
 // @description        通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可单击网页全屏
 // @description:zh     通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可单击网页全屏
@@ -87,7 +87,6 @@
     HALF_SEC: 500,
     ONE_SEC: 1e3,
     webFull: "webFullscreen",
-    WEBFULL_PARENT_DEPTH: 20,
     MSG_SOURCE: "SCRIPTS_VIDEO_FULLSCREEN"
   });
   const Tools = {
@@ -347,7 +346,7 @@
         element.onclick = (e) => {
           Tools.preventDefault(e);
           const vid = e.target.video;
-          if (this.player !== vid) delete this.player, this.setCurrentVideo(vid);
+          if (this.player !== vid) this.player = vid, this.setVideoInfo(vid);
           Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
         };
         return element;
@@ -466,6 +465,7 @@
     }
   }
   const Storage = {
+    DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, false, Number, true),
     CUSTOM_CONTAINER: new BasicStorage("CUSTOM_CONTAINER_", "", false, void 0, true),
     THIS_SITE_AUTO: new BasicStorage("THIS_SITE_AUTO_", false, false, Boolean, true),
     IGNORE_URLS: new BasicStorage("IGNORE_URLS", "")
@@ -487,7 +487,7 @@
       const parents = Tools.getParents(container, true);
       container.top = container.top ?? Tools.getElementRect(container).top;
       container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
-      container instanceof HTMLIFrameElement || parents.length < Consts.WEBFULL_PARENT_DEPTH ? parents.forEach((el) => {
+      container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(location.host) ? parents.forEach((el) => {
         Tools.emitEvent("addStyle", { shadowRoot: el.getRootNode() });
         Tools.setPart(el, Consts.webFull);
       }) : this.detachForFullscreen();
@@ -654,6 +654,7 @@
   class I18n {
     static langPacks = {
       zh_CN: {
+        detach: "此站脱离式全屏阈值",
         enAuto: "启用自动网页全屏",
         disAuto: "禁用自动网页全屏",
         ignore: "自动时忽略的网址",
@@ -661,6 +662,7 @@
         close: "关闭"
       },
       zh_TW: {
+        detach: "此站脫離式全屏閾值",
         enAuto: "啓用自動網頁全屏",
         disAuto: "禁用自動網頁全屏",
         ignore: "自動時忽略的網址",
@@ -668,6 +670,7 @@
         close: "關閉"
       },
       en: {
+        detach: "Leave the original DOM threshold",
         enAuto: "Enable automatic web full-screen",
         disAuto: "Disable automatic web full-screen",
         ignore: "Exclude URLs from auto full-screen",
@@ -701,6 +704,7 @@
       const siteFn = ({ host, cache }) => cache.set(!cache.get(host), host);
       const configs = [
         { title: I18n.t(this.isAutoSite() ? "disAuto" : "enAuto"), cache: Storage.THIS_SITE_AUTO, useHost: true, fn: siteFn },
+        { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD, useHost: true, isHidden: Site.isGmMatch() },
         { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS, fn: this.ignoreUrlsPopup },
         { title: I18n.t("custom"), cache: Storage.CUSTOM_CONTAINER, useHost: true }
       ];
@@ -712,7 +716,7 @@
         this[id] = _GM_registerMenuCommand(title, () => {
           if (fn) return fn.call(this, { host, cache, title });
           const input = prompt(title, host ? cache.get(host) : cache.get());
-          host ? cache.set(input, host) : cache.set(input);
+          if (input !== null) host ? cache.set(input, host) : cache.set(input);
         });
       });
     },
