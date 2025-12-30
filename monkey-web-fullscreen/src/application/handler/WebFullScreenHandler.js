@@ -52,7 +52,7 @@ export default {
     container.top = container.top ?? Tools.getElementRect(container).top;
     container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
     // 父元素链的长度超过预设的阈值，视频容器“脱离”其原始DOM结构
-    container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_DEPTH.get(location.host)
+    container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(location.host)
       ? parents.forEach((el) => {
           Tools.emitEvent("addStyle", { shadowRoot: el.getRootNode() });
           Tools.setPart(el, Consts.webFull);

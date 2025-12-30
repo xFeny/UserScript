@@ -25,7 +25,7 @@ export default {
     // 菜单配置项
     const configs = [
       { title: I18n.t(this.isAutoSite() ? "disAuto" : "enAuto"), cache: Storage.THIS_SITE_AUTO, useHost: true, fn: siteFn },
-      { title: I18n.t("detach"), cache: Storage.DETACH_DEPTH, useHost: true, isHidden: Site.isGmMatch() },
+      { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD, useHost: true, isHidden: Site.isGmMatch() },
       { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS, fn: this.ignoreUrlsPopup },
       { title: I18n.t("custom"), cache: Storage.CUSTOM_CONTAINER, useHost: true },
     ];

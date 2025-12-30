@@ -37,7 +37,7 @@ export default {
     // 菜单配置项
     const configs = [
       { title: siteTitle, cache: IS_SITE_AUTO, useHost: true, isHidden: Site.isGmMatch(), fn: siteFun },
-      { title: "此站脱离式全屏阈值", cache: Storage.DETACH_DEPTH, useHost: true, isHidden: Site.isGmMatch() },
+      { title: "此站脱离式全屏阈值", cache: Storage.DETACH_THRESHOLD, useHost: true, isHidden: Site.isGmMatch() },
       { title: "删除此站剧集选择器", cache: CURRENT_EPISODE, useHost: true, isHidden: noPicker, fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: this.shortcutKeysPopup },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: this.settingPopup },
