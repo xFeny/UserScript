@@ -25,7 +25,7 @@ export default {
   },
   loadedmetadata(video) {
     if (video.matches("fake-video")) this.loadeddata(video);
-    if (!this.player) this.playing(video);
+    if (!this.player) this.setCurrentVideo(video);
     this.autoWebFullscreen(video);
     this.hideLoadingElement();
   },
