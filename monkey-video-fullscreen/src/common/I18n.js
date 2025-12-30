@@ -2,6 +2,7 @@ export default class I18n {
   static langPacks = {
     // 简体中文
     zh_CN: {
+      detach: "此站脱离式全屏阈值",
       enAuto: "启用自动网页全屏",
       disAuto: "禁用自动网页全屏",
       ignore: "自动时忽略的网址",
@@ -10,6 +11,7 @@ export default class I18n {
     },
     // 繁体中文（可扩展）
     zh_TW: {
+      detach: "此站脫離式全屏閾值",
       enAuto: "啓用自動網頁全屏",
       disAuto: "禁用自動網頁全屏",
       ignore: "自動時忽略的網址",
@@ -18,6 +20,7 @@ export default class I18n {
     },
     // 英文
     en: {
+      detach: "Leave the original DOM threshold",
       enAuto: "Enable automatic web full-screen",
       disAuto: "Disable automatic web full-screen",
       ignore: "Exclude URLs from auto full-screen",

@@ -128,7 +128,7 @@ export default {
       element.onclick = (e) => {
         Tools.preventDefault(e);
         const vid = e.target.video;
-        if (this.player !== vid) delete this.player, this.setCurrentVideo(vid);
+        if (this.player !== vid) (this.player = vid), this.setVideoInfo(vid);
         Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
       };
 
