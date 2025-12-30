@@ -37,6 +37,7 @@ export default {
     // 菜单配置项
     const configs = [
       { title: siteTitle, cache: IS_SITE_AUTO, useHost: true, isHidden: Site.isGmMatch(), fn: siteFun },
+      { title: "此站脱离式全屏阈值", cache: Storage.DETACH_DEPTH, useHost: true, isHidden: Site.isGmMatch() },
       { title: "删除此站剧集选择器", cache: CURRENT_EPISODE, useHost: true, isHidden: noPicker, fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: this.shortcutKeysPopup },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: this.settingPopup },
@@ -54,8 +55,9 @@ export default {
         if (fn) return fn.call(this, { host, cache, title }); // 自定义逻辑
 
         // 弹出输入框对话框
+        Tools.log("获取值：", { value: cache.get(host), host });
         const input = prompt(title, host ? cache.get(host) : cache.get());
-        host ? cache.set(input, host) : cache.set(input);
+        if (input !== null) host ? cache.set(input, host) : cache.set(input);
       });
     });
   },

@@ -14,7 +14,6 @@ export default Object.freeze({
   MIN_SPEED: 0.1,
   webFull: "webFullscreen",
   FAKE_VIDEO: "fake-video",
-  WEBFULL_PARENT_DEPTH: 20,
   MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN",
   DEF_TSR: { zoom: 100, moveX: 0, moveY: 0, rotation: 0, isMirrored: false },
 });
