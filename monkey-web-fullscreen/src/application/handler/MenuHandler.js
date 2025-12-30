@@ -4,8 +4,6 @@ import Tools from "../common/Tools";
 import Site from "../common/Site";
 import Swal from "sweetalert2";
 
-const { IS_SITE_AUTO, CURRENT_EPISODE } = Storage;
-
 /**
  * 脚本菜单相关逻辑处理
  */
@@ -14,7 +12,7 @@ export default {
   isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
   isDisableSpeed: () => Storage.DISABLE_SPEED.get(),
   isDisableZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
-  isAutoSite: () => IS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
+  isAutoSite: () => Storage.IS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
   restoreDefaultSetting: () => GM_listValues().forEach((key) => GM_deleteValue(key)),
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
@@ -24,21 +22,21 @@ export default {
   },
   setupMenuChangeListener() {
     const host = location.host;
-    [IS_SITE_AUTO.name + host, CURRENT_EPISODE.name + host].forEach((key) =>
+    [Storage.IS_SITE_AUTO.name + host, Storage.CURRENT_EPISODE.name + host].forEach((key) =>
       GM_addValueChangeListener(key, () => this.registMenuCommand())
     );
   },
   registMenuCommand() {
-    const noPicker = !CURRENT_EPISODE.get(location.host);
+    const noPicker = !Storage.CURRENT_EPISODE.get(location.host);
     const siteTitle = `此站${this.isAutoSite() ? "禁" : "启"}用自动网页全屏`;
     const siteFun = ({ host, cache }) => cache.set(!cache.get(host), host);
     const delPicker = ({ host }) => Storage.CURRENT_EPISODE.del(host) & Storage.RELATIVE_EPISODE.del(host);
 
     // 菜单配置项
     const configs = [
-      { title: siteTitle, cache: IS_SITE_AUTO, useHost: true, isHidden: Site.isGmMatch(), fn: siteFun },
+      { title: siteTitle, cache: Storage.IS_SITE_AUTO, useHost: true, isHidden: Site.isGmMatch(), fn: siteFun },
       { title: "此站脱离式全屏阈值", cache: Storage.DETACH_THRESHOLD, useHost: true, isHidden: Site.isGmMatch() },
-      { title: "删除此站剧集选择器", cache: CURRENT_EPISODE, useHost: true, isHidden: noPicker, fn: delPicker },
+      { title: "删除此站剧集选择器", cache: Storage.CURRENT_EPISODE, useHost: true, isHidden: noPicker, fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: this.shortcutKeysPopup },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: this.settingPopup },
       // { title: "还原默认", cache: { name: "RESET" }, isHidden: false, fn: this.restoreDefaultSetting },
@@ -165,7 +163,7 @@ export default {
       { name: "memory", text: "禁用 记忆倍速", cache: Storage.NOT_CACHE_SPEED, attrs: ["send"] },
       { name: "time", text: "禁用 记忆进度", cache: Storage.NOT_CACHE_TIME },
       { name: "tabs", text: "禁用 不可见暂停", cache: Storage.IS_INVISIBLE_PAUSE },
-      { name: "tryPlay", text: "禁用 尝试自动播放", cache: Storage.DISABLE_TRY_PLAY },
+      { name: "try", text: "禁用 尝试自动播放", cache: Storage.DISABLE_TRY_PLAY },
       { name: "next", text: "启用 自动切换下集", cache: Storage.IS_AUTO_NEXT },
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEY },
     ];
@@ -201,7 +199,7 @@ export default {
     const configs = [
       { name: "step", text: "倍速步进", cache: Storage.SPEED_STEP },
       { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
-      { name: "zeroSkip", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL },
+      { name: "zero", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL },
       { name: "advance", text: "下集提前秒数", cache: Storage.NEXT_ADVANCE_SEC },
       { name: "days", text: "进度保存天数", cache: Storage.STORAGE_DAYS },
       { name: "percent", text: "缩放百分比", cache: Storage.ZOOM_PERCENT },
@@ -218,11 +216,10 @@ export default {
     return this.generateCommonItems(configs, renderItem);
   },
   genIgnoreItems() {
-    const { CUSTOM_WEB_FULL, NEXT_IGNORE_URLS, FULL_IGNORE_URLS } = Storage;
     const configs = [
-      { name: "customRule", text: "自定义此站视频容器", cache: CUSTOM_WEB_FULL, isHide: Site.isGmMatch(), useHost: true },
-      { name: "nextIgnore", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: NEXT_IGNORE_URLS },
-      { name: "fitIgnore", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: FULL_IGNORE_URLS },
+      { name: "custom", text: "自定义此站视频容器", cache: Storage.CUSTOM_WEB_FULL, isHide: Site.isGmMatch(), useHost: true },
+      { name: "nextIg", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: Storage.NEXT_IGNORE_URLS },
+      { name: "fsIg", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: Storage.FULL_IGNORE_URLS },
     ];
 
     const renderItem = ({ text, dataset, name, value }) => `
