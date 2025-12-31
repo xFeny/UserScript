@@ -183,9 +183,7 @@ export default {
   createEdgeClickElement(video) {
     if (!Storage.ENABLE_EDGE_CLICK.get()) return;
 
-    const parentNode = video.parentNode;
-    const sroot = video.getRootNode() instanceof ShadowRoot;
-    const container = sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
+    const container = this.getEdgeClickContainer(video);
 
     // 父容器未发生变化，不更新位置
     if (video.lArea?.parentNode === container) return;
@@ -215,6 +213,13 @@ export default {
     // 解构赋值批量创建边缘元素
     [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
     container.prepend(video.lArea, video.rArea);
+  },
+  getEdgeClickContainer(video) {
+    if (this.fsWrapper) return video.closest(`[part="${Consts.webFull}"]`);
+
+    const parentNode = video.parentNode;
+    const sroot = video.getRootNode() instanceof ShadowRoot;
+    return sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
   },
   removeEdgeClickElements() {
     Tools.querys(".video-edge-click").forEach((el) => (el.remove(), delete el.video.lArea, delete el.video.rArea));
