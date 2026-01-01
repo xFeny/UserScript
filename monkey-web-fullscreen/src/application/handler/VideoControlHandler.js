@@ -222,9 +222,6 @@ export default {
     !this.player.paused && this.player.pause();
     this.player.currentTime += (isPrev ? -1 : 1) / 24;
   },
-  toggleNativeControls() {
-    if (this.player) this.player.controls = !this.player.controls;
-  },
   customToast(startText, colorText, endText, duration, isRemove) {
     // 最终呈现：<span>正在以<span class="cText">1.15x</span>倍速播放</span>
     const span = document.createElement("span");

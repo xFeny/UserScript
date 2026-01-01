@@ -12,14 +12,14 @@
 | ----------- | ---------------------------- | ---------------------------- | ---------------------------- |
 | Enter | 全屏 | P | 网页全屏 |
 | N | 切换下集               | R              | 旋转 90°         |
-| Z | 恢复正常倍速           | D          | 弹幕显/隐      |
-| M | 静音切换 | K / L | 上下帧 |
-| Ctrl <b style='color:#bbb'>+</b> Z | 复位缩放移动 | Shift <b style='color:#bbb'>+</b> R | 水平镜像 |
-| Shift <b style='color:#bbb'>+</b> P | 画中画切换 | Ctrl <b style='color:#bbb'>+</b> Alt <b style='color:#bbb'>+</b> A | 截图 (默禁) |
+| M                                                            | 静音切换       | D          | 弹幕显/隐      |
+| K / L                                                        | 上下帧         | Shift <b style='color:#bbb'>+</b> R                          | 水平镜像         |
+| Shift <b style='color:#bbb'>+</b> P                          | 画中画切换     | Ctrl <b style='color:#bbb'>+</b> Z                           | 复位缩放移动     |
+| Shift <b style='color:#bbb'>+</b> E                          | 启/禁自动下集  | Ctrl <b style='color:#bbb'>+</b> Alt <b style='color:#bbb'>+</b> A | 截图 (默禁) |
 | Alt <b style='color:#bbb'>+</b> <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 缩放 (默禁)  | A / S  或  <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 倍速 ±0.25 |
-| Alt <b style='color:#bbb'>+</b> ◀️🔼🔽▶️ | 移动 (默禁) | ◀️▶️ | 快退/进 (默禁) |
-| 空格      | 播放/暂停 (默禁)         | 1️⃣ - 9️⃣ | 1️⃣ - 9️⃣ 倍速 |
-| 数字 0️⃣   | 快进 30 秒                   |                    |                    |
+| Alt <b style='color:#bbb'>+</b> ◀️🔼🔽▶️ | 移动 (默禁) | Ctrl 1️⃣~5️⃣                                                     | 预设倍速         |
+| 1️⃣~9️⃣                                                          | 1️⃣ - 9️⃣ 倍速     | 数字 0️⃣                                                       | 快进 30 秒       |
+| ◀️▶️                                                           | 快退/进 (默禁) | 空格 | 播放/暂停 (默禁) |
 
 ### 网页全屏 | 倍速
 
