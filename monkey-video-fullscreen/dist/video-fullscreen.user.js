@@ -4,7 +4,7 @@
 // @name:zh-TW         視頻網頁全屏
 // @name:en            Video webpage fullscreen
 // @namespace          npm/vite-plugin-monkey
-// @version            3.8.0
+// @version            3.8.1
 // @author             Feny
 // @description        通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可单击网页全屏
 // @description:zh     通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可单击网页全屏
@@ -333,9 +333,7 @@
       return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
     },
     createEdgeClickElement(video) {
-      const parentNode = video.parentNode;
-      const sroot = video.getRootNode() instanceof ShadowRoot;
-      const container = sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
+      const container = this.getEdgeClickContainer(video);
       if (video.lArea?.parentNode === container) return;
       if (container instanceof Element && getComputedStyle(container).position === "static") {
         Tools.setStyle(container, "position", "relative");
@@ -353,6 +351,12 @@
       };
       [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
       container.prepend(video.lArea, video.rArea);
+    },
+    getEdgeClickContainer(video) {
+      if (this.fsWrapper) return video.closest(`[part="${Consts.webFull}"]`) ?? this.fsWrapper;
+      const parentNode = video.parentNode;
+      const sroot = video.getRootNode() instanceof ShadowRoot;
+      return sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
     }
   };
   const Keydown = {

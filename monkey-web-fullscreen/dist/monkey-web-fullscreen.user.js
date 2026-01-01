@@ -2,7 +2,7 @@
 // @name               视频自动网页全屏｜倍速播放
 // @name:zh-TW         視頻自動網頁全屏｜倍速播放
 // @namespace          http://tampermonkey.net/
-// @version            3.8.0
+// @version            3.8.1
 // @author             Feny
 // @description        支持所有H5视频的增强脚本，通用网页全屏｜倍速调节，对微博 / 推特 / Instagram / Facebook等多视频平台均适用；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @description:zh-TW  支持所有H5视频的增强脚本，通用網頁全屏｜倍速調節，对微博 / 推特 / Instagram / Facebook等平臺均適用；B站(含直播) / 騰訊視頻 / 優酷 / 愛奇藝 / 芒果TV / AcFun 默認自動網頁全屏，其他網站可手動開啓；自動網頁全屏 + 記憶倍速 + 下集切換，減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
@@ -655,9 +655,7 @@
     },
     createEdgeClickElement(video) {
       if (!Storage.ENABLE_EDGE_CLICK.get()) return;
-      const parentNode = video.parentNode;
-      const sroot = video.getRootNode() instanceof ShadowRoot;
-      const container = sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
+      const container = this.getEdgeClickContainer(video);
       if (video.lArea?.parentNode === container) return;
       if (container instanceof Element && getComputedStyle(container).position === "static") {
         Tools.setStyle(container, "position", "relative");
@@ -675,6 +673,12 @@
       };
       [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
       container.prepend(video.lArea, video.rArea);
+    },
+    getEdgeClickContainer(video) {
+      if (this.fsWrapper) return video.closest(`[part="${Consts.webFull}"]`) ?? this.fsWrapper;
+      const parentNode = video.parentNode;
+      const sroot = video.getRootNode() instanceof ShadowRoot;
+      return sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
     },
     removeEdgeClickElements() {
       Tools.querys(".video-edge-click").forEach((el) => (el.remove(), delete el.video.lArea, delete el.video.rArea));
@@ -782,7 +786,6 @@
         R: () => this.rotateVideo(),
         L: () => this.freezeVideoFrame(),
         K: () => this.freezeVideoFrame(true),
-        Z: () => this.setPlaybackRate(Consts.DEF_SPEED),
         D: () => Site.isGmMatch() && this.triggerIconElement(Site.icons.danmaku),
         N: () => Site.isGmMatch() ? this.triggerIconElement(Site.icons.next) : this.switchEpisode(),
         ENTER: () => Site.isGmMatch() ? this.triggerIconElement(Site.icons.full) : this.toggleFullscreen(),
@@ -793,7 +796,6 @@
         0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
         SHIFT_P: () => this.togglePictureInPicture(),
         SHIFT_E: () => this.toggleAutoNextEnabled(),
-        SHIFT_L: () => this.toggleNativeControls(),
         CTRL_ALT_A: () => this.captureScreenshot(),
         CTRL_Z: () => this.resetVideoTransform(),
         SHIFT_R: () => this.toggleMirrorFlip(),
@@ -1053,9 +1055,6 @@
       if (!this.player) return;
       !this.player.paused && this.player.pause();
       this.player.currentTime += (isPrev ? -1 : 1) / 24;
-    },
-    toggleNativeControls() {
-      if (this.player) this.player.controls = !this.player.controls;
     },
     customToast(startText, colorText, endText, duration, isRemove) {
       const span = document.createElement("span");
@@ -1671,7 +1670,6 @@
         const host = useHost ? location.host : Consts.EMPTY;
         this[id] = _GM_registerMenuCommand(title, () => {
           if (fn) return fn.call(this, { host, cache, title });
-          Tools.log("获取值：", { value: cache.get(host), host });
           const input = prompt(title, host ? cache.get(host) : cache.get());
           if (input !== null) host ? cache.set(input, host) : cache.set(input);
         });
@@ -1685,11 +1683,9 @@
         { key: "R", desc: "旋转 90°" },
         { key: "M", desc: "静音切换" },
         { key: "D", desc: "弹幕切换" },
-        { key: "Z", desc: "正常倍速" },
         { key: "K / L", desc: "上下帧" },
         { key: "Shift R", desc: "水平镜像" },
         { key: "Shift P", desc: "画中画切换" },
-        { key: "Shift L", desc: "原生控制栏" },
         { key: "Ctrl Z", desc: "复位缩放移动" },
         { key: "Shift E", desc: "启/禁自动下集" },
         { key: "Ctrl Alt A", desc: "截图 (默禁)" },
