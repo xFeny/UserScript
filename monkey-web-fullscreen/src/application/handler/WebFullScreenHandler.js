@@ -42,15 +42,17 @@ export default {
     if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
     this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
   },
+  /**
+   * 进入网页全屏
+   * 若容器层级超过阈值，容器“脱离”原DOM结构
+   */
   enterWebFullscreen() {
     // video的宿主容器元素
     const container = (this.fsWrapper = this.getVideoHostContainer());
     if (!container || container.matches(":is(html, body)")) return this.ensureWebFullscreen();
 
-    // 进入网页全屏
+    container.scrollY = window.scrollY;
     const parents = Tools.getParents(container, true);
-    container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
-    // 父元素链的长度超过预设的阈值，视频容器“脱离”其原始DOM结构
     container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(location.host)
       ? parents.forEach((el) => {
           Tools.emitEvent("addStyle", { shadowRoot: el.getRootNode() });
