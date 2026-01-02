@@ -26,7 +26,6 @@ export default {
 
     // 进入网页全屏
     const parents = Tools.getParents(container, true);
-    container.top = container.top ?? Tools.getElementRect(container).top;
     container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
     // 父元素链的长度超过预设的阈值，视频容器“脱离”其原始DOM结构
     container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(location.host)
@@ -35,9 +34,6 @@ export default {
           Tools.setPart(el, Consts.webFull);
         })
       : this.detachForFullscreen();
-
-    // 滚动到视频容器位置，解决微博网页全屏后，在退出时不在原始位置问题
-    Tools.scrollTop(container.scrollY + container.top);
 
     // 确保网页全屏成功
     this.ensureWebFullscreen();
