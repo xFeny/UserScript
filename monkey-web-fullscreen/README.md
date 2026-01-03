@@ -278,7 +278,7 @@
 如需关闭此功能，请在脚本中注释掉以下代码：
 
 ```js
-App.autoExitWebFullscreen();
+this.autoExitWebFullscreen();
 ```
 #### 3. 记忆播放位置
 

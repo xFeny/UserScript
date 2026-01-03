@@ -19,7 +19,7 @@ declare global {
     topWin?: { host: string; urlHash: string; viewWidth: string; viewHeight: string };
 
     /**
-     * 进度显示元素
+     * 显示进度的元素
      */
     progressNode: HTMLDivElement;
 
@@ -33,7 +33,7 @@ declare global {
      */
     Clock: {
       stop: (hide: boolean) => void;
-      setContainer: (container: HTMLElement) => typeof window.App.Clock;
+      setContainer: (container: HTMLElement) => Clock;
       start: () => void;
       element: HTMLElement;
     };
@@ -58,7 +58,7 @@ declare global {
     adjustPlaybackRate(step?: number): void;
 
     /**
-     * 获取播放进度缓存的key
+     * 获取进度缓存 key
      * @param {HTMLVideoElement} video - 视频元素
      * @returns {string} 缓存key
      */
