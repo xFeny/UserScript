@@ -26,7 +26,8 @@ export default {
   },
   handleKeydown(event, { key, code, isTrusted } = event) {
     // Tools.log("键盘事件：", { key, code });
-    if (this.noVideo() || Tools.isInputable(event.composedPath()[0]) || !Object.values(Keyboard).includes(code)) return;
+    const target = event.composedPath()[0];
+    if (this.noVideo() || Tools.isInputable(target) || !Object.values(Keyboard).includes(code)) return;
 
     Tools.preventDefault(event);
     key = this.processShortcutKey(event);
