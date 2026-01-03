@@ -4,7 +4,7 @@
 // @name:zh-TW         視頻網頁全屏
 // @name:en            Video webpage fullscreen
 // @namespace          npm/vite-plugin-monkey
-// @version            3.8.1
+// @version            3.8.2
 // @author             Feny
 // @description        通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可单击网页全屏
 // @description:zh     通用(网页)全屏，快捷键：P-网页全屏，Enter-全屏；视频左右两侧可单击网页全屏
@@ -237,13 +237,6 @@
     Enter: "Enter",
     NumEnter: "NumpadEnter"
   });
-  var _GM_addValueChangeListener = /* @__PURE__ */ (() => typeof GM_addValueChangeListener != "undefined" ? GM_addValueChangeListener : void 0)();
-  var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
-  var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
-  var _GM_registerMenuCommand = /* @__PURE__ */ (() => typeof GM_registerMenuCommand != "undefined" ? GM_registerMenuCommand : void 0)();
-  var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
-  var _GM_unregisterMenuCommand = /* @__PURE__ */ (() => typeof GM_unregisterMenuCommand != "undefined" ? GM_unregisterMenuCommand : void 0)();
-  var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
   const observedValue = { isFullscreen: false, fsWrapper: null };
   const Listen = {
     noVideo: () => !window?.videoInfo,
@@ -268,29 +261,6 @@
         this.init(true), document.head.append(gmStyle.cloneNode(true));
       }).observe(document, { childList: true });
     },
-    setCurrentVideo(video) {
-      if (!video || this.player === video || video.offsetWidth < 240 || this.isBackgroundVideo(video)) return;
-      if (this.player && !this.player.paused && !isNaN(this.player.duration)) return;
-      this.player = video;
-      this.setVideoInfo(video);
-    },
-    setVideoInfo(video) {
-      const videoInfo = { ...Tools.getCenterPoint(video), isLive: video.duration === Infinity };
-      this.setParentWinVideoInfo(videoInfo);
-    },
-    setParentWinVideoInfo(videoInfo) {
-      window.videoInfo = this.videoInfo = videoInfo;
-      if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iframeSrc: location.href } });
-      Tools.microTask(() => this.setupScriptMenuCommand());
-      this.sendTopWinInfo();
-    },
-    sendTopWinInfo() {
-      const { host, href: url } = location;
-      const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
-      const topWin = { url, host, viewWidth, viewHeight };
-      window.topWin = this.topWin = topWin;
-      Tools.sendToIFrames({ topWin });
-    },
     setupFullscreenListener() {
       document.addEventListener("fullscreenchange", () => {
         const isFullscreen = !!document.fullscreenElement;
@@ -313,11 +283,7 @@
         set: (value) => {
           observedValue.fsWrapper = value;
           const method = value ? "addEventListener" : "removeEventListener";
-          try {
-            window[method]("scroll", handle, true);
-          } catch {
-            _unsafeWindow[method]("scroll", handle, true);
-          }
+          window[method]("scroll", handle, true);
         }
       });
     },
@@ -359,6 +325,13 @@
       return sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
     }
   };
+  var _GM_addValueChangeListener = /* @__PURE__ */ (() => typeof GM_addValueChangeListener != "undefined" ? GM_addValueChangeListener : void 0)();
+  var _GM_deleteValue = /* @__PURE__ */ (() => typeof GM_deleteValue != "undefined" ? GM_deleteValue : void 0)();
+  var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
+  var _GM_registerMenuCommand = /* @__PURE__ */ (() => typeof GM_registerMenuCommand != "undefined" ? GM_registerMenuCommand : void 0)();
+  var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
+  var _GM_unregisterMenuCommand = /* @__PURE__ */ (() => typeof GM_unregisterMenuCommand != "undefined" ? GM_unregisterMenuCommand : void 0)();
+  var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
   const Keydown = {
     dispatchShortcutKey(code, { isTrusted = false } = {}) {
       const key = this.processShortcutKey({ code });
@@ -379,13 +352,18 @@
       }
     },
     handleKeydown(event, { key, code, isTrusted } = event) {
-      if (this.noVideo() || Tools.isInputable(event.composedPath()[0])) return;
-      if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
+      const target = event.composedPath()[0];
+      if (this.noVideo() || Tools.isInputable(target) || !Object.values(Keyboard).includes(code)) return;
       Tools.preventDefault(event);
       key = this.processShortcutKey(event);
-      const specialKeys = [Keyboard.P, Keyboard.Enter, Keyboard.NumEnter];
-      if (specialKeys.includes(code)) return Tools.postMessage(window.top, { key, isTrusted });
-      this.processEvent({ key, isTrusted });
+      Tools.postMessage(window.top, { key, isTrusted });
+    },
+    handleMessage(data) {
+      if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
+      if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
+      if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
+      if (data?.topWin) window.topWin = this.topWin = data.topWin;
+      this.processEvent(data);
     },
     processEvent(data) {
       if (!this.player) Tools.sendToIFrames(data);
@@ -397,13 +375,6 @@
         ENTER: () => this.toggleFullscreen()
       };
       dict[key]?.();
-    },
-    handleMessage(data) {
-      if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
-      if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
-      if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
-      if (data?.topWin) window.topWin = this.topWin = data.topWin;
-      this.processEvent(data);
     }
   };
   const Events = {
@@ -436,6 +407,29 @@
       delete video.__isWide;
       Tools.resetLimit("autoWide");
       if (!Tools.isAttached(this.player)) delete this.player;
+    },
+    setCurrentVideo(video) {
+      if (!video || this.player === video || video.offsetWidth < 240 || this.isBackgroundVideo(video)) return;
+      if (this.player && !this.player.paused && !isNaN(this.player.duration)) return;
+      this.player = video;
+      this.setVideoInfo(video);
+    },
+    setVideoInfo(video) {
+      const videoInfo = { ...Tools.getCenterPoint(video), isLive: video.duration === Infinity };
+      this.setParentWinVideoInfo(videoInfo);
+    },
+    setParentWinVideoInfo(videoInfo) {
+      window.videoInfo = this.videoInfo = videoInfo;
+      if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iframeSrc: location.href } });
+      Tools.microTask(() => this.setupScriptMenuCommand());
+      this.sendTopWinInfo();
+    },
+    sendTopWinInfo() {
+      const { host, href: url } = location;
+      const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
+      const topWin = { url, host, viewWidth, viewHeight };
+      window.topWin = this.topWin = topWin;
+      Tools.sendToIFrames({ topWin });
     }
   };
   class BasicStorage {
@@ -464,9 +458,6 @@
         return this.parser(value ?? this.defVal);
       }
     }
-    del(key) {
-      this.storage.removeItem(this.#getFinalKey(key));
-    }
   }
   const Storage = {
     DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, false, Number, true),
@@ -488,14 +479,12 @@
     enterWebFullscreen() {
       const container = this.fsWrapper = this.getVideoHostContainer();
       if (!container || container.matches(":is(html, body)")) return this.ensureWebFullscreen();
+      container.scrollY = window.scrollY;
       const parents = Tools.getParents(container, true);
-      container.top = container.top ?? Tools.getElementRect(container).top;
-      container.scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
       container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(location.host) ? parents.forEach((el) => {
         Tools.emitEvent("addStyle", { shadowRoot: el.getRootNode() });
         Tools.setPart(el, Consts.webFull);
       }) : this.detachForFullscreen();
-      Tools.scrollTop(container.scrollY + container.top);
       this.ensureWebFullscreen();
     },
     detachForFullscreen() {
@@ -695,7 +684,7 @@
   const Menu = {
     isAutoSite: () => Storage.THIS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
     setupScriptMenuCommand() {
-      if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
+      if (this.hasMenu || !Tools.isTopWin()) return;
       this.setupMenuChangeListener();
       this.registMenuCommand();
       this.hasMenu = true;
