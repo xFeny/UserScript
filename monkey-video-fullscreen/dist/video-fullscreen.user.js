@@ -239,7 +239,7 @@
   });
   const observedValue = { isFullscreen: false, fsWrapper: null };
   const Listen = {
-    noVideo: () => !window?.videoInfo,
+    noVideo: () => !window.videoInfo && !window.topWin,
     isBackgroundVideo: (video) => video?.muted && video?.loop,
     getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
     init(isNonFirst = false) {
