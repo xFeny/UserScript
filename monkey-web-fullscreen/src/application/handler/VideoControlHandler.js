@@ -131,8 +131,7 @@ export default {
 
     // 判断当前是否为静音状态（同时检查 muted 和 volume）
     const isMuted = this.player.muted || !this.player.volume;
-    this.player.muted = !isMuted;
-    this.player.volume = +isMuted;
+    Object.assign(this.player, { muted: !isMuted, volume: +isMuted });
     this.showToast(isMuted ? "🔊 取消静音" : "🔇 已静音", Consts.ONE_SEC);
   },
   toggleMirrorFlip() {
