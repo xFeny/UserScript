@@ -58,8 +58,7 @@ export default {
   playToggle: (video) => (Site.isDouyu() ? video?.click() : video?.[video?.paused ? "play" : "pause"]()),
   tryPlay: (video) => video?.paused && (Site.isDouyu() ? video?.click() : video?.play()),
   setPlaybackRate(playRate, show = true) {
-    if (!this.player || isNaN(this.player.duration) || this.player.ended || this.isLive()) return;
-    if (!playRate || this.isDisRate() || +this.player.playbackRate === +playRate) return;
+    if (!playRate || !this.player || this.isLive() || this.isDisRate() || +this.player.playbackRate === +playRate) return;
 
     // 设置倍速
     VideoEnhancer.setPlaybackRate(this.player, playRate);
@@ -70,7 +69,7 @@ export default {
     return Promise.resolve();
   },
   adjustPlaybackRate(step = Storage.SPEED_STEP.get()) {
-    const playRate = Math.max(Consts.MIN_SPEED, Number(this.player.playbackRate) + step);
+    const playRate = Math.max(Consts.MIN_SPEED, +this.player.playbackRate + step);
     this.setPlaybackRate(Math.min(Consts.MAX_SPEED, playRate));
   },
   applyCachedPlayRate() {
@@ -78,16 +77,16 @@ export default {
   },
   skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
     if (!this.player || this.isLive() || this.player.ended) return;
-    this.setCurrentTime(Math.min(Number(this.player.currentTime) + second, this.player.duration));
+    this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
   },
   cachePlayTime(video) {
-    if (Tools.isThrottle("cacheTime", Consts.ONE_SEC) || Number(video.currentTime) < Storage.SKIP_INTERVAL.get()) return;
-    if (video !== this.player || !this.topWin || video.paused || video.duration < 120 || this.isLive()) return;
+    if (video !== this.player || !this.topWin || video.duration < 120 || this.isLive()) return;
+    if (Tools.isThrottle("cacheTime", Consts.ONE_SEC) || +video.currentTime < Storage.SKIP_INTERVAL.get()) return;
 
     // 禁用记忆、距离结束10秒，清除记忆缓存
     if (Storage.NOT_CACHE_TIME.get() || this.remainTime(video) <= 10) return this.clearCachedTime(video);
 
-    Storage.PLAY_TIME.set(Number(video.currentTime) - 1, this.getCacheTimeKey(video), Storage.STORAGE_DAYS.get());
+    Storage.PLAY_TIME.set(+video.currentTime - 1, this.getCacheTimeKey(video), Storage.STORAGE_DAYS.get());
     this.clearMultiVideoCacheTime(); // 清除页面内多视频的播放进度存储，如：抖音网页版
   },
   applyCachedTime(video) {
@@ -96,7 +95,7 @@ export default {
 
     // 从存储中获取该视频的缓存播放时间
     const time = Storage.PLAY_TIME.get(this.getCacheTimeKey(video));
-    if (time <= Number(video.currentTime)) return (video._mfs_hasApplyCTime = true);
+    if (time <= +video.currentTime) return (video._mfs_hasApplyCTime = true);
 
     this.setCurrentTime(time);
     video._mfs_hasApplyCTime = true;
@@ -133,7 +132,7 @@ export default {
     // 判断当前是否为静音状态（同时检查 muted 和 volume）
     const isMuted = this.player.muted || !this.player.volume;
     this.player.muted = !isMuted;
-    this.player.volume = Number(isMuted);
+    this.player.volume = +isMuted;
     this.showToast(isMuted ? "🔊 取消静音" : "🔇 已静音", Consts.ONE_SEC);
   },
   toggleMirrorFlip() {
