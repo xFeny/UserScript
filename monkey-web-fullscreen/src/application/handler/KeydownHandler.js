@@ -105,7 +105,7 @@ export default {
   handleSettMessage(data) {
     // 处理在 “更多设置” 中操作功能切换（启用/禁用）时发来的消息
     if ("sw_rateKeep" in data) this.playbackRateKeepDisplay(); // 左上角常显倍速
-    if ("sw_clockAlw" in data) this.changeTimeElementDisplay(); // 非全屏显示时间
+    if ("sw_clockAlw" in data) setTimeout(() => this.changeTimeElementDisplay(), 30); // 非全屏显示时间
     if ("sw_color" in data) this.setTimeElementColor(data.sw_color); // 时间颜色
     if ("sw_edgeClk" in data) this.removeEdgeClickElements(); // 禁用侧边触发网页全屏
 
