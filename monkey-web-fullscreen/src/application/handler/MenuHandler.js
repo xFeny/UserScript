@@ -66,7 +66,7 @@ export default {
       { key: "K / L", desc: "上下帧" },
       { key: "Shift R", desc: "水平镜像" },
       { key: "Ctrl Z", desc: "复位缩放移动" },
-      { key: "Shift E", desc: "启/禁自动下集" },
+      { key: "Shift A", desc: "启/禁自动下集" },
       { key: "Ctrl Alt A", desc: "截图 (默禁)" },
       { key: "Alt ➕ / ➖", desc: "缩放 (默禁)" },
       { key: "A / S 或 ➕ / ➖", desc: "倍速 ±0.25" },

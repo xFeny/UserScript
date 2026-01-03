@@ -6,7 +6,6 @@
 export default Object.freeze({
   A: "KeyA",
   D: "KeyD",
-  E: "KeyE",
   K: "KeyK",
   L: "KeyL",
   M: "KeyM",
