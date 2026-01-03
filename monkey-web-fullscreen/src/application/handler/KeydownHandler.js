@@ -10,12 +10,11 @@ import Keyboard from "../common/Keyboard";
 export default {
   isInputFocus: (event) => Tools.isInputable(event.composedPath()[0]),
   preventDefault(event, { code, altKey } = event) {
-    const overrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right];
-    const isNumberKey = Tools.isNumber(event.key) && !this.isDisableSpeed();
-    const isOverrideKey = this.isOverrideKey() && overrideKey.includes(code);
-    const preventKeys = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
-    const zoomKeys = !this.isDisableZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
-    if (isNumberKey || isOverrideKey || preventKeys || (altKey && zoomKeys)) Tools.preventDefault(event);
+    const isNumKeys = Tools.isNumber(event.key) && !this.isDisRate();
+    const isOverrideKeys = this.isOverrideKey() && [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
+    const isPreventKeys = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
+    const isZoomKeys = altKey && !this.isDisZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
+    if (isNumKeys || isOverrideKeys || isPreventKeys || isZoomKeys) Tools.preventDefault(event);
   },
   dispatchShortcutKey(code, { bypass = false, isTrusted = false } = {}) {
     const key = this.processShortcutKey({ code });

@@ -8,10 +8,10 @@ import Swal from "sweetalert2";
  * 脚本菜单相关逻辑处理
  */
 export default {
+  isDisRate: () => Storage.DISABLE_SPEED.get(),
   noAutoDefault: () => Storage.NO_AUTO_DEF.get(),
   isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
-  isDisableSpeed: () => Storage.DISABLE_SPEED.get(),
-  isDisableZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
+  isDisZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
   isAutoSite: () => Storage.IS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window.topWin?.host),
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;

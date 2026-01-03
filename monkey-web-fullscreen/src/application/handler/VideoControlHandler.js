@@ -59,7 +59,7 @@ export default {
   tryPlay: (video) => video?.paused && (Site.isDouyu() ? video?.click() : video?.play()),
   setPlaybackRate(playRate, show = true) {
     if (!this.player || isNaN(this.player.duration) || this.player.ended || this.isLive()) return;
-    if (!playRate || this.isDisableSpeed() || +this.player.playbackRate === +playRate) return;
+    if (!playRate || this.isDisRate() || +this.player.playbackRate === +playRate) return;
 
     // 设置倍速
     VideoEnhancer.setPlaybackRate(this.player, playRate);
@@ -154,7 +154,7 @@ export default {
     this.setTsr("--scale", scale).setTsr("--rotate", `${tsr.rotation}deg`);
   },
   zoomVideo(isDown) {
-    if (!this.player || this.isDisableZoom()) return;
+    if (!this.player || this.isDisZoom()) return;
 
     const tsr = this.player.tsr;
     const step = Storage.ZOOM_PERCENT.get();
@@ -166,7 +166,7 @@ export default {
     this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC);
   },
   moveVideoPosition(direction) {
-    if (!this.player || this.isDisableZoom()) return;
+    if (!this.player || this.isDisZoom()) return;
 
     const tsr = this.player.tsr;
     const step = Storage.MOVING_DISTANCE.get();
@@ -189,7 +189,7 @@ export default {
     this.showToast(`${desc}：${x ? tsr.moveX : tsr.moveY}px`, Consts.ONE_SEC);
   },
   resetVideoTransform() {
-    if (!this.player || this.isDisableZoom()) return;
+    if (!this.player || this.isDisZoom()) return;
 
     this.setTsr("--zoom").setTsr("--moveX").setTsr("--moveY").setTsr("--scale").setTsr("--mirror").setTsr("--rotate");
     this.player.tsr = { ...Consts.DEF_TSR };
