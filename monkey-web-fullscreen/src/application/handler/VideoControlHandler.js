@@ -57,7 +57,7 @@ export default {
   playToggle: (video) => (Site.isDouyu() ? video?.click() : video?.[video?.paused ? "play" : "pause"]()),
   tryPlay: (video) => video?.paused && (Site.isDouyu() ? video?.click() : video?.play()),
 
-  // ====================⇓⇓⇓ 播放倍速控制相关逻辑 ⇓⇓⇓====================
+  // ====================⇓⇓⇓ 调节播放倍速相关逻辑 ⇓⇓⇓====================
   delCachedRate: () => Storage.CACHED_SPEED.del(),
   setPlaybackRate(playRate, show = true) {
     if (!playRate || !this.player || this.isLive() || this.isDisRate() || +this.player.playbackRate === +playRate) return;
@@ -75,9 +75,9 @@ export default {
     this.setPlaybackRate(Math.min(Consts.MAX_SPEED, playRate));
   },
   applyCachedRate: () => (Storage.NOT_CACHE_SPEED.get() ? App.delCachedRate() : App.setPlaybackRate(Storage.CACHED_SPEED.get())),
-  // ====================⇑⇑⇑ 播放倍速控制相关逻辑 ⇑⇑⇑====================
+  // ====================⇑⇑⇑ 调节播放倍速相关逻辑 ⇑⇑⇑====================
 
-  // ====================⇓⇓⇓ 播放进度控制相关逻辑 ⇓⇓⇓====================
+  // ====================⇓⇓⇓ 调节播放进度相关逻辑 ⇓⇓⇓====================
   skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
     if (!this.player || this.isLive() || this.player.ended) return;
     this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
@@ -125,7 +125,15 @@ export default {
     const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
     if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
   },
-  // ====================⇑⇑⇑ 播放进度控制相关逻辑 ⇑⇑⇑====================
+  formatTime(seconds) {
+    if (isNaN(seconds)) return "00:00";
+
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    return [...(h ? [h] : []), m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
+  },
+  // ====================⇑⇑⇑ 调节播放进度相关逻辑 ⇑⇑⇑====================
 
   // ====================⇓⇓⇓ 视频画面变换相关逻辑 ⇓⇓⇓====================
   toggleMirrorFlip() {
@@ -186,6 +194,21 @@ export default {
     this.setTsr("--zoom").setTsr("--moveX").setTsr("--moveY").setTsr("--scale").setTsr("--mirror").setTsr("--rotate");
     this.player.tsr = { ...Consts.DEF_TSR };
   },
+  setTsr(name, value) {
+    Tools.addCls(this.player, "__tsr");
+
+    try {
+      // 默认 transform 样式
+      this.player.__trans = this.player.__trans ?? getComputedStyle(this.player)?.getPropertyValue("transform");
+      Tools.setStyle(this.player, "--deftsr", this.player.__trans);
+    } catch (e) {
+      console.error(e);
+    }
+
+    // transform 变换值
+    Tools.setStyle(this.player, name, value);
+    return this;
+  },
   // ====================⇑⇑⇑ 视频画面变换相关逻辑 ⇑⇑⇑====================
 
   toggleMute() {
@@ -242,28 +265,5 @@ export default {
       (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2, false)).prepend(el), resolve(el);
       setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.HALF_SEC)), duration);
     });
-  },
-  formatTime(seconds) {
-    if (isNaN(seconds)) return "00:00";
-
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
-    return [...(h ? [h] : []), m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
-  },
-  setTsr(name, value) {
-    Tools.addCls(this.player, "__tsr");
-
-    try {
-      // 默认 transform 样式
-      this.player.__trans = this.player.__trans ?? getComputedStyle(this.player)?.getPropertyValue("transform");
-      Tools.setStyle(this.player, "--deftsr", this.player.__trans);
-    } catch (e) {
-      console.error(e);
-    }
-
-    // transform 变换值
-    Tools.setStyle(this.player, name, value);
-    return this;
   },
 };
