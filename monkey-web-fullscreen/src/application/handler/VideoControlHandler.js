@@ -46,14 +46,14 @@ export default {
     video._mfs_hasInited = true;
 
     // ====== 应用缓存数据 ======
-    this.applyCachedPlayRate();
+    this.applyCachedRate();
     this.applyCachedTime(video);
 
     this.playbackRateKeepDisplay();
     this.setupPlayerClock();
     this.setBiliQuality();
   },
-  delCachedPlayRate: () => Storage.CACHED_SPEED.del(),
+  delCachedRate: () => Storage.CACHED_SPEED.del(),
   remainTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
   playToggle: (video) => (Site.isDouyu() ? video?.click() : video?.[video?.paused ? "play" : "pause"]()),
   tryPlay: (video) => video?.paused && (Site.isDouyu() ? video?.click() : video?.play()),
@@ -72,9 +72,7 @@ export default {
     const playRate = Math.max(Consts.MIN_SPEED, +this.player.playbackRate + step);
     this.setPlaybackRate(Math.min(Consts.MAX_SPEED, playRate));
   },
-  applyCachedPlayRate() {
-    Storage.NOT_CACHE_SPEED.get() ? this.delCachedPlayRate() : this.setPlaybackRate(Storage.CACHED_SPEED.get());
-  },
+  applyCachedRate: () => (Storage.NOT_CACHE_SPEED.get() ? App.delCachedRate() : App.setPlaybackRate(Storage.CACHED_SPEED.get())),
   skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
     if (!this.player || this.isLive() || this.player.ended) return;
     this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
@@ -104,9 +102,8 @@ export default {
       Tools.setStyle(el, "transform", `translateY(${-5 - el.offsetHeight}px)`);
     });
   },
-  clearCachedTime(video) {
-    if (this.topWin) Storage.PLAY_TIME.del(this.getCacheTimeKey(video));
-  },
+  setCurrentTime: (currentTime) => currentTime && (App.player.currentTime = Math.max(0, currentTime)),
+  clearCachedTime: (video) => App.topWin && Storage.PLAY_TIME.del(App.getCacheTimeKey(video)),
   getCacheTimeKey(video, { duration, __duration } = video) {
     if (video._mfs_cacheTKey) return video._mfs_cacheTKey;
 
@@ -122,9 +119,6 @@ export default {
     const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
     const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
     if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
-  },
-  setCurrentTime(currentTime) {
-    if (currentTime) this.player.currentTime = Math.max(0, currentTime);
   },
   toggleMute() {
     if (!this.player) return;

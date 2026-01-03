@@ -40,10 +40,7 @@ export default {
     const target = list.find((quality) => quality === 80) ?? list[0];
     if (current !== target) unsafeWindow.player.requestQuality(target);
   },
-  shouldHideTime() {
-    const isFull = this.isFullscreen;
-    return (isFull && Storage.DISABLE_CLOCK.get()) || (!isFull && !Storage.PAGE_CLOCK.get());
-  },
+  shouldHideTime: () => (App.isFullscreen && Storage.DISABLE_CLOCK.get()) || (!App.isFullscreen && !Storage.PAGE_CLOCK.get()),
   async setupPlayerClock() {
     if (!this.player || this.shouldHideTime()) return this.Clock?.stop(true);
     if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(this.player.parentNode).start();
@@ -78,9 +75,7 @@ export default {
 
     return element;
   },
-  removeProgressElement() {
-    this.progressNode?.remove();
-  },
+  removeProgressElement: () => App.progressNode?.remove(),
   playbackRateKeepDisplay() {
     if (!this.player || this.isLive()) return;
     if (!Storage.RATE_KEEP_SHOW.get()) return this.removeRateKeepDisplay();
@@ -93,23 +88,17 @@ export default {
     if (Tools.isOverLimit("rateKeep") || document.contains(this.rateKeepElement)) return;
     this.playbackRateKeepDisplay();
   },
-  removeRateKeepDisplay() {
-    this.rateKeepElement?.remove();
-  },
+  removeRateKeepDisplay: () => App.rateKeepElement?.remove(),
   createDisplayElement(clss, color) {
     const element = Tools.createElement("div", { className: clss, style: `color: ${color}` });
     this.prependElement(element);
     return element;
   },
-  prependElement(element, target) {
-    const container = target ?? this.player?.parentNode;
+  prependElement(element) {
+    const container = this.player?.parentNode;
     if (element && !container?.contains(element)) container?.prepend(element);
   },
-  setTimeElementColor(color) {
-    Tools.setStyle([this.progressNode, this.Clock?.element], "color", color);
-  },
-  changeTimeElementDisplay() {
-    this.setupPlayerClock(), this.videoProgress(this.player, true);
-  },
+  changeTimeElementDisplay: () => (App.setupPlayerClock(), App.videoProgress(App.player, true)),
+  setTimeElementColor: (color) => Tools.setStyle([App.progressNode, App.Clock?.element], "color", color),
   hideLoadingElement: () => Tools.querys("#loading").forEach((el) => !Tools.query("video", el) && Tools.addCls(el, "hide")),
 };

@@ -109,7 +109,7 @@ export default {
     if ("sw_color" in data) this.setTimeElementColor(data.sw_color); // 时间颜色
     if ("sw_edgeClk" in data) this.removeEdgeClickElements(); // 禁用侧边触发网页全屏
 
-    if (data?.sw_memory) this.delCachedPlayRate(); // 禁用记忆倍速
+    if (data?.sw_memory) this.delCachedRate(); // 禁用记忆倍速
     if (data?.sw_zoom) this.resetVideoTransform(); // 禁用缩放
     if (data?.sw_speed) this.setPlaybackRate(Consts.DEF_SPEED); // 禁用倍速调节
   },
