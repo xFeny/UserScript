@@ -66,6 +66,8 @@ export default {
     });
   },
   // ====================⇑⇑⇑ 全屏状态变换时处理相关逻辑 ⇑⇑⇑====================
+
+  // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
   setupMouseMoveListener() {
     const handle = ({ type, clientX, clientY }) => {
       if (Tools.isThrottle(type, 300)) return;
