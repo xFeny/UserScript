@@ -19,7 +19,7 @@ export default {
     this.jumpToTargetEpisode(targetEpisode);
   },
   getCurrentEpisode() {
-    return Storage.RELATIVE_EPISODE.get(location.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
+    return Storage.RELATIVE_EPISODE.get(this.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
   },
   getCurrentEpisodeByLink() {
     const { pathname, search } = location;

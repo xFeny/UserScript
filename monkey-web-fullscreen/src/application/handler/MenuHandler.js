@@ -20,13 +20,12 @@ export default {
     this.hasMenu = true;
   },
   setupMenuChangeListener() {
-    const host = location.host;
-    [Storage.IS_SITE_AUTO.name + host, Storage.CURRENT_EPISODE.name + host].forEach((key) =>
+    [Storage.IS_SITE_AUTO.name + this.host, Storage.CURRENT_EPISODE.name + this.host].forEach((key) =>
       GM_addValueChangeListener(key, () => this.registMenuCommand())
     );
   },
   registMenuCommand() {
-    const noPicker = !Storage.CURRENT_EPISODE.get(location.host);
+    const noPicker = !Storage.CURRENT_EPISODE.get(this.host);
     const siteTitle = `此站${this.isAutoSite() ? "禁" : "启"}用自动网页全屏`;
     const siteFun = ({ host, cache }) => cache.set(!cache.get(host), host);
     const delPicker = ({ host }) => Storage.CURRENT_EPISODE.del(host) & Storage.RELATIVE_EPISODE.del(host);
@@ -46,7 +45,7 @@ export default {
       GM_unregisterMenuCommand(this[id]);
       if (isHidden) return;
 
-      const host = useHost ? location.host : Consts.EMPTY;
+      const host = useHost ? this.host : Consts.EMPTY;
       this[id] = GM_registerMenuCommand(title, () => {
         if (fn) return fn.call(this, { host, cache, title }); // 自定义逻辑
 
@@ -229,11 +228,11 @@ export default {
     const filteredConfigs = baseConfigs.filter(({ isHide }) => !isHide);
     const processedConfigs = filteredConfigs.map((config) => {
       const { cache, attrs = [], useHost } = config;
-      const host = useHost ? location.host : Consts.EMPTY;
-      const value = useHost ? cache.get(location.host) : cache.get();
+      const host = useHost ? this.host : Consts.EMPTY;
+      const value = useHost ? cache.get(this.host) : cache.get();
 
       if (useHost && !attrs.includes("host")) attrs.push("host");
-      return { ...config, host, value, dataset: getDataset(attrs, location.host) };
+      return { ...config, host, value, dataset: getDataset(attrs, this.host) };
     });
 
     // 生成HTML字符串

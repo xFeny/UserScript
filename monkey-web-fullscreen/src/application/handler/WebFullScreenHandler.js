@@ -53,7 +53,7 @@ export default {
 
     container.scrollY = window.scrollY;
     const parents = Tools.getParents(container, true);
-    container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(location.host)
+    container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(this.host)
       ? parents.forEach((el) => {
           Tools.emitEvent("addStyle", { shadowRoot: el.getRootNode() });
           Tools.setPart(el, Consts.webFull);

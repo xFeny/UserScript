@@ -23,8 +23,8 @@ export default {
       if (!Tools.isTopWin()) return Tools.notyf("此页面不能抓取 (•ิ_•ิ)?", true);
       Tools.preventDefault(event);
 
-      const hasCurrentSelector = Storage.CURRENT_EPISODE.get(location.host);
-      const hasRelativeSelector = Storage.RELATIVE_EPISODE.get(location.host);
+      const hasCurrentSelector = Storage.CURRENT_EPISODE.get(this.host);
+      const hasRelativeSelector = Storage.RELATIVE_EPISODE.get(this.host);
       if (hasCurrentSelector && hasRelativeSelector) return Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
 
       const number = this.getEpisodeNumber(target);
@@ -36,7 +36,7 @@ export default {
     document.addEventListener("click", handle, true);
   },
   pickerCurrentEpisodeChain(element) {
-    if (Storage.CURRENT_EPISODE.get(location.host)) return;
+    if (Storage.CURRENT_EPISODE.get(this.host)) return;
     this.pickerEpisodePopup(element, {
       validBtnCallback(value) {
         try {
@@ -48,13 +48,13 @@ export default {
         }
       },
       confirmCallback(value) {
-        Storage.CURRENT_EPISODE.set(value, location.host);
+        Storage.CURRENT_EPISODE.set(value, this.host);
         Tools.notyf("继续拾取元素 ＼(＞０＜)／");
       },
     });
   },
   pickerRelativeEpisodeChain(element) {
-    if (Storage.RELATIVE_EPISODE.get(location.host)) return;
+    if (Storage.RELATIVE_EPISODE.get(this.host)) return;
     this.pickerEpisodePopup(element, {
       validBtnCallback(value) {
         try {
@@ -67,7 +67,7 @@ export default {
         }
       },
       confirmCallback(value) {
-        Storage.RELATIVE_EPISODE.set(value, location.host);
+        Storage.RELATIVE_EPISODE.set(value, this.host);
         Tools.notyf("操作完成 []~(￣▽￣)~* 干杯");
       },
     });
@@ -78,8 +78,8 @@ export default {
   },
   getCurrentEpisodeBySelector() {
     const num = this.getCurrentEpisodeNumber();
-    const current = this.getEpisodeWrapper(Tools.query(Storage.CURRENT_EPISODE.get(location.host)));
-    const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(Storage.RELATIVE_EPISODE.get(location.host))));
+    const current = this.getEpisodeWrapper(Tools.query(Storage.CURRENT_EPISODE.get(this.host)));
+    const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(Storage.RELATIVE_EPISODE.get(this.host))));
     return episodes.includes(current) ? current : episodes.find((el) => this.getEpisodeNumber(el) === num);
   },
   pickerEpisodePopup(element, { validBtnCallback, confirmCallback }) {
