@@ -31,6 +31,15 @@ export default {
     this.setupShadowVideoListeners();
     this.setupLoadEventListener();
   },
+  setupVisibleListener() {
+    window.addEventListener("visibilitychange", () => {
+      if (this.noVideo() || Storage.IS_INVISIBLE_PAUSE.get()) return;
+
+      const video = this.player ?? this.getVideo();
+      if (!video || video.ended || !Tools.isVisible(video)) return;
+      document.hidden ? video.pause() : video.play();
+    });
+  },
   /**
    * 解决 document.write 导致监听失效问题
    * 网站：https://nkvod.me、https://www.lkvod.com
@@ -40,15 +49,6 @@ export default {
       if (this.docElement === document.documentElement) return;
       this.init(true), document.head.append(gmStyle.cloneNode(true));
     }).observe(document, { childList: true });
-  },
-  setupVisibleListener() {
-    window.addEventListener("visibilitychange", () => {
-      if (this.noVideo() || Storage.IS_INVISIBLE_PAUSE.get()) return;
-
-      const video = this.player ?? this.getVideo();
-      if (!video || video.ended || !Tools.isVisible(video)) return;
-      document.hidden ? video.pause() : video.play();
-    });
   },
   setupVideoDetector() {
     this.docElement = document.documentElement;
@@ -62,6 +62,7 @@ export default {
     });
     this.obsTimer = setTimeout(() => this.obsDoc?.disconnect(), Consts.ONE_SEC * 5);
   },
+  // ====================⇓⇓⇓ 设置当前视频相关逻辑 ⇓⇓⇓====================
   setCurrentVideo(video) {
     if (!video || this.player === video || video.offsetWidth < 260 || this.isBackgroundVideo(video)) return;
     if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // this.player 播放中
@@ -105,32 +106,9 @@ export default {
       },
     });
   },
-  setupMouseMoveListener() {
-    let timer = null;
-    const handle = ({ type, clientX, clientY }) => {
-      if (Tools.isThrottle(type, 300)) return;
+  // ====================⇑⇑⇑ 设置当前视频相关逻辑 ⇑⇑⇑====================
 
-      // 有视频信息时才切换鼠标光标的显隐
-      if (!this.noVideo()) {
-        clearTimeout(timer), this.toggleCursor();
-        timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
-      }
-
-      // 是否创建侧边双击网页全屏元素
-      if (!Storage.ENABLE_EDGE_CLICK.get()) return;
-      const video = this.getVideoForCoordinate(clientX, clientY);
-      video && this.createEdgeClickElement(video);
-    };
-
-    document.addEventListener("mousemove", handle, { passive: true });
-  },
-  toggleCursor(hide = false, cls = "__hc") {
-    if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
-
-    [...Tools.getParents(this.player, true, 3), ...Tools.getIFrames()].forEach((el) => {
-      el?.blur(), Tools.addCls(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
-    });
-  },
+  // ====================⇓⇓⇓ 全屏状态变换时处理相关逻辑 ⇓⇓⇓====================
   setupFullscreenListener() {
     document.addEventListener("fullscreenchange", () => {
       const isFullscreen = !!document.fullscreenElement;
@@ -171,6 +149,36 @@ export default {
       },
     });
   },
+  // ====================⇑⇑⇑ 全屏状态变换时处理相关逻辑 ⇑⇑⇑====================
+
+  // ====================⇓⇓⇓ 鼠标移动监听相关逻辑 ⇓⇓⇓====================
+  setupMouseMoveListener() {
+    let timer = null;
+    const handle = ({ type, clientX, clientY }) => {
+      if (Tools.isThrottle(type, 300)) return;
+
+      // 有视频信息时才切换鼠标光标的显隐
+      if (!this.noVideo()) {
+        clearTimeout(timer), this.toggleCursor();
+        timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
+      }
+
+      // 是否创建侧边双击网页全屏元素
+      if (!Storage.ENABLE_EDGE_CLICK.get()) return;
+      const video = this.getVideoForCoordinate(clientX, clientY);
+      video && this.createEdgeClickElement(video);
+    };
+
+    document.addEventListener("mousemove", handle, { passive: true });
+  },
+  toggleCursor(hide = false, cls = "__hc") {
+    if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
+
+    [...Tools.getParents(this.player, true, 3), ...Tools.getIFrames()].forEach((el) => {
+      el?.blur(), Tools.addCls(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
+    });
+  },
+  // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
   getVideoForCoordinate(clientX, clientY) {
     return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
   },
@@ -218,4 +226,5 @@ export default {
   removeEdgeClickElements() {
     Tools.querys(".video-edge-click").forEach((el) => (el.remove(), delete el.video.lArea, delete el.video.rArea));
   },
+  // ====================⇑⇑⇑ 侧边点击相关逻辑 ⇑⇑⇑====================
 };

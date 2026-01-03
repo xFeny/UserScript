@@ -36,31 +36,7 @@ export default {
       this.init(true), document.head.append(gmStyle.cloneNode(true));
     }).observe(document, { childList: true });
   },
-  setCurrentVideo(video) {
-    if (!video || this.player === video || video.offsetWidth < 240 || this.isBackgroundVideo(video)) return;
-    if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // this.player 播放中
-
-    this.player = video;
-    this.setVideoInfo(video);
-  },
-  setVideoInfo(video) {
-    const videoInfo = { ...Tools.getCenterPoint(video), isLive: video.duration === Infinity };
-    this.setParentWinVideoInfo(videoInfo);
-  },
-  setParentWinVideoInfo(videoInfo) {
-    window.videoInfo = this.videoInfo = videoInfo;
-    if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iframeSrc: location.href } });
-    Tools.microTask(() => this.setupScriptMenuCommand());
-    this.sendTopWinInfo();
-  },
-  sendTopWinInfo() {
-    // 向iframe传递顶级窗口信息
-    const { host, href: url } = location;
-    const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
-    const topWin = { url, host, viewWidth, viewHeight };
-    window.topWin = this.topWin = topWin;
-    Tools.sendToIFrames({ topWin });
-  },
+  // ====================⇓⇓⇓ 全屏状态变换时处理相关逻辑 ⇓⇓⇓====================
   setupFullscreenListener() {
     document.addEventListener("fullscreenchange", () => {
       const isFullscreen = !!document.fullscreenElement;
@@ -89,6 +65,7 @@ export default {
       },
     });
   },
+  // ====================⇑⇑⇑ 全屏状态变换时处理相关逻辑 ⇑⇑⇑====================
   setupMouseMoveListener() {
     const handle = ({ type, clientX, clientY }) => {
       if (Tools.isThrottle(type, 300)) return;

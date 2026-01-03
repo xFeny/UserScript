@@ -53,10 +53,12 @@ export default {
     this.setupPlayerClock();
     this.setBiliQuality();
   },
-  delCachedRate: () => Storage.CACHED_SPEED.del(),
   remainTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
   playToggle: (video) => (Site.isDouyu() ? video?.click() : video?.[video?.paused ? "play" : "pause"]()),
   tryPlay: (video) => video?.paused && (Site.isDouyu() ? video?.click() : video?.play()),
+
+  // ====================⇓⇓⇓ 播放倍速控制相关逻辑 ⇓⇓⇓====================
+  delCachedRate: () => Storage.CACHED_SPEED.del(),
   setPlaybackRate(playRate, show = true) {
     if (!playRate || !this.player || this.isLive() || this.isDisRate() || +this.player.playbackRate === +playRate) return;
 
@@ -73,6 +75,9 @@ export default {
     this.setPlaybackRate(Math.min(Consts.MAX_SPEED, playRate));
   },
   applyCachedRate: () => (Storage.NOT_CACHE_SPEED.get() ? App.delCachedRate() : App.setPlaybackRate(Storage.CACHED_SPEED.get())),
+  // ====================⇑⇑⇑ 播放倍速控制相关逻辑 ⇑⇑⇑====================
+
+  // ====================⇓⇓⇓ 播放进度控制相关逻辑 ⇓⇓⇓====================
   skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
     if (!this.player || this.isLive() || this.player.ended) return;
     this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
@@ -120,14 +125,9 @@ export default {
     const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
     if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
   },
-  toggleMute() {
-    if (!this.player) return;
+  // ====================⇑⇑⇑ 播放进度控制相关逻辑 ⇑⇑⇑====================
 
-    // 判断当前是否为静音状态（同时检查 muted 和 volume）
-    const isMuted = this.player.muted || !this.player.volume;
-    Object.assign(this.player, { muted: !isMuted, volume: +isMuted });
-    this.showToast(isMuted ? "🔊 取消静音" : "🔇 已静音", Consts.ONE_SEC);
-  },
+  // ====================⇓⇓⇓ 视频画面变换相关逻辑 ⇓⇓⇓====================
   toggleMirrorFlip() {
     if (!this.player) return;
 
@@ -186,6 +186,16 @@ export default {
     this.setTsr("--zoom").setTsr("--moveX").setTsr("--moveY").setTsr("--scale").setTsr("--mirror").setTsr("--rotate");
     this.player.tsr = { ...Consts.DEF_TSR };
   },
+  // ====================⇑⇑⇑ 视频画面变换相关逻辑 ⇑⇑⇑====================
+
+  toggleMute() {
+    if (!this.player) return;
+
+    // 判断当前是否为静音状态（同时检查 muted 和 volume）
+    const isMuted = this.player.muted || !this.player.volume;
+    Object.assign(this.player, { muted: !isMuted, volume: +isMuted });
+    this.showToast(isMuted ? "🔊 取消静音" : "🔇 已静音", Consts.ONE_SEC);
+  },
   async captureScreenshot() {
     if (!this.player || Storage.DISABLE_SCREENSHOT.get()) return;
 
@@ -210,6 +220,11 @@ export default {
     if (!this.player) return;
     !this.player.paused && this.player.pause();
     this.player.currentTime += (isPrev ? -1 : 1) / 24;
+  },
+  toggleAutoNextEnabled() {
+    const status = !Storage.IS_AUTO_NEXT.get();
+    Storage.IS_AUTO_NEXT.set(status);
+    this.showToast(`已${status ? "启" : "禁"}用自动切换下集`);
   },
   customToast(startText, colorText, endText, duration, isRemove) {
     // 最终呈现：<span>正在以<span class="cText">1.15x</span>倍速播放</span>
@@ -250,10 +265,5 @@ export default {
     // transform 变换值
     Tools.setStyle(this.player, name, value);
     return this;
-  },
-  toggleAutoNextEnabled() {
-    const status = !Storage.IS_AUTO_NEXT.get();
-    Storage.IS_AUTO_NEXT.set(status);
-    this.showToast(`已${status ? "启" : "禁"}用自动切换下集`);
   },
 };

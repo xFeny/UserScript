@@ -63,12 +63,4 @@ export default class BasicStorage {
       return this.parser(value ?? this.defVal);
     }
   }
-
-  /**
-   * 删除指定键名的数据
-   * @param {string} [key] 键名后缀（可选，不传则删除基础名对应数据）
-   */
-  del(key) {
-    this.storage.removeItem(this.#getFinalKey(key));
-  }
 }

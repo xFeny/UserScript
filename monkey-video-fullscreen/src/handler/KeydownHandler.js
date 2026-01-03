@@ -26,14 +26,21 @@ export default {
   },
   handleKeydown(event, { key, code, isTrusted } = event) {
     // Tools.log("键盘事件：", { key, code });
-    if (this.noVideo() || Tools.isInputable(event.composedPath()[0])) return;
-    if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
+    if (this.noVideo() || Tools.isInputable(event.composedPath()[0]) || !Object.values(Keyboard).includes(code)) return;
 
     Tools.preventDefault(event);
     key = this.processShortcutKey(event);
-    const specialKeys = [Keyboard.P, Keyboard.Enter, Keyboard.NumEnter];
-    if (specialKeys.includes(code)) return Tools.postMessage(window.top, { key, isTrusted });
-    this.processEvent({ key, isTrusted });
+    Tools.postMessage(window.top, { key, isTrusted });
+  },
+  handleMessage(data) {
+    // Tools.log(location.href, "接收到消息：", data);
+    if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
+    if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
+    if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
+    if (data?.topWin) window.topWin = this.topWin = data.topWin;
+
+    // 处理键盘按键消息和继续分发消息
+    this.processEvent(data);
   },
   processEvent(data) {
     // video在iframe中，向iframe传递事件
@@ -49,15 +56,5 @@ export default {
 
     // 执行函数
     dict[key]?.();
-  },
-  handleMessage(data) {
-    // Tools.log(location.href, "接收到消息：", data);
-    if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
-    if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
-    if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
-    if (data?.topWin) window.topWin = this.topWin = data.topWin;
-
-    // 处理键盘按键消息和继续分发消息
-    this.processEvent(data);
   },
 };

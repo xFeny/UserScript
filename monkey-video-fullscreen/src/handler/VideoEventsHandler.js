@@ -18,6 +18,7 @@ export default {
       if (!this.player) this.setCurrentVideo(video);
     });
   },
+  // ====================⇓⇓⇓ 视频监听事件相关逻辑 ⇓⇓⇓====================
   loadedmetadata(video) {
     this.initVideoProps(video);
     if (!this.player) this.playing(video);
@@ -33,5 +34,33 @@ export default {
     delete video.__isWide;
     Tools.resetLimit("autoWide");
     if (!Tools.isAttached(this.player)) delete this.player;
+  },
+  // ====================⇑⇑⇑ 视频监听事件相关逻辑 ⇑⇑⇑====================
+
+  // ====================⇓⇓⇓ 设置当前视频相关逻辑 ⇓⇓⇓====================
+  setCurrentVideo(video) {
+    if (!video || this.player === video || video.offsetWidth < 240 || this.isBackgroundVideo(video)) return;
+    if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // this.player 播放中
+
+    this.player = video;
+    this.setVideoInfo(video);
+  },
+  setVideoInfo(video) {
+    const videoInfo = { ...Tools.getCenterPoint(video), isLive: video.duration === Infinity };
+    this.setParentWinVideoInfo(videoInfo);
+  },
+  setParentWinVideoInfo(videoInfo) {
+    window.videoInfo = this.videoInfo = videoInfo;
+    if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iframeSrc: location.href } });
+    Tools.microTask(() => this.setupScriptMenuCommand());
+    this.sendTopWinInfo();
+  },
+  sendTopWinInfo() {
+    // 向iframe传递顶级窗口信息
+    const { host, href: url } = location;
+    const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
+    const topWin = { url, host, viewWidth, viewHeight };
+    window.topWin = this.topWin = topWin;
+    Tools.sendToIFrames({ topWin });
   },
 };

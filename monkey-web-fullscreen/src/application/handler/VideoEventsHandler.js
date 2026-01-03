@@ -23,6 +23,7 @@ export default {
       if (!this.player) this.setCurrentVideo(video);
     });
   },
+  // ====================⇓⇓⇓ 视频监听事件相关逻辑 ⇓⇓⇓====================
   loadedmetadata(video) {
     if (video.matches("fake-video")) this.loadeddata(video);
     if (!this.player) this.setCurrentVideo(video);
