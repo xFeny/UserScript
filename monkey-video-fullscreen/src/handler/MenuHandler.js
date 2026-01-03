@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 export default {
   isAutoSite: () => Storage.THIS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
   setupScriptMenuCommand() {
-    if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
+    if (this.hasMenu || !Tools.isTopWin()) return;
     this.setupMenuChangeListener();
     this.registMenuCommand();
     this.hasMenu = true;

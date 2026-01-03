@@ -35,12 +35,7 @@ const include = [
   "*://www.instagram.com/*",
   "*://www.dailymotion.com/*",
   "*://geo.dailymotion.com/*",
-  "*://www.ezdmw.site/Index/video/*",
-  "*://player.ezdmw.com/danmuku/*",
   "*://pages.iqiyi.com/p/zy/*",
-  "*://*bimiacg*.net/*/play*",
-  "*://acgfta.com/play*",
-  "*://ppoft.com/play*",
 ];
 
 const description = [
