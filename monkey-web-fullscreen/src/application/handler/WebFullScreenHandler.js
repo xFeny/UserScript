@@ -106,11 +106,11 @@ export default {
 
     // 与video中心点相交的iframe
     const ifrs = Tools.getIFrames();
-    const { centerX, centerY } = this?.videoInfo ?? {};
+    const { centerX, centerY } = this.videoInfo ?? {};
     return ifrs.length <= 1 ? ifrs[0] : ifrs.find((el) => Tools.isVisible(el) && Tools.pointInElement(centerX, centerY, el));
   },
   getVideoIFrame() {
-    if (!this?.videoInfo?.iframeSrc) return null;
+    if (!this.videoInfo?.iframeSrc) return null;
 
     const { pathname, search } = new URL(this.videoInfo.iframeSrc);
     const decoded = decodeURI(search); // 先解码得到实际字符串

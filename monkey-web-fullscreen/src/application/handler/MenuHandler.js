@@ -12,7 +12,7 @@ export default {
   isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
   isDisableSpeed: () => Storage.DISABLE_SPEED.get(),
   isDisableZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
-  isAutoSite: () => Storage.IS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
+  isAutoSite: () => Storage.IS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window.topWin?.host),
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
     this.setupMenuChangeListener();
