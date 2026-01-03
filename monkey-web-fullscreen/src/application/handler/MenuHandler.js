@@ -13,7 +13,6 @@ export default {
   isDisableSpeed: () => Storage.DISABLE_SPEED.get(),
   isDisableZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
   isAutoSite: () => Storage.IS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
-  restoreDefaultSetting: () => GM_listValues().forEach((key) => GM_deleteValue(key)),
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin() || Tools.isFrequent("menu")) return;
     this.setupMenuChangeListener();
@@ -39,7 +38,6 @@ export default {
       { title: "删除此站剧集选择器", cache: Storage.CURRENT_EPISODE, useHost: true, isHidden: noPicker, fn: delPicker },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: this.shortcutKeysPopup },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: this.settingPopup },
-      // { title: "还原默认", cache: { name: "RESET" }, isHidden: false, fn: this.restoreDefaultSetting },
     ];
 
     // 注册菜单项
@@ -68,7 +66,6 @@ export default {
       { key: "D", desc: "弹幕切换" },
       { key: "K / L", desc: "上下帧" },
       { key: "Shift R", desc: "水平镜像" },
-      { key: "Shift P", desc: "画中画切换" },
       { key: "Ctrl Z", desc: "复位缩放移动" },
       { key: "Shift E", desc: "启/禁自动下集" },
       { key: "Ctrl Alt A", desc: "截图 (默禁)" },

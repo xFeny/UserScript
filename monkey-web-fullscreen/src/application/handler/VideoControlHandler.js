@@ -136,9 +136,6 @@ export default {
     this.player.volume = Number(isMuted);
     this.showToast(isMuted ? "🔊 取消静音" : "🔇 已静音", Consts.ONE_SEC);
   },
-  togglePictureInPicture() {
-    if (this.player) document.pictureInPictureElement ? document.exitPictureInPicture() : this.player?.requestPictureInPicture();
-  },
   toggleMirrorFlip() {
     if (!this.player) return;
 

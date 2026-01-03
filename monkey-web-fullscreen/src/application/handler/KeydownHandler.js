@@ -69,7 +69,6 @@ export default {
       RIGHT: () => (bypass || this.isOverrideKey()) && this.skipPlayback(Storage.SKIP_INTERVAL.get()),
       SPACE: () => (bypass || this.isOverrideKey()) && this.playToggle(this.player),
       0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
-      SHIFT_P: () => this.togglePictureInPicture(),
       SHIFT_E: () => this.toggleAutoNextEnabled(),
       CTRL_ALT_A: () => this.captureScreenshot(),
       CTRL_Z: () => this.resetVideoTransform(),
