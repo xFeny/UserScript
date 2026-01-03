@@ -58,23 +58,22 @@ export default {
   tryPlay: (video) => video?.paused && (Site.isDouyu() ? video?.click() : video?.play()),
 
   // ====================⇓⇓⇓ 调节播放倍速相关逻辑 ⇓⇓⇓====================
-  delCachedRate: () => Storage.CACHED_SPEED.del(),
-  setPlaybackRate(playRate, show = true) {
+  setPlaybackRate(playRate) {
     if (!playRate || !this.player || this.isLive() || this.isDisRate() || +this.player.playbackRate === +playRate) return;
 
     // 设置倍速
     VideoEnhancer.setPlaybackRate(this.player, playRate);
-    if (show) this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
+    this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
     this.playbackRateKeepDisplay(); // 倍速始终显示
 
     if (!Storage.NOT_CACHE_SPEED.get()) Storage.CACHED_SPEED.set(this.player.playbackRate);
-    return Promise.resolve();
   },
   adjustPlaybackRate(step = Storage.SPEED_STEP.get()) {
     const playRate = Math.max(Consts.MIN_SPEED, +this.player.playbackRate + step);
     this.setPlaybackRate(Math.min(Consts.MAX_SPEED, playRate));
   },
   applyCachedRate: () => (Storage.NOT_CACHE_SPEED.get() ? App.delCachedRate() : App.setPlaybackRate(Storage.CACHED_SPEED.get())),
+  delCachedRate: () => Storage.CACHED_SPEED.del(),
   // ====================⇑⇑⇑ 调节播放倍速相关逻辑 ⇑⇑⇑====================
 
   // ====================⇓⇓⇓ 调节播放进度相关逻辑 ⇓⇓⇓====================
