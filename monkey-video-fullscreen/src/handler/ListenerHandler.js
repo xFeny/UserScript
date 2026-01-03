@@ -85,11 +85,7 @@ export default {
       set: (value) => {
         observedValue.fsWrapper = value;
         const method = value ? "addEventListener" : "removeEventListener";
-        try {
-          window[method]("scroll", handle, true);
-        } catch {
-          unsafeWindow[method]("scroll", handle, true);
-        }
+        window[method]("scroll", handle, true);
       },
     });
   },

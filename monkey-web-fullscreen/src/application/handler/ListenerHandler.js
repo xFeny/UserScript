@@ -160,21 +160,14 @@ export default {
     const handle = (event, { code, type } = event) => {
       if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
       if (this.isInputFocus(event) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
-      if (type === "keyup") return Tools.preventDefault(event); // 防止 keyup 事件触发
-      Tools.preventDefault(event), this.dispatchShortcutKey(code, { bypass: true });
+      Tools.preventDefault(event), Object.is(type, "keydown") && this.dispatchShortcutKey(code, { bypass: true });
     };
     Object.defineProperty(this, "fsWrapper", {
       get: () => observedValue.fsWrapper,
       set: (value) => {
         observedValue.fsWrapper = value;
         const method = value ? "addEventListener" : "removeEventListener";
-        ["scroll", "keyup", "keydown"].forEach((type) => {
-          try {
-            window[method](type, handle, true);
-          } catch {
-            unsafeWindow[method](type, handle, true);
-          }
-        });
+        ["scroll", "keyup", "keydown"].forEach((type) => window[method](type, handle, true));
       },
     });
   },
