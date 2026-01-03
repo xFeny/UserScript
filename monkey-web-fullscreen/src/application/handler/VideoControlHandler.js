@@ -38,7 +38,7 @@ export default {
     Tools.resetLimit("rateKeep", "autoWide");
 
     // 移除相关的自定义元素
-    this.removeRateKeepDisplay(video);
+    this.removeRateKeepDisplay();
     this.removeProgressElement();
   },
   initVideoPlay(video) {
