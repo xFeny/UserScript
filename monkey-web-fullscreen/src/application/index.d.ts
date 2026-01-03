@@ -33,7 +33,7 @@ declare global {
      */
     Clock: {
       stop: (hide: boolean) => void;
-      setContainer: (container: HTMLElement) => Clock;
+      setContainer: (container: HTMLElement) => any;
       start: () => void;
       element: HTMLElement;
     };
