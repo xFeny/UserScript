@@ -84,14 +84,14 @@ export default {
     const { scrollY } = this.fsWrapper;
 
     // 临时禁用平滑滚动：为了确保接下来的滚动操作是瞬间完成的（无动画）
-    Tools.setStyle(document.documentElement, "scroll-behavior", "auto", "important");
+    Tools.setStyle(this.docElement, "scroll-behavior", "auto", "important");
 
     // 是脱离原结构式网页全屏时，将视频容器还原到它原来的DOM位置
     if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
     Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
 
     // 滚动到全屏前位置、恢复默认滚动效果
-    requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(document.documentElement, "scroll-behavior")));
+    requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(this.docElement, "scroll-behavior")));
 
     // 清理相关变量
     this.videoParents.clear();
