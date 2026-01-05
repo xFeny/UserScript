@@ -42,12 +42,6 @@ export default defineConfig({
         ],
       },
       build: {
-        externalGlobals: {
-          sweetalert2: cdn.unpkg("sweetalert2", "dist/sweetalert2.min.js").concat(util.dataUrl(";window.sweetalert2=Swal;")),
-        },
-        externalResource: {
-          "sweetalert2/dist/sweetalert2.min.css": cdn.unpkg("sweetalert2"),
-        },
         cssSideEffects: () => {
           return (cssText) => {
             const styleAdded = Symbol("styleAdded");

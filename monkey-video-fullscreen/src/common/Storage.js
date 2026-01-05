@@ -11,5 +11,5 @@ export default {
   /** 网页全屏相关：此站启/禁用自动网页全屏 */
   THIS_SITE_AUTO: new BasicStorage("THIS_SITE_AUTO_", false, Boolean, true),
   /** 网页全屏相关：自动网页全屏忽略的网址 */
-  IGNORE_URLS: new BasicStorage("IGNORE_URLS", ""),
+  IGNORE_URLS: new BasicStorage("IGNORE_URLS", "", undefined, true),
 };

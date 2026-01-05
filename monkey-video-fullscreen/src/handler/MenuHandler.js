@@ -2,7 +2,6 @@ import I18n from "../common/I18n";
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
-import Swal from "sweetalert2";
 
 /**
  * 脚本菜单相关逻辑处理
@@ -26,7 +25,7 @@ export default {
     const configs = [
       { title: I18n.t(this.isAutoSite() ? "disAuto" : "enAuto"), cache: Storage.THIS_SITE_AUTO, useHost: true, fn: siteFn },
       { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD, useHost: true },
-      { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS, fn: this.ignoreUrlsPopup },
+      { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS, useHost: true },
       { title: I18n.t("custom"), cache: Storage.CUSTOM_CONTAINER, useHost: true },
     ];
 
@@ -44,22 +43,6 @@ export default {
         const input = prompt(title, host ? cache.get(host) : cache.get());
         if (input !== null) host ? cache.set(input, host) : cache.set(input);
       });
-    });
-  },
-  ignoreUrlsPopup({ title, cache }) {
-    Swal.fire({
-      width: 350,
-      title: title,
-      showCancelButton: true,
-      showConfirmButton: false,
-      cancelButtonText: I18n.t("close"),
-      html: Tools.safeHTML('<textarea id="ignoreUrls" spellcheck="false"></textarea>'),
-      customClass: { container: "monkey-web-fullscreen" },
-      didOpen(popup) {
-        const textarea = Tools.query("#ignoreUrls", popup);
-        textarea.oninput = () => cache.set(textarea.value); // 保存输入值
-        textarea.value = cache.get(); // 赋值
-      },
     });
   },
 };
