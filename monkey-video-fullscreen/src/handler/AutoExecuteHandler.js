@@ -7,7 +7,7 @@ import Consts from "../common/Consts";
 export default {
   async autoWebFullscreen(video) {
     if (!this.topWin || !video.offsetWidth || this.player !== video) return;
-    if (video.__isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC) || !this.isAutoSite()) return;
+    if (video.__isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC) || !this.isAuto()) return;
     if (this.isIgnoreUrl() || (await this.isWebFull(video)) || Tools.isOverLimit("autoWide")) return (video.__isWide = true);
 
     // 发送网页全屏消息

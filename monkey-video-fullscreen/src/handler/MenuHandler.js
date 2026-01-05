@@ -7,7 +7,7 @@ import Storage from "../common/Storage";
  * 脚本菜单相关逻辑处理
  */
 export default {
-  isAutoSite: () => Storage.THIS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
+  isAuto: () => Storage.IS_AUTO.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin()) return;
     this.setupMenuChangeListener();
@@ -15,33 +15,31 @@ export default {
     this.hasMenu = true;
   },
   setupMenuChangeListener() {
-    const key = Storage.THIS_SITE_AUTO.name + location.host;
+    const key = Storage.IS_AUTO.name + location.host;
     GM_addValueChangeListener(key, () => this.registMenuCommand());
   },
   registMenuCommand() {
-    const siteFn = ({ host, cache }) => cache.set(!cache.get(host), host);
+    const host = location.host;
 
     // 菜单配置项
     const configs = [
-      { title: I18n.t(this.isAutoSite() ? "disAuto" : "enAuto"), cache: Storage.THIS_SITE_AUTO, useHost: true, fn: siteFn },
-      { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD, useHost: true },
-      { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS, useHost: true },
-      { title: I18n.t("custom"), cache: Storage.CUSTOM_CONTAINER, useHost: true },
+      { title: I18n.t(this.isAuto() ? "disable" : "enable"), cache: Storage.IS_AUTO, fn: (cache, val) => cache.set(!val, host) },
+      { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD },
+      { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS },
+      { title: I18n.t("custom"), cache: Storage.CUSTOM_CONTAINER },
     ];
 
     // 注册菜单项
-    configs.forEach(({ title, useHost, cache, isHidden, fn }) => {
+    configs.forEach(({ title, cache, fn }) => {
       const id = `${cache.name}_MENU_ID`;
       GM_unregisterMenuCommand(this[id]);
-      if (isHidden) return;
-
-      const host = useHost ? location.host : Consts.EMPTY;
       this[id] = GM_registerMenuCommand(title, () => {
-        if (fn) return fn.call(this, { host, cache, title }); // 自定义逻辑
+        const value = cache.get(host);
+        if (fn) return fn.call(this, cache, value); // 自定义逻辑
 
         // 弹出输入框对话框
-        const input = prompt(title, host ? cache.get(host) : cache.get());
-        if (input !== null) host ? cache.set(input, host) : cache.set(input);
+        const input = prompt(title, value);
+        if (input !== null) cache.set(input, host);
       });
     });
   },
