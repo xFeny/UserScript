@@ -40,45 +40,6 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 }
 /** 视频网页全屏相关样式 END **/
 
-.monkey-web-fullscreen {
-  z-index: 2147483647 !important;
-
-  * {
-    box-sizing: border-box !important;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-  }
-
-  .swal2-cancel {
-    background-color: #757575 !important;
-  }
-
-  textarea {
-    color: #333;
-    border-radius: 3px;
-    width: 100% !important;
-    resize: none !important;
-    font-size: 12px !important;
-    padding: 3px 5px !important;
-    box-shadow: none !important;
-    min-height: 8rem !important;
-    border: 1px solid #cbd5e1 !important;
-
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 3px;
-    }
-
-    &:focus {
-      outline: none !important;
-      border-color: #3b82f6 !important;
-    }
-  }
-}
-
 /** 视频侧边双击元素样式 */
 .video-edge-click {
   cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC"),
