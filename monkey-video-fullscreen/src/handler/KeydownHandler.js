@@ -7,8 +7,9 @@ import Consts from "../common/Consts";
 export default {
   dispatchShortcutKey: (key, isTrusted = false) => Tools.postMessage(window.top, { key: key.toUpperCase(), isTrusted }),
   setupKeydownListener() {
-    unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
     unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
+    unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
+    unsafeWindow.addEventListener("scroll", () => this.fsWrapper && Tools.scrollTop(this.fsWrapper.scrollY));
   },
   handleKeydown(event) {
     // Tools.log("键盘事件：", { key, code });

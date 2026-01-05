@@ -2,7 +2,7 @@ import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 
 // 要 Object.defineProperty 的值
-const observedValue = { isFullscreen: false, fsWrapper: null };
+const observedValue = { isFullscreen: false };
 
 /**
  * 应用程序初始化
@@ -21,7 +21,6 @@ export default {
     if (isNonFirst) return;
     this.setupDocumentObserver();
     this.observeFullscreenChange();
-    this.observeWebFullscreenChange();
     this.setupIgnoreUrlsChangeListener();
     this.setupShadowVideoListeners();
   },
@@ -38,8 +37,7 @@ export default {
   // ====================⇓⇓⇓ 全屏状态变换时处理相关逻辑 ⇓⇓⇓====================
   setupFullscreenListener() {
     document.addEventListener("fullscreenchange", () => {
-      const isFullscreen = !!document.fullscreenElement;
-      Tools.postMessage(window.top, { isFullscreen });
+      Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
     });
   },
   observeFullscreenChange() {
@@ -50,17 +48,6 @@ export default {
 
         // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
         !value && this.fsWrapper && this.dispatchShortcutKey(Consts.P);
-      },
-    });
-  },
-  observeWebFullscreenChange() {
-    const handle = () => Tools.scrollTop(this.fsWrapper.scrollY);
-    Object.defineProperty(this, "fsWrapper", {
-      get: () => observedValue.fsWrapper,
-      set: (value) => {
-        observedValue.fsWrapper = value;
-        const method = value ? "addEventListener" : "removeEventListener";
-        unsafeWindow[method]("scroll", handle, true);
       },
     });
   },
