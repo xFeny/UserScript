@@ -6,16 +6,13 @@ import Storage from "../common/Storage";
  * 脚本菜单相关逻辑处理
  */
 export default {
-  isAuto: () => Storage.IS_AUTO.get(Tools.isTopWin() ? location.host : window?.topWin?.host),
+  isAuto: () => Storage.IS_AUTO.get(Tools.isTopWin() ? location.host : window.topWin?.host),
   setupScriptMenuCommand() {
     if (this.hasMenu || !Tools.isTopWin()) return;
-    this.setupMenuChangeListener();
-    this.registMenuCommand();
-    this.hasMenu = true;
-  },
-  setupMenuChangeListener() {
     const key = Storage.IS_AUTO.name + location.host;
     GM_addValueChangeListener(key, () => this.registMenuCommand());
+    this.registMenuCommand();
+    this.hasMenu = true;
   },
   registMenuCommand() {
     const host = location.host;
