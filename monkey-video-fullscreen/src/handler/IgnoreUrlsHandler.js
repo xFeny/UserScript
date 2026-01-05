@@ -7,21 +7,18 @@ import Storage from "../common/Storage";
 export default {
   setupIgnoreUrlsChangeListener() {
     GM_addValueChangeListener(Storage.IGNORE_URLS.name, (_, oldVal, newVal) => {
-      if (oldVal === newVal) return; // 防止无限循环
-      this.initializeIgnoreUrls();
+      if (oldVal !== newVal) this.initializeIgnoreUrls();
     });
   },
   initializeIgnoreUrls() {
-    const urls = this.processIgnoreUrls(Storage.IGNORE_URLS);
-    this.urlFilter = new URLBlacklist(urls);
+    this.urlFilter = new URLBlacklist(this.getIgnoreUrls());
   },
   isIgnoreUrl() {
     if (!this.urlFilter) this.initializeIgnoreUrls();
-    return this.urlFilter?.isBlocked(this.topWin?.url ?? location.href);
+    return this.urlFilter?.isBlocked(this.topWin.url);
   },
-  processIgnoreUrls(cache) {
-    const urlsStr = cache.get(this.topWin.host) ?? "";
-    const existUrls = urlsStr.split(/[;\n]/).filter((e) => e.trim());
-    return existUrls.length ? existUrls : [];
+  getIgnoreUrls() {
+    const urlsStr = Storage.IGNORE_URLS.get(this.topWin.host);
+    return urlsStr.split(/[;\n]/).filter((url) => url.trim());
   },
 };
