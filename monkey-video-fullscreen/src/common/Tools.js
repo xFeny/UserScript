@@ -3,7 +3,6 @@ import Consts from "./Consts";
 
 export default {
   isTopWin: () => window.top === window,
-  isNumber: (str) => /^[0-9]$/.test(str),
   scrollTop: (top) => window.scrollTo({ top }),
   getElementRect: (el) => el?.getBoundingClientRect(),
   microTask: (callback) => Promise.resolve().then(callback),
