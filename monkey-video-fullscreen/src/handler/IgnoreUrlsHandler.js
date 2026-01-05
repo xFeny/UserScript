@@ -14,7 +14,7 @@ export default {
     if (!this.urlFilter) this.initIgnoreUrls();
     return this.isBlocked(this.urlFilter);
   },
-  async getIgnoreUrls() {
+  getIgnoreUrls() {
     const urlsStr = Storage.IGNORE_URLS.get(this.topWin.host);
     return urlsStr.split(/[;\n]/).filter((url) => url.trim());
   },
