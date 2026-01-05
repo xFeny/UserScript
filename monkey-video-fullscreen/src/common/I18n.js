@@ -1,6 +1,5 @@
 export default class I18n {
   static langPacks = {
-    // 简体中文
     zh_CN: {
       detach: "此站脱离式全屏阈值",
       enable: "启用自动网页全屏",
@@ -9,16 +8,6 @@ export default class I18n {
       custom: "自定义视频容器",
       close: "关闭",
     },
-    // 繁体中文（可扩展）
-    zh_TW: {
-      detach: "此站脫離式全屏閾值",
-      enable: "啓用自動網頁全屏",
-      disable: "禁用自動網頁全屏",
-      ignore: "自動時忽略的網址",
-      custom: "自定義視頻容器",
-      close: "關閉",
-    },
-    // 英文
     en: {
       detach: "Leave the original DOM threshold",
       enable: "Enable automatic web full-screen",
@@ -35,7 +24,7 @@ export default class I18n {
    */
   static getLang() {
     const lang = navigator.language || navigator.userLanguage;
-    return lang.includes("zh-TW") || lang.includes("zh-HK") ? "zh_TW" : lang.includes("zh") ? "zh_CN" : "en";
+    return lang.includes("zh") ? "zh_CN" : "en";
   }
 
   /**
