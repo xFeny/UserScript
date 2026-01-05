@@ -1,7 +1,6 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
-import Keyboard from "../common/Keyboard";
 
 /**
  * 网页全屏逻辑处理
@@ -12,7 +11,7 @@ export default {
   toggleFullscreen() {
     if (!Tools.isTopWin() || Tools.isFrequent("toggleFull")) return;
     this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-    if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcutKey(Keyboard.P); // 全屏或非网页全屏模式下
+    if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcutKey(Consts.P); // 全屏或非网页全屏模式下
   },
   toggleWebFullscreen(isTrusted) {
     if (this.noVideo() || Tools.isFrequent("toggleWeb")) return;

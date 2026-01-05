@@ -1,37 +1,23 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
-import Keyboard from "../common/Keyboard";
 
 /**
  * 快捷键和消息相关逻辑处理
  */
 export default {
-  dispatchShortcutKey(code, { isTrusted = false } = {}) {
-    const key = this.processShortcutKey({ code });
-    Tools.postMessage(window.top, { key, isTrusted });
-  },
-  processShortcutKey({ key, code, ctrlKey, shiftKey, altKey }) {
-    code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
-    const keys = [ctrlKey && "ctrl", shiftKey && "shift", altKey && "alt", /[0-9]/.test(key) ? key : code];
-    return keys.filter(Boolean).join("_").toUpperCase();
-  },
+  dispatchShortcutKey: (key, isTrusted = false) => Tools.postMessage(window.top, { key: key.toUpperCase(), isTrusted }),
   setupKeydownListener() {
-    try {
-      window.addEventListener("keydown", (event) => this.handleKeydown(event), true);
-      window.addEventListener("message", ({ data }) => this.handleMessage(data));
-    } catch {
-      unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
-      unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
-    }
+    unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
+    unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
   },
-  handleKeydown(event, { key, code, isTrusted } = event) {
+  handleKeydown(event) {
     // Tools.log("键盘事件：", { key, code });
+    const { key, isTrusted } = event;
     const target = event.composedPath()[0];
-    if (this.noVideo() || Tools.isInputable(target) || !Object.values(Keyboard).includes(code)) return;
+    if (this.noVideo() || Tools.isInputable(target) || !["p", "Enter"].includes(key)) return;
 
     Tools.preventDefault(event);
-    key = this.processShortcutKey(event);
-    Tools.postMessage(window.top, { key, isTrusted });
+    this.dispatchShortcutKey(key, isTrusted);
   },
   handleMessage(data) {
     // Tools.log(location.href, "接收到消息：", data);

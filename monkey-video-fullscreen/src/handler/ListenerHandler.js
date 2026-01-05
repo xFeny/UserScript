@@ -1,6 +1,5 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
-import Keyboard from "../common/Keyboard";
 
 // 要 Object.defineProperty 的值
 const observedValue = { isFullscreen: false, fsWrapper: null };
@@ -50,7 +49,7 @@ export default {
         observedValue.isFullscreen = value;
 
         // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
-        !value && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
+        !value && this.fsWrapper && this.dispatchShortcutKey(Consts.P);
       },
     });
   },
@@ -61,7 +60,7 @@ export default {
       set: (value) => {
         observedValue.fsWrapper = value;
         const method = value ? "addEventListener" : "removeEventListener";
-        window[method]("scroll", handle, true);
+        unsafeWindow[method]("scroll", handle, true);
       },
     });
   },
@@ -102,7 +101,7 @@ export default {
         Tools.preventDefault(e);
         const vid = e.target.video;
         if (this.player !== vid) (this.player = vid), this.setVideoInfo(vid);
-        Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
+        Tools.microTask(() => this.dispatchShortcutKey(Consts.P, true));
       };
 
       return element;

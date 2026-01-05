@@ -1,6 +1,5 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
-import Keyboard from "../common/Keyboard";
 
 /**
  * 自动网页全屏、自动切换下集逻辑处理
@@ -12,7 +11,7 @@ export default {
     if (this.isIgnoreUrl() || (await this.isWebFull(video)) || Tools.isOverLimit("autoWide")) return (video.__isWide = true);
 
     // 发送网页全屏消息
-    this.dispatchShortcutKey(Keyboard.P);
+    this.dispatchShortcutKey(Consts.P);
   },
   async isWebFull(video) {
     const isWebFull = video.offsetWidth >= this.topWin.viewWidth;
