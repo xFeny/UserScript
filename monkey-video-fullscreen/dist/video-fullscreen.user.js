@@ -202,7 +202,6 @@
     }
   }
   VideoEnhancer.hackAttachShadow();
-  const observedValue = { isFullscreen: false };
   const Listen = {
     noVideo: () => !window.videoInfo && !window.topWin,
     isBackgroundVideo: (video) => video?.muted && video?.loop,
@@ -232,9 +231,9 @@
     },
     observeFullscreenChange() {
       Object.defineProperty(this, "isFullscreen", {
-        get: () => observedValue.isFullscreen,
+        get: () => this._isFullscreen ?? false,
         set: (value) => {
-          observedValue.isFullscreen = value;
+          this._isFullscreen = value;
           !value && this.fsWrapper && this.dispatchShortcutKey(Consts.P);
         }
       });

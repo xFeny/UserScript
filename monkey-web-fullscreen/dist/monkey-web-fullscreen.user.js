@@ -497,7 +497,6 @@
     Enter: "Enter",
     NumEnter: "NumpadEnter"
   });
-  const observedValue = { isFullscreen: false, fsWrapper: null };
   const Listen = {
     noVideo: () => !window.videoInfo && !window.topWin,
     isBackgroundVideo: (video) => video?.muted && video?.loop,
@@ -591,9 +590,9 @@
     },
     observeFullscreenChange() {
       Object.defineProperty(this, "isFullscreen", {
-        get: () => observedValue.isFullscreen,
+        get: () => this._isFullscreen ?? false,
         set: (value) => {
-          observedValue.isFullscreen = value;
+          this._isFullscreen = value;
           this.handleFullscreenChange(value);
         }
       });
@@ -610,9 +609,9 @@
         Tools.preventDefault(event), Object.is(type, "keydown") && this.dispatchShortcutKey(code, { bypass: true });
       };
       Object.defineProperty(this, "fsWrapper", {
-        get: () => observedValue.fsWrapper,
+        get: () => this._fsWrapper,
         set: (value) => {
-          observedValue.fsWrapper = value;
+          this._fsWrapper = value;
           const method = value ? "addEventListener" : "removeEventListener";
           ["scroll", "keyup", "keydown"].forEach((type) => window[method](type, handle, true));
         }
