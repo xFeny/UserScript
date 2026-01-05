@@ -34,9 +34,8 @@ export default class I18n {
    * @returns {string} 语言标识（如 zh_CN、en）
    */
   static getLang() {
-    const browserLang = navigator.language || navigator.userLanguage;
-    if (browserLang.includes("zh-TW") || browserLang.includes("zh-HK")) return "zh_TW";
-    return browserLang.includes("zh") ? "zh_CN" : "en";
+    const lang = navigator.language || navigator.userLanguage;
+    return lang.includes("zh-TW") || lang.includes("zh-HK") ? "zh_TW" : lang.includes("zh") ? "zh_CN" : "en";
   }
 
   /**
@@ -45,7 +44,6 @@ export default class I18n {
    * @returns
    */
   static t(key) {
-    const lang = this.getLang();
-    return this.langPacks[lang][key];
+    return this.langPacks[this.getLang()][key];
   }
 }
