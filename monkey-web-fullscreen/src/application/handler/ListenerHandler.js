@@ -4,9 +4,6 @@ import Storage from "../common/Storage";
 import Keyboard from "../common/Keyboard";
 import VideoEnhancer from "../VideoEnhancer";
 
-// 要 Object.defineProperty 的值
-const observedValue = { isFullscreen: false, fsWrapper: null };
-
 /**
  * 应用程序初始化
  */
@@ -117,9 +114,9 @@ export default {
   },
   observeFullscreenChange() {
     Object.defineProperty(this, "isFullscreen", {
-      get: () => observedValue.isFullscreen,
+      get: () => this._isFullscreen ?? false,
       set: (value) => {
-        observedValue.isFullscreen = value;
+        this._isFullscreen = value;
         this.handleFullscreenChange(value);
       },
     });
@@ -141,9 +138,9 @@ export default {
       Tools.preventDefault(event), Object.is(type, "keydown") && this.dispatchShortcutKey(code, { bypass: true });
     };
     Object.defineProperty(this, "fsWrapper", {
-      get: () => observedValue.fsWrapper,
+      get: () => this._fsWrapper,
       set: (value) => {
-        observedValue.fsWrapper = value;
+        this._fsWrapper = value;
         const method = value ? "addEventListener" : "removeEventListener";
         ["scroll", "keyup", "keydown"].forEach((type) => window[method](type, handle, true));
       },

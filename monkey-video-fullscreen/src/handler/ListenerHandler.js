@@ -1,9 +1,6 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 
-// 要 Object.defineProperty 的值
-const observedValue = { isFullscreen: false };
-
 /**
  * 应用程序初始化
  */
@@ -42,9 +39,9 @@ export default {
   },
   observeFullscreenChange() {
     Object.defineProperty(this, "isFullscreen", {
-      get: () => observedValue.isFullscreen,
+      get: () => this._isFullscreen ?? false,
       set: (value) => {
-        observedValue.isFullscreen = value;
+        this._isFullscreen = value;
 
         // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
         !value && this.fsWrapper && this.dispatchShortcutKey(Consts.P);
