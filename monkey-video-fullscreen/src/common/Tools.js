@@ -71,15 +71,15 @@ export default {
     }
     return parents;
   },
+  getParts: (node) => node.getAttribute("part")?.split(/\s+/) ?? [],
   setPart(node, value) {
     if (!(node instanceof Element)) return;
-    const parts = node?.getAttribute("part")?.split(/\s+/) ?? [];
-    node?.setAttribute("part", [...new Set([...parts, value])].join(" ").trim());
+    node.setAttribute("part", [...new Set([...this.getParts(node), value])].join(" "));
   },
   delPart(node, value) {
     if (!(node instanceof Element)) return;
-    const parts = (node?.getAttribute("part")?.split(/\s+/) ?? []).filter((v) => v !== value);
-    node?.setAttribute("part", parts.join(" ").trim());
+    const parts = this.getParts(node).filter((v) => v !== value);
+    node.setAttribute("part", parts.join(" "));
   },
   safeHTML(htmlStr) {
     if (!window.trustedTypes?.createPolicy) return htmlStr;
