@@ -35,13 +35,6 @@ export default {
     if (data?.key) this.execHotKeyActions(data);
   },
   execHotKeyActions({ key, isTrusted }) {
-    // Tools.log("按下的键：", { key, isTrusted });
-    const dict = {
-      P: () => this.toggleWebFullscreen(isTrusted),
-      ENTER: () => this.toggleFullscreen(),
-    };
-
-    // 执行函数
-    dict[key]?.();
+    key === Consts.P ? this.toggleWebFullscreen(isTrusted) : this.toggleFullscreen();
   },
 };
