@@ -20,20 +20,16 @@ export default {
     this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
   },
   freqTimes: new Map(),
-  _getTimeDiff(key) {
+  /**
+   * 是否需要节流
+   * @param {*} key 节流键名
+   * @param {*} gap 节流间隔
+   * @returns true = 需要节流（不执行），false = 可以执行
+   */
+  isThrottle(key = "throttle", gap = 300) {
     const now = Date.now();
     const last = this.freqTimes.get(key) ?? 0;
     const diff = now - last;
-    return { now, last, diff };
-  },
-  isFrequent(key = "frequent", gap = 300) {
-    const { now, diff } = this._getTimeDiff(key);
-    // 判断操作是否过于频繁，true = 过于频繁（不执行），false = 可以执行
-    return this.freqTimes.set(key, now) && diff < gap;
-  },
-  isThrottle(key = "throttle", gap = 300) {
-    const { now, diff } = this._getTimeDiff(key);
-    // 判断是否需要节流，true = 需要节流（不执行），false = 可以执行
     return diff >= gap ? this.freqTimes.set(key, now) && false : true;
   },
   limitCountMap: new Map(),
@@ -55,12 +51,6 @@ export default {
     if (!element) return false;
     const { top, left, right, bottom } = this.getElementRect(element);
     return pointX >= left && pointX <= right && pointY >= top && pointY <= bottom;
-  },
-  createObserver(target, callback, options = {}) {
-    const observer = new MutationObserver(callback);
-    const observeTarget = typeof target === "string" ? this.query(target) : target;
-    observer.observe(observeTarget, { childList: true, subtree: true, ...options });
-    return observer;
   },
   findParentWithChild(element, selector, maxLevel = 8) {
     for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {

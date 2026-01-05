@@ -9,12 +9,12 @@ import Storage from "../common/Storage";
  */
 export default {
   toggleFullscreen() {
-    if (!Tools.isTopWin() || Tools.isFrequent("toggleFull")) return;
+    if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
     this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
     if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcutKey(Consts.P); // 全屏或非网页全屏模式下
   },
   toggleWebFullscreen(isTrusted) {
-    if (this.noVideo() || Tools.isFrequent("toggleWeb")) return;
+    if (this.noVideo() || Tools.isThrottle("toggleWeb")) return;
     if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
     this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
   },
