@@ -2,7 +2,7 @@
 // @name               视频自动网页全屏｜倍速播放
 // @name:zh-TW         視頻自動網頁全屏｜倍速播放
 // @namespace          http://tampermonkey.net/
-// @version            3.8.2
+// @version            3.8.3
 // @author             Feny
 // @description        支持所有H5视频的增强脚本，通用网页全屏｜倍速调节，对微博 / 推特 / Instagram / Facebook等多视频平台均适用；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @description:zh-TW  支持所有H5视频的增强脚本，通用網頁全屏｜倍速調節，对微博 / 推特 / Instagram / Facebook等平臺均適用；B站(含直播) / 騰訊視頻 / 優酷 / 愛奇藝 / 芒果TV / AcFun 默認自動網頁全屏，其他網站可手動開啓；自動網頁全屏 + 記憶倍速 + 下集切換，減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
@@ -1527,70 +1527,33 @@
     setTimeElementColor: (color) => Tools.setStyle([App.progressNode, App.Clock?.element], "color", color),
     hideLoadingElement: () => Tools.querys("#loading").forEach((el) => !Tools.query("video", el) && Tools.addCls(el, "hide"))
   };
-  class URLBlacklist {
-    constructor(blacklist) {
-      this.blacklist = this.normalizeBlacklist(blacklist);
-    }
-    normalizeBlacklist(urls) {
-      return urls.map((url) => {
-        try {
-          const parsedUrl = new URL(url);
-          return { hostname: parsedUrl.hostname, pathname: this.normalizePath(parsedUrl.pathname) };
-        } catch (e) {
-          console.error(`无效的URL: ${url}`, e);
-          return null;
-        }
-      }).filter(Boolean);
-    }
-    normalizePath(path) {
-      return path.length > 1 && path.endsWith("/") ? path.slice(0, -1) : path;
-    }
-    isBlocked(url) {
-      try {
-        const parsedUrl = new URL(url);
-        const normalizedPath = this.normalizePath(parsedUrl.pathname);
-        if (normalizedPath === "/") return true;
-        return this.blacklist.some((entry) => {
-          if (parsedUrl.hostname !== entry.hostname) return false;
-          if (entry.pathname === "/") return normalizedPath === "/";
-          return normalizedPath === entry.pathname || normalizedPath.startsWith(`${entry.pathname}/`);
-        });
-      } catch (e) {
-        console.error(`要检查的URL无效: ${url}`, e);
-        return false;
-      }
-    }
-  }
   const Ignore = {
-    defNextIgnore: ["https://www.youtube.com/watch", "https://www.bilibili.com/video", "https://www.bilibili.com/list"],
-    defFullIgnore: ["https://www.youtube.com/results", "https://www.youtube.com/shorts"],
     setupIgnoreUrlsChangeListener() {
-      this.initializeIgnoreUrls();
       [Storage.FULL_IGNORE_URLS.name, Storage.NEXT_IGNORE_URLS.name].forEach(
-        (key) => _GM_addValueChangeListener(key, (_, oldVal, newVal) => {
-          if (oldVal === newVal) return;
-          this.initializeIgnoreUrls();
-        })
+        (key) => _GM_addValueChangeListener(key, (_, oldVal, newVal) => oldVal !== newVal && this.initializeIgnoreUrls())
       );
     },
     initializeIgnoreUrls() {
-      const nextUrls = this.processIgnoreUrls(Storage.NEXT_IGNORE_URLS, this.defNextIgnore);
-      this.nextUrlFilter = new URLBlacklist(nextUrls);
-      const fullUrls = this.processIgnoreUrls(Storage.FULL_IGNORE_URLS, this.defFullIgnore);
-      this.fullUrlFilter = new URLBlacklist(fullUrls);
+      const nextIgnore = ["https://www.youtube.com/watch", "https://www.bilibili.com/video", "https://www.bilibili.com/list"];
+      this.nextFilter = this.processIgnoreUrls(Storage.NEXT_IGNORE_URLS, nextIgnore);
+      const wideIgnore = ["https://www.youtube.com/results", "https://www.youtube.com/shorts"];
+      this.wideFilter = this.processIgnoreUrls(Storage.FULL_IGNORE_URLS, wideIgnore);
     },
     isIgnoreNext() {
-      return this.nextUrlFilter?.isBlocked(this.topWin?.url ?? location.href);
+      if (!this.nextFilter) this.initializeIgnoreUrls();
+      return this.isBlocked(this.nextFilter);
     },
     isIgnoreWide() {
-      return this.fullUrlFilter?.isBlocked(this.topWin?.url ?? location.href);
+      if (!this.wideFilter) this.initializeIgnoreUrls();
+      return this.isBlocked(this.wideFilter);
     },
-    processIgnoreUrls(cache, defaultUrls) {
-      const urlsStr = cache.get() ?? "";
-      const existUrls = urlsStr.split(/[;\n]/).filter((e) => e.trim());
-      if (existUrls.length) return existUrls;
-      cache.set(defaultUrls.join(";\n"));
-      return defaultUrls;
+    processIgnoreUrls(cache, defUrls) {
+      const existUrls = (cache.get() || "").split(/[;\n]/).filter((e) => e.trim());
+      return existUrls.length ? existUrls : (cache.set(defUrls.join(";\n")), defUrls);
+    },
+    isBlocked(urls = []) {
+      const { href, pathname } = new URL(this.topWin.url);
+      return pathname === "/" || urls.some((u) => href.startsWith(u));
     }
   };
   const Menu = {
