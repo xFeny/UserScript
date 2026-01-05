@@ -8,9 +8,7 @@ import Storage from "../common/Storage";
 export default {
   setupIgnoreUrlsChangeListener() {
     [Storage.FULL_IGNORE_URLS.name, Storage.NEXT_IGNORE_URLS.name].forEach((key) =>
-      GM_addValueChangeListener(key, (_, oldVal, newVal) => {
-        if (oldVal !== newVal) this.initializeIgnoreUrls();
-      })
+      GM_addValueChangeListener(key, (_, oldVal, newVal) => oldVal !== newVal && this.initializeIgnoreUrls())
     );
   },
   initializeIgnoreUrls() {
