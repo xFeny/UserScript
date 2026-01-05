@@ -34,7 +34,5 @@ export default {
     if (!this.player) Tools.sendToIFrames(data);
     if (data?.key) this.execHotKeyActions(data);
   },
-  execHotKeyActions({ key, isTrusted }) {
-    key === Consts.P ? this.toggleWebFullscreen(isTrusted) : this.toggleFullscreen();
-  },
+  execHotKeyActions: ({ key, isTrusted }) => (key === Consts.P ? this.toggleWebFullscreen(isTrusted) : this.toggleFullscreen()),
 };
