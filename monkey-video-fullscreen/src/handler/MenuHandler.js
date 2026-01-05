@@ -1,6 +1,5 @@
 import I18n from "../common/I18n";
 import Tools from "../common/Tools";
-import Consts from "../common/Consts";
 import Storage from "../common/Storage";
 
 /**
