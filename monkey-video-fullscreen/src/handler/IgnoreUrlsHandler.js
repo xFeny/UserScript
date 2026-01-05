@@ -1,4 +1,3 @@
-import URLBlacklist from "../lib/URLBlacklist";
 import Storage from "../common/Storage";
 
 /**
@@ -7,18 +6,22 @@ import Storage from "../common/Storage";
 export default {
   setupIgnoreUrlsChangeListener() {
     GM_addValueChangeListener(Storage.IGNORE_URLS.name, (_, oldVal, newVal) => {
-      if (oldVal !== newVal) this.initializeIgnoreUrls();
+      if (oldVal !== newVal) this.initIgnoreUrls();
     });
   },
-  initializeIgnoreUrls() {
-    this.urlFilter = new URLBlacklist(this.getIgnoreUrls());
+  initIgnoreUrls() {
+    this.urlFilter = this.getIgnoreUrls();
   },
   isIgnoreUrl() {
-    if (!this.urlFilter) this.initializeIgnoreUrls();
-    return this.urlFilter?.isBlocked(this.topWin.url);
+    if (!this.urlFilter) this.initIgnoreUrls();
+    return this.isBlocked(this.urlFilter);
   },
-  getIgnoreUrls() {
+  async getIgnoreUrls() {
     const urlsStr = Storage.IGNORE_URLS.get(this.topWin.host);
     return urlsStr.split(/[;\n]/).filter((url) => url.trim());
+  },
+  isBlocked(urls = []) {
+    const { href, pathname } = new URL(this.topWin.url);
+    return pathname === "/" || urls.some((u) => href.startsWith(u));
   },
 };
