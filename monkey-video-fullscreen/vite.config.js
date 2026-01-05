@@ -3,7 +3,7 @@ import monkey, { util, cdn } from "vite-plugin-monkey";
 import AutoImport from "unplugin-auto-import/vite";
 import cleanup from "rollup-plugin-cleanup";
 
-const description = ["快捷键：P-网页全屏，Enter-全屏", "支持视频侧边点击击切换网页全屏", "支持自动网页全屏"];
+const description = ["快捷键：P-网页全屏，Enter-全屏", "支持侧边点击切换网页全屏", "支持自动网页全屏"];
 
 // https://vitejs.dev/config/
 export default defineConfig({
