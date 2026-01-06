@@ -149,15 +149,15 @@ export default unsafeWindow.FyTools = {
     const nodes = document.evaluate(expr, document.body, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     return Array.from({ length: nodes.snapshotLength }, (_, i) => nodes.snapshotItem(i)).filter((el) => !el.matches("script"));
   },
+  getParts: (node) => node.getAttribute("part")?.split(/\s+/) ?? [],
   setPart(node, value) {
     if (!isElement(node)) return;
-    const parts = node?.getAttribute("part")?.split(/\s+/) ?? [];
-    node?.setAttribute("part", [...new Set([...parts, value])].join(" ").trim());
+    node.setAttribute("part", [...new Set([...this.getParts(node), value])].join(" "));
   },
   delPart(node, value) {
     if (!isElement(node)) return;
-    const parts = (node?.getAttribute("part")?.split(/\s+/) ?? []).filter((v) => v !== value);
-    node?.setAttribute("part", parts.join(" ").trim());
+    const parts = this.getParts(node).filter((v) => v !== value);
+    node.setAttribute("part", parts.join(" "));
   },
   safeHTML(htmlStr) {
     if (!window.trustedTypes?.createPolicy) return htmlStr;

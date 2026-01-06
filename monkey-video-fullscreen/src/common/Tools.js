@@ -1,4 +1,4 @@
-import { querySelector, querySelectorAll } from "../lib/ShadowUtils";
+import { isElement, querySelector, querySelectorAll } from "../lib/ShadowUtils";
 import Consts from "./Consts";
 
 export default {
@@ -67,11 +67,11 @@ export default {
   },
   getParts: (node) => node.getAttribute("part")?.split(/\s+/) ?? [],
   setPart(node, value) {
-    if (!(node instanceof Element)) return;
+    if (!isElement(node)) return;
     node.setAttribute("part", [...new Set([...this.getParts(node), value])].join(" "));
   },
   delPart(node, value) {
-    if (!(node instanceof Element)) return;
+    if (!isElement(node)) return;
     const parts = this.getParts(node).filter((v) => v !== value);
     node.setAttribute("part", parts.join(" "));
   },
