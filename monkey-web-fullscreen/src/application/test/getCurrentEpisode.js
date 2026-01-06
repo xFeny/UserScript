@@ -48,7 +48,7 @@
   function getCurrentEpisodeLinkElement() {
     const { pathname, search, hash } = location;
     const last = pathname.split("/").pop();
-    const links = querys(`a[href*="${[pathname + search, last, search, hash].join('"], a[href*="')}"]`);
+    const links = querys(`a[href*="${[pathname + search, last, search, hash].filter(Boolean).join('"], a[href*="')}"]`);
     console.log("匹配到所有的链接：", links);
     return links.length <= 1 ? getEpisodeWrapper(links[0]) : findCurrentEpisodeElement(links, pathname + search);
   }

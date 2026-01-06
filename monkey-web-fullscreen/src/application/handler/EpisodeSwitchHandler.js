@@ -24,7 +24,7 @@ export default {
   getCurrentEpisodeByLink() {
     const { pathname, search, hash } = location;
     const last = pathname.split("/").pop();
-    const links = Tools.querys(`a[href*="${[pathname + search, last, search, hash].join('"], a[href*="')}"]`);
+    const links = Tools.querys(`a[href*="${[pathname + search, last, search, hash].filter(Boolean).join('"], a[href*="')}"]`);
     // Tools.log("匹配到所有的链接：", links);
     return links.length <= 1 ? this.getEpisodeWrapper(links[0]) : this.findCurrentEpisode(links, pathname + search);
   },
