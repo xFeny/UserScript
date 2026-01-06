@@ -69,7 +69,7 @@ export default {
     if (this.progressNode) return this.progressNode;
 
     // 创建播放进度元素
-    const element = this.createDisplayElement("__time-progress", Storage.CLOCK_COLOR.get());
+    const element = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
     element.append(document.createTextNode("00:00"), Tools.createElement("b", { textContent: "%" }));
     this.progressNode = element;
 

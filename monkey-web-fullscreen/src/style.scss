@@ -411,7 +411,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 }
 
 .Clock,
-.__time-progress,
+.__timeupdate,
 .__rate-keep-show {
   color: #e0e0e0;
   text-indent: 0 !important;
@@ -450,7 +450,7 @@ body[part*="webFullscreen"] [part*="webFullscreen"] video {
 }
 
 /** 全屏模式下的播放进度 **/
-.__time-progress {
+.__timeupdate {
   top: 27px !important;
   right: 20px !important;
   font-size: 12px !important;
