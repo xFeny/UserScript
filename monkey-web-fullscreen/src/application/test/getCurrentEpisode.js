@@ -31,14 +31,6 @@
     return extractNumbers(element?.innerText?.replace(/-/g, ""))?.shift();
   }
 
-  /** 向上查找元素 */
-  function closest(element, selector, maxLevel = 3) {
-    for (let level = 0; element && level < maxLevel; level++, element = element.parentElement) {
-      if (element.matches(selector)) return element;
-    }
-    return null;
-  }
-
   function getEpisodeWrapper(element) {
     //  当前集相对所有集所在的标签
     while (element && element.parentElement) {
@@ -72,7 +64,7 @@
     eles = eles
       .filter((el) => {
         const { pathname, search } = new URL(el.href);
-        return !closest(el, `:is(${filter})`, 5) && pageUrl.includes(pathname + search);
+        return !el.closest(`:is(${filter})`) && pageUrl.includes(pathname + search);
       })
       .map(getEpisodeWrapper)
       .filter((el) => getAllEpisodes(el)?.map(getEpisodeNumber).filter(Boolean).length > 1);

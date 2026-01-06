@@ -39,7 +39,7 @@ export default {
     eles = eles
       .filter((el) => {
         const { pathname, search } = new URL(el.href);
-        return !Tools.closest(el, `:is(${filter})`, 5) && pageUrl.includes(pathname + search);
+        return !el.closest(`:is(${filter})`) && pageUrl.includes(pathname + search);
       })
       .map(this.getEpisodeWrapper)
       .filter((el) => this.getAllEpisodes(el).map(this.getEpisodeNumber).filter(Boolean).length > 1);
