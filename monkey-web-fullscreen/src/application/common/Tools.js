@@ -80,12 +80,6 @@ export default unsafeWindow.FyTools = {
     const dict = { clientX, clientY, bubbles: true };
     element?.dispatchEvent(new MouseEvent(eventType, dict));
   },
-  createObserver(target, callback, options = {}) {
-    const observer = new MutationObserver(callback);
-    const observeTarget = typeof target === "string" ? this.query(target) : target;
-    observer.observe(observeTarget, { childList: true, subtree: true, ...options });
-    return observer;
-  },
   getParentChain(element, nth = false) {
     const parents = [];
     for (let current = element; current && current !== document.body; current = current.parentElement) {

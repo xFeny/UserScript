@@ -50,13 +50,16 @@ export default {
   setupVideoDetector() {
     this.docElement = document.documentElement;
     this.obsDoc?.disconnect(), clearTimeout(this.obsTimer);
-    this.obsDoc = Tools.createObserver(document, () => {
+
+    this.obsDoc = new MutationObserver(() => {
       if (Tools.isThrottle("detector", 100)) return;
       if (this.topWin) return this.obsDoc?.disconnect();
 
       const video = this.getVideo();
       if (video?.offsetWidth) this.setCurrentVideo(video);
     });
+
+    this.obsDoc.observe(document, { childList: true, subtree: true });
     this.obsTimer = setTimeout(() => this.obsDoc?.disconnect(), Consts.ONE_SEC * 5);
   },
   // ====================⇓⇓⇓ 设置当前视频相关逻辑 ⇓⇓⇓====================
