@@ -46,9 +46,9 @@
   }
 
   function getCurrentEpisodeLinkElement() {
-    const { pathname, search } = location;
+    const { pathname, search, hash } = location;
     const last = pathname.split("/").pop();
-    const links = querys(`:is(a[href*="${pathname + search}"], a[href*="${last}"], a[href*="${search}"])`);
+    const links = querys(`a[href*="${[pathname + search, last, search, hash].join('"], a[href*="')}"]`);
     console.log("匹配到所有的链接：", links);
     return links.length <= 1 ? getEpisodeWrapper(links[0]) : findCurrentEpisodeElement(links, pathname + search);
   }
@@ -57,7 +57,7 @@
     // 过滤： 标题、线路、排行、热门、猜你喜欢、推荐、历史记录
     // https://www.yingshikong1.com、https://www.dyttlg1.com
     const filter = [
-      "h1, header, footer",
+      "h1, header, footer, [class*='header']",
       "[class*='rank'], [class*='hotlist'], [class*='vodlist']",
       "[id*='guankan'], [id*='history' i], [class*='history' i], [class*='record'], [class*='lishi']",
     ];

@@ -22,9 +22,9 @@ export default {
     return Storage.RELATIVE_EPISODE.get(this.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
   },
   getCurrentEpisodeByLink() {
-    const { pathname, search } = location;
+    const { pathname, search, hash } = location;
     const last = pathname.split("/").pop();
-    const links = Tools.querys(`:is(a[href*="${pathname + search}"], a[href*="${last}"], a[href*="${search}"])`);
+    const links = Tools.querys(`a[href*="${[pathname + search, last, search, hash].join('"], a[href*="')}"]`);
     // Tools.log("匹配到所有的链接：", links);
     return links.length <= 1 ? this.getEpisodeWrapper(links[0]) : this.findCurrentEpisode(links, pathname + search);
   },
@@ -32,7 +32,7 @@ export default {
     // 过滤与地址栏相同连接的： 标题、线路、排行、热门、猜你喜欢、推荐、历史记录
     // https://www.2rk.cc、https://www.yingshikong1.com、https://www.dyttlg1.com
     const filter = [
-      "h1, header, footer",
+      "h1, header, footer, [class*='header']",
       "[class*='rank'], [class*='hotlist'], [class*='vodlist']",
       "[id*='guankan'], [id*='history'], [class*='history'], [class*='record'], [class*='lishi']",
     ];
