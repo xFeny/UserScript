@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import monkey, { util, cdn } from "vite-plugin-monkey";
+import monkey, { util } from "vite-plugin-monkey";
 import AutoImport from "unplugin-auto-import/vite";
 import cleanup from "rollup-plugin-cleanup";
 
@@ -19,7 +19,7 @@ export default defineConfig({
       entry: "src/main.js",
       userscript: {
         author: "Feny",
-        version: "3.8.3",
+        version: "3.8.4",
         match: ["*://*/*"],
         license: "GPL-3.0-only",
         name: "视频网页全屏",
