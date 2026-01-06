@@ -70,7 +70,7 @@ export default {
     if (video.lArea?.parentNode === container) return;
 
     // 避免元素定位异常
-    if (container instanceof Element && getComputedStyle(container).position === "static") {
+    if (container instanceof Element && this.lacksRelativePosition(container)) {
       Tools.setStyle(container, "position", "relative");
     }
 
@@ -100,6 +100,9 @@ export default {
 
     const parentNode = video.parentNode;
     const sroot = video.getRootNode() instanceof ShadowRoot;
-    return sroot ? parentNode : this.findVideoParentContainer(parentNode, 4, false);
+    return sroot ? parentNode : this.findVideoParentContainer(parentNode, undefined, false);
+  },
+  lacksRelativePosition(element) {
+    return Tools.getParents(element, true, 2).every((el) => el && getComputedStyle(el).position === "static");
   },
 };

@@ -133,7 +133,7 @@ export default {
       parent = Tools.getParent(parent);
     }
 
-    return parent;
+    return null;
   },
   videoParents: new Set(),
   findVideoParentContainer(container, maxLevel = 4, track = true) {
