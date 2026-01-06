@@ -125,7 +125,7 @@ export default {
   },
   findControlBarContainer() {
     const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
-    const selector = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"], [class*="progress"]`;
+    const selector = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"], [class*="progress"], [class*="volume"]`;
 
     let parent = Tools.getParent(this.player);
     while (parent && parent.offsetHeight <= this.player.offsetHeight) {
