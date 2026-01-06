@@ -51,12 +51,6 @@ export default {
     const { top, left, right, bottom } = this.getElementRect(element);
     return pointX >= left && pointX <= right && pointY >= top && pointY <= bottom;
   },
-  findParentWithChild(element, selector, maxLevel = 8) {
-    for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
-      if (this.query(selector, parent)) return parent;
-    }
-    return null;
-  },
   getParent(element) {
     if (!element) return null;
     const parent = element.parentNode;

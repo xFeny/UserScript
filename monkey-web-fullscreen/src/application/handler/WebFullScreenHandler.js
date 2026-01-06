@@ -119,26 +119,21 @@ export default {
   },
   getVideoContainer() {
     // 自定义网页全屏元素，支持多个选择器，返回第一个找到的元素
-    const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin?.host)?.trim();
+    const selector = Storage.CUSTOM_CONTAINER.get(this.topWin?.host)?.trim();
     const container = selector ? this.player.closest(selector) : null;
-    if (container) return container;
-
-    // 查找相关元素
-    const ctrlContainer = this.findControlBarContainer();
-    return ctrlContainer ? this.findVideoParentContainer(ctrlContainer) : this.findVideoParentContainer();
+    return container ?? this.findVideoParentContainer(this.findControlBarContainer());
   },
   findControlBarContainer() {
     const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
-    const ctrl = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"], [class*="progress"]`;
-    const ctrlContainer = Tools.findParentWithChild(this.player, ctrl);
-    if (!ctrlContainer) return null;
+    const selector = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"], [class*="progress"]`;
 
-    const { width } = Tools.getElementRect(ctrlContainer);
-    const { width: vw } = Tools.getElementRect(this.player);
-    const { centerX, centerY } = Tools.getCenterPoint(ctrlContainer);
-    const inRect = Tools.pointInElement(centerX, centerY, this.player);
+    let parent = Tools.getParent(this.player);
+    while (parent && parent.offsetHeight <= this.player.offsetHeight) {
+      if (Tools.query(selector, parent)) return parent;
+      parent = Tools.getParent(parent);
+    }
 
-    return Math.floor(width) <= Math.floor(vw) && inRect ? ctrlContainer : null;
+    return parent;
   },
   videoParents: new Set(),
   findVideoParentContainer(container, maxLevel = 4, track = true) {

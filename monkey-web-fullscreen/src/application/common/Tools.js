@@ -92,12 +92,6 @@ export default unsafeWindow.FyTools = {
     }
     return null;
   },
-  findParentWithChild(element, selector, maxLevel = 8) {
-    for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
-      if (this.query(selector, parent)) return parent;
-    }
-    return null;
-  },
   findSibling(element, selector, maxLevel = 3) {
     for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
       for (const child of parent.children) {
