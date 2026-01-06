@@ -74,8 +74,7 @@ export default {
     const numSet = new Set(); // 用于过滤重复的集数
     const eleName = element.tagName;
     const eleClass = Array.from(element.classList);
-    const sibling = Tools.findSibling(element, eleName);
-    const children = Array.from(sibling?.parentElement?.children ?? []);
+    const children = Array.from(element.parentNode.children);
 
     return children.filter((ele) => {
       const currClass = Array.from(ele.classList).filter((cls) => !["on", "cur", "active"].includes(cls));

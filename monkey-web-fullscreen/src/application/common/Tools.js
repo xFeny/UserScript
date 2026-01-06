@@ -86,14 +86,6 @@ export default unsafeWindow.FyTools = {
     observer.observe(observeTarget, { childList: true, subtree: true, ...options });
     return observer;
   },
-  findSibling(element, selector, maxLevel = 3) {
-    for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
-      for (const child of parent.children) {
-        if (child !== element && child.matches(selector)) return child;
-      }
-    }
-    return null;
-  },
   getParentChain(element, nth = false) {
     const parents = [];
     for (let current = element; current && current !== document.body; current = current.parentElement) {

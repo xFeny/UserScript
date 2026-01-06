@@ -100,8 +100,7 @@
     const numSet = new Set();
     const eleName = element.tagName;
     const eleClass = Array.from(element.classList);
-    const sibling = findSibling(element, eleName);
-    const children = Array.from(sibling?.parentElement.children);
+    const children = Array.from(element.parentNode.children);
 
     return children.filter((ele) => {
       const currClass = Array.from(ele.classList).filter((cls) => !["on", "cur", "active"].includes(cls));
@@ -110,15 +109,6 @@
       if (!isMatch || numSet.has(ele.innerText)) return false;
       return numSet.add(ele.innerText); // 过滤重复的集数
     });
-  }
-
-  function findSibling(element, selector, maxLevel = 3) {
-    for (let parent = element?.parentElement, level = 0; parent && level < maxLevel; parent = parent.parentElement, level++) {
-      for (const child of parent.children) {
-        if (child !== element && child.matches(selector)) return child;
-      }
-    }
-    return null;
   }
 
   const currEpisode = getCurrentEpisode();
