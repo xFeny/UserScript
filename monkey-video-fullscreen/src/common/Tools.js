@@ -1,4 +1,4 @@
-import { isElement, querySelector, querySelectorAll } from "../lib/ShadowUtils";
+import { querySelector, querySelectorAll } from "../lib/ShadowUtils";
 import Consts from "./Consts";
 
 export default {

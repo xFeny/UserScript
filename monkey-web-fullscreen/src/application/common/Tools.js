@@ -1,4 +1,4 @@
-import { isElement, querySelector, querySelectorAll } from "./lib/ShadowUtils";
+import { querySelector, querySelectorAll } from "./lib/ShadowUtils";
 import { Notyf } from "notyf";
 import Consts from "./Consts";
 
