@@ -11,7 +11,7 @@ import Keyboard from "../common/Keyboard";
  */
 export default {
   triggerIconElement(name) {
-    if (Tools.isFrequent("icon")) return;
+    if (Tools.isThrottle("icon")) return;
     if (!Site.isBiliLive()) return Tools.query(Site.getIcons()?.[name])?.click();
     const index = Object.values(Site.icons).indexOf(name);
     this.liveAuxHandle(), this.getLiveIcons()?.[index]?.click();
@@ -33,12 +33,12 @@ export default {
     return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
   },
   toggleFullscreen() {
-    if (!Tools.isTopWin() || Tools.isFrequent("toggleFull")) return;
+    if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
     this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
     if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcutKey(Keyboard.P); // 全屏或非网页全屏模式下
   },
   toggleWebFullscreen(isTrusted) {
-    if (this.noVideo() || Tools.isFrequent("toggleWeb")) return;
+    if (this.noVideo() || Tools.isThrottle("toggleWeb")) return;
     if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
     this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
   },

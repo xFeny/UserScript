@@ -37,19 +37,11 @@ export default unsafeWindow.FyTools = {
     this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
   },
   freqTimes: new Map(),
-  _getTimeDiff(key) {
+  isThrottle(key = "throttle", gap = 300) {
     const now = Date.now();
     const last = this.freqTimes.get(key) ?? 0;
     const diff = now - last;
-    return { now, last, diff };
-  },
-  isFrequent(key = "frequent", gap = 300) {
-    const { now, diff } = this._getTimeDiff(key);
-    // 判断操作是否过于频繁，true = 过于频繁（不执行），false = 可以执行
-    return this.freqTimes.set(key, now) && diff < gap;
-  },
-  isThrottle(key = "throttle", gap = 300) {
-    const { now, diff } = this._getTimeDiff(key);
+
     // 判断是否需要节流，true = 需要节流（不执行），false = 可以执行
     return diff >= gap ? this.freqTimes.set(key, now) && false : true;
   },

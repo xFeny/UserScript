@@ -20,16 +20,12 @@ export default {
     this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
   },
   freqTimes: new Map(),
-  /**
-   * 是否需要节流
-   * @param {*} key 节流键名
-   * @param {*} gap 节流间隔
-   * @returns true = 需要节流（不执行），false = 可以执行
-   */
   isThrottle(key = "throttle", gap = 300) {
     const now = Date.now();
     const last = this.freqTimes.get(key) ?? 0;
     const diff = now - last;
+
+    // 判断是否需要节流，true = 需要节流（不执行），false = 可以执行
     return diff >= gap ? this.freqTimes.set(key, now) && false : true;
   },
   limitCountMap: new Map(),
