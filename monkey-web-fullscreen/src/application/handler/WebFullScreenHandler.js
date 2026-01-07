@@ -61,7 +61,7 @@ export default {
       : this.detachForFullscreen();
 
     // 确保网页全屏成功
-    if (!this.fsParent) this.ensureWebFullscreen();
+    this.ensureWebFullscreen();
   },
   detachForFullscreen() {
     if (this.fsParent) return;
@@ -158,6 +158,7 @@ export default {
     // 背景说明：当父元素因外联CSS设置了固定宽高值；当进入网页全屏后，父元素宽高未适应视窗，因此需要重新计算并修正元素宽高；
     // 如：https://www.toutiao.com/video/7579134807163060782、https://www.163.com/v/video/VO3QRCEH5.html
     for (const element of elements) {
+      if (!this.fsWrapper.contains(element)) continue; // 脱离式网页全屏时，元素不在 this.fsWrapper 中
       const { offsetWidth: width, offsetHeight: height } = this.player;
       if (width === viewWidth && height === viewHeight && element.offsetHeight === viewHeight) continue;
       Tools.attr(element, Consts.webFull, true);
