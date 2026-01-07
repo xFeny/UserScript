@@ -217,7 +217,7 @@ export default {
     container.prepend(video.lArea, video.rArea);
   },
   getEdgeClickContainer(video) {
-    if (this.fsWrapper) return video.closest(`[part="${Consts.webFull}"]`) ?? this.fsWrapper;
+    if (this.fsWrapper) return video.closest(`[${Consts.webFull}]`) ?? this.fsWrapper;
 
     const parentNode = video.parentNode;
     const sroot = video.getRootNode() instanceof ShadowRoot;

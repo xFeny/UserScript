@@ -13,6 +13,7 @@ export default {
   getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
   isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
   preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
+  attr: (el, name, val) => el && name && el[val ? "setAttribute" : "removeAttribute"](name, val),
   emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
   isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
   sendToIFrames(data) {
@@ -65,16 +66,6 @@ export default {
     }
     return parents;
   },
-  getParts: (node) => node.getAttribute("part")?.split(/\s+/) ?? [],
-  setPart(node, value) {
-    if (!isElement(node)) return;
-    node.setAttribute("part", [...new Set([...this.getParts(node), value])].join(" "));
-  },
-  delPart(node, value) {
-    if (!isElement(node)) return;
-    const parts = this.getParts(node).filter((v) => v !== value);
-    node.setAttribute("part", parts.join(" "));
-  },
   safeHTML(htmlStr) {
     if (!window.trustedTypes?.createPolicy) return htmlStr;
     const policy = trustedTypes.defaultPolicy ?? trustedTypes.createPolicy("default", { createHTML: (input) => input });
@@ -84,13 +75,6 @@ export default {
     attrs.flat().forEach((attr) => {
       const value = source.getAttribute(attr);
       if (value) target.setAttribute(attr, value);
-    });
-  },
-  cloneStyle(source, target, ...names) {
-    const computedStyle = window.getComputedStyle(source);
-    names.flat().forEach((name) => {
-      const value = computedStyle.getPropertyValue(name);
-      if (value) target.style.setProperty(name, value);
     });
   },
   setStyle(eles, prop, val, priority) {

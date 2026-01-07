@@ -56,12 +56,12 @@ export default {
     container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(this.host)
       ? parents.forEach((el) => {
           Tools.emitEvent("addStyle", { shadowRoot: el.getRootNode() });
-          Tools.setPart(el, Consts.webFull);
+          Tools.attr(el, Consts.webFull, true);
         })
       : this.detachForFullscreen();
 
     // 确保网页全屏成功
-    this.ensureWebFullscreen();
+    if (!this.fsParent) this.ensureWebFullscreen();
   },
   detachForFullscreen() {
     if (this.fsParent) return;
@@ -70,14 +70,13 @@ export default {
     // 创建占位元素（保持原布局不塌陷）
     this.fsPlaceholder = document.createElement("div");
     Tools.cloneAttrs(this.fsWrapper, this.fsPlaceholder, ["id", "class", "style"]);
-    Tools.cloneStyle(this.fsWrapper, this.fsPlaceholder, ["position", "width", "height"]);
 
     // 替换并移动视频容器
     this.fsParent.replaceChild(this.fsPlaceholder, this.fsWrapper);
     document.body.insertAdjacentElement("beforeend", this.fsWrapper);
 
     this.fsWrapper.querySelector("video")?.play();
-    Tools.setPart(this.fsWrapper, Consts.webFull);
+    Tools.attr(this.fsWrapper, Consts.webFull, true);
   },
   exitWebFullscreen() {
     if (!this.fsWrapper) return;
@@ -88,7 +87,7 @@ export default {
 
     // 是脱离原结构式网页全屏时，将视频容器还原到它原来的DOM位置
     if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
-    Tools.querys(`[part*=${Consts.webFull}]`).forEach((el) => Tools.delPart(el, Consts.webFull));
+    Tools.querys(`[${Consts.webFull}]`).forEach((el) => Tools.attr(el, Consts.webFull));
 
     // 滚动到全屏前位置、恢复默认滚动效果
     requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(this.docElement, "scroll-behavior")));
@@ -169,7 +168,7 @@ export default {
     for (const element of elements) {
       const { offsetWidth: width, offsetHeight: height } = this.player;
       if (width === viewWidth && height === viewHeight && element.offsetHeight === viewHeight) continue;
-      Tools.setPart(element, Consts.webFull);
+      Tools.attr(element, Consts.webFull, true);
     }
   },
 };
