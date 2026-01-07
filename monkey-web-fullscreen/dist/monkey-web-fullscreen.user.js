@@ -1038,7 +1038,7 @@
         Tools.emitEvent("addStyle", { shadowRoot: el.getRootNode() });
         Tools.attr(el, Consts.webFull, true);
       }) : this.detachForFullscreen();
-      if (!this.fsParent) this.ensureWebFullscreen();
+      this.ensureWebFullscreen();
     },
     detachForFullscreen() {
       if (this.fsParent) return;
@@ -1111,6 +1111,7 @@
       const { viewWidth, viewHeight } = this.topWin;
       const elements = [...this.videoParents].reverse();
       for (const element of elements) {
+        if (!this.fsWrapper.contains(element)) continue;
         const { offsetWidth: width, offsetHeight: height } = this.player;
         if (width === viewWidth && height === viewHeight && element.offsetHeight === viewHeight) continue;
         Tools.attr(element, Consts.webFull, true);
