@@ -66,11 +66,6 @@ export default {
     }
     return parents;
   },
-  safeHTML(htmlStr) {
-    if (!window.trustedTypes?.createPolicy) return htmlStr;
-    const policy = trustedTypes.defaultPolicy ?? trustedTypes.createPolicy("default", { createHTML: (input) => input });
-    return policy.createHTML(htmlStr);
-  },
   cloneAttrs(source, target, ...attrs) {
     attrs.flat().forEach((attr) => {
       const value = source.getAttribute(attr);
