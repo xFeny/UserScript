@@ -7,7 +7,6 @@ import Consts from "../common/Consts";
 export default {
   noVideo: () => !window.videoInfo && !window.topWin,
   isBackgroundVideo: (video) => video?.muted && video?.loop,
-  getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
   init(isNonFirst = false) {
     this.docElement = document.documentElement;
 
