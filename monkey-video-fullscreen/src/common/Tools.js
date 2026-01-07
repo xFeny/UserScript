@@ -38,11 +38,6 @@ export default {
     const keyList = keys.length > 0 ? keys : ["default"];
     keyList.forEach((key) => this.limitCountMap.set(key, 0));
   },
-  getCenterPoint(element) {
-    if (!element) return { centerX: 0, centerY: 0 };
-    const { top, left, width, height } = this.getElementRect(element);
-    return { centerX: left + width / 2, centerY: top + height / 2 }; // 元素中心点
-  },
   pointInElement(pointX, pointY, element) {
     if (!element) return false;
     const { top, left, right, bottom } = this.getElementRect(element);

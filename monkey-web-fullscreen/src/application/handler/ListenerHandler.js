@@ -13,7 +13,8 @@ export default {
   getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
   init(isNonFirst = false) {
     this.host = location.host;
-    this.setupVideoDetector();
+    this.docElement = document.documentElement;
+
     this.setupKeydownListener();
     this.setupVisibleListener();
     this.setupMouseMoveListener();
@@ -47,67 +48,6 @@ export default {
       this.init(true), document.head.append(gmStyle.cloneNode(true));
     }).observe(document, { childList: true });
   },
-  setupVideoDetector() {
-    this.docElement = document.documentElement;
-    this.obsDoc?.disconnect(), clearTimeout(this.obsTimer);
-
-    this.obsDoc = new MutationObserver(() => {
-      if (Tools.isThrottle("detector", 100)) return;
-      if (this.topWin) return this.obsDoc?.disconnect();
-
-      const video = this.getVideo();
-      if (video?.offsetWidth) this.setCurrentVideo(video);
-    });
-
-    this.obsDoc.observe(document, { childList: true, subtree: true });
-    this.obsTimer = setTimeout(() => this.obsDoc?.disconnect(), Consts.ONE_SEC * 5);
-  },
-  // ====================⇓⇓⇓ 设置当前视频相关逻辑 ⇓⇓⇓====================
-  setCurrentVideo(video) {
-    if (!video || this.player === video || video.offsetWidth < 260 || this.isBackgroundVideo(video)) return;
-    if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // this.player 播放中
-
-    this.player = video;
-    this.setVideoInfo(video);
-    this.observeVideoSrcChange(video);
-  },
-  setVideoInfo(video) {
-    const isLive = Object.is(video.duration, Infinity);
-    const selector = Tools.getParentChain(video, true);
-    const videoInfo = { ...Tools.getCenterPoint(video), src: video.currentSrc, isLive, selector };
-    this.setParentWinVideoInfo(videoInfo);
-  },
-  setParentWinVideoInfo(videoInfo) {
-    window.videoInfo = this.videoInfo = videoInfo;
-    if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iframeSrc: location.href } });
-    Tools.microTask(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
-    this.getVideoIFrame()?.focus(); // 自动聚焦到内嵌框架，使空格键能切换播放状态
-    this.sendTopWinInfo();
-  },
-  sendTopWinInfo() {
-    // 向iframe传递顶级窗口信息
-    const { host, href: url } = location;
-    const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
-    const topWin = { url, host, viewWidth, viewHeight, urlHash: Tools.hashCode(url) };
-    window.topWin = this.topWin = topWin;
-    Tools.sendToIFrames({ topWin });
-  },
-  observeVideoSrcChange(video) {
-    if (video.hasAttribute("observed")) return;
-    video.setAttribute("observed", true);
-
-    const that = this;
-    const isFake = video.matches(Consts.FAKE_VIDEO);
-    const handleChange = (v) => (delete that.topWin, that.setVideoInfo(v));
-    VideoEnhancer.defineProperty(video, isFake ? "srcConfig" : "src", {
-      set(value, setter) {
-        isFake ? (this._src = value) : setter(value);
-        if ((isFake || this === that.player) && value) handleChange(this);
-      },
-    });
-  },
-  // ====================⇑⇑⇑ 设置当前视频相关逻辑 ⇑⇑⇑====================
-
   // ====================⇓⇓⇓ 全屏状态变换时处理相关逻辑 ⇓⇓⇓====================
   setupFullscreenListener() {
     document.addEventListener("fullscreenchange", () => {
@@ -145,7 +85,7 @@ export default {
       set: (value) => {
         this._fsWrapper = value;
         const method = value ? "addEventListener" : "removeEventListener";
-        ["scroll", "keyup", "keydown"].forEach((type) => window[method](type, handle, true));
+        ["scroll", "keyup", "keydown"].forEach((type) => unsafeWindow[method](type, handle, true));
       },
     });
   },

@@ -15,13 +15,12 @@ export default {
       if (!video || video.hasAttribute("received")) return;
       this.setupVideoListeners(video), video.setAttribute("received", true);
       Tools.microTask(() => this.createEdgeClickElement(video));
-      if (!this.player) this.setCurrentVideo(video);
     });
   },
   // ====================⇓⇓⇓ 视频监听事件相关逻辑 ⇓⇓⇓====================
   loadedmetadata(video) {
     this.initVideoProps(video);
-    if (!this.player) this.playing(video);
+    if (!this.player) this.setCurrentVideo(video);
   },
   timeupdate(video) {
     if (isNaN(video.duration)) return;
@@ -46,7 +45,7 @@ export default {
     this.setVideoInfo(video);
   },
   setVideoInfo(video) {
-    const videoInfo = { ...Tools.getCenterPoint(video), isLive: video.duration === Infinity };
+    const videoInfo = { isLive: video.duration === Infinity };
     this.setParentWinVideoInfo(videoInfo);
   },
   setParentWinVideoInfo(videoInfo) {

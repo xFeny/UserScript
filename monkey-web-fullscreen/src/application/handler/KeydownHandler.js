@@ -26,16 +26,9 @@ export default {
     return keys.filter(Boolean).join("_").toUpperCase();
   },
   setupKeydownListener() {
-    try {
-      window.addEventListener("keyup", (event) => this.preventDefault(event), true); // 阻止相关按键，通一`keydown`处理
-      window.addEventListener("keydown", (event) => this.handleKeydown(event), true);
-      window.addEventListener("message", ({ data }) => this.handleMessage(data));
-    } catch {
-      // https://www.reddit.com 重写了`addEventListener`导致异常，降级`unsafeWindow`绑定事件
-      unsafeWindow.addEventListener("keyup", (event) => this.preventDefault(event), true);
-      unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
-      unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
-    }
+    unsafeWindow.addEventListener("keyup", (event) => this.preventDefault(event), true);
+    unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
+    unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
   },
   handleKeydown(event, { key, code, isTrusted } = event) {
     // Tools.log("键盘事件：", { key, code });

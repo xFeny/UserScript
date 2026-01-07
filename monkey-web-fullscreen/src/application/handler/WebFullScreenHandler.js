@@ -98,15 +98,7 @@ export default {
   },
   getVideoHostContainer() {
     if (this.player) return this.getVideoContainer();
-
-    // video所在的iframe
-    const videoIFrame = this.getVideoIFrame();
-    if (videoIFrame) return videoIFrame;
-
-    // 与video中心点相交的iframe
-    const ifrs = Tools.getIFrames();
-    const { centerX, centerY } = this.videoInfo ?? {};
-    return ifrs.length <= 1 ? ifrs[0] : ifrs.find((el) => Tools.isVisible(el) && Tools.pointInElement(centerX, centerY, el));
+    return this.getVideoIFrame() ?? Tools.getIFrames()[0];
   },
   getVideoIFrame() {
     if (!this.videoInfo?.iframeSrc) return null;

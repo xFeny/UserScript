@@ -9,7 +9,8 @@ export default {
   isBackgroundVideo: (video) => video?.muted && video?.loop,
   getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
   init(isNonFirst = false) {
-    this.body = document.body;
+    this.docElement = document.documentElement;
+
     this.setupKeydownListener();
     this.setupMouseMoveListener();
     this.setupFullscreenListener();
@@ -27,7 +28,7 @@ export default {
    */
   setupDocumentObserver() {
     new MutationObserver(() => {
-      if (this.body === document.body) return;
+      if (this.docElement === document.documentElement) return;
       this.init(true), document.head.append(gmStyle.cloneNode(true));
     }).observe(document, { childList: true });
   },
