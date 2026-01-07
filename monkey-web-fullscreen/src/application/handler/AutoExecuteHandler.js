@@ -17,6 +17,7 @@ export default {
     video._mfs_hasTriedNext = true;
   },
   async autoWebFullscreen(video) {
+    if (!this.topWin) await Tools.sleep(50);
     if (!this.topWin || !video.offsetWidth || this.player !== video) return;
     if (video._mfs_isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
     if (Site.isGmMatch() ? this.noAutoDefault() : !this.isAutoSite()) return;
