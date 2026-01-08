@@ -29,7 +29,7 @@ export default defineConfig({
         license: "MIT",
         version: "1.0.2",
         name: "M站_哔咪动漫脚本",
-        "run-at": "document-body",
+        "run-at": "document-start",
         namespace: "http://tampermonkey.net/",
         homepage: "https://github.com/xFeny/UserScript/tree/main/monkey-bimiacg",
         description: "哔咪动漫｜E站弹幕网｜饭团动漫，快捷键(T)切换线路。",
