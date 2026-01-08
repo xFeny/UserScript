@@ -23,19 +23,19 @@ export default {
       if (!Tools.isTopWin()) return Tools.notyf("此页面不能抓取 (•ิ_•ิ)?", true);
       Tools.preventDefault(event);
 
-      const hasCurrentSelector = Storage.CURRENT_EPISODE.get(this.host);
-      const hasRelativeSelector = Storage.RELATIVE_EPISODE.get(this.host);
-      if (hasCurrentSelector && hasRelativeSelector) return Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
+      const curSelector = Storage.CURRENT_EPISODE.get(this.host);
+      const relSelector = Storage.RELATIVE_EPISODE.get(this.host);
+      if (curSelector && relSelector) return Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
 
       const number = this.getEpisodeNumber(target);
       if (!number) return Tools.notyf("点击位置无数字 (•ิ_•ิ)?", true);
 
-      hasCurrentSelector ? this.pickerRelativeEpisodeChain(target) : this.pickerCurrentEpisodeChain(target);
+      curSelector ? this.pickerRelativeEpisodePath(target) : this.pickerCurrentEpisodePath(target);
     };
 
     document.addEventListener("click", handle, true);
   },
-  pickerCurrentEpisodeChain(element) {
+  pickerCurrentEpisodePath(element) {
     if (Storage.CURRENT_EPISODE.get(this.host)) return;
     this.pickerEpisodePopup(element, {
       validBtnCallback(value) {
@@ -53,7 +53,7 @@ export default {
       },
     });
   },
-  pickerRelativeEpisodeChain(element) {
+  pickerRelativeEpisodePath(element) {
     if (Storage.RELATIVE_EPISODE.get(this.host)) return;
     this.pickerEpisodePopup(element, {
       validBtnCallback(value) {
