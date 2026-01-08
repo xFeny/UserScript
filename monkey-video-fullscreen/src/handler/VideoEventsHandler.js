@@ -50,7 +50,7 @@ export default {
   },
   setParentWinVideoInfo(videoInfo) {
     window.videoInfo = this.videoInfo = videoInfo;
-    if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iframeSrc: location.href } });
+    if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iFrame: location.href } });
     Tools.microTask(() => this.setupScriptMenuCommand());
     this.sendTopWinInfo();
   },
