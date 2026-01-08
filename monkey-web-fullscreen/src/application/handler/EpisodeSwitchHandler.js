@@ -93,20 +93,29 @@ export default {
       current?.click && current.click();
     }
   },
+  /**
+   * 向上遍历DOM，找到同级包裹元素，限定遍历层数
+   * @param {HTMLElement} element - 起始DOM元素
+   * @returns {HTMLElement|null} 同级包裹元素
+   */
   getEpisodeWrapper(element) {
     //  集数相对于所有集数所在的同级标签
+
     // 示例一：得到<a>标签
     // <div><a>第01集</a><a>第02集</a></div>
+
     // 示例二：得到<li>标签
     // <ul class="player_list"><li><a>第01话</a></li> <li><a>第02话</a></li></ul>
+
     // 示例三：得到<div id="stab_1_71">标签
     // <ul class="urlli">
     // 	<div id="stab_1_71"><ul><li><a>第01集</a></li></ul></div>
     // 	<div id="stab_1_71"><ul><li><a>第02集</a></li></ul></div>
     // </ul>
-    while (element && element.parentElement) {
-      const siblings = Array.from(element.parentElement.children);
-      if (siblings.length > 1 && siblings.some((sib) => sib !== element && sib.tagName === element.tagName)) return element;
+
+    while (element?.parentElement) {
+      const sibs = Array.from(element.parentElement.children);
+      if (sibs.filter((s) => s.tagName === element.tagName).length > 1) return element;
       element = element.parentElement;
     }
     return null;

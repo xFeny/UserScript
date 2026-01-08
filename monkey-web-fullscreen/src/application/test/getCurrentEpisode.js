@@ -33,9 +33,9 @@
 
   function getEpisodeWrapper(element) {
     //  当前集相对所有集所在的标签
-    while (element && element.parentElement) {
-      const siblings = Array.from(element.parentElement.children);
-      if (siblings.length > 1 && siblings.some((sib) => sib !== element && sib.tagName === element.tagName)) return element;
+    while (element?.parentElement) {
+      const sibs = Array.from(element.parentElement.children);
+      if (sibs.filter((s) => s.tagName === element.tagName).length > 1) return element;
       element = element.parentElement;
     }
     return null;
