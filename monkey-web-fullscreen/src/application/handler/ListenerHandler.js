@@ -140,7 +140,7 @@ export default {
     const handle = ({ type, clientX, clientY }) => {
       if (Tools.isThrottle(type)) return;
 
-      // 根据坐标获取视频元素，并根据结果创建侧边元素
+      // 根据坐标获取视频元素，并创建侧边元素
       this.createEdgeClickElement(this.getVideoForCoord(clientX, clientY));
 
       // 有视频信息时才切换鼠标光标的显隐
@@ -154,9 +154,8 @@ export default {
   toggleCursor(hide = false, cls = "__hc") {
     if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
 
-    [...Tools.getParents(this.player, true, 3), ...Tools.getIFrames()].forEach((el) => {
-      el?.blur(), Tools.addCls(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
-    });
+    const elements = [...Tools.getParents(this.player, true, 3), this.getVideoIFrame()];
+    elements.forEach((el) => (Tools.addCls(el, cls), Tools.emitMouseEvent(el, "mouseleave")));
   },
   // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
   getVideoForCoord(clientX, clientY) {
