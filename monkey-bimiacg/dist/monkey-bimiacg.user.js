@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         M站_哔咪动漫脚本
 // @namespace    http://tampermonkey.net/
-// @version      1.0.1
+// @version      1.0.2
 // @author       Feny
 // @description  哔咪动漫｜E站弹幕网｜饭团动漫，快捷键(T)切换线路。
 // @license      MIT
@@ -18,7 +18,7 @@
 // @run-at       document-body
 // ==/UserScript==
 
-(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const n=document.createElement("style");n.textContent=t,document.head.append(n)})(" #zhuXian a{margin:0!important;font-size:12px!important}.nav-area{margin-bottom:20px}#bkcl,.newhd,.ABP-Text,.tuiguang,.play-full,.login-box,.line_button2{width:0!important;height:0!important;display:none!important}.ABP-Unit .ABP-Comment-List{display:none!important}.ABP-Unit,.ABP-Unit .ABP-Player{width:100%!important;height:100%!important} ");
+(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const n=document.createElement("style");n.textContent=t,document.head.append(n)})(" #zhuXian a{margin:0!important;font-size:12px!important}.nav-area{margin-bottom:20px}#bkcl,.newhd,.ABP-Text,.tuiguang,.play-full,.login-box,.line_button2{width:0!important;height:0!important;display:none!important}.ABP-Unit .ABP-Comment-List{display:none!important} ");
 
 (function () {
   'use strict';
@@ -63,16 +63,7 @@
   const App = {
     init() {
       this.videoSetting();
-      this.setupMutationObserver();
       this.setupKeydownListener();
-    },
-    setupMutationObserver() {
-      const observer = new MutationObserver(() => {
-        document.querySelector(".line_button2")?.remove();
-        document.querySelector(".ABP-Unit")?.removeAttribute("style");
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
-      setTimeout(() => observer.disconnect(), 5e3);
     },
     isFanTuan: () => location.host.includes("ft"),
     isEzSite: () => location.host.includes("ezdmw"),
