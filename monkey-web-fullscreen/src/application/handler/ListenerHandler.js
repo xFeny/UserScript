@@ -95,8 +95,7 @@ export default {
   // ====================⇓⇓⇓ 全屏状态变换时处理相关逻辑 ⇓⇓⇓====================
   setupFullscreenListener() {
     document.addEventListener("fullscreenchange", () => {
-      const isFullscreen = !!document.fullscreenElement;
-      Tools.postMessage(window.top, { isFullscreen });
+      Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
     });
   },
   observeFullscreenChange() {
@@ -139,18 +138,15 @@ export default {
   setupMouseMoveListener() {
     let timer = null;
     const handle = ({ type, clientX, clientY }) => {
-      if (Tools.isThrottle(type, 300)) return;
+      if (Tools.isThrottle(type)) return;
+
+      // 根据坐标获取视频元素，并根据结果创建侧边元素
+      this.createEdgeClickElement(this.getVideoForCoord(clientX, clientY));
 
       // 有视频信息时才切换鼠标光标的显隐
-      if (!this.noVideo()) {
-        clearTimeout(timer), this.toggleCursor();
-        timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
-      }
-
-      // 是否创建侧边双击网页全屏元素
-      if (!Storage.ENABLE_EDGE_CLICK.get()) return;
-      const video = this.getVideoForCoordinate(clientX, clientY);
-      video && this.createEdgeClickElement(video);
+      if (this.noVideo()) return;
+      clearTimeout(timer), this.toggleCursor();
+      timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
     };
 
     document.addEventListener("mousemove", handle, { passive: true });
@@ -163,11 +159,12 @@ export default {
     });
   },
   // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
-  getVideoForCoordinate(clientX, clientY) {
+  getVideoForCoord(clientX, clientY) {
+    if (!Storage.ENABLE_EDGE_CLICK.get()) return;
     return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
   },
   createEdgeClickElement(video) {
-    if (!Storage.ENABLE_EDGE_CLICK.get()) return;
+    if (!video || !Storage.ENABLE_EDGE_CLICK.get()) return;
 
     const container = this.getEdgeClickContainer(video);
 

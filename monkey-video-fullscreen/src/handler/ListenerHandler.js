@@ -53,14 +53,14 @@ export default {
   // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
   setupMouseMoveListener() {
     const handle = ({ type, clientX, clientY }) => {
-      if (Tools.isThrottle(type, 300)) return;
-      const video = this.getVideoForCoordinate(clientX, clientY);
+      if (Tools.isThrottle(type)) return;
+      const video = this.getVideoForCoord(clientX, clientY);
       video && this.createEdgeClickElement(video);
     };
 
     document.addEventListener("mousemove", handle, { passive: true });
   },
-  getVideoForCoordinate(clientX, clientY) {
+  getVideoForCoord(clientX, clientY) {
     return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
   },
   createEdgeClickElement(video) {
