@@ -46,9 +46,9 @@ export default {
   },
   setVideoInfo(video) {
     const videoInfo = { isLive: video.duration === Infinity };
-    this.setParentWinVideoInfo(videoInfo);
+    this.syncVideoToParentWin(videoInfo);
   },
-  setParentWinVideoInfo(videoInfo) {
+  syncVideoToParentWin(videoInfo) {
     window.videoInfo = this.videoInfo = videoInfo;
     if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iFrame: location.href } });
     Tools.microTask(() => this.setupScriptMenuCommand());

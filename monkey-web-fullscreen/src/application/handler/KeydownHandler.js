@@ -85,7 +85,7 @@ export default {
   handleMessage(data) {
     // Tools.log(location.href, "接收到消息：", data);
     if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
-    if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
+    if (data?.videoInfo) return this.syncVideoToParentWin(data.videoInfo);
     if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
     if (data?.topWin) window.topWin = this.topWin = data.topWin;
 

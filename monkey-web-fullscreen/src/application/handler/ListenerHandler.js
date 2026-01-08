@@ -58,11 +58,10 @@ export default {
     this.observeVideoSrcChange(video);
   },
   setVideoInfo(video) {
-    const isLive = Object.is(video.duration, Infinity);
-    const videoInfo = { src: video.currentSrc, isLive };
-    this.setParentWinVideoInfo(videoInfo);
+    const videoInfo = { isLive: video.duration === Infinity };
+    this.syncVideoToParentWin(videoInfo);
   },
-  setParentWinVideoInfo(videoInfo) {
+  syncVideoToParentWin(videoInfo) {
     window.videoInfo = this.videoInfo = videoInfo;
     if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iFrame: location.href } });
     Tools.microTask(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
