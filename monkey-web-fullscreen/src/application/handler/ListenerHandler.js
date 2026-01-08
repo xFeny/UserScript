@@ -59,8 +59,7 @@ export default {
   },
   setVideoInfo(video) {
     const isLive = Object.is(video.duration, Infinity);
-    const selector = Tools.getParentChain(video, true);
-    const videoInfo = { src: video.currentSrc, isLive, selector };
+    const videoInfo = { src: video.currentSrc, isLive };
     this.setParentWinVideoInfo(videoInfo);
   },
   setParentWinVideoInfo(videoInfo) {

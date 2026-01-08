@@ -3,7 +3,6 @@ import { Notyf } from "notyf";
 import Consts from "./Consts";
 
 export default unsafeWindow.FyTools = {
-  noNumber: (str) => !/\d/.test(str),
   isTopWin: () => window.top === window,
   isNumber: (str) => /^[0-9]$/.test(str),
   scrollTop: (top) => window.scrollTo({ top }),
@@ -61,45 +60,34 @@ export default unsafeWindow.FyTools = {
     return pointX >= left && pointX <= right && pointY >= top && pointY <= bottom;
   },
   emitMousemove(element) {
-    const { top, left, right } = this.getElementRect(element);
-    for (let x = left; x <= right; x += 10) this.emitMouseEvent(element, "mousemove", x, top);
+    const { top: y, left, right } = this.getElementRect(element);
+    for (let x = left; x <= right; x += 10) this.emitMouseEvent(element, "mousemove", x, y);
   },
   emitMouseEvent(element, eventType, clientX, clientY) {
     const dict = { clientX, clientY, bubbles: true };
     element?.dispatchEvent(new MouseEvent(eventType, dict));
   },
-  getParentChain(element, nth = false) {
+  /**
+   * 判断元素是否有有效ID（不含数字/中文）
+   * @param {Element} el
+   * @returns
+   */
+  hasValidDomId: (el) => el.id && !/[\d\u4e00-\u9fa5]/.test(el.id),
+  getElementPath(element) {
     const parents = [];
-    for (let current = element; current && current !== document.body; current = current.parentElement) {
-      parents.unshift(this.getTagInfo(current, nth));
-      if (current.id && this.noNumber(current.id)) break;
+    let current = element;
+    while (current && !current.matches("body")) {
+      parents.unshift(this.getElementSelector(current));
+      if (this.hasValidDomId(current)) break;
+      current = this.getParent(current);
     }
     return parents.join(" > ");
   },
-  getTagInfo(ele, nth = false) {
-    // id不是数字和中文
-    if (ele.id && this.noNumber(ele.id) && !/[\u4e00-\u9fa5]/.test(ele.id)) return `#${ele.id}`;
-    let selector = ele.tagName.toLowerCase();
-    const classes = Array.from(ele.classList);
-
-    // 处理类选择器
-    if (classes.length) {
-      const validClasses = classes.filter(this.noNumber, this);
-      selector += /[:[\]]/.test(ele.className)
-        ? `[class="${ele.className}"]`
-        : validClasses.length
-        ? `.${validClasses.join(".")}`
-        : Consts.EMPTY;
-    }
-
-    // 非首个同类型元素添加nth-of-type
-    if (nth && ele.parentElement) {
-      const siblings = Array.from(ele.parentElement.children).filter((sib) => sib.tagName === ele.tagName);
-      const index = siblings.indexOf(ele);
-      if (index > 0) selector += `:nth-of-type(${index + 1})`;
-    }
-
-    return selector;
+  getElementSelector(ele) {
+    if (this.hasValidDomId(ele)) return `#${ele.id}`;
+    const tag = ele.tagName.toLowerCase();
+    const validCls = Array.from(ele.classList).filter((cls) => !/[\[\]\d]/.test(cls)); // 排除含[]或数字的类名
+    return validCls.length ? `${tag}.${validCls.join(".")}` : tag;
   },
   getParent(element) {
     if (!element) return null;

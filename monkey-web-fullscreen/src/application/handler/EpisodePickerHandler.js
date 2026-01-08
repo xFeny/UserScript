@@ -100,7 +100,7 @@ export default {
         return value ? validBtnCallback.call(this, value) ?? false : Tools.notyf("元素选择器不能为空！", true);
       },
       preConfirm: () => Tools.query("#__picker").value.trim() || Tools.notyf("元素选择器不能为空！", true),
-      didOpen: () => (Tools.query("#__picker").value = Tools.getParentChain(element)),
+      didOpen: () => (Tools.query("#__picker").value = Tools.getElementPath(element)),
     }).then((result) => result.isConfirmed && confirmCallback.call(this, result.value));
   },
 };
