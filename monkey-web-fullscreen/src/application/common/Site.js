@@ -28,7 +28,7 @@ export default class Site {
   static {
     const selectors = Storage.ICONS_SELECTOR.get();
     selectors ? (this.selectors = selectors) : this.#loadRemote();
-    Tools.microTask(() => (this.#createSiteTests(), this.#convertGmMatchToRegex()));
+    Tools.microTask(() => (this.#createSiteTests(), this.#convertGmMatch()));
   }
 
   static getIcons(domain = location.host) {
@@ -54,7 +54,7 @@ export default class Site {
   /**
    * 将 GM 脚本的 @match 规则转换为 JS 正则表达式数组
    */
-  static #convertGmMatchToRegex() {
+  static #convertGmMatch() {
     const { matches, includes: excluded } = GM_info.script;
     const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
     this.gmMatches = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));

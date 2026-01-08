@@ -101,11 +101,10 @@ export default {
     return this.getVideoIFrame() ?? Tools.getIFrames()[0];
   },
   getVideoIFrame() {
-    if (!this.videoInfo?.iframeSrc) return null;
+    if (!this.videoInfo?.iFrame) return null;
 
-    const { pathname, search } = new URL(this.videoInfo.iframeSrc);
-    const decoded = decodeURI(search); // 先解码得到实际字符串
-    const partial = decoded.slice(0, decoded.length * 0.8);
+    const { pathname, search } = new URL(decodeURI(this.videoInfo.iFrame));
+    const partial = search.slice(0, search.length * 0.8);
     return Tools.query(`iframe[src*="${pathname + partial}"]`) ?? Tools.query(`iframe[src*="${pathname}"]`);
   },
   getVideoContainer() {

@@ -64,7 +64,7 @@ export default {
   },
   setParentWinVideoInfo(videoInfo) {
     window.videoInfo = this.videoInfo = videoInfo;
-    if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iframeSrc: location.href } });
+    if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iFrame: location.href } });
     Tools.microTask(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
     this.getVideoIFrame()?.focus(); // 自动聚焦到内嵌框架，使空格键能切换播放状态
     this.sendTopWinInfo();
