@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网页全屏
 // @namespace    npm/vite-plugin-monkey
-// @version      3.8.5
+// @version      3.8.6
 // @author       Feny
 // @description  快捷键：P-网页全屏，Enter-全屏；支持侧边点击切换网页全屏；支持自动网页全屏
 // @license      GPL-3.0-only
@@ -207,13 +207,13 @@
     },
     setupMouseMoveListener() {
       const handle = ({ type, clientX, clientY }) => {
-        if (Tools.isThrottle(type, 300)) return;
-        const video = this.getVideoForCoordinate(clientX, clientY);
+        if (Tools.isThrottle(type)) return;
+        const video = this.getVideoForCoord(clientX, clientY);
         video && this.createEdgeClickElement(video);
       };
       document.addEventListener("mousemove", handle, { passive: true });
     },
-    getVideoForCoordinate(clientX, clientY) {
+    getVideoForCoord(clientX, clientY) {
       return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
     },
     createEdgeClickElement(video) {
@@ -268,7 +268,7 @@
     },
     handleMessage(data) {
       if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
-      if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
+      if (data?.videoInfo) return this.syncVideoToParentWin(data.videoInfo);
       if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
       if (data?.topWin) window.topWin = this.topWin = data.topWin;
       this.processEvent(data);
@@ -317,11 +317,11 @@
     },
     setVideoInfo(video) {
       const videoInfo = { isLive: video.duration === Infinity };
-      this.setParentWinVideoInfo(videoInfo);
+      this.syncVideoToParentWin(videoInfo);
     },
-    setParentWinVideoInfo(videoInfo) {
+    syncVideoToParentWin(videoInfo) {
       window.videoInfo = this.videoInfo = videoInfo;
-      if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iframeSrc: location.href } });
+      if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iFrame: location.href } });
       Tools.microTask(() => this.setupScriptMenuCommand());
       this.sendTopWinInfo();
     },
@@ -339,8 +339,8 @@
       this.storage = { getItem: _GM_getValue, setItem: _GM_setValue };
     }
     #getFinalKey(suffix) {
-      if ([null, void 0].includes(suffix)) throw new Error("键名后缀不能为空");
-      return suffix.startsWith(this.name) ? suffix : this.name + suffix;
+      if (!suffix) throw new Error(`${this.name} 后缀不能为空！`);
+      return this.name + suffix;
     }
     set(value, key) {
       this.storage.setItem(this.#getFinalKey(key), value);
@@ -354,7 +354,7 @@
     IS_AUTO: new BasicStorage("IS_AUTO_", false, Boolean),
     DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, Number),
     CUSTOM_CONTAINER: new BasicStorage("CUSTOM_CONTAINER_", ""),
-    IGNORE_URLS: new BasicStorage("IGNORE_URLS", "")
+    IGNORE_URLS: new BasicStorage("IGNORE_URLS_", "")
   };
   const WebFull = {
     toggleFullscreen() {
@@ -403,10 +403,9 @@
       return this.getVideoIFrame() ?? Tools.getIFrames()[0];
     },
     getVideoIFrame() {
-      if (!this?.videoInfo?.iframeSrc) return null;
-      const { pathname, search } = new URL(this.videoInfo.iframeSrc);
-      const decoded = decodeURI(search);
-      const partial = decoded.slice(0, decoded.length * 0.8);
+      if (!this?.videoInfo?.iFrame) return null;
+      const { pathname, search } = new URL(decodeURI(this.videoInfo.iFrame));
+      const partial = search.slice(0, search.length * 0.8);
       return Tools.query(`iframe[src*="${pathname + partial}"]`) ?? Tools.query(`iframe[src*="${pathname}"]`);
     },
     getVideoContainer() {
@@ -464,10 +463,10 @@
       this.dispatchShortcutKey(Consts.P);
     },
     async isWebFull(video) {
-      const isWebFull = video.offsetWidth >= this.topWin.viewWidth;
-      if (!isWebFull) return false;
+      const { viewWidth } = this.topWin;
+      if (video.offsetWidth < viewWidth) return false;
       await Tools.sleep(Consts.HALF_SEC);
-      return video.offsetWidth >= this.topWin.viewWidth;
+      return video.offsetWidth >= viewWidth;
     }
   };
   const Ignore = {

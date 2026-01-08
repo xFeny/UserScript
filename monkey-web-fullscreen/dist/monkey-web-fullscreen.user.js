@@ -2,7 +2,7 @@
 // @name               视频自动网页全屏｜倍速播放
 // @name:zh-TW         視頻自動網頁全屏｜倍速播放
 // @namespace          http://tampermonkey.net/
-// @version            3.8.5
+// @version            3.8.6
 // @author             Feny
 // @description        支持所有H5视频的增强脚本，通用网页全屏｜倍速调节，对微博 / 推特 / Instagram / Facebook等多视频平台均适用；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @description:zh-TW  支持所有H5视频的增强脚本，通用網頁全屏｜倍速調節，对微博 / 推特 / Instagram / Facebook等平臺均適用；B站(含直播) / 騰訊視頻 / 優酷 / 愛奇藝 / 芒果TV / AcFun 默認自動網頁全屏，其他網站可手動開啓；自動網頁全屏 + 記憶倍速 + 下集切換，減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
@@ -137,7 +137,6 @@
   var _GM_unregisterMenuCommand = /* @__PURE__ */ (() => typeof GM_unregisterMenuCommand != "undefined" ? GM_unregisterMenuCommand : void 0)();
   var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
   const Tools = _unsafeWindow.FyTools = {
-    noNumber: (str) => !/\d/.test(str),
     isTopWin: () => window.top === window,
     isNumber: (str) => /^[0-9]$/.test(str),
     scrollTop: (top2) => window.scrollTo({ top: top2 }),
@@ -193,35 +192,29 @@
       return pointX >= left && pointX <= right && pointY >= top2 && pointY <= bottom;
     },
     emitMousemove(element) {
-      const { top: top2, left, right } = this.getElementRect(element);
-      for (let x = left; x <= right; x += 10) this.emitMouseEvent(element, "mousemove", x, top2);
+      const { top: y, left, right } = this.getElementRect(element);
+      for (let x = left; x <= right; x += 10) this.fireMouseEvt(element, "mousemove", x, y);
     },
-    emitMouseEvent(element, eventType, clientX, clientY) {
+    fireMouseEvt(element, eventType, clientX, clientY) {
       const dict = { clientX, clientY, bubbles: true };
       element?.dispatchEvent(new MouseEvent(eventType, dict));
     },
-    getParentChain(element, nth = false) {
+    hasValidDomId: (el) => el.id && !/[\d\u4e00-\u9fa5]/.test(el.id),
+    getElementPath(element) {
       const parents = [];
-      for (let current = element; current && current !== document.body; current = current.parentElement) {
-        parents.unshift(this.getTagInfo(current, nth));
-        if (current.id && this.noNumber(current.id)) break;
+      let current = element;
+      while (current && !current.matches("body")) {
+        parents.unshift(this.getElementSelector(current));
+        if (this.hasValidDomId(current)) break;
+        current = this.getParent(current);
       }
       return parents.join(" > ");
     },
-    getTagInfo(ele, nth = false) {
-      if (ele.id && this.noNumber(ele.id) && !/[\u4e00-\u9fa5]/.test(ele.id)) return `#${ele.id}`;
-      let selector = ele.tagName.toLowerCase();
-      const classes = Array.from(ele.classList);
-      if (classes.length) {
-        const validClasses = classes.filter(this.noNumber, this);
-        selector += /[:[\]]/.test(ele.className) ? `[class="${ele.className}"]` : validClasses.length ? `.${validClasses.join(".")}` : Consts.EMPTY;
-      }
-      if (nth && ele.parentElement) {
-        const siblings = Array.from(ele.parentElement.children).filter((sib) => sib.tagName === ele.tagName);
-        const index = siblings.indexOf(ele);
-        if (index > 0) selector += `:nth-of-type(${index + 1})`;
-      }
-      return selector;
+    getElementSelector(ele) {
+      if (this.hasValidDomId(ele)) return `#${ele.id}`;
+      const tag = ele.tagName.toLowerCase();
+      const validCls = Array.from(ele.classList).filter((cls) => !/[\[\]\d]/.test(cls));
+      return validCls.length ? `${tag}.${validCls.join(".")}` : tag;
     },
     getParent(element) {
       if (!element) return null;
@@ -341,14 +334,13 @@
       BasicStorage.#instances.push(this);
       if (BasicStorage.#instances.length === 1) requestIdleCallback(() => BasicStorage.cleanExpired());
     }
-    #getFinalKey(suffix = "", requireKey = false) {
-      if (requireKey && [null, void 0].includes(suffix)) throw new Error("键名拼接时，suffix（第二个参数）不能为空");
-      if (suffix.startsWith(this.name)) return suffix;
-      return this.splice ? this.name + suffix : this.name;
+    #getFinalKey(suffix) {
+      if (this.splice && !suffix) throw new Error(`${this.name} 后缀不能为空！`);
+      return this.name + (this.splice ? suffix : "");
     }
     set(value, key, expires) {
       const val = expires ? JSON.stringify({ value, expires: Date.now() + expires * 864e5 }) : value;
-      this.storage.setItem(this.#getFinalKey(key, true), val);
+      this.storage.setItem(this.#getFinalKey(key), val);
     }
     get(key) {
       const data = this.#get(this.#getFinalKey(key));
@@ -484,14 +476,12 @@
       this.observeVideoSrcChange(video);
     },
     setVideoInfo(video) {
-      const isLive = Object.is(video.duration, Infinity);
-      const selector = Tools.getParentChain(video, true);
-      const videoInfo = { src: video.currentSrc, isLive, selector };
-      this.setParentWinVideoInfo(videoInfo);
+      const videoInfo = { isLive: video.duration === Infinity };
+      this.syncVideoToParentWin(videoInfo);
     },
-    setParentWinVideoInfo(videoInfo) {
+    syncVideoToParentWin(videoInfo) {
       window.videoInfo = this.videoInfo = videoInfo;
-      if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iframeSrc: location.href } });
+      if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iFrame: location.href } });
       Tools.microTask(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
       this.getVideoIFrame()?.focus();
       this.sendTopWinInfo();
@@ -518,8 +508,7 @@
     },
     setupFullscreenListener() {
       document.addEventListener("fullscreenchange", () => {
-        const isFullscreen = !!document.fullscreenElement;
-        Tools.postMessage(window.top, { isFullscreen });
+        Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
       });
     },
     observeFullscreenChange() {
@@ -554,28 +543,25 @@
     setupMouseMoveListener() {
       let timer = null;
       const handle = ({ type, clientX, clientY }) => {
-        if (Tools.isThrottle(type, 300)) return;
-        if (!this.noVideo()) {
-          clearTimeout(timer), this.toggleCursor();
-          timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
-        }
-        if (!Storage.ENABLE_EDGE_CLICK.get()) return;
-        const video = this.getVideoForCoordinate(clientX, clientY);
-        video && this.createEdgeClickElement(video);
+        if (Tools.isThrottle(type)) return;
+        this.createEdgeClickElement(this.getVideoForCoord(clientX, clientY));
+        if (this.noVideo()) return;
+        clearTimeout(timer), this.toggleCursor();
+        timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
       };
       document.addEventListener("mousemove", handle, { passive: true });
     },
     toggleCursor(hide = false, cls = "__hc") {
       if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
-      [...Tools.getParents(this.player, true, 3), ...Tools.getIFrames()].forEach((el) => {
-        el?.blur(), Tools.addCls(el, cls), el?.dispatchEvent(new MouseEvent("mouseleave"));
-      });
+      const elements = [...Tools.getParents(this.player, true, 3), this.getVideoIFrame()];
+      elements.forEach((el) => (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
     },
-    getVideoForCoordinate(clientX, clientY) {
+    getVideoForCoord(clientX, clientY) {
+      if (!Storage.ENABLE_EDGE_CLICK.get()) return;
       return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
     },
     createEdgeClickElement(video) {
-      if (!Storage.ENABLE_EDGE_CLICK.get()) return;
+      if (!video || !Storage.ENABLE_EDGE_CLICK.get()) return;
       const container = this.getEdgeClickContainer(video);
       if (video.lArea?.parentNode === container) return;
       if (container instanceof Element && this.lacksRelativePosition(container)) {
@@ -632,7 +618,7 @@
     static {
       const selectors = Storage.ICONS_SELECTOR.get();
       selectors ? this.selectors = selectors : this.#loadRemote();
-      Tools.microTask(() => (this.#createSiteTests(), this.#convertGmMatchToRegex()));
+      Tools.microTask(() => (this.#createSiteTests(), this.#convertGmMatch()));
     }
     static getIcons(domain = location.host) {
       if (!Storage.ICONS_SELECTOR.get()) this.#loadRemote();
@@ -649,7 +635,7 @@
         Storage.ICONS_SELECTOR.set(this.selectors, Consts.EMPTY, 1 / 3);
       }).catch((e) => console.error("加载远程配置失败", e));
     }
-    static #convertGmMatchToRegex() {
+    static #convertGmMatch() {
       const { matches, includes: excluded } = _GM_info.script;
       const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
       this.gmMatches = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
@@ -726,7 +712,7 @@
     },
     handleMessage(data) {
       if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
-      if (data?.videoInfo) return this.setParentWinVideoInfo(data.videoInfo);
+      if (data?.videoInfo) return this.syncVideoToParentWin(data.videoInfo);
       if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
       if (data?.topWin) window.topWin = this.topWin = data.topWin;
       this.handleSettMessage(data);
@@ -1065,10 +1051,9 @@
       return this.getVideoIFrame() ?? Tools.getIFrames()[0];
     },
     getVideoIFrame() {
-      if (!this.videoInfo?.iframeSrc) return null;
-      const { pathname, search } = new URL(this.videoInfo.iframeSrc);
-      const decoded = decodeURI(search);
-      const partial = decoded.slice(0, decoded.length * 0.8);
+      if (!this.videoInfo?.iFrame) return null;
+      const { pathname, search } = new URL(decodeURI(this.videoInfo.iFrame));
+      const partial = search.slice(0, search.length * 0.8);
       return Tools.query(`iframe[src*="${pathname + partial}"]`) ?? Tools.query(`iframe[src*="${pathname}"]`);
     },
     getVideoContainer() {
@@ -1135,10 +1120,10 @@
       this.dispatchShortcutKey(Keyboard.P);
     },
     async isWebFull(video) {
-      const isWebFull = video.offsetWidth >= this.topWin.viewWidth;
-      if (!isWebFull) return false;
+      const { viewWidth } = this.topWin;
+      if (video.offsetWidth < viewWidth) return false;
       await Tools.sleep(Consts.HALF_SEC);
-      return video?.offsetWidth >= this.topWin?.viewWidth;
+      return video.offsetWidth >= viewWidth;
     },
     autoExitWebFullscreen() {
       if (!Site.isBili() && !Site.isAcFun()) return;
@@ -1184,8 +1169,8 @@
       if (numbers.length < 2) return;
       const index = episodes.indexOf(element);
       const currNumber = this.getEpisodeNumber(element);
-      const { leftSmall, rightLarge } = this.compareLeftRight(numbers, currNumber, index);
-      return (leftSmall || rightLarge) === isPrev ? episodes[index - 1] : episodes[index + 1];
+      const { lSmall, rLarge } = this.compareNumSize(numbers, currNumber, index);
+      return (lSmall || rLarge) === isPrev ? episodes[index - 1] : episodes[index + 1];
     },
     getAllEpisodes(element) {
       if (!element) return [];
@@ -1211,9 +1196,9 @@
       }
     },
     getEpisodeWrapper(element) {
-      while (element && element.parentElement) {
-        const siblings = Array.from(element.parentElement.children);
-        if (siblings.length > 1 && siblings.some((sib) => sib !== element && sib.tagName === element.tagName)) return element;
+      while (element?.parentElement) {
+        const sibs = Array.from(element.parentElement.children);
+        if (sibs.filter((s) => s.tagName === element.tagName).length > 1) return element;
         element = element.parentElement;
       }
       return null;
@@ -1224,12 +1209,11 @@
       return Tools.findByText("attr", texts).filter(ignore).shift() ?? Tools.findByText("text", texts).filter(ignore).shift();
     },
     getTargetEpisodeByClass(isPrev = false) {
-      if (isPrev) return null;
-      return Tools.query("[class*='control'] [class*='next' i]");
+      return isPrev ? null : Tools.query("[class*='control'] [class*='next' i]");
     },
-    compareLeftRight: (numbers, compareNumber = 0, index) => ({
-      leftSmall: numbers.some((val, i) => i < index && val < compareNumber),
-      rightLarge: numbers.some((val, i) => i > index && val > compareNumber)
+    compareNumSize: (nums, compareVal = 0, index) => ({
+      lSmall: nums.some((v, i) => i < index && v < compareVal),
+      rLarge: nums.some((v, i) => i > index && v > compareVal)
     })
   };
   const EpisodePicker = {
@@ -1240,16 +1224,16 @@
         if (!ctrlKey || !altKey || !isTrusted || this.isLive()) return;
         if (!Tools.isTopWin()) return Tools.notyf("此页面不能抓取 (•ิ_•ิ)?", true);
         Tools.preventDefault(event);
-        const hasCurrentSelector = Storage.CURRENT_EPISODE.get(this.host);
-        const hasRelativeSelector = Storage.RELATIVE_EPISODE.get(this.host);
-        if (hasCurrentSelector && hasRelativeSelector) return Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
+        const curSelector = Storage.CURRENT_EPISODE.get(this.host);
+        const relSelector = Storage.RELATIVE_EPISODE.get(this.host);
+        if (curSelector && relSelector) return Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
         const number = this.getEpisodeNumber(target);
         if (!number) return Tools.notyf("点击位置无数字 (•ิ_•ิ)?", true);
-        hasCurrentSelector ? this.pickerRelativeEpisodeChain(target) : this.pickerCurrentEpisodeChain(target);
+        curSelector ? this.pickerRelativeEpisodePath(target) : this.pickerCurrentEpisodePath(target);
       };
       document.addEventListener("click", handle, true);
     },
-    pickerCurrentEpisodeChain(element) {
+    pickerCurrentEpisodePath(element) {
       if (Storage.CURRENT_EPISODE.get(this.host)) return;
       this.pickerEpisodePopup(element, {
         validBtnCallback(value) {
@@ -1267,7 +1251,7 @@
         }
       });
     },
-    pickerRelativeEpisodeChain(element) {
+    pickerRelativeEpisodePath(element) {
       if (Storage.RELATIVE_EPISODE.get(this.host)) return;
       this.pickerEpisodePopup(element, {
         validBtnCallback(value) {
@@ -1314,7 +1298,7 @@
           return value ? validBtnCallback.call(this, value) ?? false : Tools.notyf("元素选择器不能为空！", true);
         },
         preConfirm: () => Tools.query("#__picker").value.trim() || Tools.notyf("元素选择器不能为空！", true),
-        didOpen: () => Tools.query("#__picker").value = Tools.getParentChain(element)
+        didOpen: () => Tools.query("#__picker").value = Tools.getElementPath(element)
       }).then((result) => result.isConfirmed && confirmCallback.call(this, result.value));
     }
   };
