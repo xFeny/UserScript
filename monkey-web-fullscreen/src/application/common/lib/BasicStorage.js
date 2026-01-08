@@ -24,14 +24,12 @@ export default class BasicStorage {
   /**
    * 生成最终键名
    * @param {string} [suffix=""] 后缀
-   * @param {boolean} [requireKey=false] 是否强制非空
    * @returns {string} 最终拼接后的键名
    * @throws {Error} 当requireKey为true且suffix为空时抛出错误
    */
-  #getFinalKey(suffix = "", requireKey = false) {
-    if (requireKey && [null, undefined].includes(suffix)) throw new Error("键名拼接时，suffix（第二个参数）不能为空");
-    if (suffix.startsWith(this.name)) return suffix;
-    return this.splice ? this.name + suffix : this.name;
+  #getFinalKey(suffix) {
+    if (this.splice && !suffix) throw new Error(`${this.name} 后缀不能为空！`);
+    return this.name + (this.splice ? suffix : "");
   }
 
   /**
@@ -42,7 +40,7 @@ export default class BasicStorage {
    */
   set(value, key, expires) {
     const val = expires ? JSON.stringify({ value, expires: Date.now() + expires * 864e5 }) : value;
-    this.storage.setItem(this.#getFinalKey(key, true), val);
+    this.storage.setItem(this.#getFinalKey(key), val);
   }
 
   /**

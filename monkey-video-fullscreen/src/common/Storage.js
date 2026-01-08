@@ -11,5 +11,5 @@ export default {
   /** 网页全屏相关：自定义此站视频容器 */
   CUSTOM_CONTAINER: new BasicStorage("CUSTOM_CONTAINER_", ""),
   /** 网页全屏相关：自动网页全屏忽略的网址 */
-  IGNORE_URLS: new BasicStorage("IGNORE_URLS", ""),
+  IGNORE_URLS: new BasicStorage("IGNORE_URLS_", ""),
 };

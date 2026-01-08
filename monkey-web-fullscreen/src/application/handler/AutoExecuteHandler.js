@@ -27,10 +27,10 @@ export default {
     this.dispatchShortcutKey(Keyboard.P);
   },
   async isWebFull(video) {
-    const isWebFull = video.offsetWidth >= this.topWin.viewWidth;
-    if (!isWebFull) return false;
+    const { viewWidth } = this.topWin;
+    if (video.offsetWidth < viewWidth) return false;
     await Tools.sleep(Consts.HALF_SEC);
-    return video?.offsetWidth >= this.topWin?.viewWidth; // 加可选链，避免报错
+    return video.offsetWidth >= viewWidth;
   },
   autoExitWebFullscreen() {
     if (!Site.isBili() && !Site.isAcFun()) return;

@@ -14,9 +14,9 @@ export default {
     this.dispatchShortcutKey(Consts.P);
   },
   async isWebFull(video) {
-    const isWebFull = video.offsetWidth >= this.topWin.viewWidth;
-    if (!isWebFull) return false;
+    const { viewWidth } = this.topWin;
+    if (video.offsetWidth < viewWidth) return false;
     await Tools.sleep(Consts.HALF_SEC);
-    return video.offsetWidth >= this.topWin.viewWidth;
+    return video.offsetWidth >= viewWidth;
   },
 };

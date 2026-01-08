@@ -20,8 +20,8 @@ export default class BasicStorage {
    * @returns {string} 最终拼接后的键名
    */
   #getFinalKey(suffix) {
-    if ([null, undefined].includes(suffix)) throw new Error("键名后缀不能为空");
-    return suffix.startsWith(this.name) ? suffix : this.name + suffix;
+    if (!suffix) throw new Error(`${this.name} 后缀不能为空！`);
+    return this.name + suffix;
   }
 
   set(value, key) {
