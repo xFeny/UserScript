@@ -15,7 +15,7 @@
 // @match        *://player.danmuzf.vip/danmuku/*
 // @match        *://www.ezdmw.site/Index/video/*
 // @grant        GM_addStyle
-// @run-at       document-body
+// @run-at       document-start
 // ==/UserScript==
 
 (t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const n=document.createElement("style");n.textContent=t,document.head.append(n)})(" #zhuXian a{margin:0!important;font-size:12px!important}.nav-area{margin-bottom:20px}#bkcl,.newhd,.ABP-Text,.tuiguang,.play-full,.login-box,.line_button2{width:0!important;height:0!important;display:none!important}.ABP-Unit .ABP-Comment-List{display:none!important} ");
