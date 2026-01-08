@@ -81,16 +81,16 @@
 
     const index = episodes.indexOf(element);
     const currNumber = getEpisodeNumber(element);
-    const { leftSmall, rightLarge } = compareLeftRight(numbers, currNumber, index);
-    console.log("左小", leftSmall, "右大", rightLarge);
-    // 当 leftSmall || rightLarge 的结果与 isPrev 的布尔值相同时，返回 prev，当两者不同时，返回 next。
-    return (leftSmall || rightLarge) === isPrev ? episodes[index - 1] : episodes[index + 1];
+    const { lSmall, rLarge } = compareNumSize(numbers, currNumber, index);
+    console.log("左小", lSmall, "右大", rLarge);
+    // 当 lSmall || rLarge 的结果与 isPrev 的布尔值相同时，返回 prev，当两者不同时，返回 next。
+    return (lSmall || rLarge) === isPrev ? episodes[index - 1] : episodes[index + 1];
   }
 
-  function compareLeftRight(numbers, compareNumber = 0, index) {
+  function compareNumSize(nums, compareVal = 0, index) {
     return {
-      leftSmall: numbers.some((val, i) => i < index && val < compareNumber),
-      rightLarge: numbers.some((val, i) => i > index && val > compareNumber),
+      lSmall: nums.some((v, i) => i < index && v < compareVal),
+      rLarge: nums.some((v, i) => i > index && v > compareVal),
     };
   }
 

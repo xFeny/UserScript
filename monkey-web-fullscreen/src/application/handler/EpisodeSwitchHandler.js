@@ -56,9 +56,9 @@ export default {
 
     const index = episodes.indexOf(element);
     const currNumber = this.getEpisodeNumber(element);
-    const { leftSmall, rightLarge } = this.compareLeftRight(numbers, currNumber, index);
-    // 当 leftSmall || rightLarge 的结果与 isPrev 的布尔值相同时，返回 prev，当两者不同时，返回 next。
-    return (leftSmall || rightLarge) === isPrev ? episodes[index - 1] : episodes[index + 1];
+    const { lSmall, rLarge } = this.compareNumSize(numbers, currNumber, index);
+    // 当 lSmall || rLarge 的结果与 isPrev 的布尔值相同时，返回 prev，当两者不同时，返回 next。
+    return (lSmall || rLarge) === isPrev ? episodes[index - 1] : episodes[index + 1];
   },
   /**
    * 获取所有匹配的剧集元素（去重）
@@ -129,11 +129,10 @@ export default {
     return Tools.findByText("attr", texts).filter(ignore).shift() ?? Tools.findByText("text", texts).filter(ignore).shift();
   },
   getTargetEpisodeByClass(isPrev = false) {
-    if (isPrev) return null;
-    return Tools.query("[class*='control'] [class*='next' i]");
+    return isPrev ? null : Tools.query("[class*='control'] [class*='next' i]");
   },
-  compareLeftRight: (numbers, compareNumber = 0, index) => ({
-    leftSmall: numbers.some((val, i) => i < index && val < compareNumber),
-    rightLarge: numbers.some((val, i) => i > index && val > compareNumber),
+  compareNumSize: (nums, compareVal = 0, index) => ({
+    lSmall: nums.some((v, i) => i < index && v < compareVal),
+    rLarge: nums.some((v, i) => i > index && v > compareVal),
   }),
 };
