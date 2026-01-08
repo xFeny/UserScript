@@ -155,7 +155,7 @@ export default {
     if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
 
     const elements = [...Tools.getParents(this.player, true, 3), this.getVideoIFrame()];
-    elements.forEach((el) => (Tools.addCls(el, cls), Tools.emitMouseEvent(el, "mouseleave")));
+    elements.forEach((el) => (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
   },
   // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
   getVideoForCoord(clientX, clientY) {

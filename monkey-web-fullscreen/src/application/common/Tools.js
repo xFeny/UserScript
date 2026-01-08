@@ -61,9 +61,9 @@ export default unsafeWindow.FyTools = {
   },
   emitMousemove(element) {
     const { top: y, left, right } = this.getElementRect(element);
-    for (let x = left; x <= right; x += 10) this.emitMouseEvent(element, "mousemove", x, y);
+    for (let x = left; x <= right; x += 10) this.fireMouseEvt(element, "mousemove", x, y);
   },
-  emitMouseEvent(element, eventType, clientX, clientY) {
+  fireMouseEvt(element, eventType, clientX, clientY) {
     const dict = { clientX, clientY, bubbles: true };
     element?.dispatchEvent(new MouseEvent(eventType, dict));
   },
