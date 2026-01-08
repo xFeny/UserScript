@@ -6,16 +6,7 @@ const settings = { volume: 1, opacity: 0.88, autoPlay: true, defaultWide: true }
 const App = {
   init() {
     this.videoSetting();
-    this.setupMutationObserver();
     this.setupKeydownListener();
-  },
-  setupMutationObserver() {
-    const observer = new MutationObserver(() => {
-      document.querySelector(".line_button2")?.remove();
-      document.querySelector(".ABP-Unit")?.removeAttribute("style");
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-    setTimeout(() => observer.disconnect(), 5000);
   },
   isFanTuan: () => location.host.includes("ft"),
   isEzSite: () => location.host.includes("ezdmw"),

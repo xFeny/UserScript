@@ -22,9 +22,3 @@
 .ABP-Unit .ABP-Comment-List {
   display: none !important;
 }
-
-.ABP-Unit,
-.ABP-Unit .ABP-Player {
-  width: 100% !important;
-  height: 100% !important;
-}
