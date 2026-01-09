@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网页全屏
 // @namespace    npm/vite-plugin-monkey
-// @version      3.8.6
+// @version      3.8.7
 // @author       Feny
 // @description  快捷键：P-网页全屏，Enter-全屏；支持侧边点击切换网页全屏；支持自动网页全屏
 // @license      GPL-3.0-only
@@ -400,13 +400,13 @@
     },
     getVideoHostContainer() {
       if (this.player) return this.getVideoContainer();
-      return this.getVideoIFrame() ?? Tools.getIFrames()[0];
+      return this.getVideoIFrame() ?? Tools.getIFrames().find(Tools.isVisible);
     },
     getVideoIFrame() {
-      if (!this?.videoInfo?.iFrame) return null;
-      const { pathname, search } = new URL(decodeURI(this.videoInfo.iFrame));
-      const partial = search.slice(0, search.length * 0.8);
-      return Tools.query(`iframe[src*="${pathname + partial}"]`) ?? Tools.query(`iframe[src*="${pathname}"]`);
+      if (!this.videoInfo?.iFrame) return null;
+      const { pathname, search } = new URL(this.videoInfo.iFrame);
+      const partial = ((s) => s.slice(0, s.length * 0.8))(decodeURIComponent(search));
+      return Tools.query(`iframe[src*="${pathname + partial}"]`);
     },
     getVideoContainer() {
       const selector = Storage.CUSTOM_CONTAINER.get(this.topWin?.host)?.trim();
