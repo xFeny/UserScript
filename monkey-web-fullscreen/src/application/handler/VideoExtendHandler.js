@@ -77,7 +77,7 @@ export default {
     this.prependElement(this.rateKeepElement);
   },
   resumeRateKeepDisplay() {
-    if (Tools.isOverLimit("rateKeep") || document.contains(this.rateKeepElement)) return;
+    if (document.contains(this.rateKeepElement) || Tools.isOverLimit("rateKeep")) return;
     this.playbackRateKeepDisplay();
   },
   removeRateKeepDisplay: () => App.rateKeepElement?.remove(),
