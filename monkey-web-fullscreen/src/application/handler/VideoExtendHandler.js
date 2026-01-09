@@ -12,17 +12,9 @@ export default {
     window.addEventListener("load", () => {
       // 某些网站需要点击相关元素，才会加载视频
       // 如：https://www.dadaqu.cc、https://www.jddzx.cc
-      const element = document.querySelector("body > #start, #play-button-overlay");
-      if (element) element.click?.();
-
+      Tools.query("body > #start, #play-button-overlay")?.click?.();
       this.setFakeBiliUser();
     });
-  },
-  async removeRelevantElements() {
-    // 防止网站的播放进度，对脚本的进度恢复造成影响，如：https://skr.skr1.cc:666
-    if (Tools.isThrottle("choice", Consts.ONE_SEC) || Tools.isOverLimit("choice", 3)) return;
-    const element = Tools.query(".ec-no, .conplaying, .choice-true, .close-btn, .closeclick");
-    if (element) element.click?.(), element.remove?.();
   },
   setFakeBiliUser() {
     if (!Site.isBili() || unsafeWindow.UserStatus?.userInfo?.isLogin) return;
@@ -100,5 +92,4 @@ export default {
   },
   changeTimeElementDisplay: () => (App.setupPlayerClock(), App.videoProgress(App.player, true)),
   setTimeElementColor: (color) => Tools.setStyle([App.progressNode, App.Clock?.element], "color", color),
-  hideLoadingElement: () => Tools.querys("#loading").forEach((el) => !Tools.query("video", el) && Tools.addCls(el, "hide")),
 };

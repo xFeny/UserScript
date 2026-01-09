@@ -41,7 +41,6 @@ export default {
     if (video.matches("fake-video")) this.loadeddata(video);
     if (!this.player) this.playing(video);
     this.autoWebFullscreen(video);
-    this.hideLoadingElement();
   },
   loadeddata(video) {
     this.initVideoProps(video);
@@ -51,7 +50,6 @@ export default {
     if (!this.player) this.playing(video);
 
     this.resumeRateKeepDisplay();
-    this.removeRelevantElements(video);
 
     this.autoWebFullscreen(video);
     this.autoNextEpisode(video);

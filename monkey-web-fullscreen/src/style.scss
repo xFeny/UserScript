@@ -164,11 +164,11 @@ body[gm_webfullscreen] [gm_webfullscreen] video {
 
   .swal2-tab {
     flex: 1;
+    padding: 8px 0;
     cursor: pointer;
     color: #64748b;
     font-weight: 500;
     text-align: center;
-    padding: 12px 10px;
     position: relative;
     transition: all 0.2s ease;
   }
@@ -374,40 +374,21 @@ body[gm_webfullscreen] [gm_webfullscreen] video {
 }
 
 /** 隐藏B站的提示 START **/
-.login-tip,
-.login-guide,
-.live-room-app #sidebar-vm,
-.lite-room .bili-mini-mask,
-.live-room-app #prehold-nav-vm,
-.live-room-app #shop-popover-vm,
-.risk-captcha-adapt .bili-mini-mask,
-#bilibili-player .bpx-player-toast-wrap,
-#bilibili-player .bpx-player-cmd-dm-wrap,
+#bilibili-player :is(.bpx-player-toast-wrap, .bpx-player-cmd-dm-wrap),
 #bilibili-player .bpx-player-dialog-wrap > :not(.bpx-player-dm-tip) {
   display: none !important;
 }
 /** 隐藏B站的提示 END **/
 
+/** 隐藏视频加载层 START **/
 #buffer,
 #install,
-#fd_tips,
-#a1 #tips,
-#loading.hide,
-.player-overlay,
-.memory-play-wrap,
-.atom-notice-click,
-.dplayer-resume-tip,
-[id*="player"] #tips,
 #player #loading-box,
-.dplayer-comment-box,
-.dplayer-notice strong,
 .air-player-loading-box,
-.art-layer-autoPlayback,
-.art-layer-auto-playback,
-.invoke-app-floating-tips,
-.invoke-app-san-container {
+body > #loading:not(:has(video)) {
   display: none !important;
 }
+/** 隐藏视频加载层 END **/
 
 .Clock,
 .__timeupdate,

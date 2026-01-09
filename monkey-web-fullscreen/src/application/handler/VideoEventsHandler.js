@@ -5,7 +5,7 @@ import Storage from "../common/Storage";
  * 视频监听事件逻辑处理
  */
 export default {
-  videoEvents: ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "pause", "ended"],
+  videoEvents: ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "ended"],
   setupVideoListeners(video) {
     const handleEvent = (event) => {
       const target = video ?? event.target;
@@ -27,7 +27,6 @@ export default {
     if (video.matches("fake-video")) this.loadeddata(video);
     if (!this.player) this.setCurrentVideo(video);
     this.autoWebFullscreen(video);
-    this.hideLoadingElement();
   },
   loadeddata(video) {
     this.initVideoProps(video);
@@ -37,8 +36,6 @@ export default {
     if (!this.player) this.playing(video);
 
     this.resumeRateKeepDisplay();
-    this.removeRelevantElements(video);
-
     this.autoWebFullscreen(video);
     this.autoNextEpisode(video);
 
@@ -54,10 +51,6 @@ export default {
   playing(video) {
     this.setCurrentVideo(video);
     Tools.sleep(50).then(() => this.initVideoPlay(video));
-  },
-  pause() {
-    // 稀饭动漫（https://dm.xifanacg.com）
-    Tools.query(".ec-no")?.click();
   },
   ended(video) {
     this.autoExitWebFullscreen();

@@ -70,14 +70,14 @@ export default {
   },
   getVideoHostContainer() {
     if (this.player) return this.getVideoContainer();
-    return this.getVideoIFrame() ?? Tools.getIFrames()[0];
+    return this.getVideoIFrame() ?? Tools.getIFrames().find(Tools.isVisible);
   },
   getVideoIFrame() {
-    if (!this?.videoInfo?.iFrame) return null;
+    if (!this.videoInfo?.iFrame) return null;
 
-    const { pathname, search } = new URL(decodeURI(this.videoInfo.iFrame));
-    const partial = search.slice(0, search.length * 0.8);
-    return Tools.query(`iframe[src*="${pathname + partial}"]`) ?? Tools.query(`iframe[src*="${pathname}"]`);
+    const { pathname, search } = new URL(this.videoInfo.iFrame);
+    const partial = ((s) => s.slice(0, s.length * 0.8))(decodeURIComponent(search));
+    return Tools.query(`iframe[src*="${pathname + partial}"]`);
   },
   getVideoContainer() {
     // 自定义网页全屏元素，支持多个选择器，返回第一个找到的元素
