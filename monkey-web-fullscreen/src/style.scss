@@ -383,6 +383,7 @@ body[gm_webfullscreen] [gm_webfullscreen] video {
 /** 隐藏视频加载层 START **/
 #buffer,
 #install,
+.memory-play-wrap,
 #player #loading-box,
 .air-player-loading-box,
 body > #loading:not(:has(video)) {
