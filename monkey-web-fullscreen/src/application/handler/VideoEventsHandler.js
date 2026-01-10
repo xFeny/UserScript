@@ -1,5 +1,6 @@
 import Tools from "../common/Tools";
 import Storage from "../common/Storage";
+import Consts from "../common/Consts";
 
 /**
  * 视频监听事件逻辑处理
@@ -50,6 +51,7 @@ export default {
   },
   playing(video) {
     this.setCurrentVideo(video);
+    if (!video.tsr) video.tsr = { ...Consts.DEF_TSR };
     Tools.sleep(50).then(() => this.initVideoPlay(video));
   },
   ended(video) {
