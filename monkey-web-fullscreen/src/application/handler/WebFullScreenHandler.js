@@ -14,31 +14,26 @@ export default {
     if (Tools.isThrottle("icon")) return;
     if (!Site.isBiliLive()) return Tools.query(Site.getIcons()?.[name])?.click();
     const index = Object.values(Site.icons).indexOf(name);
-    this.liveAuxHandle(), this.getLiveIcons()?.[index]?.click();
+    this.getLiveIcons()?.[index]?.click();
   },
-  async liveAuxHandle() {
-    unsafeWindow.top.scrollTo({ top: 70 });
-    const el = Tools.query(":is(.lite-room, #player-ctnr)", top.document);
-    if (el) unsafeWindow.top.scrollTo({ top: Tools.getElementRect(el)?.top });
-
-    if (Tools.hasCls(document.body, "hide-asida-area") || !unsafeWindow.top?.livePlayer) return;
-    unsafeWindow.top.livePlayer.volume(100); // 声音100%
-    unsafeWindow.top.livePlayer.switchQualityAsync("10000"); // 原画画质
-    localStorage.setItem("FULLSCREEN-GIFT-PANEL-SHOW", 0); // 关闭全屏礼物栏
-    Tools.addCls(document.body, "hide-asida-area", "hide-aside-area"); // 关闭侧边聊天栏
-  },
+  /**
+   * 获取B站直播播放器控制栏右侧的功能图标列表
+   * @description 图标从右到左排序：全屏、网页全屏、弹幕设置、弹幕开关、小窗模式（下标[0]为全屏图标）
+   * @returns {NodeList} 图标元素的节点列表，按「全屏→网页全屏→弹幕设置→弹幕开关→小窗模式」顺序排列
+   */
   getLiveIcons() {
-    // 图标从右到左：全屏、网页全屏、弹幕设置、弹幕开关、小窗模式，即下标[0]是全屏图标
-    Tools.emitMousemove(this.getVideo());
-    return Tools.querys("#web-player-controller-wrap-el .right-area .icon");
+    Tools.emitMousemove(this.player);
+    return Tools.querys(".right-area .icon");
   },
   toggleFullscreen() {
     if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
+    if (Site.isGmMatch() && !Site.isBiliLive()) return this.triggerIconElement(Site.icons.full);
     this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
     if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcutKey(Keyboard.P); // 全屏或非网页全屏模式下
   },
   toggleWebFullscreen(isTrusted) {
     if (this.noVideo() || Tools.isThrottle("toggleWeb")) return;
+    if (Site.isGmMatch() && !Site.isBiliLive()) return this.triggerIconElement(Site.icons.webFull);
     if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
     this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
   },
