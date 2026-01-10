@@ -2,27 +2,15 @@ import Tools from "./common/Tools";
 
 class VideoEnhancer {
   static setPlaybackRate(video, playRate) {
-    this.bypassPlaybackRateLimit(video);
-    video.playbackRate = video.__playRate = (+playRate).toFixed(2).replace(/\.?0+$/, "");
-  }
-
-  /**
-   * 绕过视频播放器的播放速率限制
-   * @param video - 视频元素
-   * @see 腾讯视频fake-video https://v.qq.com/wasm-kernel/1.0.49/fake-video-element-iframe.js
-   */
-  static bypassPlaybackRateLimit(video) {
     this.defineProperty(video, "playbackRate", {
       set(value, setter) {
         if (this.playbackRate === value) return;
-        if (this instanceof HTMLMediaElement) return this.__playRate === value && setter(value);
-
-        this._playbackRate = value;
-        this._quality.setPlaybackRate(value);
-        this?.mailToWorker({ cmd: "callWorker_setRate", rate: value });
-        Tools.microTask(() => this?.emit("ratechange", this._playbackRate));
+        this.__playRate === value && setter(value);
       },
     });
+
+    const rate = (+playRate).toFixed(2).replace(/\.?0+$/, "");
+    video.playbackRate = video.__playRate = rate;
   }
 
   static defineProperty(video, property, descs) {

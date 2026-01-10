@@ -10,7 +10,7 @@ export default {
   setupVideoListeners(video) {
     const handleEvent = (event) => {
       const target = video ?? event.target;
-      if (video || target.matches("video, fake-video")) this[event.type](target);
+      if (video || target.matches(`video, ${Consts.FAKE_VIDEO}`)) this[event.type](target);
     };
 
     this.videoEvents.forEach((type) => (video ?? document).addEventListener(type, handleEvent, true));
@@ -22,7 +22,6 @@ export default {
       if (!video || video.hasAttribute("received")) return;
       this.setupVideoListeners(video), video.setAttribute("received", true);
       Tools.microTask(() => this.createEdgeClickElement(video));
-      if (!this.player) this.setCurrentVideo(video);
     });
   },
   cleanupDetachedVideos() {
@@ -38,7 +37,7 @@ export default {
     }, Consts.THREE_SEC * 10);
   },
   loadedmetadata(video) {
-    if (video.matches("fake-video")) this.loadeddata(video);
+    if (video.matches(Consts.FAKE_VIDEO)) this.loadeddata(video);
     if (!this.player) this.playing(video);
     this.autoWebFullscreen(video);
   },
