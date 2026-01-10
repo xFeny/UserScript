@@ -98,7 +98,9 @@ export default {
     const iFrame = this.getVideoIFrame();
     if (!iFrame || iFrame.hasAttribute("observed")) return;
 
-    const observer = new MutationObserver(() => this.fsWrapper && this.exitWebFullscreen());
+    const observer = new MutationObserver(() =>
+      this.isFullscreen ? this.toggleFullscreen() : this.fsWrapper && this.exitWebFullscreen()
+    );
     observer.observe(iFrame, { attributes: true, attributeFilter: ["src"] });
     iFrame.setAttribute("observed", true);
     iFrame.focus(); // 自动聚焦：单层嵌套场景下，「启用 空格◀️▶️ 控制」时，能切换视频播放状态
