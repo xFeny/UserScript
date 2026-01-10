@@ -770,6 +770,7 @@
     },
     playing(video) {
       this.setCurrentVideo(video);
+      if (!video.tsr) video.tsr = { ...Consts.DEF_TSR };
       Tools.sleep(50).then(() => this.initVideoPlay(video));
     },
     ended(video) {
