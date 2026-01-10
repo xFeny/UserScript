@@ -268,20 +268,14 @@
   };
   class VideoEnhancer {
     static setPlaybackRate(video, playRate) {
-      this.bypassPlaybackRateLimit(video);
-      video.playbackRate = video.__playRate = (+playRate).toFixed(2).replace(/\.?0+$/, "");
-    }
-    static bypassPlaybackRateLimit(video) {
       this.defineProperty(video, "playbackRate", {
         set(value, setter) {
           if (this.playbackRate === value) return;
-          if (this instanceof HTMLMediaElement) return this.__playRate === value && setter(value);
-          this._playbackRate = value;
-          this._quality.setPlaybackRate(value);
-          this?.mailToWorker({ cmd: "callWorker_setRate", rate: value });
-          Tools.microTask(() => this?.emit("ratechange", this._playbackRate));
+          this.__playRate === value && setter(value);
         }
       });
+      const rate = (+playRate).toFixed(2).replace(/\.?0+$/, "");
+      video.playbackRate = video.__playRate = rate;
     }
     static defineProperty(video, property, descs) {
       try {
@@ -742,7 +736,7 @@
     setupVideoListeners(video) {
       const handleEvent = (event) => {
         const target = video ?? event.target;
-        if (video || target.matches("video, fake-video")) this[event.type](target);
+        if (video || target.matches(`video, ${Consts.FAKE_VIDEO}`)) this[event.type](target);
       };
       this.videoEvents.forEach((type) => (video ?? document).addEventListener(type, handleEvent, true));
     },
@@ -755,7 +749,7 @@
       });
     },
     loadedmetadata(video) {
-      if (video.matches("fake-video")) this.loadeddata(video);
+      if (video.matches(Consts.FAKE_VIDEO)) this.loadeddata(video);
       if (!this.player) this.setCurrentVideo(video);
       this.autoWebFullscreen(video);
     },
