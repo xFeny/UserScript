@@ -15,17 +15,20 @@ class VideoEnhancer {
 
   static defineProperty(video, property, descs) {
     try {
-      const isMediaElement = video instanceof HTMLMediaElement;
-      const videoPrototype = isMediaElement ? HTMLMediaElement.prototype : Object.getPrototypeOf(video);
-      const original = Object.getOwnPropertyDescriptor(videoPrototype, property);
+      const isMedia = video instanceof HTMLMediaElement;
+      const proto = isMedia ? HTMLMediaElement.prototype : Object.getPrototypeOf(video);
+      const original = Object.getOwnPropertyDescriptor(proto, property);
       if (!original) throw new Error(`属性 ${property} 不存在`);
 
-      Object.defineProperty(isMediaElement ? video : videoPrototype, property, {
+      const target = isMedia ? video : proto;
+      Object.defineProperty(target, property, {
         get() {
-          return descs.get ? descs.get.call(this, original.get.call(this)) : original.get.call(this);
+          const value = original.get.call(this);
+          return descs.get ? descs.get.call(this, value) : value;
         },
         set(value) {
-          descs.set ? descs.set.call(this, value, original.set.bind(this)) : original.set.call(this, value);
+          const setter = original.set.bind(this);
+          descs.set ? descs.set.call(this, value, setter) : setter(value);
         },
         configurable: true,
       });
