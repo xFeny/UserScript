@@ -64,7 +64,7 @@ export default {
     window.videoInfo = this.videoInfo = videoInfo;
     if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iFrame: location.href } });
     Tools.microTask(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
-    this.getVideoIFrame()?.focus(); // 自动聚焦到内嵌框架，使空格键能切换播放状态
+    this.watchVideoIFrameChange();
     this.sendTopWinInfo();
   },
   sendTopWinInfo() {
@@ -88,6 +88,20 @@ export default {
         if ((isFake || this === that.player) && value) handleChange(this);
       },
     });
+  },
+  /**
+   * 监听视频所在iframe的src属性变化
+   * 当src发生变动时，自动退出网页全屏状态
+   * 如：https://www.ttdm1.me
+   */
+  async watchVideoIFrameChange() {
+    const iFrame = this.getVideoIFrame();
+    if (!iFrame || iFrame.hasAttribute("observed")) return;
+
+    const observer = new MutationObserver(() => this.fsWrapper && this.exitWebFullscreen());
+    observer.observe(iFrame, { attributes: true, attributeFilter: ["src"] });
+    iFrame.setAttribute("observed", true);
+    iFrame.focus(); // 自动聚焦：单层嵌套场景下，「启用 空格◀️▶️ 控制」时，能切换视频播放状态
   },
   // ====================⇑⇑⇑ 设置当前视频相关逻辑 ⇑⇑⇑====================
 
