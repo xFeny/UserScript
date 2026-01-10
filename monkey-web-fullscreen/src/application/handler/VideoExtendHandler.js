@@ -10,8 +10,7 @@ import Storage from "../common/Storage";
 export default {
   setupLoadEventListener() {
     window.addEventListener("load", () => {
-      // 某些网站需要点击相关元素，才会加载视频
-      // 如：https://www.dadaqu.cc、https://www.jddzx.cc
+      // 个别需点击元素才加载视频，如：https://www.dadaqu.cc、https://www.jddzx.cc
       Tools.query("body > #start, #play-button-overlay")?.click?.();
       this.setFakeBiliUser();
     });

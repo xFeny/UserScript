@@ -198,14 +198,13 @@ export default {
   },
   setTsr(name, value) {
     try {
+      Tools.addCls(this.player, "__tsr");
       this.player._mfs_tsr = this.player._mfs_tsr ?? getComputedStyle(this.player).transform;
       Tools.setStyle(this.player, "--deftsr", this.player._mfs_tsr);
+      Tools.setStyle(this.player, name, value);
     } catch (e) {
       console.error(e);
     }
-
-    Tools.setStyle(this.player, name, value);
-    Tools.addCls(this.player, "__tsr");
     return this;
   },
   // ====================⇑⇑⇑ 视频画面变换相关逻辑 ⇑⇑⇑====================
