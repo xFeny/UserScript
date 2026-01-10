@@ -13,21 +13,24 @@ class VideoEnhancer {
     video.playbackRate = video.__playRate = rate;
   }
 
-  static defineProperty(video, property, descs) {
+  /**
+   * 通用属性拦截方法（支持DOM元素/普通对象）
+   * @param {HTMLElement|Object} target 目标对象/元素
+   * @param {string} property 要拦截的属性名
+   * @param {Object} descs 拦截器 { get?: (value) => *, set?: (value, setter) => void }
+   */
+  static defineProperty(target, property, descs) {
     try {
-      const isMedia = video instanceof HTMLMediaElement;
-      const proto = isMedia ? HTMLMediaElement.prototype : Object.getPrototypeOf(video);
-      const original = Object.getOwnPropertyDescriptor(proto, property);
+      const original = this.#getPropertyDescriptor(target, property);
       if (!original) throw new Error(`属性 ${property} 不存在`);
 
-      const target = isMedia ? video : proto;
       Object.defineProperty(target, property, {
         get() {
-          const value = original.get.call(this);
+          const value = original.get ? original.get.call(this) : original.value;
           return descs.get ? descs.get.call(this, value) : value;
         },
         set(value) {
-          const setter = original.set.bind(this);
+          const setter = (val) => (original.set ? original.set.call(this, val) : (original.value = val));
           descs.set ? descs.set.call(this, value, setter) : setter(value);
         },
         configurable: true,
@@ -35,6 +38,24 @@ class VideoEnhancer {
     } catch (e) {
       console.error(`修改 ${property} 属性时出错：`, e);
     }
+  }
+
+  /**
+   * 深度获取属性描述符（自身+原型链）
+   * @param {HTMLElement|Object} target 目标对象/元素
+   * @param {string} prop 属性名
+   * @returns {PropertyDescriptor|undefined} 属性描述符
+   */
+  static #getPropertyDescriptor(target, prop) {
+    let desc = Object.getOwnPropertyDescriptor(target, prop);
+    let proto = Object.getPrototypeOf(target);
+
+    while (!desc && proto) {
+      desc = Object.getOwnPropertyDescriptor(proto, prop);
+      proto = Object.getPrototypeOf(proto);
+    }
+
+    return desc;
   }
 
   static hackAttachShadow() {

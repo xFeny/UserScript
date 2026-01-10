@@ -8,6 +8,8 @@ import VideoEnhancer from "../VideoEnhancer";
  * 应用程序初始化
  */
 export default {
+  fsWrapper: null,
+  isFullscreen: false,
   noVideo: () => !window.videoInfo && !window.topWin,
   isBackgroundVideo: (video) => video?.muted && video?.loop,
   init(isNonFirst = false) {
@@ -114,12 +116,8 @@ export default {
     });
   },
   observeFullscreenChange() {
-    Object.defineProperty(this, "isFullscreen", {
-      get: () => this._isFullscreen ?? false,
-      set: (value) => {
-        this._isFullscreen = value;
-        this.handleFullscreenChange(value);
-      },
+    VideoEnhancer.defineProperty(this, "isFullscreen", {
+      set: (value, setter) => (setter(value), this.handleFullscreenChange(value)),
     });
   },
   handleFullscreenChange(isFullscreen) {
@@ -138,10 +136,11 @@ export default {
       if (this.isInputFocus(event) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
       Tools.preventDefault(event), Object.is(type, "keydown") && this.dispatchShortcutKey(code, { bypass: true });
     };
-    Object.defineProperty(this, "fsWrapper", {
-      get: () => this._fsWrapper,
-      set: (value) => {
-        this._fsWrapper = value;
+
+    VideoEnhancer.defineProperty(this, "fsWrapper", {
+      set: (value, setter) => {
+        setter(value);
+
         const method = value ? "addEventListener" : "removeEventListener";
         ["scroll", "keyup", "keydown"].forEach((type) => unsafeWindow[method](type, handle, true));
       },
