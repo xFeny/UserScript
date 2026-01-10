@@ -2,7 +2,7 @@
 // @name               视频自动网页全屏｜倍速播放
 // @name:zh-TW         視頻自動網頁全屏｜倍速播放
 // @namespace          http://tampermonkey.net/
-// @version            3.8.8
+// @version            3.8.9
 // @author             Feny
 // @description        支持所有H5视频的增强脚本，通用网页全屏｜倍速调节，对微博 / 推特 / Instagram / Facebook等多视频平台均适用；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @description:zh-TW  支持所有H5视频的增强脚本，通用網頁全屏｜倍速調節，对微博 / 推特 / Instagram / Facebook等平臺均適用；B站(含直播) / 騰訊視頻 / 優酷 / 愛奇藝 / 芒果TV / AcFun 默認自動網頁全屏，其他網站可手動開啓；自動網頁全屏 + 記憶倍速 + 下集切換，減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
@@ -437,7 +437,6 @@
   const Listen = {
     noVideo: () => !window.videoInfo && !window.topWin,
     isBackgroundVideo: (video) => video?.muted && video?.loop,
-    getVideo: () => Tools.querys(":is(video, fake-video):not([loop])").find(Tools.isVisible),
     init(isNonFirst = false) {
       this.host = location.host;
       this.docElement = document.documentElement;
@@ -457,7 +456,7 @@
     setupVisibleListener() {
       window.addEventListener("visibilitychange", () => {
         if (this.noVideo() || Storage.IS_INVISIBLE_PAUSE.get()) return;
-        const video = this.player ?? this.getVideo();
+        const video = this.player;
         if (!video || video.ended || !Tools.isVisible(video)) return;
         document.hidden ? video.pause() : video.play();
       });
@@ -483,7 +482,7 @@
       window.videoInfo = this.videoInfo = videoInfo;
       if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iFrame: location.href } });
       Tools.microTask(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
-      this.getVideoIFrame()?.focus();
+      this.watchVideoIFrameChange();
       this.sendTopWinInfo();
     },
     sendTopWinInfo() {
@@ -505,6 +504,16 @@
           if ((isFake || this === that.player) && value) handleChange(this);
         }
       });
+    },
+    async watchVideoIFrameChange() {
+      const iFrame = this.getVideoIFrame();
+      if (!iFrame || iFrame.hasAttribute("observed")) return;
+      const observer = new MutationObserver(
+        () => this.isFullscreen ? this.toggleFullscreen() : this.fsWrapper && this.exitWebFullscreen()
+      );
+      observer.observe(iFrame, { attributes: true, attributeFilter: ["src"] });
+      iFrame.setAttribute("observed", true);
+      iFrame.focus();
     },
     setupFullscreenListener() {
       document.addEventListener("fullscreenchange", () => {
