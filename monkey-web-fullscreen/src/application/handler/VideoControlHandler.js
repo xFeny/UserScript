@@ -190,22 +190,22 @@ export default {
   resetVideoTransform() {
     if (!this.player || this.isDisZoom()) return;
 
-    this.setTsr("--zoom").setTsr("--moveX").setTsr("--moveY").setTsr("--scale").setTsr("--mirror").setTsr("--rotate");
+    const styles = ["--zoom", "--moveX", "--moveY", "--scale", "--mirror", "--rotate", "--deftsr"];
+    styles.forEach((n) => Tools.setStyle(this.player, n));
     this.player.tsr = { ...Consts.DEF_TSR };
+    Tools.delCls(this.player, "__tsr");
+    delete this.player._mfs_tsr;
   },
   setTsr(name, value) {
-    Tools.addCls(this.player, "__tsr");
-
     try {
-      // 默认 transform 样式
-      this.player.__trans = this.player.__trans ?? getComputedStyle(this.player)?.getPropertyValue("transform");
-      Tools.setStyle(this.player, "--deftsr", this.player.__trans);
+      this.player._mfs_tsr = this.player._mfs_tsr ?? getComputedStyle(this.player).transform;
+      Tools.setStyle(this.player, "--deftsr", this.player._mfs_tsr);
     } catch (e) {
       console.error(e);
     }
 
-    // transform 变换值
     Tools.setStyle(this.player, name, value);
+    Tools.addCls(this.player, "__tsr");
     return this;
   },
   // ====================⇑⇑⇑ 视频画面变换相关逻辑 ⇑⇑⇑====================

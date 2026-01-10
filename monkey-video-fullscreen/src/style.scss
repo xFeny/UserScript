@@ -34,8 +34,9 @@ body[gm_webfullscreen] [gm_webfullscreen] video {
   left: 0 !important;
   width: 100vw !important;
   border: none !important;
-  height: clamp(calc(100vh - 100%), 100vh, 100%) !important;
+  transform: none !important;
   object-fit: contain !important;
+  height: clamp(calc(100vh - 100%), 100vh, 100%) !important;
 }
 /** 视频网页全屏相关样式 END **/
 
