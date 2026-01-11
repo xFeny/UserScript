@@ -14,14 +14,14 @@ class VideoEnhancer {
   }
 
   /**
-   * 通用属性拦截方法（支持DOM元素/普通对象）
-   * @param {HTMLElement|Object} target 目标对象/元素
+   * 通用属性拦截方法（支持DOM元素/普通对象/自定义元素）
+   * @param {HTMLElement|Object|Array|Function} target 目标（支持DOM、对象、数组、类/函数）
    * @param {string} property 要拦截的属性名
    * @param {Object} descs 拦截器 { get?: (value) => *, set?: (value, setter) => void }
    */
   static defineProperty(target, property, descs) {
     try {
-      const original = this.#getPropertyDescriptor(target, property);
+      const original = this.getPropertyDescriptor(target, property);
       if (!original) throw new Error(`属性 ${property} 不存在`);
 
       Object.defineProperty(target, property, {
@@ -41,12 +41,12 @@ class VideoEnhancer {
   }
 
   /**
-   * 深度获取属性描述符（自身+原型链）
-   * @param {HTMLElement|Object} target 目标对象/元素
+   * 深度获取目标属性描述符
+   * @param {HTMLElement|Object|Array|Function} target 目标（支持DOM、对象、数组、类/函数）
    * @param {string} property 属性名
    * @returns {PropertyDescriptor|undefined} 属性描述符
    */
-  static #getPropertyDescriptor(target, property) {
+  static getPropertyDescriptor(target, property) {
     for (let proto = target; proto; proto = Object.getPrototypeOf(proto)) {
       const desc = Object.getOwnPropertyDescriptor(proto, property);
       if (desc) return desc;
