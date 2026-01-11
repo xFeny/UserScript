@@ -94,7 +94,7 @@ export default {
    * 当src发生变动时，自动退出网页全屏状态
    * 如：https://www.ttdm1.me
    */
-  async watchVideoIFrameChange() {
+  watchVideoIFrameChange() {
     const iFrame = this.getVideoIFrame();
     if (!iFrame || this.isObserved(iFrame)) return;
 
