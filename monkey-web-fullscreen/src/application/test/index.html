@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>VideoEnhancer 使用示例</title>
+  </head>
+  <body></body>
+</html>
+<script>
+  class VideoEnhancer {
+    /**
+     * 通用属性拦截方法（支持DOM元素/普通对象/自定义元素）
+     * @param {HTMLElement|Object|Array|Function} target 目标（支持DOM、对象、数组、类/函数）
+     * @param {string} property 要拦截的属性名
+     * @param {Object} descs 拦截器 { get?: (value) => *, set?: (value, setter) => void }
+     */
+    static defineProperty(target, property, descs) {
+      try {
+        const original = this.getPropertyDescriptor(target, property);
+        if (!original) throw new Error(`属性 ${property} 不存在`);
+
+        Object.defineProperty(target, property, {
+          get() {
+            const value = original.get ? original.get.call(this) : original.value;
+            return descs.get ? descs.get.call(this, value) : value;
+          },
+          set(value) {
+            // 执行属性赋值（原生set/直接赋值），返回传入值
+            const setter = (v) => (original.set ? original.set.call(this, v) : (original.value = v), v);
+            descs.set ? descs.set.call(this, value, setter) : setter(value);
+          },
+          configurable: true,
+        });
+      } catch (e) {
+        console.error(`修改 ${property} 属性时出错：`, e);
+      }
+    }
+
+    /**
+     * 深度获取目标属性描述符
+     * @param {HTMLElement|Object|Array|Function} target 目标（支持DOM、对象、数组、类/函数）
+     * @param {string} property 属性名
+     * @returns {PropertyDescriptor|undefined} 属性描述符
+     */
+    static getPropertyDescriptor(target, property) {
+      for (let proto = target; proto; proto = Object.getPrototypeOf(proto)) {
+        const desc = Object.getOwnPropertyDescriptor(proto, property);
+        if (desc) return desc;
+      }
+
+      return null;
+    }
+  }
+</script>
+<script>
+  // ===== 场景1：拦截视频元素的 playbackRate 属性 =====
+  console.log("===== 场景1：限制视频播放速率区间 =====");
+  const video = document.createElement("video");
+  VideoEnhancer.defineProperty(video, "playbackRate", {
+    set(value, setter) {
+      console.log("要设置的播放速率：", value);
+      setter(Math.max(0.1, Math.min(3, value)));
+    },
+  });
+  video.playbackRate = 0.06;
+  console.log("实际播放速率:", video.playbackRate); // 输出拦截后的结果
+</script>
+<script>
+  // ===== 场景2：拦截普通对象的属性 =====
+  console.log("\n===== 场景2：拦截普通对象属性 =====");
+  const user = { name: "张三", age: 20 };
+  VideoEnhancer.defineProperty(user, "name", {
+    get: (value) => `[用户] ${value}`,
+    set(value, setter) {
+      // 拦截set：限制名称长度不超过10
+      if (value.length > 10) {
+        console.warn("名称长度超过10，自动截断");
+        setter(value.substring(0, 10));
+      } else {
+        setter(value);
+      }
+    },
+  });
+  // 测试get拦截
+  console.log("user.name 获取的值：", user.name); // 输出: [用户] 张三
+  // 测试set拦截（超长名称）
+  user.name = "限制字符串的长度不超过10"; // 输出警告，截断为10个字符
+  console.log("修改后的user.name:", user.name); // 输出: [用户] 张三张三张三张三
+</script>
+<script>
+  // ===== 场景3：拦截自定义元素的自定义属性 =====
+  console.log("\n===== 场景3：拦截自定义元素属性 =====");
+  // 定义自定义元素
+  class FakeVideoElement extends HTMLElement {
+    constructor() {
+      super();
+      this._content = "默认内容";
+    }
+    // 自定义属性的访问器
+    get content() {
+      return this._content;
+    }
+    set content(val) {
+      this._content = val;
+    }
+  }
+  customElements.define("fake-video", FakeVideoElement);
+  // 创建自定义元素实例
+  const myEl = document.createElement("fake-video");
+  // 拦截自定义元素的 content 属性
+  VideoEnhancer.defineProperty(myEl, "content", {
+    get: (value) => `[自定义元素] ${value}`,
+    set(value, setter) {
+      // 拦截set：过滤空值
+      if (!value || value.trim() === "") {
+        console.warn("内容不能为空，使用默认值");
+        setter("默认内容");
+      } else {
+        setter(value);
+      }
+    },
+  });
+  // 测试get拦截
+  console.log("myEl.content:", myEl.content); // 输出: [自定义元素] 默认内容
+  // 测试set拦截（空值）
+  myEl.content = ""; // 输出警告，使用默认值
+  console.log("修改后的myEl.content:", myEl.content); // 输出: [自定义元素] 默认内容
+  // 测试set拦截（正常值）
+  myEl.content = "自定义内容";
+  console.log("最终myEl.content:", myEl.content); // 输出: [自定义元素] 自定义内容
+</script>

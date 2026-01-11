@@ -30,7 +30,8 @@ class VideoEnhancer {
           return descs.get ? descs.get.call(this, value) : value;
         },
         set(value) {
-          const setter = (v) => (original.set ? (original.set.call(this, v), v) : ((original.value = v), v));
+          // 执行属性赋值（原生set/直接赋值），返回传入值
+          const setter = (v) => (original.set ? original.set.call(this, v) : (original.value = v), v);
           descs.set ? descs.set.call(this, value, setter) : setter(value);
         },
         configurable: true,
