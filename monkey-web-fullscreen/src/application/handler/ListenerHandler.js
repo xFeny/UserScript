@@ -84,10 +84,9 @@ export default {
     const that = this;
     const isFake = video.matches(Consts.FAKE_VIDEO);
     const handleChange = (v) => (delete that.topWin, that.setVideoInfo(v));
-    VideoEnhancer.defineProperty(video, isFake ? "srcConfig" : "src", {
+    VideoEnhancer.defineProperty(video, isFake ? "_src" : "src", {
       set(value, setter) {
-        isFake ? (this._src = value) : setter(value);
-        if ((isFake || this === that.player) && value) handleChange(this);
+        setter(value), value && this === that.player && handleChange(this);
       },
     });
   },
@@ -139,9 +138,7 @@ export default {
 
     VideoEnhancer.defineProperty(this, "fsWrapper", {
       set: (value, setter) => {
-        setter(value);
-
-        const method = value ? "addEventListener" : "removeEventListener";
+        const method = setter(value) ? "addEventListener" : "removeEventListener";
         ["scroll", "keyup", "keydown"].forEach((type) => unsafeWindow[method](type, handle, true));
       },
     });

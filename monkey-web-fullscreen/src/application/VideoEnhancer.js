@@ -30,7 +30,7 @@ class VideoEnhancer {
           return descs.get ? descs.get.call(this, value) : value;
         },
         set(value) {
-          const setter = (val) => (original.set ? original.set.call(this, val) : (original.value = val));
+          const setter = (v) => (original.set ? (original.set.call(this, v), v) : ((original.value = v), v));
           descs.set ? descs.set.call(this, value, setter) : setter(value);
         },
         configurable: true,
@@ -43,19 +43,16 @@ class VideoEnhancer {
   /**
    * 深度获取属性描述符（自身+原型链）
    * @param {HTMLElement|Object} target 目标对象/元素
-   * @param {string} prop 属性名
+   * @param {string} property 属性名
    * @returns {PropertyDescriptor|undefined} 属性描述符
    */
-  static #getPropertyDescriptor(target, prop) {
-    let desc = Object.getOwnPropertyDescriptor(target, prop);
-    let proto = Object.getPrototypeOf(target);
-
-    while (!desc && proto) {
-      desc = Object.getOwnPropertyDescriptor(proto, prop);
-      proto = Object.getPrototypeOf(proto);
+  static #getPropertyDescriptor(target, property) {
+    for (let proto = target; proto; proto = Object.getPrototypeOf(proto)) {
+      const desc = Object.getOwnPropertyDescriptor(proto, property);
+      if (desc) return desc;
     }
 
-    return desc;
+    return null;
   }
 
   static hackAttachShadow() {
