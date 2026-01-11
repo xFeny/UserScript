@@ -9,8 +9,7 @@ class VideoEnhancer {
       },
     });
 
-    const rate = (+playRate).toFixed(2).replace(/\.?0+$/, "");
-    video.playbackRate = video.__playRate = rate;
+    video.playbackRate = video.__playRate = Tools.toFixed(playRate);
   }
 
   /**
