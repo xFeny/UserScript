@@ -134,7 +134,7 @@ export default {
     };
 
     VideoEnhancer.defineProperty(this, "fsWrapper", {
-      set: (value, setter) => {
+      set(value, setter) {
         const method = setter(value) ? "addEventListener" : "removeEventListener";
         ["scroll", "keyup", "keydown"].forEach((type) => unsafeWindow[method](type, handle, true));
       },
