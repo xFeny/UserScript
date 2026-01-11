@@ -32,7 +32,7 @@ export default {
     if (current !== target) unsafeWindow.player.requestQuality(target);
   },
   shouldHideTime: () => (App.isFullscreen && Storage.DISABLE_CLOCK.get()) || (!App.isFullscreen && !Storage.PAGE_CLOCK.get()),
-  async setupPlayerClock() {
+  setupPlayerClock() {
     if (!this.player || this.shouldHideTime()) return this.Clock?.stop(true);
     if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(this.player.parentNode).start();
 

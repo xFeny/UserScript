@@ -118,7 +118,7 @@ export default {
 
     return cacheTimeKey;
   },
-  async clearMultiVideoCacheTime() {
+  clearMultiVideoCacheTime() {
     if (!Tools.isMultiVideo()) return;
     const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
     const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
