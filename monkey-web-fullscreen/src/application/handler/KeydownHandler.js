@@ -9,14 +9,14 @@ import Keyboard from "../common/Keyboard";
  */
 export default {
   isInputFocus: (event) => Tools.isInputable(event.composedPath()[0]),
-  preventDefault(event, { code, altKey } = event) {
+  preventKey(event, { code, altKey } = event) {
     const isNumKeys = Tools.isNumber(event.key) && !this.isDisRate();
     const isOverrideKeys = this.isOverrideKey() && [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
     const isPreventKeys = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
     const isZoomKeys = altKey && !this.isDisZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
     if (isNumKeys || isOverrideKeys || isPreventKeys || isZoomKeys) Tools.preventDefault(event);
   },
-  dispatchShortcutKey(code, { bypass = false, isTrusted = false } = {}) {
+  dispatchShortcut(code, { bypass = false, isTrusted = false } = {}) {
     const key = this.processShortcutKey({ code });
     Tools.postMessage(window.top, { key, bypass, isTrusted });
   },
@@ -26,7 +26,7 @@ export default {
     return keys.filter(Boolean).join("_").toUpperCase();
   },
   setupKeydownListener() {
-    unsafeWindow.addEventListener("keyup", (event) => this.preventDefault(event), true);
+    unsafeWindow.addEventListener("keyup", (event) => this.preventKey(event), true);
     unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
     unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
   },
@@ -35,7 +35,7 @@ export default {
     if (this.noVideo() || this.isInputFocus(event)) return;
     if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
 
-    this.preventDefault(event);
+    this.preventKey(event);
     key = this.processShortcutKey(event);
     const specialKeys = [Keyboard.N, Keyboard.P, Keyboard.Enter, Keyboard.NumEnter];
     if (specialKeys.includes(code)) return Tools.postMessage(window.top, { key, isTrusted });
@@ -44,9 +44,9 @@ export default {
   processEvent(data) {
     // video在iframe中，向iframe传递事件
     if (!this.player) Tools.sendToIFrames(data);
-    if (data?.key) this.execHotKeyActions(data);
+    if (data?.key) this.execKeyActions(data);
   },
-  execHotKeyActions({ key, isTrusted, bypass }) {
+  execKeyActions({ key, isTrusted, bypass }) {
     // Tools.log("按下的键：", { key, isTrusted });
     const dict = {
       M: () => this.toggleMute(),

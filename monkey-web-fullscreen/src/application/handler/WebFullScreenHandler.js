@@ -29,7 +29,7 @@ export default {
     if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
     if (Site.isGmMatch() && !Site.isBiliLive()) return this.triggerIconElement(Site.icons.full);
     this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-    if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcutKey(Keyboard.P); // 全屏或非网页全屏模式下
+    if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcut(Keyboard.P); // 全屏或非网页全屏模式下
   },
   toggleWebFullscreen(isTrusted) {
     if (this.noVideo() || Tools.isThrottle("toggleWeb")) return;

@@ -13,7 +13,7 @@ export default {
     if (!Storage.IS_AUTO_NEXT.get() || Tools.isThrottle("autoNext", Consts.HALF_SEC)) return;
     if (this.isIgnoreNext()) return (video._mfs_hasTriedNext = true);
 
-    this.dispatchShortcutKey(Keyboard.N);
+    this.dispatchShortcut(Keyboard.N);
     video._mfs_hasTriedNext = true;
   },
   async autoWebFullscreen(video) {
@@ -24,7 +24,7 @@ export default {
     if (this.isIgnoreWide() || (await this.isWebFull(video)) || Tools.isOverLimit("autoWide")) return (video._mfs_isWide = true);
 
     // 发送网页全屏消息
-    this.dispatchShortcutKey(Keyboard.P);
+    this.dispatchShortcut(Keyboard.P);
   },
   async isWebFull(video) {
     const { viewWidth } = this.topWin;

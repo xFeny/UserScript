@@ -11,12 +11,10 @@ import Storage from "../common/Storage";
  */
 export default {
   switchEpisode(isPrev = false) {
-    const targetEpisode =
-      this.getTargetEpisode(this.getCurrentEpisode(), isPrev) ??
-      this.getTargetEpisodeByText(isPrev) ??
-      this.getTargetEpisodeByClass(isPrev);
-    // Tools.log("跳转集元素：", targetEpisode);
-    this.jumpToTargetEpisode(targetEpisode);
+    const target =
+      this.getTargetEpisode(this.getCurrentEpisode(), isPrev) ?? this.getTargetByText(isPrev) ?? this.getTargetByClass(isPrev);
+    // Tools.log("跳转集元素：", target);
+    this.jumpToTargetEpisode(target);
   },
   getCurrentEpisode() {
     return Storage.RELATIVE_EPISODE.get(this.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
@@ -120,7 +118,7 @@ export default {
     }
     return null;
   },
-  getTargetEpisodeByText(isPrev = false) {
+  getTargetByText(isPrev = false) {
     // 示例网址：https://www.dmb0u.art、https://www.lincartoon.com
     // https://ddys.pro、https://www.5dm.link、https://www.tucao.my、https://www.flixflop.com
 
@@ -128,7 +126,7 @@ export default {
     const texts = isPrev ? ["上集", "上一集", "上话", "上一话", "上一个"] : ["下集", "下一集", "下话", "下一话", "下一个"];
     return Tools.findByText("attr", texts).filter(ignore).shift() ?? Tools.findByText("text", texts).filter(ignore).shift();
   },
-  getTargetEpisodeByClass(isPrev = false) {
+  getTargetByClass(isPrev = false) {
     return isPrev ? null : Tools.query("[class*='control'] [class*='next' i]");
   },
   compareNumSize: (nums, compareVal = 0, index) => ({

@@ -121,7 +121,7 @@ export default {
     isFullscreen && Tools.isInputable(document.activeElement) && document.activeElement.blur();
 
     // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
-    !isFullscreen && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
+    !isFullscreen && this.fsWrapper && this.dispatchShortcut(Keyboard.P);
 
     // 播放器右上角时间的显/隐
     this.changeTimeElementDisplay();
@@ -130,7 +130,7 @@ export default {
     const handle = (event, { code, type } = event) => {
       if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
       if (this.isInputFocus(event) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
-      Tools.preventDefault(event), Object.is(type, "keydown") && this.dispatchShortcutKey(code, { bypass: true });
+      Tools.preventDefault(event), Object.is(type, "keydown") && this.dispatchShortcut(code, { bypass: true });
     };
 
     VideoEnhancer.defineProperty(this, "fsWrapper", {
@@ -194,7 +194,7 @@ export default {
         Tools.preventDefault(e);
         const vid = e.target.video;
         if (this.player !== vid) (this.player = vid), this.setVideoInfo(vid);
-        Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
+        Tools.microTask(() => this.dispatchShortcut(Keyboard.P, { isTrusted: true }));
       };
 
       return element;
