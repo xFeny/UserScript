@@ -83,7 +83,7 @@ export default {
 
     const isFake = video.matches(Consts.FAKE_VIDEO);
     const handleChange = (v) => (delete this.topWin, this.setVideoInfo(v));
-    VideoEnhancer.defineProperty(video, isFake ? "_src" : "src", {
+    VideoEnhancer.defineProperty(video, isFake ? "srcConfig" : "src", {
       set(value, setter) {
         setter(value), value && this === App.player && handleChange(this);
       },
