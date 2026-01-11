@@ -535,7 +535,7 @@
         Tools.preventDefault(event), Object.is(type, "keydown") && this.dispatchShortcut(code, { bypass: true });
       };
       VideoEnhancer.defineProperty(this, "fsWrapper", {
-        set: (value, setter) => {
+        set(value, setter) {
           const method = setter(value) ? "addEventListener" : "removeEventListener";
           ["scroll", "keyup", "keydown"].forEach((type) => _unsafeWindow[method](type, handle, true));
         }
@@ -1129,7 +1129,7 @@
   };
   const Episode = {
     switchEpisode(isPrev = false) {
-      const target = this.getTargetEpisode(this.getCurrentEpisode(), isPrev) ?? this.getTargetByText(isPrev) ?? this.getTargetByClass(isPrev);
+      const target = this.getTargetEpisode(this.getCurrentEpisode(), isPrev) ?? this.getEpisodeByText(isPrev) ?? this.getEpisodeByClass(isPrev);
       this.jumpToTargetEpisode(target);
     },
     getCurrentEpisode() {
@@ -1195,12 +1195,12 @@
       }
       return null;
     },
-    getTargetByText(isPrev = false) {
+    getEpisodeByText(isPrev = false) {
       const ignore = (el) => !el?.innerText?.includes("自动");
       const texts = isPrev ? ["上集", "上一集", "上话", "上一话", "上一个"] : ["下集", "下一集", "下话", "下一话", "下一个"];
       return Tools.findByText("attr", texts).filter(ignore).shift() ?? Tools.findByText("text", texts).filter(ignore).shift();
     },
-    getTargetByClass(isPrev = false) {
+    getEpisodeByClass(isPrev = false) {
       return isPrev ? null : Tools.query("[class*='control'] [class*='next' i]");
     },
     compareNumSize: (nums, compareVal = 0, index) => ({
