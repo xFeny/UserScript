@@ -12,6 +12,7 @@ export default {
   isFullscreen: false,
   noVideo: () => !window.videoInfo && !window.topWin,
   isBackgroundVideo: (video) => video?.muted && video?.loop,
+  isObserved: (el) => el.hasAttribute("observed") || !!(el.setAttribute("observed", true), false),
   init(isNonFirst = false) {
     this.host = location.host;
     this.docElement = document.documentElement;
@@ -78,8 +79,7 @@ export default {
     Tools.sendToIFrames({ topWin });
   },
   observeVideoSrcChange(video) {
-    if (video.hasAttribute("observed")) return;
-    video.setAttribute("observed", true);
+    if (this.isObserved(video)) return;
 
     const that = this;
     const isFake = video.matches(Consts.FAKE_VIDEO);
@@ -97,13 +97,12 @@ export default {
    */
   async watchVideoIFrameChange() {
     const iFrame = this.getVideoIFrame();
-    if (!iFrame || iFrame.hasAttribute("observed")) return;
+    if (!iFrame || this.isObserved(iFrame)) return;
 
     const observer = new MutationObserver(() =>
       this.isFullscreen ? this.toggleFullscreen() : this.fsWrapper && this.exitWebFullscreen()
     );
     observer.observe(iFrame, { attributes: true, attributeFilter: ["src"] });
-    iFrame.setAttribute("observed", true);
     iFrame.focus(); // 自动聚焦：单层嵌套场景下，「启用 空格◀️▶️ 控制」时，能切换视频播放状态
   },
   // ====================⇑⇑⇑ 设置当前视频相关逻辑 ⇑⇑⇑====================
