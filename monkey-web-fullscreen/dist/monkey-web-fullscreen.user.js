@@ -2,7 +2,7 @@
 // @name               视频自动网页全屏｜倍速播放
 // @name:zh-TW         視頻自動網頁全屏｜倍速播放
 // @namespace          http://tampermonkey.net/
-// @version            3.8.9
+// @version            3.9.0
 // @author             Feny
 // @description        支持所有H5视频的增强脚本，通用网页全屏｜倍速调节，对微博 / 推特 / Instagram / Facebook等多视频平台均适用；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @description:zh-TW  支持所有H5视频的增强脚本，通用網頁全屏｜倍速調節，对微博 / 推特 / Instagram / Facebook等平臺均適用；B站(含直播) / 騰訊視頻 / 優酷 / 愛奇藝 / 芒果TV / AcFun 默認自動網頁全屏，其他網站可手動開啓；自動網頁全屏 + 記憶倍速 + 下集切換，減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
@@ -274,23 +274,19 @@
           this.__playRate === value && setter(value);
         }
       });
-      const rate = (+playRate).toFixed(2).replace(/\.?0+$/, "");
-      video.playbackRate = video.__playRate = rate;
+      video.playbackRate = video.__playRate = Tools.toFixed(playRate);
     }
-    static defineProperty(video, property, descs) {
+    static defineProperty(target, property, descs) {
       try {
-        const isMedia = video instanceof HTMLMediaElement;
-        const proto = isMedia ? HTMLMediaElement.prototype : Object.getPrototypeOf(video);
-        const original = Object.getOwnPropertyDescriptor(proto, property);
+        const original = this.getPropertyDescriptor(target, property);
         if (!original) throw new Error(`属性 ${property} 不存在`);
-        const target = isMedia ? video : proto;
         Object.defineProperty(target, property, {
           get() {
-            const value = original.get.call(this);
+            const value = original.get ? original.get.call(this) : original.value;
             return descs.get ? descs.get.call(this, value) : value;
           },
           set(value) {
-            const setter = original.set.bind(this);
+            const setter = (v) => (original.set ? original.set.call(this, v) : original.value = v, v);
             descs.set ? descs.set.call(this, value, setter) : setter(value);
           },
           configurable: true
@@ -298,6 +294,13 @@
       } catch (e) {
         console.error(`修改 ${property} 属性时出错：`, e);
       }
+    }
+    static getPropertyDescriptor(target, property) {
+      for (let proto = target; proto; proto = Object.getPrototypeOf(proto)) {
+        const desc = Object.getOwnPropertyDescriptor(proto, property);
+        if (desc) return desc;
+      }
+      return null;
     }
     static hackAttachShadow() {
       if (Element.prototype.__attachShadow) return;
@@ -432,8 +435,11 @@
     NumEnter: "NumpadEnter"
   });
   const Listen = {
+    fsWrapper: null,
+    isFullscreen: false,
     noVideo: () => !window.videoInfo && !window.topWin,
     isBackgroundVideo: (video) => video?.muted && video?.loop,
+    isObserved: (el) => el.hasAttribute("observed") || !!(el.setAttribute("observed", true), false),
     init(isNonFirst = false) {
       this.host = location.host;
       this.docElement = document.documentElement;
@@ -490,26 +496,21 @@
       Tools.sendToIFrames({ topWin });
     },
     observeVideoSrcChange(video) {
-      if (video.hasAttribute("observed")) return;
-      video.setAttribute("observed", true);
-      const that = this;
+      if (this.isObserved(video)) return;
       const isFake = video.matches(Consts.FAKE_VIDEO);
-      const handleChange = (v) => (delete that.topWin, that.setVideoInfo(v));
+      const handleChange = (v) => (delete this.topWin, this.setVideoInfo(v));
       VideoEnhancer.defineProperty(video, isFake ? "srcConfig" : "src", {
         set(value, setter) {
-          isFake ? this._src = value : setter(value);
-          if ((isFake || this === that.player) && value) handleChange(this);
+          setter(value), value && this === App.player && handleChange(this);
         }
       });
     },
-    async watchVideoIFrameChange() {
+    watchVideoIFrameChange() {
       const iFrame = this.getVideoIFrame();
-      if (!iFrame || iFrame.hasAttribute("observed")) return;
-      const observer = new MutationObserver(
+      if (!iFrame || this.isObserved(iFrame)) return;
+      new MutationObserver(
         () => this.isFullscreen ? this.toggleFullscreen() : this.fsWrapper && this.exitWebFullscreen()
-      );
-      observer.observe(iFrame, { attributes: true, attributeFilter: ["src"] });
-      iFrame.setAttribute("observed", true);
+      ).observe(iFrame, { attributes: true, attributeFilter: ["src"] });
       iFrame.focus();
     },
     setupFullscreenListener() {
@@ -518,30 +519,24 @@
       });
     },
     observeFullscreenChange() {
-      Object.defineProperty(this, "isFullscreen", {
-        get: () => this._isFullscreen ?? false,
-        set: (value) => {
-          this._isFullscreen = value;
-          this.handleFullscreenChange(value);
-        }
+      VideoEnhancer.defineProperty(this, "isFullscreen", {
+        set: (value, setter) => (setter(value), this.handleFullscreenChange(value))
       });
     },
     handleFullscreenChange(isFullscreen) {
       isFullscreen && Tools.isInputable(document.activeElement) && document.activeElement.blur();
-      !isFullscreen && this.fsWrapper && this.dispatchShortcutKey(Keyboard.P);
+      !isFullscreen && this.fsWrapper && this.dispatchShortcut(Keyboard.P);
       this.changeTimeElementDisplay();
     },
     observeWebFullscreenChange() {
       const handle = (event, { code, type } = event) => {
         if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
         if (this.isInputFocus(event) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
-        Tools.preventDefault(event), Object.is(type, "keydown") && this.dispatchShortcutKey(code, { bypass: true });
+        Tools.preventDefault(event), Object.is(type, "keydown") && this.dispatchShortcut(code, { bypass: true });
       };
-      Object.defineProperty(this, "fsWrapper", {
-        get: () => this._fsWrapper,
-        set: (value) => {
-          this._fsWrapper = value;
-          const method = value ? "addEventListener" : "removeEventListener";
+      VideoEnhancer.defineProperty(this, "fsWrapper", {
+        set: (value, setter) => {
+          const method = setter(value) ? "addEventListener" : "removeEventListener";
           ["scroll", "keyup", "keydown"].forEach((type) => _unsafeWindow[method](type, handle, true));
         }
       });
@@ -580,7 +575,7 @@
           Tools.preventDefault(e);
           const vid = e.target.video;
           if (this.player !== vid) this.player = vid, this.setVideoInfo(vid);
-          Tools.microTask(() => this.dispatchShortcutKey(Keyboard.P, { isTrusted: true }));
+          Tools.microTask(() => this.dispatchShortcut(Keyboard.P, { isTrusted: true }));
         };
         return element;
       };
@@ -655,14 +650,14 @@
   }
   const Keydown = {
     isInputFocus: (event) => Tools.isInputable(event.composedPath()[0]),
-    preventDefault(event, { code, altKey } = event) {
+    preventKey(event, { code, altKey } = event) {
       const isNumKeys = Tools.isNumber(event.key) && !this.isDisRate();
       const isOverrideKeys = this.isOverrideKey() && [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
       const isPreventKeys = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
       const isZoomKeys = altKey && !this.isDisZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
       if (isNumKeys || isOverrideKeys || isPreventKeys || isZoomKeys) Tools.preventDefault(event);
     },
-    dispatchShortcutKey(code, { bypass = false, isTrusted = false } = {}) {
+    dispatchShortcut(code, { bypass = false, isTrusted = false } = {}) {
       const key = this.processShortcutKey({ code });
       Tools.postMessage(window.top, { key, bypass, isTrusted });
     },
@@ -672,14 +667,14 @@
       return keys.filter(Boolean).join("_").toUpperCase();
     },
     setupKeydownListener() {
-      _unsafeWindow.addEventListener("keyup", (event) => this.preventDefault(event), true);
+      _unsafeWindow.addEventListener("keyup", (event) => this.preventKey(event), true);
       _unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
       _unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
     },
     handleKeydown(event, { key, code, isTrusted } = event) {
       if (this.noVideo() || this.isInputFocus(event)) return;
       if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
-      this.preventDefault(event);
+      this.preventKey(event);
       key = this.processShortcutKey(event);
       const specialKeys = [Keyboard.N, Keyboard.P, Keyboard.Enter, Keyboard.NumEnter];
       if (specialKeys.includes(code)) return Tools.postMessage(window.top, { key, isTrusted });
@@ -687,9 +682,9 @@
     },
     processEvent(data) {
       if (!this.player) Tools.sendToIFrames(data);
-      if (data?.key) this.execHotKeyActions(data);
+      if (data?.key) this.execKeyActions(data);
     },
-    execHotKeyActions({ key, isTrusted, bypass }) {
+    execKeyActions({ key, isTrusted, bypass }) {
       const dict = {
         M: () => this.toggleMute(),
         R: () => this.rotateVideo(),
@@ -865,7 +860,7 @@
       video._mfs_cacheTKey = cacheTimeKey;
       return cacheTimeKey;
     },
-    async clearMultiVideoCacheTime() {
+    clearMultiVideoCacheTime() {
       if (!Tools.isMultiVideo()) return;
       const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
       const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
@@ -1004,7 +999,7 @@
       if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
       if (Site.isGmMatch() && !Site.isBiliLive()) return this.triggerIconElement(Site.icons.full);
       this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-      if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcutKey(Keyboard.P);
+      if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcut(Keyboard.P);
     },
     toggleWebFullscreen(isTrusted) {
       if (this.noVideo() || Tools.isThrottle("toggleWeb")) return;
@@ -1105,7 +1100,7 @@
       if (video.duration < 300 || video._mfs_hasTriedNext || this.remainTime(video) > Storage.NEXT_ADVANCE_SEC.get()) return;
       if (!Storage.IS_AUTO_NEXT.get() || Tools.isThrottle("autoNext", Consts.HALF_SEC)) return;
       if (this.isIgnoreNext()) return video._mfs_hasTriedNext = true;
-      this.dispatchShortcutKey(Keyboard.N);
+      this.dispatchShortcut(Keyboard.N);
       video._mfs_hasTriedNext = true;
     },
     async autoWebFullscreen(video) {
@@ -1114,7 +1109,7 @@
       if (video._mfs_isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
       if (Site.isGmMatch() ? this.noAutoDefault() : !this.isAutoSite()) return;
       if (this.isIgnoreWide() || await this.isWebFull(video) || Tools.isOverLimit("autoWide")) return video._mfs_isWide = true;
-      this.dispatchShortcutKey(Keyboard.P);
+      this.dispatchShortcut(Keyboard.P);
     },
     async isWebFull(video) {
       const { viewWidth } = this.topWin;
@@ -1134,8 +1129,8 @@
   };
   const Episode = {
     switchEpisode(isPrev = false) {
-      const targetEpisode = this.getTargetEpisode(this.getCurrentEpisode(), isPrev) ?? this.getTargetEpisodeByText(isPrev) ?? this.getTargetEpisodeByClass(isPrev);
-      this.jumpToTargetEpisode(targetEpisode);
+      const target = this.getTargetEpisode(this.getCurrentEpisode(), isPrev) ?? this.getTargetByText(isPrev) ?? this.getTargetByClass(isPrev);
+      this.jumpToTargetEpisode(target);
     },
     getCurrentEpisode() {
       return Storage.RELATIVE_EPISODE.get(this.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
@@ -1200,12 +1195,12 @@
       }
       return null;
     },
-    getTargetEpisodeByText(isPrev = false) {
+    getTargetByText(isPrev = false) {
       const ignore = (el) => !el?.innerText?.includes("自动");
       const texts = isPrev ? ["上集", "上一集", "上话", "上一话", "上一个"] : ["下集", "下一集", "下话", "下一话", "下一个"];
       return Tools.findByText("attr", texts).filter(ignore).shift() ?? Tools.findByText("text", texts).filter(ignore).shift();
     },
-    getTargetEpisodeByClass(isPrev = false) {
+    getTargetByClass(isPrev = false) {
       return isPrev ? null : Tools.query("[class*='control'] [class*='next' i]");
     },
     compareNumSize: (nums, compareVal = 0, index) => ({
@@ -1371,7 +1366,7 @@
       if (current !== target) _unsafeWindow.player.requestQuality(target);
     },
     shouldHideTime: () => App.isFullscreen && Storage.DISABLE_CLOCK.get() || !App.isFullscreen && !Storage.PAGE_CLOCK.get(),
-    async setupPlayerClock() {
+    setupPlayerClock() {
       if (!this.player || this.shouldHideTime()) return this.Clock?.stop(true);
       if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(this.player.parentNode).start();
       this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
@@ -1426,21 +1421,21 @@
   const Ignore = {
     setupIgnoreUrlsChangeListener() {
       [Storage.FULL_IGNORE_URLS.name, Storage.NEXT_IGNORE_URLS.name].forEach(
-        (key) => _GM_addValueChangeListener(key, (_, oldVal, newVal) => oldVal !== newVal && this.initializeIgnoreUrls())
+        (key) => _GM_addValueChangeListener(key, (_, oldVal, newVal) => oldVal !== newVal && this.initIgnoreUrls())
       );
     },
-    initializeIgnoreUrls() {
+    initIgnoreUrls() {
       const nextIgnore = ["https://www.youtube.com/watch", "https://www.bilibili.com/video", "https://www.bilibili.com/list"];
       this.nextFilter = this.processIgnoreUrls(Storage.NEXT_IGNORE_URLS, nextIgnore);
       const wideIgnore = ["https://www.youtube.com/results", "https://www.youtube.com/shorts"];
       this.wideFilter = this.processIgnoreUrls(Storage.FULL_IGNORE_URLS, wideIgnore);
     },
     isIgnoreNext() {
-      if (!this.nextFilter) this.initializeIgnoreUrls();
+      if (!this.nextFilter) this.initIgnoreUrls();
       return this.isBlocked(this.nextFilter);
     },
     isIgnoreWide() {
-      if (!this.wideFilter) this.initializeIgnoreUrls();
+      if (!this.wideFilter) this.initIgnoreUrls();
       return this.isBlocked(this.wideFilter);
     },
     processIgnoreUrls(cache, defUrls) {
