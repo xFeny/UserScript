@@ -5,7 +5,7 @@ import Consts from "../common/Consts";
  * 快捷键和消息相关逻辑处理
  */
 export default {
-  dispatchShortcutKey: (key, isTrusted = false) => Tools.postMessage(window.top, { key: key.toUpperCase(), isTrusted }),
+  dispatchShortcut: (key, isTrusted = false) => Tools.postMessage(window.top, { key: key.toUpperCase(), isTrusted }),
   setupKeydownListener() {
     unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
     unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
@@ -18,7 +18,7 @@ export default {
     if (this.isNoVideo() || Tools.isInputable(target) || !["p", "Enter"].includes(key)) return;
 
     Tools.preventDefault(event);
-    this.dispatchShortcutKey(key, isTrusted);
+    this.dispatchShortcut(key, isTrusted);
   },
   handleMessage(data) {
     // Tools.log(location.href, "接收到消息：", data);
@@ -33,7 +33,7 @@ export default {
   processEvent(data) {
     // video在iframe中，向iframe传递事件
     if (!this.player) Tools.sendToIFrames(data);
-    if (data?.key) this.execHotKeyActions(data);
+    if (data?.key) this.execKeyActions(data);
   },
-  execHotKeyActions: ({ key, isTrusted }) => (key === Consts.P ? App.toggleWebFullscreen(isTrusted) : App.toggleFullscreen()),
+  execKeyActions: ({ key, isTrusted }) => (key === Consts.P ? App.toggleWebFullscreen(isTrusted) : App.toggleFullscreen()),
 };

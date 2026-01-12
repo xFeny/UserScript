@@ -44,7 +44,7 @@ export default {
         this._isFullscreen = value;
 
         // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
-        !value && this.fsWrapper && this.dispatchShortcutKey(Consts.P);
+        !value && this.fsWrapper && this.dispatchShortcut(Consts.P);
       },
     });
   },
@@ -88,7 +88,7 @@ export default {
         Tools.preventDefault(e);
         const vid = e.target.video;
         if (this.player !== vid) (this.player = vid), this.setVideoInfo(vid);
-        Tools.microTask(() => this.dispatchShortcutKey(Consts.P, true));
+        Tools.microTask(() => this.dispatchShortcut(Consts.P, true));
       };
 
       return element;

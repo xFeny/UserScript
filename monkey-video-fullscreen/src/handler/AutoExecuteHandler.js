@@ -11,7 +11,7 @@ export default {
     if (this.isIgnoreUrl() || (await this.isWebFull(video)) || Tools.isOverLimit("autoWide")) return (video.__isWide = true);
 
     // 发送网页全屏消息
-    this.dispatchShortcutKey(Consts.P);
+    this.dispatchShortcut(Consts.P);
   },
   async isWebFull(video) {
     const { viewWidth } = this.topWin;
