@@ -19,9 +19,8 @@ export default {
     document.addEventListener("shadow-video", (e) => {
       const { video } = e.detail;
       if (!video || video.hasAttribute("received")) return;
-      this.setupVideoListeners(video);
-      this.createEdgeClickElement(video);
       video.setAttribute("received", true);
+      this.setupVideoListeners(video);
     });
   },
   // ====================⇓⇓⇓ 视频监听事件相关逻辑 ⇓⇓⇓====================

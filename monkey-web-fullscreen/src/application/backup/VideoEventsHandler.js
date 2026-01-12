@@ -20,9 +20,8 @@ export default {
     document.addEventListener("shadow-video", (e) => {
       const { video } = e.detail;
       if (!video || video.hasAttribute("received")) return;
-      this.setupVideoListeners(video);
-      this.createEdgeClickElement(video);
       video.setAttribute("received", true);
+      this.setupVideoListeners(video);
     });
   },
   cleanupDetachedVideos() {
@@ -33,6 +32,7 @@ export default {
         this.videoEvents.forEach((type) => video.removeEventListener(type, handler, true));
         this.videoEvtMap.delete(video);
         video.removeAttribute("received");
+        if (this.player === video) this.player = null;
         // Tools.log("清理已脱离文档的video元素", video);
       });
     }, Consts.THREE_SEC * 10);
