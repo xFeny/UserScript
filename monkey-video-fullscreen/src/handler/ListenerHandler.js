@@ -17,7 +17,6 @@ export default {
 
     if (isNonFirst) return;
     this.setupDocumentObserver();
-    this.observeFullscreenChange();
     this.setupIgnoreUrlsChangeListener();
     this.setupShadowVideoListeners();
   },
@@ -31,25 +30,13 @@ export default {
       this.init(true), document.head.append(gmStyle.cloneNode(true));
     }).observe(document, { childList: true });
   },
-  // ====================⇓⇓⇓ 全屏状态变换时处理相关逻辑 ⇓⇓⇓====================
   setupFullscreenListener() {
     document.addEventListener("fullscreenchange", () => {
-      Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
+      const isFullscreen = !!document.fullscreenElement;
+      !isFullscreen && this.fsWrapper && this.dispatchShortcut(Consts.P); // 按`Esc`退出全屏模式时
+      Tools.postMessage(window.top, { isFullscreen });
     });
   },
-  observeFullscreenChange() {
-    Object.defineProperty(this, "isFullscreen", {
-      get: () => this._isFullscreen ?? false,
-      set: (value) => {
-        this._isFullscreen = value;
-
-        // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
-        !value && this.fsWrapper && this.dispatchShortcut(Consts.P);
-      },
-    });
-  },
-  // ====================⇑⇑⇑ 全屏状态变换时处理相关逻辑 ⇑⇑⇑====================
-
   // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
   setupMouseMoveListener() {
     const handle = ({ type, clientX, clientY }) => {
