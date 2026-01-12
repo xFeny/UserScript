@@ -10,7 +10,7 @@ import VideoEnhancer from "../VideoEnhancer";
 export default {
   fsWrapper: null,
   isFullscreen: false,
-  noVideo: () => !window.videoInfo && !window.topWin,
+  isNoVideo: () => !window.videoInfo && !window.topWin,
   isMutedLoop: (video) => video?.muted && video?.loop,
   isObserved: (el) => el.hasAttribute("observed") || !!(el.setAttribute("observed", true), false),
   init(isNonFirst = false) {
@@ -33,7 +33,7 @@ export default {
   },
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
-      if (this.noVideo() || Storage.IS_INVISIBLE_PAUSE.get()) return;
+      if (this.isNoVideo() || Storage.IS_INVISIBLE_PAUSE.get()) return;
 
       const video = this.player;
       if (!video || video.ended || !Tools.isVisible(video)) return;
@@ -152,7 +152,7 @@ export default {
       this.createEdgeClickElement(this.getVideoForCoord(clientX, clientY));
 
       // 有视频信息时才切换鼠标光标的显隐
-      if (this.noVideo()) return;
+      if (this.isNoVideo()) return;
       clearTimeout(timer), this.toggleCursor();
       timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
     };
