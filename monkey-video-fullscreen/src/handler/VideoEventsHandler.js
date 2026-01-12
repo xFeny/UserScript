@@ -38,7 +38,7 @@ export default {
 
   // ====================⇓⇓⇓ 设置当前视频相关逻辑 ⇓⇓⇓====================
   setCurrentVideo(video) {
-    if (!video || this.player === video || video.offsetWidth < 240 || this.isBackgroundVideo(video)) return;
+    if (!video || this.player === video || video.offsetWidth < 240 || this.isMutedLoop(video)) return;
     if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // this.player 播放中
 
     this.player = video;

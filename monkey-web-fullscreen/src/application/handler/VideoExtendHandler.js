@@ -43,7 +43,7 @@ export default {
     return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
   },
   videoProgress(video, bypass) {
-    if (!video || (!bypass && video.paused) || this.player !== video || this.isBackgroundVideo(video)) return;
+    if (!video || (!bypass && video.paused) || this.player !== video || this.isMutedLoop(video)) return;
     if (video.duration <= 30 || this.isLive() || this.shouldHideTime()) return this.removeProgressElement();
 
     const duration = this.getRealDuration(video);

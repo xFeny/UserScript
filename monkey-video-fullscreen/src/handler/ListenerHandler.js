@@ -6,7 +6,7 @@ import Consts from "../common/Consts";
  */
 export default {
   noVideo: () => !window.videoInfo && !window.topWin,
-  isBackgroundVideo: (video) => video?.muted && video?.loop,
+  isMutedLoop: (video) => video?.muted && video?.loop,
   init(isNonFirst = false) {
     this.docElement = document.documentElement;
 
@@ -61,7 +61,9 @@ export default {
     document.addEventListener("mousemove", handle, { passive: true });
   },
   getVideoForCoord(clientX, clientY) {
-    return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
+    const getZIndex = (el) => Number(getComputedStyle(el).zIndex) || 0;
+    const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(clientX, clientY, v));
+    return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
   createEdgeClickElement(video) {
     const container = this.getEdgeClickContainer(video);
@@ -74,7 +76,8 @@ export default {
       Tools.setStyle(container, "position", "relative");
     }
 
-    // 已创建过，复用元素
+    // 已创建过侧边元素，重新插入到父容器中
+    Tools.querys(".video-edge-click", container).forEach((el) => el.remove());
     if (video.lArea) return container.prepend(video.lArea, video.rArea);
 
     // 复用元素创建逻辑

@@ -11,7 +11,7 @@ export default {
   fsWrapper: null,
   isFullscreen: false,
   noVideo: () => !window.videoInfo && !window.topWin,
-  isBackgroundVideo: (video) => video?.muted && video?.loop,
+  isMutedLoop: (video) => video?.muted && video?.loop,
   isObserved: (el) => el.hasAttribute("observed") || !!(el.setAttribute("observed", true), false),
   init(isNonFirst = false) {
     this.host = location.host;
@@ -52,7 +52,7 @@ export default {
   },
   // ====================⇓⇓⇓ 设置当前视频相关逻辑 ⇓⇓⇓====================
   setCurrentVideo(video) {
-    if (!video || this.player === video || video.offsetWidth < 260 || this.isBackgroundVideo(video)) return;
+    if (!video || this.player === video || video.offsetWidth < 260 || this.isMutedLoop(video)) return;
     if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // this.player 播放中
 
     this.player = video;
@@ -168,7 +168,9 @@ export default {
   // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
   getVideoForCoord(clientX, clientY) {
     if (!Storage.ENABLE_EDGE_CLICK.get()) return;
-    return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
+    const getZIndex = (el) => Number(getComputedStyle(el).zIndex) || 0;
+    const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(clientX, clientY, v));
+    return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
   createEdgeClickElement(video) {
     if (!video || !Storage.ENABLE_EDGE_CLICK.get()) return;
@@ -184,6 +186,7 @@ export default {
     }
 
     // 已创建过侧边元素，重新插入到父容器中
+    Tools.querys(".video-edge-click", container).forEach((el) => el.remove());
     if (video.lArea) return container.prepend(video.lArea, video.rArea);
 
     // 复用元素创建逻辑
