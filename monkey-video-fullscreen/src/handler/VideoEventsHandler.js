@@ -51,7 +51,7 @@ export default {
   syncVideoToParentWin(videoInfo) {
     window.videoInfo = this.videoInfo = videoInfo;
     if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iFrame: location.href } });
-    Tools.microTask(() => this.setupScriptMenuCommand());
+    Tools.microTask(() => this.initMenuCmds());
     this.sendTopWinInfo();
   },
   sendTopWinInfo() {

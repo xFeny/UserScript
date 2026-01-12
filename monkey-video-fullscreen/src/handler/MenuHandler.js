@@ -6,14 +6,13 @@ import Storage from "../common/Storage";
  */
 export default {
   isAuto: () => Storage.IS_AUTO.get(Tools.isTopWin() ? location.host : window.topWin?.host),
-  setupScriptMenuCommand() {
+  initMenuCmds() {
     if (this.hasMenu || !Tools.isTopWin()) return;
-    const key = Storage.IS_AUTO.name + location.host;
-    GM_addValueChangeListener(key, () => this.registMenuCommand());
-    this.registMenuCommand();
+    GM_addValueChangeListener(Storage.IS_AUTO.name + location.host, () => this.setupMenuCmds());
+    this.setupMenuCmds();
     this.hasMenu = true;
   },
-  registMenuCommand() {
+  setupMenuCmds() {
     const host = location.host;
     const isAuto = `此站${this.isAuto() ? "禁" : "启"}用自动网页全屏`;
     const configs = [

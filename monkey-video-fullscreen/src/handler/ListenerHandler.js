@@ -5,8 +5,8 @@ import Consts from "../common/Consts";
  * 应用程序初始化
  */
 export default {
-  noVideo: () => !window.videoInfo && !window.topWin,
   isMutedLoop: (video) => video?.muted && video?.loop,
+  isNoVideo: () => !window.videoInfo && !window.topWin,
   init(isNonFirst = false) {
     this.docElement = document.documentElement;
 

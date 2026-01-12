@@ -15,7 +15,7 @@ export default {
     // Tools.log("键盘事件：", { key, code });
     const { key, isTrusted } = event;
     const target = event.composedPath()[0];
-    if (this.noVideo() || Tools.isInputable(target) || !["p", "Enter"].includes(key)) return;
+    if (this.isNoVideo() || Tools.isInputable(target) || !["p", "Enter"].includes(key)) return;
 
     Tools.preventDefault(event);
     this.dispatchShortcutKey(key, isTrusted);
