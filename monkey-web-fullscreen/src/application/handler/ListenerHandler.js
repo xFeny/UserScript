@@ -110,6 +110,7 @@ export default {
       Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
     });
 
+    if (this.isExecuted("isDefined")) return;
     VideoEnhancer.defineProperty(this, "isFullscreen", {
       set: (value, setter) => (setter(value), this.handleFullscreenChange(value)),
     });
