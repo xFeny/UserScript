@@ -10,9 +10,9 @@ import VideoEnhancer from "../VideoEnhancer";
 export default {
   fsWrapper: null,
   isFullscreen: false,
-  isNoVideo: () => !window.videoInfo && !window.topWin,
   isMutedLoop: (video) => video?.muted && video?.loop,
-  isObserved: (el) => el.hasAttribute("observed") || !!(el.setAttribute("observed", true), false),
+  isNoVideo: () => !window.videoInfo && !window.topWin,
+  isExecuted: (key, ctx = window) => ctx[key] || !!((ctx[key] = true), false),
   init(isNonFirst = false) {
     this.host = location.host;
     this.docElement = document.documentElement;
@@ -66,7 +66,7 @@ export default {
   syncVideoToParentWin(videoInfo) {
     window.videoInfo = this.videoInfo = videoInfo;
     if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iFrame: location.href } });
-    Tools.microTask(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
+    Tools.microTask(() => (this.setupEpisodePickerListener(), this.initMenuCmds()));
     this.watchVideoIFrameChange();
     this.sendTopWinInfo();
   },
@@ -79,7 +79,7 @@ export default {
     Tools.sendToIFrames({ topWin });
   },
   observeVideoSrcChange(video) {
-    if (this.isObserved(video)) return;
+    if (this.isExecuted("observed", video)) return;
 
     const isFake = video.matches(Consts.FAKE_VIDEO);
     const handleChange = (v) => (delete this.topWin, this.setVideoInfo(v));
@@ -96,7 +96,7 @@ export default {
    */
   watchVideoIFrameChange() {
     const iFrame = this.getVideoIFrame();
-    if (!iFrame || this.isObserved(iFrame)) return;
+    if (!iFrame || this.isExecuted("observed", iFrame)) return;
 
     new MutationObserver(() =>
       this.isFullscreen ? this.toggleFullscreen() : this.fsWrapper && this.exitWebFullscreen()

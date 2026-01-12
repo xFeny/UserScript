@@ -14,13 +14,11 @@ import Swal from "sweetalert2";
  * https://www.freeok123.com/
  */
 export default {
-  setupPickerEpisodeListener() {
-    if (Site.isGmMatch() || this.hasPickerListener) return;
-    this.hasPickerListener = true;
+  setupEpisodePickerListener() {
+    if (Site.isGmMatch() || this.isExecuted("isBindPicker")) return;
 
     const handle = (event, { target, ctrlKey, altKey, isTrusted } = event) => {
-      if (!ctrlKey || !altKey || !isTrusted || this.isLive()) return;
-      if (!Tools.isTopWin()) return Tools.notyf("此页面不能抓取 (•ิ_•ิ)?", true);
+      if (!ctrlKey || !altKey || !isTrusted || this.isNoVideo() || this.isLive()) return;
       Tools.preventDefault(event);
 
       const curSelector = Storage.CURRENT_EPISODE.get(this.host);

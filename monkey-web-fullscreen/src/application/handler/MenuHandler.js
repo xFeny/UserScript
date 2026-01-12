@@ -13,18 +13,17 @@ export default {
   isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
   isDisZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
   isAutoSite: () => Storage.IS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window.topWin?.host),
-  setupScriptMenuCommand() {
-    if (this.hasMenu || !Tools.isTopWin()) return;
-    this.setupMenuChangeListener();
-    this.registMenuCommand();
-    this.hasMenu = true;
+  initMenuCmds() {
+    if (this.isExecuted("hasMenu") || !Tools.isTopWin()) return;
+    this.setupMenuStorageListener();
+    this.setupMenuCmds();
   },
-  setupMenuChangeListener() {
+  setupMenuStorageListener() {
     [Storage.IS_SITE_AUTO.name + this.host, Storage.CURRENT_EPISODE.name + this.host].forEach((key) =>
-      GM_addValueChangeListener(key, () => this.registMenuCommand())
+      GM_addValueChangeListener(key, () => this.setupMenuCmds())
     );
   },
-  registMenuCommand() {
+  setupMenuCmds() {
     const noPicker = !Storage.CURRENT_EPISODE.get(this.host);
     const siteTitle = `此站${this.isAutoSite() ? "禁" : "启"}用自动网页全屏`;
     const siteFun = ({ host, cache }) => cache.set(!cache.get(host), host);
