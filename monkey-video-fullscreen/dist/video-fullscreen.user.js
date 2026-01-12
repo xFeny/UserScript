@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网页全屏
 // @namespace    npm/vite-plugin-monkey
-// @version      3.8.7
+// @version      3.8.8
 // @author       Feny
 // @description  快捷键：P-网页全屏，Enter-全屏；支持侧边点击切换网页全屏；支持自动网页全屏
 // @license      GPL-3.0-only
@@ -172,7 +172,7 @@
   VideoEnhancer.hackAttachShadow();
   const Listen = {
     noVideo: () => !window.videoInfo && !window.topWin,
-    isBackgroundVideo: (video) => video?.muted && video?.loop,
+    isMutedLoop: (video) => video?.muted && video?.loop,
     init(isNonFirst = false) {
       this.docElement = document.documentElement;
       this.setupKeydownListener();
@@ -214,7 +214,9 @@
       document.addEventListener("mousemove", handle, { passive: true });
     },
     getVideoForCoord(clientX, clientY) {
-      return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
+      const getZIndex = (el) => Number(getComputedStyle(el).zIndex) || 0;
+      const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(clientX, clientY, v));
+      return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
     },
     createEdgeClickElement(video) {
       const container = this.getEdgeClickContainer(video);
@@ -222,6 +224,7 @@
       if (container instanceof Element && this.lacksRelativePosition(container)) {
         Tools.setStyle(container, "position", "relative");
       }
+      Tools.querys(".video-edge-click", container).forEach((el) => el.remove());
       if (video.lArea) return container.prepend(video.lArea, video.rArea);
       const createEdge = (clas = "") => {
         const element = Object.assign(document.createElement("div"), { video, className: `video-edge-click ${clas}` });
@@ -310,7 +313,7 @@
       if (!Tools.isAttached(this.player)) delete this.player;
     },
     setCurrentVideo(video) {
-      if (!video || this.player === video || video.offsetWidth < 240 || this.isBackgroundVideo(video)) return;
+      if (!video || this.player === video || video.offsetWidth < 240 || this.isMutedLoop(video)) return;
       if (this.player && !this.player.paused && !isNaN(this.player.duration)) return;
       this.player = video;
       this.setVideoInfo(video);

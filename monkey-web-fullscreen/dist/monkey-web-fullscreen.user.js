@@ -2,7 +2,7 @@
 // @name               视频自动网页全屏｜倍速播放
 // @name:zh-TW         視頻自動網頁全屏｜倍速播放
 // @namespace          http://tampermonkey.net/
-// @version            3.9.0
+// @version            3.9.1
 // @author             Feny
 // @description        支持所有H5视频的增强脚本，通用网页全屏｜倍速调节，对微博 / 推特 / Instagram / Facebook等多视频平台均适用；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @description:zh-TW  支持所有H5视频的增强脚本，通用網頁全屏｜倍速調節，对微博 / 推特 / Instagram / Facebook等平臺均適用；B站(含直播) / 騰訊視頻 / 優酷 / 愛奇藝 / 芒果TV / AcFun 默認自動網頁全屏，其他網站可手動開啓；自動網頁全屏 + 記憶倍速 + 下集切換，減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
@@ -438,7 +438,7 @@
     fsWrapper: null,
     isFullscreen: false,
     noVideo: () => !window.videoInfo && !window.topWin,
-    isBackgroundVideo: (video) => video?.muted && video?.loop,
+    isMutedLoop: (video) => video?.muted && video?.loop,
     isObserved: (el) => el.hasAttribute("observed") || !!(el.setAttribute("observed", true), false),
     init(isNonFirst = false) {
       this.host = location.host;
@@ -471,7 +471,7 @@
       }).observe(document, { childList: true });
     },
     setCurrentVideo(video) {
-      if (!video || this.player === video || video.offsetWidth < 260 || this.isBackgroundVideo(video)) return;
+      if (!video || this.player === video || video.offsetWidth < 260 || this.isMutedLoop(video)) return;
       if (this.player && !this.player.paused && !isNaN(this.player.duration)) return;
       this.player = video;
       this.setVideoInfo(video);
@@ -559,7 +559,9 @@
     },
     getVideoForCoord(clientX, clientY) {
       if (!Storage.ENABLE_EDGE_CLICK.get()) return;
-      return Tools.querys("video").find((video) => Tools.pointInElement(clientX, clientY, video));
+      const getZIndex = (el) => Number(getComputedStyle(el).zIndex) || 0;
+      const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(clientX, clientY, v));
+      return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
     },
     createEdgeClickElement(video) {
       if (!video || !Storage.ENABLE_EDGE_CLICK.get()) return;
@@ -568,6 +570,7 @@
       if (container instanceof Element && this.lacksRelativePosition(container)) {
         Tools.setStyle(container, "position", "relative");
       }
+      Tools.querys(".video-edge-click", container).forEach((el) => el.remove());
       if (video.lArea) return container.prepend(video.lArea, video.rArea);
       const createEdge = (clas = "") => {
         const element = Tools.createElement("div", { video, className: `video-edge-click ${clas}` });
@@ -1376,7 +1379,7 @@
       return _unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
     },
     videoProgress(video, bypass) {
-      if (!video || !bypass && video.paused || this.player !== video || this.isBackgroundVideo(video)) return;
+      if (!video || !bypass && video.paused || this.player !== video || this.isMutedLoop(video)) return;
       if (video.duration <= 30 || this.isLive() || this.shouldHideTime()) return this.removeProgressElement();
       const duration = this.getRealDuration(video);
       if (duration > 86400) return this.removeProgressElement();
