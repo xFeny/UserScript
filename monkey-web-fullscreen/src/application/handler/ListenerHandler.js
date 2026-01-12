@@ -25,7 +25,6 @@ export default {
 
     if (isNonFirst) return;
     this.setupDocumentObserver();
-    this.observeFullscreenChange();
     this.observeWebFullscreenChange();
     this.setupIgnoreUrlsChangeListener();
     this.setupShadowVideoListeners();
@@ -110,8 +109,7 @@ export default {
     document.addEventListener("fullscreenchange", () => {
       Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
     });
-  },
-  observeFullscreenChange() {
+
     VideoEnhancer.defineProperty(this, "isFullscreen", {
       set: (value, setter) => (setter(value), this.handleFullscreenChange(value)),
     });
