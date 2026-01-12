@@ -1,12 +1,13 @@
-import Consts from "../common/Consts";
 import Tools from "../common/Tools";
+import Consts from "../common/Consts";
+import Storage from "../common/Storage";
 
 /**
  * 视频监听事件逻辑处理
  */
 export default {
   videoEvtMap: new Map(), // 存储：video -> handler（仅用于video事件解绑）
-  videoEvents: ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "pause", "ended"],
+  videoEvents: ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "ended"],
   setupVideoListeners(video) {
     const handleEvent = (event) => {
       const target = video ?? event.target;
@@ -25,21 +26,19 @@ export default {
     });
   },
   cleanupDetachedVideos() {
-    if (this.cleanupTimer || this.videoEvtMap.size <= 1) return;
-    this.cleanupTimer = setInterval(() => {
-      this.videoEvtMap.forEach((handler, video) => {
-        if (Tools.isAttached(video)) return;
-        this.videoEvents.forEach((type) => video.removeEventListener(type, handler, true));
-        this.videoEvtMap.delete(video);
-        video.removeAttribute("received");
-        if (this.player === video) this.player = null;
-        // Tools.log("清理已脱离文档的video元素", video);
-      });
-    }, Consts.THREE_SEC * 10);
+    if (Tools.isThrottle("cleanup")) return;
+
+    this.videoEvtMap.forEach((handler, video) => {
+      if (Tools.isAttached(video)) return;
+      this.videoEvents.forEach((type) => video.removeEventListener(type, handler, true));
+      video.removeAttribute("received");
+      this.videoEvtMap.delete(video);
+    });
   },
+  // ====================⇓⇓⇓ 视频监听事件相关逻辑 ⇓⇓⇓====================
   loadedmetadata(video) {
     if (video.matches(Consts.FAKE_VIDEO)) this.loadeddata(video);
-    if (!this.player) this.playing(video);
+    if (!this.player) this.setCurrentVideo(video);
     this.autoWebFullscreen(video);
   },
   loadeddata(video) {
@@ -50,7 +49,6 @@ export default {
     if (!this.player) this.playing(video);
 
     this.resumeRateKeepDisplay();
-
     this.autoWebFullscreen(video);
     this.autoNextEpisode(video);
 
@@ -65,11 +63,8 @@ export default {
   },
   playing(video) {
     this.setCurrentVideo(video);
-    Tools.sleep(30).then(() => this.initVideoPlay(video));
-  },
-  pause() {
-    // 稀饭动漫（https://dm.xifanacg.com）
-    Tools.query(".ec-no")?.click();
+    if (!video.tsr) video.tsr = { ...Consts.DEF_TSR };
+    Tools.sleep(50).then(() => this.initVideoPlay(video));
   },
   ended(video) {
     this.autoExitWebFullscreen();
