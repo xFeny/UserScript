@@ -38,14 +38,14 @@ export default {
 
   // ====================⇓⇓⇓ 设置当前视频相关逻辑 ⇓⇓⇓====================
   setCurrentVideo(video) {
-    if (!video || this.player === video || video.offsetWidth < 240 || this.isMutedLoop(video)) return;
+    if (!video || this.player === video || video.offsetWidth < 260 || this.isMutedLoop(video)) return;
     if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // this.player 播放中
 
-    this.player = video;
-    this.setVideoInfo(video);
+    this.setPlayer(video);
   },
-  setVideoInfo(video) {
-    const videoInfo = { isLive: video.duration === Infinity };
+  setPlayer(video) {
+    this.player = video;
+    const videoInfo = { isLive: video.duration === Infinity, timestamp: Date.now() };
     this.syncVideoToParentWin(videoInfo);
   },
   syncVideoToParentWin(videoInfo) {

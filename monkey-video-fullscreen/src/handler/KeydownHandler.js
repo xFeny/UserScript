@@ -31,7 +31,10 @@ export default {
     this.processEvent(data);
   },
   processEvent(data) {
-    // video在iframe中，向iframe传递事件
+    // 规避父窗口视频对 iframe 内视频网页全屏的干扰
+    if (this.videoInfo?.iFrame && this.player) delete this.player;
+
+    // 视频可能在 iframe 中，向 iframe 传递操作
     if (!this.player) Tools.sendToIFrames(data);
     if (data?.key) this.execKeyActions(data);
   },

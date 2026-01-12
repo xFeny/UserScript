@@ -73,8 +73,7 @@ export default {
 
       element.onclick = (e) => {
         Tools.preventDefault(e);
-        const vid = e.target.video;
-        if (this.player !== vid) (this.player = vid), this.setVideoInfo(vid);
+        this.setPlayer(e.target.video);
         Tools.microTask(() => this.dispatchShortcut(Consts.P, true));
       };
 

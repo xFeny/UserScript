@@ -54,12 +54,12 @@ export default {
     if (!video || this.player === video || video.offsetWidth < 260 || this.isMutedLoop(video)) return;
     if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // this.player 播放中
 
-    this.player = video;
-    this.setVideoInfo(video);
+    this.setPlayer(video);
     this.observeVideoSrcChange(video);
   },
-  setVideoInfo(video) {
-    const videoInfo = { isLive: video.duration === Infinity };
+  setPlayer(video) {
+    this.player = video;
+    const videoInfo = { isLive: video.duration === Infinity, timestamp: Date.now() };
     this.syncVideoToParentWin(videoInfo);
   },
   syncVideoToParentWin(videoInfo) {
@@ -81,7 +81,7 @@ export default {
     if (this.isExecuted("observed", video)) return;
 
     const isFake = video.matches(Consts.FAKE_VIDEO);
-    const handleChange = (v) => (delete this.topWin, this.setVideoInfo(v));
+    const handleChange = (v) => (delete this.topWin, this.setPlayer(v));
     VideoEnhancer.defineProperty(video, isFake ? "srcConfig" : "src", {
       set(value, setter) {
         setter(value), value && this === App.player && handleChange(this);
@@ -194,8 +194,7 @@ export default {
 
       element.onclick = (e) => {
         Tools.preventDefault(e);
-        const vid = e.target.video;
-        if (this.player !== vid) (this.player = vid), this.setVideoInfo(vid);
+        this.setPlayer(e.target.video);
         Tools.microTask(() => this.dispatchShortcut(Keyboard.P, { isTrusted: true }));
       };
 
