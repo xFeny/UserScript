@@ -161,14 +161,16 @@ export default {
   toggleCursor(hide = false, cls = "__hc") {
     if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
 
-    const elements = [...Tools.getParents(this.player, true, 3), this.getVideoIFrame()];
-    elements.forEach((el) => (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
+    const eles = [...Tools.getParents(this.player, true, 3), this.getVideoIFrame()];
+    eles.forEach((el) => (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
   },
   // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
-  getVideoForCoord(clientX, clientY) {
+  getVideoForCoord(x, y) {
     if (!Storage.ENABLE_EDGE_CLICK.get()) return;
+    if (Tools.pointInElement(x, y, this.player)) return this.player;
+
     const getZIndex = (el) => Number(getComputedStyle(el).zIndex) || 0;
-    const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(clientX, clientY, v));
+    const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(x, y, v));
     return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
   createEdgeClickElement(video) {

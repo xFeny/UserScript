@@ -47,9 +47,11 @@ export default {
 
     document.addEventListener("mousemove", handle, { passive: true });
   },
-  getVideoForCoord(clientX, clientY) {
+  getVideoForCoord(x, y) {
+    if (Tools.pointInElement(x, y, this.player)) return this.player;
+
     const getZIndex = (el) => Number(getComputedStyle(el).zIndex) || 0;
-    const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(clientX, clientY, v));
+    const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(x, y, v));
     return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
   createEdgeClickElement(video) {

@@ -6,14 +6,19 @@ import Storage from "../common/Storage";
  * 视频监听事件逻辑处理
  */
 export default {
-  videoEvents: ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "ended"],
+  videoAborts: new Map(), // 存储：video -> AbortController（用于事件解绑）
+  videoEvts: ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "ended"],
   setupVideoListeners(video) {
-    const handleEvent = (event) => {
-      const target = video ?? event.target;
-      if (video || target.matches(`video, ${Consts.FAKE_VIDEO}`)) this[event.type](target);
+    const handle = (e) => {
+      const target = video ?? e.target;
+      if (video || target.matches(`video, ${Consts.FAKE_VIDEO}`)) this[e.type](target);
     };
 
-    this.videoEvents.forEach((type) => (video ?? document).addEventListener(type, handleEvent, true));
+    const ctrl = new AbortController();
+    if (video) this.videoAborts.get(video)?.abort(); // 防止重复绑定
+
+    this.videoEvts.forEach((t) => (video ?? document).addEventListener(t, handle, { capture: true, signal: ctrl.signal }));
+    if (video) this.videoAborts.set(video, ctrl), this.unbindVideoEvts();
   },
   setupShadowVideoListeners() {
     document.addEventListener("shadow-video", (e) => {
@@ -21,6 +26,13 @@ export default {
       if (!video || video.hasAttribute("received")) return;
       video.setAttribute("received", true);
       this.setupVideoListeners(video);
+    });
+  },
+  unbindVideoEvts() {
+    if (this.videoAborts.size <= 1 || Tools.isThrottle("cleanup")) return;
+    this.videoAborts.forEach((ctrl, video) => {
+      if (Tools.isAttached(video)) return;
+      ctrl.abort(), video.removeAttribute("received"), this.videoAborts.delete(video);
     });
   },
   // ====================⇓⇓⇓ 视频监听事件相关逻辑 ⇓⇓⇓====================
