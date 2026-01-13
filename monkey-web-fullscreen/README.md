@@ -1,4 +1,8 @@
-### 脚本菜单  
+# 设置为适用于所有网站
+
+参考设置：<a href="https://pic1.imgdb.cn/item/696662c00e6bc0c5db9822b5.png" target="_blank">https://pic1.imgdb.cn/item/696662c00e6bc0c5db9822b5.png</a>
+
+### 脚本菜单
 
 1. 此站启/禁用自动网页全屏（非 `@match` 网站时显示）
 2. 删除此站剧集选择器 （有手动适配时显示）
@@ -49,7 +53,7 @@
 
 推荐在插件的脚本设置面板中完成用户匹配规则的配置；后续脚本更新时，即可避免重复修改。
 
-参考截图：<a href="https://pic1.imgdb.cn/item/69271b433203f7be003466ce.png" target="_blank">https://pic1.imgdb.cn/item/69271b433203f7be003466ce.png</a>
+参考设置：<a href="https://pic1.imgdb.cn/item/696662c00e6bc0c5db9822b5.png" target="_blank">https://pic1.imgdb.cn/item/696662c00e6bc0c5db9822b5.png</a>
 
 **2. 对特定网站生效（以咕咕番为例）**
 
