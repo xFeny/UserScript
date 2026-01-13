@@ -47,7 +47,9 @@
 // @match        *://*/*
 ```
 
-或在插件的脚本设置面板中添加用户匹配；后续脚本更新时，就能避免重复修改：<a href="https://pic1.imgdb.cn/item/69271b433203f7be003466ce.png" target="_blank">https://pic1.imgdb.cn/item/69271b433203f7be003466ce.png</a>
+推荐在插件的脚本设置面板中完成用户匹配规则的配置；后续脚本更新时，即可避免重复修改。
+
+参考截图：<a href="https://pic1.imgdb.cn/item/69271b433203f7be003466ce.png" target="_blank">https://pic1.imgdb.cn/item/69271b433203f7be003466ce.png</a>
 
 **2. 对特定网站生效（以咕咕番为例）**
 
