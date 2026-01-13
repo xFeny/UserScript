@@ -5,7 +5,7 @@ import Tools from "../common/Tools";
  */
 export default {
   videoAborts: new Map(), // 存储：video -> AbortController（用于事件解绑）
-  videoEvents: ["loadedmetadata", "timeupdate", "playing"],
+  videoEvts: ["loadedmetadata", "timeupdate", "playing"],
   setupVideoListeners(video) {
     const ctrl = new AbortController();
     if (video) this.videoAborts.get(video)?.abort(); // 防止重复绑定
