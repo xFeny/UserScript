@@ -59,7 +59,7 @@ export default {
   },
   setPlayer(video) {
     this.player = video;
-    const videoInfo = { isLive: video.duration === Infinity, timestamp: Date.now() };
+    const videoInfo = { isLive: video.duration === Infinity };
     this.syncVideoToParentWin(videoInfo);
   },
   syncVideoToParentWin(videoInfo) {
