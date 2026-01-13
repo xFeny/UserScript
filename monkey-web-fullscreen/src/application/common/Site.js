@@ -66,8 +66,8 @@ export default class Site {
    */
   static #createSiteTests() {
     Object.entries(this._siteRegExps).forEach(([name, regex]) => {
-      const methodName = `is${name.charAt(0).toUpperCase()}${name.slice(1)}`;
-      if (!this[methodName]) this[methodName] = () => regex.test(location.href);
+      const method = `is${name.charAt(0).toUpperCase()}${name.slice(1)}`;
+      if (!this[method]) this[method] = () => regex.test(location.href);
     });
   }
 }

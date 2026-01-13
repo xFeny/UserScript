@@ -18,7 +18,7 @@ export default {
     if (isNonFirst) return;
     this.setupDocumentObserver();
     this.setupIgnoreUrlsChangeListener();
-    this.setupShadowVideoListeners();
+    this.setupShadowVideoListener();
   },
   /**
    * 解决 document.write 导致监听失效问题
@@ -42,7 +42,7 @@ export default {
     const handle = ({ type, clientX, clientY }) => {
       if (Tools.isThrottle(type)) return;
       const video = this.getVideoForCoord(clientX, clientY);
-      video && this.createEdgeClickElement(video);
+      video && this.createEdgeElement(video);
     };
 
     document.addEventListener("mousemove", handle, { passive: true });
@@ -54,8 +54,8 @@ export default {
     const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(x, y, v));
     return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
-  createEdgeClickElement(video) {
-    const container = this.getEdgeClickContainer(video);
+  createEdgeElement(video) {
+    const container = this.getEdgeContainer(video);
 
     // 父容器未发生变化，不更新位置
     if (video.lArea?.parentNode === container) return;
@@ -70,8 +70,8 @@ export default {
     if (video.lArea) return container.prepend(video.lArea, video.rArea);
 
     // 复用元素创建逻辑
-    const createEdge = (clas = "") => {
-      const element = Object.assign(document.createElement("div"), { video, className: `video-edge-click ${clas}` });
+    const createEdge = (cls = "") => {
+      const element = Object.assign(document.createElement("div"), { video, className: `video-edge-click ${cls}` });
 
       element.onclick = (e) => {
         Tools.preventDefault(e);
@@ -86,14 +86,14 @@ export default {
     [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
     container.prepend(video.lArea, video.rArea);
   },
-  getEdgeClickContainer(video) {
+  getEdgeContainer(video) {
     if (this.fsWrapper) return video.closest(`[${Consts.webFull}]`) ?? this.fsWrapper;
 
-    const parentNode = video.parentNode;
+    const parent = video.parentNode;
     const sroot = video.getRootNode() instanceof ShadowRoot;
-    return sroot ? parentNode : this.findVideoParentContainer(parentNode, undefined, false);
+    return sroot ? parent : this.findVideoContainer(parent, undefined, false);
   },
-  lacksRelativePosition(element) {
-    return Tools.getParents(element, true, 2).every((el) => el && getComputedStyle(el).position === "static");
+  lacksRelativePosition(el) {
+    return Tools.getParents(el, true, 2).every((e) => e && getComputedStyle(e).position === "static");
   },
 };

@@ -27,7 +27,7 @@ export default {
     this.setupDocumentObserver();
     this.observeWebFullscreenChange();
     this.setupIgnoreUrlsChangeListener();
-    this.setupShadowVideoListeners();
+    this.setupShadowVideoListener();
     this.setupLoadEventListener();
   },
   setupVisibleListener() {
@@ -59,7 +59,7 @@ export default {
   },
   setPlayer(video) {
     this.player = video;
-    const videoInfo = { isLive: video.duration === Infinity };
+    const videoInfo = { isLive: video.duration === Infinity, timestamp: Date.now() };
     this.syncVideoToParentWin(videoInfo);
   },
   syncVideoToParentWin(videoInfo) {
@@ -72,8 +72,8 @@ export default {
   sendTopWinInfo() {
     // 向iframe传递顶级窗口信息
     const { host, href: url } = location;
-    const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
-    const topWin = { url, host, viewWidth, viewHeight, urlHash: Tools.hashCode(url) };
+    const { innerWidth: vw, innerHeight: vh } = window;
+    const topWin = { vw, vh, url, host, urlHash: Tools.hashCode(url) };
     window.topWin = this.topWin = topWin;
     Tools.sendToIFrames({ topWin });
   },
@@ -81,10 +81,10 @@ export default {
     if (this.isExecuted("observed", video)) return;
 
     const isFake = video.matches(Consts.FAKE_VIDEO);
-    const handleChange = (v) => (delete this.topWin, this.setPlayer(v));
+    const onChange = (v) => (delete this.topWin, this.setPlayer(v));
     VideoEnhancer.defineProperty(video, isFake ? "srcConfig" : "src", {
       set(value, setter) {
-        setter(value), value && this === App.player && handleChange(this);
+        setter(value), value && this === App.player && onChange(this);
       },
     });
   },
@@ -123,13 +123,13 @@ export default {
     !isFullscreen && this.fsWrapper && this.dispatchShortcut(Keyboard.P);
 
     // 播放器右上角时间的显/隐
-    this.changeTimeElementDisplay();
+    this.changeTimeDisplay();
   },
   observeWebFullscreenChange() {
-    const handle = (event, { code, type } = event) => {
+    const handle = (e, { code, type } = e) => {
       if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
-      if (this.isInputFocus(event) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
-      Tools.preventDefault(event), Object.is(type, "keydown") && this.dispatchShortcut(code, { bypass: true });
+      if (this.isInputFocus(e) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
+      Tools.preventDefault(e), Object.is(type, "keydown") && this.dispatchShortcut(code, { bypass: true });
     };
 
     VideoEnhancer.defineProperty(this, "fsWrapper", {
@@ -148,7 +148,7 @@ export default {
       if (Tools.isThrottle(type)) return;
 
       // 根据坐标获取视频元素，并创建侧边元素
-      this.createEdgeClickElement(this.getVideoForCoord(clientX, clientY));
+      this.createEdgeElement(this.getVideoForCoord(clientX, clientY));
 
       // 有视频信息时才切换鼠标光标的显隐
       if (this.isNoVideo()) return;
@@ -173,10 +173,10 @@ export default {
     const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(x, y, v));
     return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
-  createEdgeClickElement(video) {
+  createEdgeElement(video) {
     if (!video || !Storage.ENABLE_EDGE_CLICK.get()) return;
 
-    const container = this.getEdgeClickContainer(video);
+    const container = this.getEdgeContainer(video);
 
     // 父容器未发生变化，不更新位置
     if (video.lArea?.parentNode === container) return;
@@ -191,8 +191,8 @@ export default {
     if (video.lArea) return container.prepend(video.lArea, video.rArea);
 
     // 复用元素创建逻辑
-    const createEdge = (clas = "") => {
-      const element = Tools.createElement("div", { video, className: `video-edge-click ${clas}` });
+    const createEdge = (cls = "") => {
+      const element = Tools.createElement("div", { video, className: `video-edge-click ${cls}` });
 
       element.onclick = (e) => {
         Tools.preventDefault(e);
@@ -207,17 +207,17 @@ export default {
     [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
     container.prepend(video.lArea, video.rArea);
   },
-  getEdgeClickContainer(video) {
+  getEdgeContainer(video) {
     if (this.fsWrapper) return video.closest(`[${Consts.webFull}]`) ?? this.fsWrapper;
 
-    const parentNode = video.parentNode;
+    const parent = video.parentNode;
     const sroot = video.getRootNode() instanceof ShadowRoot;
-    return sroot ? parentNode : this.findVideoParentContainer(parentNode, undefined, false);
+    return sroot ? parent : this.findVideoContainer(parent, undefined, false);
   },
-  lacksRelativePosition(element) {
-    return Tools.getParents(element, true, 2).every((el) => el && getComputedStyle(el).position === "static");
+  lacksRelativePosition(el) {
+    return Tools.getParents(el, true, 2).every((e) => e && getComputedStyle(e).position === "static");
   },
-  removeEdgeClickElements() {
+  removeEdgeElements() {
     Tools.querys(".video-edge-click").forEach((el) => (el.remove(), delete el.video.lArea, delete el.video.rArea));
   },
   // ====================⇑⇑⇑ 侧边点击相关逻辑 ⇑⇑⇑====================

@@ -8,13 +8,13 @@ import Keyboard from "../common/Keyboard";
  * 快捷键和消息相关逻辑处理
  */
 export default {
-  isInputFocus: (event) => Tools.isInputable(event.composedPath()[0]),
-  preventKey(event, { code, altKey } = event) {
-    const isNumKeys = Tools.isNumber(event.key) && !this.isDisRate();
+  isInputFocus: (e) => Tools.isInputable(e.composedPath()[0]),
+  preventKey(e, { code, altKey } = e) {
+    const isNumKeys = Tools.isNumber(e.key) && !this.isDisRate();
     const isOverrideKeys = this.isOverrideKey() && [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
     const isPreventKeys = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
     const isZoomKeys = altKey && !this.isDisZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
-    if (isNumKeys || isOverrideKeys || isPreventKeys || isZoomKeys) Tools.preventDefault(event);
+    if (isNumKeys || isOverrideKeys || isPreventKeys || isZoomKeys) Tools.preventDefault(e);
   },
   dispatchShortcut(code, { bypass = false, isTrusted = false } = {}) {
     const key = this.processShortcutKey({ code });
@@ -26,17 +26,17 @@ export default {
     return keys.filter(Boolean).join("_").toUpperCase();
   },
   setupKeydownListener() {
-    unsafeWindow.addEventListener("keyup", (event) => this.preventKey(event), true);
-    unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
+    unsafeWindow.addEventListener("keyup", (e) => this.preventKey(e), true);
+    unsafeWindow.addEventListener("keydown", (e) => this.handleKeydown(e), true);
     unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
   },
-  handleKeydown(event, { key, code, isTrusted } = event) {
+  handleKeydown(e, { key, code, isTrusted } = e) {
     // Tools.log("键盘事件：", { key, code });
-    if (this.isNoVideo() || this.isInputFocus(event)) return;
+    if (this.isNoVideo() || this.isInputFocus(e)) return;
     if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
 
-    this.preventKey(event);
-    key = this.processShortcutKey(event);
+    this.preventKey(e);
+    key = this.processShortcutKey(e);
     const specialKeys = [Keyboard.N, Keyboard.P, Keyboard.Enter, Keyboard.NumEnter];
     if (specialKeys.includes(code)) return Tools.postMessage(window.top, { key, isTrusted });
     this.processEvent({ key, isTrusted });
@@ -64,12 +64,12 @@ export default {
       RIGHT: () => (bypass || this.isOverrideKey()) && this.skipPlayback(Storage.SKIP_INTERVAL.get()),
       SPACE: () => (bypass || this.isOverrideKey()) && this.playToggle(this.player),
       0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
-      SHIFT_A: () => this.toggleAutoNextEnabled(),
-      CTRL_ALT_A: () => this.captureScreenshot(),
-      CTRL_Z: () => this.resetVideoTransform(),
-      SHIFT_R: () => this.toggleMirrorFlip(),
+      SHIFT_A: () => this.autoNextEnabled(),
+      SHIFT_R: () => this.flipHorizontal(),
+      CTRL_ALT_A: () => this.screenshot(),
       ALT_SUB: () => this.zoomVideo(true),
       ALT_ADD: () => this.zoomVideo(),
+      CTRL_Z: () => this.resetTsr(),
     };
 
     // 倍速加减
@@ -77,7 +77,7 @@ export default {
     ["A", "S", "ADD", "SUB"].forEach((k, i) => (dict[k] = () => this.adjustPlaybackRate((i % 2 ? -1 : 1) * step)));
 
     // 视频移动
-    ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => (dict[k] = () => this.moveVideoPosition(k)));
+    ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => (dict[k] = () => this.moveVideo(k)));
 
     // 预设常用倍速值
     for (let i = 1; i < 6; i++) dict[`CTRL_${i}`] = () => this.setPlaybackRate(Storage.PRESET_SPEED.get()[i - 1]);
@@ -100,13 +100,13 @@ export default {
   },
   handleSettMessage(data) {
     // 处理在 “更多设置” 中操作功能切换（启用/禁用）时发来的消息
-    if ("sw_rateKeep" in data) this.playbackRateKeepDisplay(); // 左上角常显倍速
-    if ("sw_clockAlw" in data) setTimeout(() => this.changeTimeElementDisplay(), 30); // 非全屏显示时间
-    if ("sw_color" in data) this.setTimeElementColor(data.sw_color); // 时间颜色
-    if ("sw_edgeClk" in data) this.removeEdgeClickElements(); // 禁用侧边触发网页全屏
-
+    if (data?.sw_zoom) this.resetTsr(); // 禁用缩放
     if (data?.sw_memory) this.delCachedRate(); // 禁用记忆倍速
-    if (data?.sw_zoom) this.resetVideoTransform(); // 禁用缩放
     if (data?.sw_speed) this.setPlaybackRate(Consts.DEF_SPEED); // 禁用倍速调节
+
+    if ("sw_rateKeep" in data) this.playbackRateKeepDisplay(); // 左上角常显倍速
+    if ("sw_clockAlw" in data) setTimeout(() => this.changeTimeDisplay(), 30); // 非全屏显示时间
+    if ("sw_color" in data) this.setTimeColor(data.sw_color); // 时间颜色
+    if ("sw_edgeClk" in data) this.removeEdgeElements(); // 禁用侧边触发网页全屏
   },
 };

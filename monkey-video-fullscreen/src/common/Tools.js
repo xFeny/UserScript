@@ -4,10 +4,10 @@ import Consts from "./Consts";
 export default {
   isTopWin: () => window.top === window,
   scrollTop: (top) => window.scrollTo({ top }),
-  getElementRect: (el) => el?.getBoundingClientRect(),
-  microTask: (callback) => Promise.resolve().then(callback),
-  query: (selector, context) => querySelector(selector, context),
-  querys: (selector, context) => querySelectorAll(selector, context),
+  getRect: (el) => el?.getBoundingClientRect(),
+  microTask: (fn) => Promise.resolve().then(fn),
+  query: (selector, ctx) => querySelector(selector, ctx),
+  querys: (selector, ctx) => querySelectorAll(selector, ctx),
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
   postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
   getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
@@ -17,7 +17,7 @@ export default {
   emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
   isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
   sendToIFrames(data) {
-    this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
+    this.getIFrames().forEach((el) => this.postMessage(el?.contentWindow, data));
   },
   freqTimes: new Map(),
   isThrottle(key = "throttle", gap = 300) {
@@ -28,30 +28,30 @@ export default {
     // 判断是否需要节流，true = 需要节流（不执行），false = 可以执行
     return diff >= gap ? this.freqTimes.set(key, now) && false : true;
   },
-  limitCountMap: new Map(),
-  isOverLimit(key = "default", maxCount = 5) {
-    const count = this.limitCountMap.get(key) ?? 0;
-    if (count < maxCount) return this.limitCountMap.set(key, count + 1) && false;
+  countMap: new Map(),
+  isOverLimit(key = "default", max = 5) {
+    const count = this.countMap.get(key) ?? 0;
+    if (count < max) return this.countMap.set(key, count + 1) && false;
     return true;
   },
   resetLimit(...keys) {
     const keyList = keys.length > 0 ? keys : ["default"];
-    keyList.forEach((key) => this.limitCountMap.set(key, 0));
+    keyList.forEach((key) => this.countMap.set(key, 0));
   },
-  pointInElement(pointX, pointY, element) {
-    if (!element) return false;
-    const { top, left, right, bottom } = this.getElementRect(element);
-    return pointX >= left && pointX <= right && pointY >= top && pointY <= bottom;
+  pointInElement(x, y, el) {
+    if (!el) return false;
+    const { top, left, right, bottom } = this.getRect(el);
+    return x >= left && x <= right && y >= top && y <= bottom;
   },
-  getParent(element) {
-    if (!element) return null;
-    const parent = element.parentNode;
+  getParent(el) {
+    if (!el) return null;
+    const parent = el.parentNode;
     if (parent instanceof ShadowRoot) return parent.host;
     return parent === document ? null : parent;
   },
-  getParents(element, withSelf = false, maxLevel = Infinity) {
-    const parents = withSelf && element ? [element] : [];
-    for (let current = element, level = 0; current && level < maxLevel; level++) {
+  getParents(el, self = false, max = Infinity) {
+    const parents = self && el ? [el] : [];
+    for (let current = el, deep = 0; current && deep < max; deep++) {
       current = this.getParent(current);
       current && parents.unshift(current);
     }
@@ -63,10 +63,10 @@ export default {
       if (value) target.setAttribute(attr, value);
     });
   },
-  setStyle(eles, prop, val, priority) {
-    if (!eles || !prop) return;
+  setStyle(els, prop, val, priority) {
+    if (!els || !prop) return;
     const fn = val ? "setProperty" : "removeProperty";
-    [].concat(eles).forEach((el) => el?.style?.[fn]?.(prop, val, priority));
+    [].concat(els).forEach((el) => el?.style?.[fn]?.(prop, val, priority));
   },
   /**
    * 检测DOM元素是否仍挂载在活跃文档树中（兼容开放Shadow DOM）

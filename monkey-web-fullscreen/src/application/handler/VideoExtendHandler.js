@@ -38,7 +38,7 @@ export default {
 
     this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
   },
-  getRealDuration(video) {
+  getRealDur(video) {
     if (!Site.isQiyi()) return video.duration;
     return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
   },
@@ -46,25 +46,25 @@ export default {
     if (!video || (!bypass && video.paused) || this.player !== video || this.isMutedLoop(video)) return;
     if (video.duration <= 30 || this.isLive() || this.shouldHideTime()) return this.removeProgressElement();
 
-    const duration = this.getRealDuration(video);
+    const duration = this.getRealDur(video);
     if (duration > 864e2) return this.removeProgressElement();
 
     const percent = Tools.toFixed((video.currentTime / duration) * 100, 1);
-    const timeLeft = this.formatTime(duration - video.currentTime);
+    const remain = this.formatTime(duration - video.currentTime);
 
-    const element = this.createProgressElement(); // 创建相关元素
-    element.firstChild.textContent = `${timeLeft} / ${percent}`;
-    this.prependElement(element);
+    const el = this.createProgressElement(); // 创建相关元素
+    el.firstChild.textContent = `${remain} / ${percent}`;
+    this.prependElement(el);
   },
   createProgressElement() {
     if (this.progressNode) return this.progressNode;
 
     // 创建播放进度元素
-    const element = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
-    element.append(document.createTextNode("00:00"), Tools.createElement("b", { textContent: "%" }));
-    this.progressNode = element;
+    const el = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
+    el.append(document.createTextNode("00:00"), Tools.createElement("b", { textContent: "%" }));
+    this.progressNode = el;
 
-    return element;
+    return el;
   },
   removeProgressElement: () => App.progressNode?.remove(),
   playbackRateKeepDisplay() {
@@ -80,15 +80,15 @@ export default {
     this.playbackRateKeepDisplay();
   },
   removeRateKeepDisplay: () => App.rateKeepElement?.remove(),
-  createDisplayElement(clss, color) {
-    const element = Tools.createElement("div", { className: clss, style: `color: ${color}` });
-    this.prependElement(element);
-    return element;
+  createDisplayElement(cls, color) {
+    const el = Tools.createElement("div", { className: cls, style: `color: ${color}` });
+    this.prependElement(el);
+    return el;
   },
-  prependElement(element) {
+  prependElement(el) {
     const container = this.player?.parentNode;
-    if (element && !container?.contains(element)) container?.prepend(element);
+    if (el && !container?.contains(el)) container?.prepend(el);
   },
-  changeTimeElementDisplay: () => (App.setupPlayerClock(), App.videoProgress(App.player, true)),
-  setTimeElementColor: (color) => Tools.setStyle([App.progressNode, App.Clock?.element], "color", color),
+  changeTimeDisplay: () => (App.setupPlayerClock(), App.videoProgress(App.player, true)),
+  setTimeColor: (color) => Tools.setStyle([App.progressNode, App.Clock?.element], "color", color),
 };

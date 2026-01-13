@@ -16,7 +16,7 @@ declare global {
     /**
      * 顶级窗口信息
      */
-    topWin?: { host: string; urlHash: string; viewWidth: string; viewHeight: string };
+    topWin?: { host: string; urlHash: string; vw: string; vh: string };
 
     /**
      * 显示进度的元素
@@ -62,7 +62,7 @@ declare global {
      * @param {HTMLVideoElement} video - 视频元素
      * @returns {string} 缓存key
      */
-    getCacheTimeKey(video: HTMLVideoElement): string;
+    getUniqueKey(video: HTMLVideoElement): string;
 
     /**
      * 设置播放器时钟

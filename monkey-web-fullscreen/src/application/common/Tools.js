@@ -6,12 +6,12 @@ export default unsafeWindow.FyTools = {
   isTopWin: () => window.top === window,
   isNumber: (str) => /^[0-9]$/.test(str),
   scrollTop: (top) => window.scrollTo({ top }),
+  getRect: (el) => el?.getBoundingClientRect(),
+  microTask: (fn) => Promise.resolve().then(fn),
   alert: (...data) => window.alert(data.join(" ")),
-  getElementRect: (el) => el?.getBoundingClientRect(),
-  isMultiVideo: () => querySelectorAll("video").length > 1,
-  microTask: (callback) => Promise.resolve().then(callback),
-  query: (selector, context) => querySelector(selector, context),
-  querys: (selector, context) => querySelectorAll(selector, context),
+  isMultiV: () => querySelectorAll("video").length > 1,
+  query: (selector, ctx) => querySelector(selector, ctx),
+  querys: (selector, ctx) => querySelectorAll(selector, ctx),
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
   toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, Consts.EMPTY),
   postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
@@ -19,21 +19,21 @@ export default unsafeWindow.FyTools = {
   log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
   getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
   isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
-  preventDefault: (event) => (event.preventDefault(), event.stopPropagation(), event.stopImmediatePropagation()),
+  preventDefault: (e) => (e.preventDefault(), e.stopPropagation(), e.stopImmediatePropagation()),
   attr: (el, name, val) => el && name && el[val ? "setAttribute" : "removeAttribute"](name, val),
-  createElement: (tagName, attrs = {}) => Object.assign(document.createElement(tagName), attrs),
   emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
   isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
-  hasCls: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
-  delCls: (el, ...classes) => el?.classList.remove(...classes),
-  addCls: (el, ...classes) => el?.classList.add(...classes),
+  createElement: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
+  hasCls: (el, ...cls) => cls.flat().some((cls) => el?.classList.contains(cls)),
+  delCls: (el, ...cls) => el?.classList.remove(...cls),
+  addCls: (el, ...cls) => el?.classList.add(...cls),
   notyf(msg, isError = false) {
     const notyf = new Notyf({ duration: Consts.THREE_SEC, position: { x: "center", y: "top" } });
     isError ? notyf.error(msg) : notyf.success(msg);
     return false;
   },
   sendToIFrames(data) {
-    this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
+    this.getIFrames().forEach((el) => this.postMessage(el?.contentWindow, data));
   },
   freqTimes: new Map(),
   isThrottle(key = "throttle", gap = 300) {
@@ -44,28 +44,28 @@ export default unsafeWindow.FyTools = {
     // 判断是否需要节流，true = 需要节流（不执行），false = 可以执行
     return diff >= gap ? this.freqTimes.set(key, now) && false : true;
   },
-  limitCountMap: new Map(),
-  isOverLimit(key = "default", maxCount = 5) {
-    const count = this.limitCountMap.get(key) ?? 0;
-    if (count < maxCount) return this.limitCountMap.set(key, count + 1) && false;
+  countMap: new Map(),
+  isOverLimit(key = "default", max = 5) {
+    const count = this.countMap.get(key) ?? 0;
+    if (count < max) return this.countMap.set(key, count + 1) && false;
     return true;
   },
   resetLimit(...keys) {
     const keyList = keys.length > 0 ? keys : ["default"];
-    keyList.forEach((key) => this.limitCountMap.set(key, 0));
+    keyList.forEach((key) => this.countMap.set(key, 0));
   },
-  pointInElement(pointX, pointY, element) {
-    if (!element) return false;
-    const { top, left, right, bottom } = this.getElementRect(element);
-    return pointX >= left && pointX <= right && pointY >= top && pointY <= bottom;
+  pointInElement(x, y, el) {
+    if (!el) return false;
+    const { top, left, right, bottom } = this.getRect(el);
+    return x >= left && x <= right && y >= top && y <= bottom;
   },
-  emitMousemove(element) {
-    const { top: y, left, right } = this.getElementRect(element);
-    for (let x = left; x <= right; x += 10) this.fireMouseEvt(element, "mousemove", x, y);
+  emitMousemove(el) {
+    const { top: y, left, right } = this.getRect(el);
+    for (let x = left; x <= right; x += 10) this.fireMouseEvt(el, "mousemove", x, y);
   },
-  fireMouseEvt(element, eventType, clientX, clientY) {
+  fireMouseEvt(el, type, clientX, clientY) {
     const dict = { clientX, clientY, bubbles: true };
-    element?.dispatchEvent(new MouseEvent(eventType, dict));
+    el?.dispatchEvent(new MouseEvent(type, dict));
   },
   /**
    * 判断元素是否有有效ID（不含数字/中文）
@@ -77,27 +77,27 @@ export default unsafeWindow.FyTools = {
     const parents = [];
     let current = element;
     while (current && !current.matches("body")) {
-      parents.unshift(this.getElementSelector(current));
+      parents.unshift(this.getSelector(current));
       if (this.hasValidDomId(current)) break;
       current = this.getParent(current);
     }
     return parents.join(" > ");
   },
-  getElementSelector(ele) {
-    if (this.hasValidDomId(ele)) return `#${ele.id}`;
-    const tag = ele.tagName.toLowerCase();
-    const validCls = Array.from(ele.classList).filter((cls) => !/[\[\]\d]/.test(cls)); // 排除含[]或数字的类名
+  getSelector(el) {
+    if (this.hasValidDomId(el)) return `#${el.id}`;
+    const tag = el.tagName.toLowerCase();
+    const validCls = Array.from(el.classList).filter((cls) => !/[\[\]\d]/.test(cls)); // 排除含[]或数字的类名
     return validCls.length ? `${tag}.${validCls.join(".")}` : tag;
   },
-  getParent(element) {
-    if (!element) return null;
-    const parent = element.parentNode;
+  getParent(el) {
+    if (!el) return null;
+    const parent = el.parentNode;
     if (parent instanceof ShadowRoot) return parent.host;
     return parent === document ? null : parent;
   },
-  getParents(element, withSelf = false, maxLevel = Infinity) {
-    const parents = withSelf && element ? [element] : [];
-    for (let current = element, level = 0; current && level < maxLevel; level++) {
+  getParents(el, self = false, max = Infinity) {
+    const parents = self && el ? [el] : [];
+    for (let current = el, deep = 0; current && deep < max; deep++) {
       current = this.getParent(current);
       current && parents.unshift(current);
     }
@@ -125,10 +125,10 @@ export default unsafeWindow.FyTools = {
     const nodes = document.evaluate(expr, document.body, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     return Array.from({ length: nodes.snapshotLength }, (_, i) => nodes.snapshotItem(i)).filter((el) => !el.matches("script"));
   },
-  safeHTML(htmlStr) {
-    if (!window.trustedTypes?.createPolicy) return htmlStr;
+  safeHTML(html) {
+    if (!window.trustedTypes?.createPolicy) return html;
     const policy = trustedTypes.defaultPolicy ?? trustedTypes.createPolicy("default", { createHTML: (input) => input });
-    return policy.createHTML(htmlStr);
+    return policy.createHTML(html);
   },
   cloneAttrs(source, target, ...attrs) {
     attrs.flat().forEach((attr) => {
@@ -136,10 +136,10 @@ export default unsafeWindow.FyTools = {
       if (value) target.setAttribute(attr, value);
     });
   },
-  setStyle(eles, prop, val, priority) {
-    if (!eles || !prop) return;
+  setStyle(els, prop, val, priority) {
+    if (!els || !prop) return;
     const fn = val ? "setProperty" : "removeProperty";
-    [].concat(eles).forEach((el) => el?.style?.[fn]?.(prop, val, priority));
+    [].concat(els).forEach((el) => el?.style?.[fn]?.(prop, val, priority));
   },
   /**
    * 检测DOM元素是否仍挂载在活跃文档树中（兼容开放Shadow DOM）

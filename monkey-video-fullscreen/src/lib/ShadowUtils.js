@@ -62,14 +62,14 @@ export function* getShadowRoots(node, deep = false) {
  * 在给定节点的 DOM 中查询匹配的元素，遇到 shadow root 时会自动深入查询。
  *
  * @param selector 要查询的 CSS 选择器
- * @param subject 查询的起始节点，默认为 `document`
+ * @param ctx 查询的起始节点，默认为 `document`
  * @return 找到的第一个匹配元素
  */
-export function querySelector(selector, subject = document) {
-  const immediate = subject.querySelector(selector);
-  if (immediate) return immediate;
+export function querySelector(selector, ctx = document) {
+  const direct = ctx.querySelector(selector);
+  if (direct) return direct;
 
-  const shadowRoots = [...getShadowRoots(subject, true)];
+  const shadowRoots = [...getShadowRoots(ctx, true)];
   for (const root of shadowRoots) {
     const match = root.querySelector(selector);
     if (match) return match;
@@ -82,12 +82,12 @@ export function querySelector(selector, subject = document) {
  * 在给定节点的 DOM 中查询所有匹配的元素，遇到 shadow root 时会自动深入查询。
  *
  * @param selector 要查询的 CSS 选择器
- * @param subject 查询的起始节点，默认为 `document`
+ * @param ctx 查询的起始节点，默认为 `document`
  * @return 找到的所有匹配元素集合
  */
-export function querySelectorAll(selector, subject = document) {
-  const results = [...subject.querySelectorAll(selector)];
-  const shadowRoots = [...getShadowRoots(subject, true)];
+export function querySelectorAll(selector, ctx = document) {
+  const results = [...ctx.querySelectorAll(selector)];
+  const shadowRoots = [...getShadowRoots(ctx, true)];
   for (const root of shadowRoots) {
     results.push(...root.querySelectorAll(selector));
   }

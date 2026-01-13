@@ -97,11 +97,11 @@ export default {
     });
   },
   settingPopup() {
-    const { html: basicsHtml, cacheMap: basicsMap } = this.genBasicsItems();
-    const { html: assistHtml, cacheMap: assistMap } = this.genAssistItems();
-    const { html: paramsHtml, cacheMap: paramsMap } = this.genParamsItems();
-    const { html: ignoreHtml, cacheMap: ignoreMap } = this.genIgnoreItems();
-    const cacheMap = { ...basicsMap, ...assistMap, ...paramsMap, ...ignoreMap };
+    const { html: basic, cacheMap: bCache } = this.genBasics();
+    const { html: assist, cacheMap: aCache } = this.genAssist();
+    const { html: params, cacheMap: pCache } = this.genParams();
+    const { html: ignore, cacheMap: iCache } = this.genIgnore();
+    const cacheMap = { ...bCache, ...aCache, ...pCache, ...iCache };
     const modalHtml = `
         <div class="swal2-tabs">
           <!-- Tabs 标题栏 -->
@@ -113,10 +113,10 @@ export default {
           </div>
           <!-- Tabs 内容区 -->
           <div class="swal2-tabs-content">
-            <div class="swal2-tab-panel active" id="tab1">${basicsHtml}</div>
-            <div class="swal2-tab-panel" id="tab2">${assistHtml}</div>
-            <div class="swal2-tab-panel" id="tab3">${paramsHtml}</div>
-            <div class="swal2-tab-panel" id="tab4">${ignoreHtml}</div>
+            <div class="swal2-tab-panel active" id="tab1">${basic}</div>
+            <div class="swal2-tab-panel" id="tab2">${assist}</div>
+            <div class="swal2-tab-panel" id="tab3">${params}</div>
+            <div class="swal2-tab-panel" id="tab4">${ignore}</div>
           </div>
         </div>`;
 
@@ -149,8 +149,8 @@ export default {
       },
     });
   },
-  genBasicsItems() {
-    const configs = [
+  genBasics() {
+    const confs = [
       { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_SPEED, attrs: ["send", "delay"] },
       { name: "memory", text: "禁用 记忆倍速", cache: Storage.NOT_CACHE_SPEED, attrs: ["send"] },
       { name: "time", text: "禁用 记忆进度", cache: Storage.NOT_CACHE_TIME },
@@ -160,16 +160,16 @@ export default {
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEY },
     ];
 
-    const renderItem = ({ text, dataset, name, value }) => `
+    const render = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
           <input ${dataset} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
 
-    return this.generateCommonItems(configs, renderItem);
+    return this.generate(confs, render);
   },
-  genAssistItems() {
-    const configs = [
+  genAssist() {
+    const confs = [
       { name: "fit", text: "禁用 默认自动", cache: Storage.NO_AUTO_DEF },
       { name: "pic", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
       { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, attrs: ["send"] },
@@ -179,16 +179,16 @@ export default {
       { name: "edgeClk", text: "启用 侧边单击网页全屏", cache: Storage.ENABLE_EDGE_CLICK, attrs: ["send"] },
     ].filter(({ isHidden }) => !isHidden);
 
-    const renderItem = ({ text, dataset, name, value }) => `
+    const render = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
           <input ${dataset} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
 
-    return this.generateCommonItems(configs, renderItem);
+    return this.generate(confs, render);
   },
-  genParamsItems() {
-    const configs = [
+  genParams() {
+    const confs = [
       { name: "step", text: "倍速步进", cache: Storage.SPEED_STEP },
       { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
       { name: "zero", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL },
@@ -200,45 +200,46 @@ export default {
       { name: "preset", text: "常用倍速", cache: Storage.PRESET_SPEED },
     ];
 
-    const renderItem = ({ text, dataset, name, value }) => `
+    const render = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
           <input ${dataset} value="${value}" name="${name}" type="text" autocomplete="off"/>
         </label>`;
 
-    return this.generateCommonItems(configs, renderItem);
+    return this.generate(confs, render);
   },
-  genIgnoreItems() {
-    const configs = [
+  genIgnore() {
+    const confs = [
       { name: "custom", text: "自定义此站视频容器", cache: Storage.CUSTOM_WEB_FULL, isHide: Site.isGmMatch(), useHost: true },
       { name: "nextIg", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: Storage.NEXT_IGNORE_URLS },
       { name: "fsIg", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: Storage.FULL_IGNORE_URLS },
     ];
 
-    const renderItem = ({ text, dataset, name, value }) => `
+    const render = ({ text, dataset, name, value }) => `
         <div class="others-sett"><p>${text}</p>
           <textarea ${dataset} name="${name}" type="text" spellcheck="false" autocomplete="off">${value}</textarea>
         </div>`;
 
-    return this.generateCommonItems(configs, renderItem);
+    return this.generate(confs, render);
   },
-  generateCommonItems(baseConfigs, renderItem) {
+  generate(confs, render) {
     const getDataset = (attrs = [], host) => attrs.map((key) => `data-${key}="${key === "host" ? host : true}"`).join(" ");
 
-    const filteredConfigs = baseConfigs.filter(({ isHide }) => !isHide);
-    const processedConfigs = filteredConfigs.map((config) => {
-      const { cache, attrs = [], useHost } = config;
-      const host = useHost ? this.host : Consts.EMPTY;
-      const value = useHost ? cache.get(this.host) : cache.get();
+    const finalConfs = confs
+      .filter(({ isHide }) => !isHide)
+      .map((conf) => {
+        const { cache, attrs = [], useHost } = conf;
+        const host = useHost ? this.host : Consts.EMPTY;
+        const value = useHost ? cache.get(this.host) : cache.get();
 
-      if (useHost && !attrs.includes("host")) attrs.push("host");
-      return { ...config, host, value, dataset: getDataset(attrs, this.host) };
-    });
+        if (useHost && !attrs.includes("host")) attrs.push("host");
+        return { ...conf, host, value, dataset: getDataset(attrs, this.host) };
+      });
 
     // 生成HTML字符串
-    const html = processedConfigs.map((config) => renderItem(config)).join(Consts.EMPTY);
+    const html = finalConfs.map((conf) => render(conf)).join(Consts.EMPTY);
 
     // name-cache 关系映射
-    const cacheMap = Object.fromEntries(processedConfigs.map((item) => [item.name, item.cache]));
+    const cacheMap = Object.fromEntries(finalConfs.map((e) => [e.name, e.cache]));
 
     return { html, cacheMap };
   },

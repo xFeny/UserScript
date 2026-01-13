@@ -33,10 +33,10 @@ export default {
 
     document.addEventListener("click", handle, true);
   },
-  pickerCurrentEpisodePath(element) {
+  pickerCurrentEpisodePath(el) {
     if (Storage.CURRENT_EPISODE.get(this.host)) return;
-    this.pickerEpisodePopup(element, {
-      validBtnCallback(value) {
+    this.pickerEpisodePopup(el, {
+      onVerify(value) {
         try {
           const number = this.getEpisodeNumber(Tools.query(value));
           number ? Tools.notyf(`当前集数：${number}`) : Tools.notyf("获取集数失败 〒▽〒", true);
@@ -45,16 +45,16 @@ export default {
           console.error(e);
         }
       },
-      confirmCallback(value) {
+      onSave(value) {
         Storage.CURRENT_EPISODE.set(value, this.host);
         Tools.notyf("继续拾取元素 ＼(＞０＜)／");
       },
     });
   },
-  pickerRelativeEpisodePath(element) {
+  pickerRelativeEpisodePath(el) {
     if (Storage.RELATIVE_EPISODE.get(this.host)) return;
-    this.pickerEpisodePopup(element, {
-      validBtnCallback(value) {
+    this.pickerEpisodePopup(el, {
+      onVerify(value) {
         try {
           const container = this.getEpisodeWrapper(Tools.query(value));
           const numbers = this.getAllEpisodes(container)?.map(this.getEpisodeNumber);
@@ -64,7 +64,7 @@ export default {
           console.error(e);
         }
       },
-      confirmCallback(value) {
+      onSave(value) {
         Storage.RELATIVE_EPISODE.set(value, this.host);
         Tools.notyf("操作完成 []~(￣▽￣)~* 干杯");
       },
@@ -80,7 +80,7 @@ export default {
     const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(Storage.RELATIVE_EPISODE.get(this.host))));
     return episodes.includes(current) ? current : episodes.find((el) => this.getEpisodeNumber(el) === num);
   },
-  pickerEpisodePopup(element, { validBtnCallback, confirmCallback }) {
+  pickerEpisodePopup(el, { onVerify, onSave }) {
     Swal.fire({
       html: Tools.safeHTML(`<h4>验证能正确取到集数，再确定保存</h4>
       <textarea id="__picker" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
@@ -95,10 +95,10 @@ export default {
       focusDeny: true,
       preDeny: () => {
         const value = Tools.query("#__picker").value.trim();
-        return value ? validBtnCallback.call(this, value) ?? false : Tools.notyf("元素选择器不能为空！", true);
+        return value ? onVerify.call(this, value) ?? false : Tools.notyf("元素选择器不能为空！", true);
       },
       preConfirm: () => Tools.query("#__picker").value.trim() || Tools.notyf("元素选择器不能为空！", true),
-      didOpen: () => (Tools.query("#__picker").value = Tools.getElementPath(element)),
-    }).then((result) => result.isConfirmed && confirmCallback.call(this, result.value));
+      didOpen: () => (Tools.query("#__picker").value = Tools.getElementPath(el)),
+    }).then((res) => res.isConfirmed && onSave.call(this, res.value));
   },
 };

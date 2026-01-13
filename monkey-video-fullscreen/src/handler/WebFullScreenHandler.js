@@ -81,11 +81,11 @@ export default {
   },
   getVideoContainer() {
     // 自定义网页全屏元素，支持多个选择器，返回第一个找到的元素
-    const selector = Storage.CUSTOM_CONTAINER.get(this.topWin?.host)?.trim();
+    const selector = Storage.CUSTOM_CONTAINER.get(this.topWin?.host ?? location.host)?.trim();
     const container = selector ? this.player.closest(selector) ?? Tools.query(selector) : null;
-    return container ?? this.findVideoParentContainer(this.findControlBarContainer());
+    return container ?? this.findVideoContainer(this.findCtrlContainer());
   },
-  findControlBarContainer() {
+  findCtrlContainer() {
     const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
     const selector = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"], [class*="progress"], [class*="volume"]`;
 
@@ -98,14 +98,14 @@ export default {
     return null;
   },
   videoParents: new Set(),
-  findVideoParentContainer(container, maxLevel = 4, track = true) {
+  findVideoContainer(container, max = 4, track = true) {
     container = container ?? Tools.getParent(this.player);
     if (!container.offsetHeight) container = Tools.getParent(container); // Youtube 存在这样的问题
     const { offsetWidth: cw, offsetHeight: ch } = container;
     if (track) this.videoParents.clear(); // 仅网页全屏时
 
     // 循环向上查找与初始元素宽高相等的父元素
-    for (let parent = container, level = 0; parent && level < maxLevel; parent = Tools.getParent(parent), level++) {
+    for (let parent = container, deep = 0; parent && deep < max; parent = Tools.getParent(parent), deep++) {
       if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
       if (this.hasExplicitlySize(parent)) return container;
       if (track) this.videoParents.add(parent);
@@ -113,8 +113,8 @@ export default {
 
     return container;
   },
-  hasExplicitlySize(element) {
-    const style = element.style;
+  hasExplicitlySize(el) {
+    const style = el.style;
     const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
     return ["width", "height"].some((prop) => {
       const value = style?.getPropertyValue(prop);
@@ -122,17 +122,17 @@ export default {
     });
   },
   ensureWebFullscreen() {
-    const { viewWidth, viewHeight } = this.topWin;
+    const { vw, vh } = this.topWin;
     const elements = [...this.videoParents].reverse();
 
     // 核心目的：确保视频父元素宽高与视窗完全匹配，保障网页全屏正常显示
     // 背景说明：当父元素因外联CSS设置了固定宽高值；当进入网页全屏后，父元素宽高未适应视窗，因此需要重新计算并修正元素宽高；
     // 如：https://www.toutiao.com/video/7579134807163060782、https://www.163.com/v/video/VO3QRCEH5.html
-    for (const element of elements) {
-      if (!this.fsWrapper.contains(element)) continue;
+    for (const el of elements) {
+      if (!this.fsWrapper.contains(el)) continue;
       const { offsetWidth: width, offsetHeight: height } = this.player;
-      if (width === viewWidth && height === viewHeight && element.offsetHeight === viewHeight) continue;
-      Tools.attr(element, Consts.webFull, true);
+      if (width === vw && height === vh && el.offsetHeight === vh) continue;
+      Tools.attr(el, Consts.webFull, true);
     }
   },
 };

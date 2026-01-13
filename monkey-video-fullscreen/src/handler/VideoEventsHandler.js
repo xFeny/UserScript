@@ -13,7 +13,7 @@ export default {
     this.videoEvts.forEach((t) => (video ?? document).addEventListener(t, handle, { capture: true, signal: ctrl.signal }));
     if (video) this.videoAborts.set(video, ctrl), this.unbindVideoEvts();
   },
-  setupShadowVideoListeners() {
+  setupShadowVideoListener() {
     document.addEventListener("shadow-video", (e) => {
       const { video } = e.detail;
       if (!video || video.hasAttribute("received")) return;
@@ -56,7 +56,7 @@ export default {
   },
   setPlayer(video) {
     this.player = video;
-    const videoInfo = { isLive: video.duration === Infinity };
+    const videoInfo = { isLive: video.duration === Infinity, timestamp: Date.now() };
     this.syncVideoToParentWin(videoInfo);
   },
   syncVideoToParentWin(videoInfo) {
@@ -68,8 +68,8 @@ export default {
   sendTopWinInfo() {
     // 向iframe传递顶级窗口信息
     const { host, href: url } = location;
-    const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
-    const topWin = { url, host, viewWidth, viewHeight };
+    const { innerWidth: vw, innerHeight: vh } = window;
+    const topWin = { url, host, vw, vh };
     window.topWin = this.topWin = topWin;
     Tools.sendToIFrames({ topWin });
   },

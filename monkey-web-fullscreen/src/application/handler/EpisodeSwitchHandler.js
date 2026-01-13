@@ -45,15 +45,15 @@ export default {
 
     return eles.length <= 1 ? eles[0] : eles.find((el) => Tools.hasCls(el, "cur", "active") || !!this.getEpisodeNumber(el));
   },
-  getEpisodeNumber: (ele) => Tools.getNumbers(ele?.innerText?.replace(/-|\./g, Consts.EMPTY))?.shift(),
-  getTargetEpisode(element, isPrev = false) {
-    if (!element) return;
-    const episodes = this.getAllEpisodes(element);
+  getEpisodeNumber: (el) => Tools.getNumbers(el?.innerText?.replace(/-|\./g, Consts.EMPTY))?.shift(),
+  getTargetEpisode(el, isPrev = false) {
+    if (!el) return;
+    const episodes = this.getAllEpisodes(el);
     const numbers = episodes.map(this.getEpisodeNumber).filter(Boolean);
     if (numbers.length < 2) return;
 
-    const index = episodes.indexOf(element);
-    const currNumber = this.getEpisodeNumber(element);
+    const index = episodes.indexOf(el);
+    const currNumber = this.getEpisodeNumber(el);
     const { lSmall, rLarge } = this.compareNumSize(numbers, currNumber, index);
     // 当 lSmall || rLarge 的结果与 isPrev 的布尔值相同时，返回 prev，当两者不同时，返回 next。
     return (lSmall || rLarge) === isPrev ? episodes[index - 1] : episodes[index + 1];
@@ -70,20 +70,20 @@ export default {
     if (!element) return [];
 
     const numSet = new Set(); // 用于过滤重复的集数
-    const eleName = element.tagName;
-    const eleClass = Array.from(element.classList);
+    const elName = element.tagName;
+    const elCls = Array.from(element.classList);
     const children = Array.from(element.parentNode.children);
 
-    return children.filter((ele) => {
-      const currClass = Array.from(ele.classList).filter((cls) => !["on", "cur", "active"].includes(cls));
-      const hasSameClass = eleClass.some((value) => currClass.includes(value));
-      const isMatch = currClass.length ? hasSameClass : ele.tagName === eleName;
-      if (!isMatch || numSet.has(ele.innerText)) return false;
-      return numSet.add(ele.innerText);
+    return children.filter((el) => {
+      const curCls = Array.from(el.classList).filter((cls) => !["on", "cur", "active"].includes(cls));
+      const hasCls = elCls.some((value) => curCls.includes(value));
+      const isMatch = curCls.length ? hasCls : el.tagName === elName;
+      if (!isMatch || numSet.has(el.innerText)) return false;
+      return numSet.add(el.innerText);
     });
   },
-  jumpToTargetEpisode(element) {
-    const stack = [element].filter(Boolean);
+  jumpToTargetEpisode(el) {
+    const stack = [el].filter(Boolean);
     while (stack.length > 0) {
       const current = stack.pop();
       if (current.matches("a, button")) return current?.click();
@@ -93,10 +93,10 @@ export default {
   },
   /**
    * 向上遍历DOM，找到同级包裹元素，限定遍历层数
-   * @param {HTMLElement} element - 起始DOM元素
+   * @param {HTMLElement} el - 起始DOM元素
    * @returns {HTMLElement|null} 同级包裹元素
    */
-  getEpisodeWrapper(element) {
+  getEpisodeWrapper(el) {
     //  集数相对于所有集数所在的同级标签
 
     // 示例一：得到<a>标签
@@ -111,10 +111,10 @@ export default {
     // 	<div id="stab_1_71"><ul><li><a>第02集</a></li></ul></div>
     // </ul>
 
-    while (element?.parentElement) {
-      const sibs = Array.from(element.parentElement.children);
-      if (sibs.filter((s) => s.tagName === element.tagName).length > 1) return element;
-      element = element.parentElement;
+    while (el?.parentElement) {
+      const sibs = Array.from(el.parentElement.children);
+      if (sibs.filter((s) => s.tagName === el.tagName).length > 1) return el;
+      el = el.parentElement;
     }
     return null;
   },

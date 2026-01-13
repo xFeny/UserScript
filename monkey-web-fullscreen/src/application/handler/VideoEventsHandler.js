@@ -20,7 +20,7 @@ export default {
     this.videoEvts.forEach((t) => (video ?? document).addEventListener(t, handle, { capture: true, signal: ctrl.signal }));
     if (video) this.videoAborts.set(video, ctrl), this.unbindVideoEvts();
   },
-  setupShadowVideoListeners() {
+  setupShadowVideoListener() {
     document.addEventListener("shadow-video", (e) => {
       const { video } = e.detail;
       if (!video || video.hasAttribute("received")) return;
@@ -57,7 +57,7 @@ export default {
   },
   canplay(video) {
     if (!Tools.isVisible(video) || Storage.DISABLE_TRY_PLAY.get()) return;
-    if (video._mfs_tryPlay || Tools.isMultiVideo()) return;
+    if (video._mfs_tryPlay || Tools.isMultiV()) return;
     video._mfs_tryPlay = true;
     this.tryPlay(video);
   },

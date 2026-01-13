@@ -7,17 +7,17 @@ import Consts from "../common/Consts";
 export default {
   dispatchShortcut: (key, isTrusted = false) => Tools.postMessage(window.top, { key: key.toUpperCase(), isTrusted }),
   setupKeydownListener() {
+    unsafeWindow.addEventListener("keydown", (e) => this.handleKeydown(e), true);
     unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
-    unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
     unsafeWindow.addEventListener("scroll", () => this.fsWrapper && Tools.scrollTop(this.fsWrapper.scrollY));
   },
-  handleKeydown(event) {
+  handleKeydown(e) {
     // Tools.log("键盘事件：", { key, code });
-    const { key, isTrusted } = event;
-    const target = event.composedPath()[0];
+    const { key, isTrusted } = e;
+    const target = e.composedPath()[0];
     if (this.isNoVideo() || Tools.isInputable(target) || !["p", "Enter"].includes(key)) return;
 
-    Tools.preventDefault(event);
+    Tools.preventDefault(e);
     this.dispatchShortcut(key, isTrusted);
   },
   handleMessage(data) {

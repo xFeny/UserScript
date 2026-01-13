@@ -53,31 +53,31 @@ export default {
     this.setupPlayerClock();
     this.setBiliQuality();
   },
-  remainTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
+  remainTime: (video) => Math.floor(App.getRealDur(video)) - Math.floor(video.currentTime),
   playToggle: (video) => (Site.isDouyu() ? video?.click() : video?.[video?.paused ? "play" : "pause"]()),
   tryPlay: (video) => video?.paused && (Site.isDouyu() ? video?.click() : video?.play()),
 
   // ====================⇓⇓⇓ 调节播放倍速相关逻辑 ⇓⇓⇓====================
-  setPlaybackRate(playRate) {
-    if (!playRate || !this.player || this.isLive() || this.isDisRate() || +this.player.playbackRate === +playRate) return;
+  setPlaybackRate(rate) {
+    if (!rate || !this.player || this.isLive() || this.isDisRate() || +this.player.playbackRate === +rate) return;
 
     // 设置倍速
-    VideoEnhancer.setPlaybackRate(this.player, playRate);
+    VideoEnhancer.setPlaybackRate(this.player, rate);
     this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
     this.playbackRateKeepDisplay(); // 倍速始终显示
 
     if (!Storage.NOT_CACHE_SPEED.get()) Storage.CACHED_SPEED.set(this.player.playbackRate);
   },
-  adjustPlaybackRate(step = Storage.SPEED_STEP.get()) {
-    const playRate = Math.max(Consts.MIN_SPEED, +this.player.playbackRate + step);
-    this.setPlaybackRate(Math.min(Consts.MAX_SPEED, playRate));
+  adjustPlaybackRate(step = 0.25) {
+    const rate = Math.max(Consts.MIN_SPEED, +this.player.playbackRate + step);
+    this.setPlaybackRate(Math.min(Consts.MAX_SPEED, rate));
   },
   applyCachedRate: () => (Storage.NOT_CACHE_SPEED.get() ? App.delCachedRate() : App.setPlaybackRate(Storage.CACHED_SPEED.get())),
   delCachedRate: () => Storage.CACHED_SPEED.del(),
   // ====================⇑⇑⇑ 调节播放倍速相关逻辑 ⇑⇑⇑====================
 
   // ====================⇓⇓⇓ 调节播放进度相关逻辑 ⇓⇓⇓====================
-  skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
+  skipPlayback(second = 0) {
     if (!this.player || this.isLive() || this.player.ended) return;
     this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
   },
@@ -88,15 +88,15 @@ export default {
     // 禁用记忆、距离结束10秒，清除记忆缓存
     if (Storage.NOT_CACHE_TIME.get() || this.remainTime(video) <= 10) return this.clearCachedTime(video);
 
-    Storage.PLAY_TIME.set(+video.currentTime - 1, this.getCacheTimeKey(video), Storage.STORAGE_DAYS.get());
-    this.clearMultiVideoCacheTime(); // 清除页面内多视频的播放进度存储，如：抖音网页版
+    Storage.PLAY_TIME.set(+video.currentTime - 1, this.getUniqueKey(video), Storage.STORAGE_DAYS.get());
+    if (Tools.isMultiV()) this.ensureUniqueCacheTime(); // 清除页面内多视频的播放进度存储，如：抖音网页版
   },
   applyCachedTime(video) {
     if (Storage.NOT_CACHE_TIME.get()) return this.clearCachedTime(video);
     if (video._mfs_hasApplyCTime || !this.topWin || this.isLive()) return;
 
     // 从存储中获取该视频的缓存播放时间
-    const time = Storage.PLAY_TIME.get(this.getCacheTimeKey(video));
+    const time = Storage.PLAY_TIME.get(this.getUniqueKey(video));
     if (time <= +video.currentTime) return (video._mfs_hasApplyCTime = true);
 
     this.setCurrentTime(time);
@@ -107,19 +107,18 @@ export default {
     });
   },
   setCurrentTime: (currentTime) => currentTime && (App.player.currentTime = Math.max(0, currentTime)),
-  clearCachedTime: (video) => App.topWin && Storage.PLAY_TIME.del(App.getCacheTimeKey(video)),
-  getCacheTimeKey(video, { duration, __duration } = video) {
+  clearCachedTime: (video) => App.topWin && Storage.PLAY_TIME.del(App.getUniqueKey(video)),
+  getUniqueKey(video, { duration, __duration } = video) {
     if (video._mfs_cacheTKey) return video._mfs_cacheTKey;
 
     const currNumber = this.getCurrentEpisodeNumber();
     const baseKey = `${this.topWin.urlHash}_${Math.floor(__duration || duration)}`;
-    const cacheTimeKey = currNumber ? `${baseKey}_${currNumber}` : baseKey;
-    video._mfs_cacheTKey = cacheTimeKey;
+    const cacheKey = currNumber ? `${baseKey}_${currNumber}` : baseKey;
+    video._mfs_cacheTKey = cacheKey;
 
-    return cacheTimeKey;
+    return cacheKey;
   },
-  clearMultiVideoCacheTime() {
-    if (!Tools.isMultiVideo()) return;
+  ensureUniqueCacheTime() {
     const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
     const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
     if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
@@ -135,7 +134,7 @@ export default {
   // ====================⇑⇑⇑ 调节播放进度相关逻辑 ⇑⇑⇑====================
 
   // ====================⇓⇓⇓ 视频画面变换相关逻辑 ⇓⇓⇓====================
-  toggleMirrorFlip() {
+  flipHorizontal() {
     if (!this.player) return;
 
     const tsr = this.player.tsr;
@@ -164,7 +163,7 @@ export default {
     this.setTsr("--zoom", zoom / 100);
     this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC);
   },
-  moveVideoPosition(direction) {
+  moveVideo(direction) {
     if (!this.player || this.isDisZoom()) return;
 
     const tsr = this.player.tsr;
@@ -187,7 +186,7 @@ export default {
     this.setTsr("--moveX", `${tsr.moveX}px`).setTsr("--moveY", `${tsr.moveY}px`);
     this.showToast(`${desc}：${x ? tsr.moveX : tsr.moveY}px`, Consts.ONE_SEC);
   },
-  resetVideoTransform() {
+  resetTsr() {
     if (!this.player || this.isDisZoom()) return;
 
     const styles = ["--zoom", "--moveX", "--moveY", "--scale", "--mirror", "--rotate", "--deftsr"];
@@ -217,16 +216,16 @@ export default {
     Object.assign(this.player, { muted: !isMuted, volume: +isMuted });
     this.showToast(isMuted ? "🔊 取消静音" : "🔇 已静音", Consts.ONE_SEC);
   },
-  async captureScreenshot() {
+  async screenshot() {
     if (!this.player || Storage.DISABLE_SCREENSHOT.get()) return;
 
-    const { videoWidth, videoHeight } = this.player;
     this.player.setAttribute("crossorigin", "anonymous");
-    const canvas = Tools.createElement("canvas", { width: videoWidth, height: videoHeight });
+    const { videoWidth: width, videoHeight: height } = this.player;
+    const canvas = Tools.createElement("canvas", { width, height });
     const ctx = canvas.getContext("2d");
 
     try {
-      ctx.drawImage(this.player, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(this.player, 0, 0, width, height);
       const url = URL.createObjectURL(await new Promise((resolve) => canvas.toBlob(resolve, "image/png")));
       GM_download({ url, name: `视频截图_${Date.now()}.png`, onload: () => URL.revokeObjectURL(url) });
     } catch (e) {
@@ -242,7 +241,7 @@ export default {
     !this.player.paused && this.player.pause();
     this.player.currentTime += (isPrev ? -1 : 1) / 24;
   },
-  toggleAutoNextEnabled() {
+  autoNextEnabled() {
     const status = !Storage.IS_AUTO_NEXT.get();
     Storage.IS_AUTO_NEXT.set(status);
     this.showToast(`已${status ? "启" : "禁"}用自动切换下集`);
@@ -258,9 +257,9 @@ export default {
     return new Promise((resolve) => {
       if (isRemove) Tools.query(".monkey-toast")?.remove();
       const el = Tools.createElement("div", { className: "monkey-toast" });
-      content instanceof Element ? el.appendChild(content) : (el.innerHTML = content);
+      content instanceof Element ? el.appendChild(content) : (el.textContent = content);
 
-      (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2, false)).prepend(el), resolve(el);
+      this.findVideoContainer(null, 2, false).prepend(el), resolve(el);
       setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.HALF_SEC)), duration);
     });
   },
