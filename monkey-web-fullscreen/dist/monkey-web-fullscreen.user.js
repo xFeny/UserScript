@@ -2,7 +2,7 @@
 // @name               视频自动网页全屏｜倍速播放
 // @name:zh-TW         視頻自動網頁全屏｜倍速播放
 // @namespace          http://tampermonkey.net/
-// @version            3.9.1
+// @version            3.9.2
 // @author             Feny
 // @description        支持所有H5视频的增强脚本，通用网页全屏｜倍速调节，对微博 / 推特 / Instagram / Facebook等多视频平台均适用；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；还支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @description:zh-TW  支持所有H5视频的增强脚本，通用網頁全屏｜倍速調節，对微博 / 推特 / Instagram / Facebook等平臺均適用；B站(含直播) / 騰訊視頻 / 優酷 / 愛奇藝 / 芒果TV / AcFun 默認自動網頁全屏，其他網站可手動開啓；自動網頁全屏 + 記憶倍速 + 下集切換，減少鼠標操作，讓追劇更省心、更沉浸；還支持視頻旋轉、截圖、鏡像翻轉、縮放與移動、記憶播放進度等功能
@@ -91,19 +91,19 @@
     }
     return;
   }
-  function querySelector(selector, subject = document) {
-    const immediate = subject.querySelector(selector);
-    if (immediate) return immediate;
-    const shadowRoots = [...getShadowRoots(subject, true)];
+  function querySelector(selector, ctx = document) {
+    const direct = ctx.querySelector(selector);
+    if (direct) return direct;
+    const shadowRoots = [...getShadowRoots(ctx, true)];
     for (const root of shadowRoots) {
       const match = root.querySelector(selector);
       if (match) return match;
     }
     return null;
   }
-  function querySelectorAll(selector, subject = document) {
-    const results = [...subject.querySelectorAll(selector)];
-    const shadowRoots = [...getShadowRoots(subject, true)];
+  function querySelectorAll(selector, ctx = document) {
+    const results = [...ctx.querySelectorAll(selector)];
+    const shadowRoots = [...getShadowRoots(ctx, true)];
     for (const root of shadowRoots) {
       results.push(...root.querySelectorAll(selector));
     }
@@ -140,12 +140,12 @@
     isTopWin: () => window.top === window,
     isNumber: (str) => /^[0-9]$/.test(str),
     scrollTop: (top) => window.scrollTo({ top }),
+    getRect: (el) => el?.getBoundingClientRect(),
+    microTask: (fn) => Promise.resolve().then(fn),
     alert: (...data) => window.alert(data.join(" ")),
-    getElementRect: (el) => el?.getBoundingClientRect(),
-    isMultiVideo: () => querySelectorAll("video").length > 1,
-    microTask: (callback) => Promise.resolve().then(callback),
-    query: (selector, context) => querySelector(selector, context),
-    querys: (selector, context) => querySelectorAll(selector, context),
+    isMultiV: () => querySelectorAll("video").length > 1,
+    query: (selector, ctx) => querySelector(selector, ctx),
+    querys: (selector, ctx) => querySelectorAll(selector, ctx),
     sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
     toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, Consts.EMPTY),
     postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
@@ -153,21 +153,21 @@
     log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
     getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
     isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
-    preventDefault: (event) => (event.preventDefault(), event.stopPropagation(), event.stopImmediatePropagation()),
+    preventDefault: (e) => (e.preventDefault(), e.stopPropagation(), e.stopImmediatePropagation()),
     attr: (el, name, val) => el && name && el[val ? "setAttribute" : "removeAttribute"](name, val),
-    createElement: (tagName, attrs = {}) => Object.assign(document.createElement(tagName), attrs),
     emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
     isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
-    hasCls: (el, ...classes) => classes.flat().some((cls) => el?.classList.contains(cls)),
-    delCls: (el, ...classes) => el?.classList.remove(...classes),
-    addCls: (el, ...classes) => el?.classList.add(...classes),
+    createElement: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
+    hasCls: (el, ...cls) => cls.flat().some((cls2) => el?.classList.contains(cls2)),
+    delCls: (el, ...cls) => el?.classList.remove(...cls),
+    addCls: (el, ...cls) => el?.classList.add(...cls),
     notyf(msg, isError = false) {
       const notyf$1 = new notyf.Notyf({ duration: Consts.THREE_SEC, position: { x: "center", y: "top" } });
       isError ? notyf$1.error(msg) : notyf$1.success(msg);
       return false;
     },
     sendToIFrames(data) {
-      this.getIFrames().forEach((iframe) => this.postMessage(iframe?.contentWindow, data));
+      this.getIFrames().forEach((el) => this.postMessage(el?.contentWindow, data));
     },
     freqTimes: /* @__PURE__ */ new Map(),
     isThrottle(key = "throttle", gap = 300) {
@@ -176,55 +176,55 @@
       const diff = now - last;
       return diff >= gap ? this.freqTimes.set(key, now) && false : true;
     },
-    limitCountMap: /* @__PURE__ */ new Map(),
-    isOverLimit(key = "default", maxCount = 5) {
-      const count = this.limitCountMap.get(key) ?? 0;
-      if (count < maxCount) return this.limitCountMap.set(key, count + 1) && false;
+    countMap: /* @__PURE__ */ new Map(),
+    isOverLimit(key = "default", max = 5) {
+      const count = this.countMap.get(key) ?? 0;
+      if (count < max) return this.countMap.set(key, count + 1) && false;
       return true;
     },
     resetLimit(...keys) {
       const keyList = keys.length > 0 ? keys : ["default"];
-      keyList.forEach((key) => this.limitCountMap.set(key, 0));
+      keyList.forEach((key) => this.countMap.set(key, 0));
     },
-    pointInElement(pointX, pointY, element) {
-      if (!element) return false;
-      const { top, left, right, bottom } = this.getElementRect(element);
-      return pointX >= left && pointX <= right && pointY >= top && pointY <= bottom;
+    pointInElement(x, y, el) {
+      if (!el) return false;
+      const { top, left, right, bottom } = this.getRect(el);
+      return x >= left && x <= right && y >= top && y <= bottom;
     },
-    emitMousemove(element) {
-      const { top: y, left, right } = this.getElementRect(element);
-      for (let x = left; x <= right; x += 10) this.fireMouseEvt(element, "mousemove", x, y);
+    emitMousemove(el) {
+      const { top: y, left, right } = this.getRect(el);
+      for (let x = left; x <= right; x += 10) this.fireMouseEvt(el, "mousemove", x, y);
     },
-    fireMouseEvt(element, eventType, clientX, clientY) {
+    fireMouseEvt(el, type, clientX, clientY) {
       const dict = { clientX, clientY, bubbles: true };
-      element?.dispatchEvent(new MouseEvent(eventType, dict));
+      el?.dispatchEvent(new MouseEvent(type, dict));
     },
     hasValidDomId: (el) => el.id && !/[\d\u4e00-\u9fa5]/.test(el.id),
     getElementPath(element) {
       const parents = [];
       let current = element;
       while (current && !current.matches("body")) {
-        parents.unshift(this.getElementSelector(current));
+        parents.unshift(this.getSelector(current));
         if (this.hasValidDomId(current)) break;
         current = this.getParent(current);
       }
       return parents.join(" > ");
     },
-    getElementSelector(ele) {
-      if (this.hasValidDomId(ele)) return `#${ele.id}`;
-      const tag = ele.tagName.toLowerCase();
-      const validCls = Array.from(ele.classList).filter((cls) => !/[\[\]\d]/.test(cls));
+    getSelector(el) {
+      if (this.hasValidDomId(el)) return `#${el.id}`;
+      const tag = el.tagName.toLowerCase();
+      const validCls = Array.from(el.classList).filter((cls) => !/[\[\]\d]/.test(cls));
       return validCls.length ? `${tag}.${validCls.join(".")}` : tag;
     },
-    getParent(element) {
-      if (!element) return null;
-      const parent = element.parentNode;
+    getParent(el) {
+      if (!el) return null;
+      const parent = el.parentNode;
       if (parent instanceof ShadowRoot) return parent.host;
       return parent === document ? null : parent;
     },
-    getParents(element, withSelf = false, maxLevel = Infinity) {
-      const parents = withSelf && element ? [element] : [];
-      for (let current = element, level = 0; current && level < maxLevel; level++) {
+    getParents(el, self = false, max = Infinity) {
+      const parents = self && el ? [el] : [];
+      for (let current = el, deep = 0; current && deep < max; deep++) {
         current = this.getParent(current);
         current && parents.unshift(current);
       }
@@ -244,10 +244,10 @@
       const nodes = document.evaluate(expr, document.body, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
       return Array.from({ length: nodes.snapshotLength }, (_, i) => nodes.snapshotItem(i)).filter((el) => !el.matches("script"));
     },
-    safeHTML(htmlStr) {
-      if (!window.trustedTypes?.createPolicy) return htmlStr;
+    safeHTML(html) {
+      if (!window.trustedTypes?.createPolicy) return html;
       const policy = trustedTypes.defaultPolicy ?? trustedTypes.createPolicy("default", { createHTML: (input) => input });
-      return policy.createHTML(htmlStr);
+      return policy.createHTML(html);
     },
     cloneAttrs(source, target, ...attrs) {
       attrs.flat().forEach((attr) => {
@@ -255,10 +255,10 @@
         if (value) target.setAttribute(attr, value);
       });
     },
-    setStyle(eles, prop, val, priority) {
-      if (!eles || !prop) return;
+    setStyle(els, prop, val, priority) {
+      if (!els || !prop) return;
       const fn = val ? "setProperty" : "removeProperty";
-      [].concat(eles).forEach((el) => el?.style?.[fn]?.(prop, val, priority));
+      [].concat(els).forEach((el) => el?.style?.[fn]?.(prop, val, priority));
     },
     isAttached(el) {
       if (!el) return false;
@@ -267,20 +267,20 @@
     }
   };
   class VideoEnhancer {
-    static setPlaybackRate(video, playRate) {
+    static setPlaybackRate(video, rate) {
       this.defineProperty(video, "playbackRate", {
         set(value, setter) {
           if (this.playbackRate === value) return;
           this.__playRate === value && setter(value);
         }
       });
-      video.playbackRate = video.__playRate = Tools.toFixed(playRate);
+      video.playbackRate = video.__playRate = Tools.toFixed(rate);
     }
-    static defineProperty(target, property, descs) {
+    static defineProperty(target, prop, descs) {
       try {
-        const original = this.getPropertyDescriptor(target, property);
-        if (!original) throw new Error(`属性 ${property} 不存在`);
-        Object.defineProperty(target, property, {
+        const original = this.getPropertyDescriptor(target, prop);
+        if (!original) throw new Error(`属性 ${prop} 不存在`);
+        Object.defineProperty(target, prop, {
           get() {
             const value = original.get ? original.get.call(this) : original.value;
             return descs.get ? descs.get.call(this, value) : value;
@@ -292,12 +292,12 @@
           configurable: true
         });
       } catch (e) {
-        console.error(`修改 ${property} 属性时出错：`, e);
+        console.error(`修改 ${prop} 属性时出错：`, e);
       }
     }
-    static getPropertyDescriptor(target, property) {
+    static getPropertyDescriptor(target, prop) {
       for (let proto = target; proto; proto = Object.getPrototypeOf(proto)) {
-        const desc = Object.getOwnPropertyDescriptor(proto, property);
+        const desc = Object.getOwnPropertyDescriptor(proto, prop);
         if (desc) return desc;
       }
       return null;
@@ -308,12 +308,12 @@
       Element.prototype.attachShadow = function(options) {
         if (this._shadowRoot) return this._shadowRoot;
         const shadowRoot = this._shadowRoot = this.__attachShadow.call(this, options);
-        VideoEnhancer.detectShadowVideoElement();
+        VideoEnhancer.detectShadowVideo();
         return shadowRoot;
       };
       Element.prototype.attachShadow.toString = () => Element.prototype.__attachShadow.toString();
     }
-    static detectShadowVideoElement() {
+    static detectShadowVideo() {
       if (Tools.isThrottle("shadow", 100)) return;
       const videos = Tools.querys("video:not([received])");
       if (!videos.length) return;
@@ -437,9 +437,9 @@
   const Listen = {
     fsWrapper: null,
     isFullscreen: false,
-    noVideo: () => !window.videoInfo && !window.topWin,
     isMutedLoop: (video) => video?.muted && video?.loop,
-    isObserved: (el) => el.hasAttribute("observed") || !!(el.setAttribute("observed", true), false),
+    isNoVideo: () => !window.videoInfo && !window.topWin,
+    isExecuted: (key, ctx = window) => ctx[key] || !!(ctx[key] = true, false),
     init(isNonFirst = false) {
       this.host = location.host;
       this.docElement = document.documentElement;
@@ -450,15 +450,14 @@
       this.setupVideoListeners();
       if (isNonFirst) return;
       this.setupDocumentObserver();
-      this.observeFullscreenChange();
       this.observeWebFullscreenChange();
       this.setupIgnoreUrlsChangeListener();
-      this.setupShadowVideoListeners();
+      this.setupShadowVideoListener();
       this.setupLoadEventListener();
     },
     setupVisibleListener() {
       window.addEventListener("visibilitychange", () => {
-        if (this.noVideo() || Storage.IS_INVISIBLE_PAUSE.get()) return;
+        if (this.isNoVideo() || Storage.IS_INVISIBLE_PAUSE.get()) return;
         const video = this.player;
         if (!video || video.ended || !Tools.isVisible(video)) return;
         document.hidden ? video.pause() : video.play();
@@ -473,41 +472,41 @@
     setCurrentVideo(video) {
       if (!video || this.player === video || video.offsetWidth < 260 || this.isMutedLoop(video)) return;
       if (this.player && !this.player.paused && !isNaN(this.player.duration)) return;
-      this.player = video;
-      this.setVideoInfo(video);
+      this.setPlayer(video);
       this.observeVideoSrcChange(video);
     },
-    setVideoInfo(video) {
-      const videoInfo = { isLive: video.duration === Infinity };
+    setPlayer(video) {
+      this.player = video;
+      const videoInfo = { isLive: video.duration === Infinity, timestamp: Date.now() };
       this.syncVideoToParentWin(videoInfo);
     },
     syncVideoToParentWin(videoInfo) {
       window.videoInfo = this.videoInfo = videoInfo;
       if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iFrame: location.href } });
-      Tools.microTask(() => (this.setupPickerEpisodeListener(), this.setupScriptMenuCommand()));
+      Tools.microTask(() => (this.setupEpisodePickerListener(), this.initMenuCmds()));
       this.watchVideoIFrameChange();
       this.sendTopWinInfo();
     },
     sendTopWinInfo() {
       const { host, href: url } = location;
-      const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
-      const topWin = { url, host, viewWidth, viewHeight, urlHash: Tools.hashCode(url) };
+      const { innerWidth: vw, innerHeight: vh } = window;
+      const topWin = { vw, vh, url, host, urlHash: Tools.hashCode(url) };
       window.topWin = this.topWin = topWin;
       Tools.sendToIFrames({ topWin });
     },
     observeVideoSrcChange(video) {
-      if (this.isObserved(video)) return;
+      if (this.isExecuted("observed", video)) return;
       const isFake = video.matches(Consts.FAKE_VIDEO);
-      const handleChange = (v) => (delete this.topWin, this.setVideoInfo(v));
+      const onChange = (v) => (delete this.topWin, this.setPlayer(v));
       VideoEnhancer.defineProperty(video, isFake ? "srcConfig" : "src", {
         set(value, setter) {
-          setter(value), value && this === App.player && handleChange(this);
+          setter(value), value && this === App.player && onChange(this);
         }
       });
     },
     watchVideoIFrameChange() {
       const iFrame = this.getVideoIFrame();
-      if (!iFrame || this.isObserved(iFrame)) return;
+      if (!iFrame || this.isExecuted("observed", iFrame)) return;
       new MutationObserver(
         () => this.isFullscreen ? this.toggleFullscreen() : this.fsWrapper && this.exitWebFullscreen()
       ).observe(iFrame, { attributes: true, attributeFilter: ["src"] });
@@ -517,8 +516,7 @@
       document.addEventListener("fullscreenchange", () => {
         Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
       });
-    },
-    observeFullscreenChange() {
+      if (this.isExecuted("isDefined")) return;
       VideoEnhancer.defineProperty(this, "isFullscreen", {
         set: (value, setter) => (setter(value), this.handleFullscreenChange(value))
       });
@@ -526,13 +524,13 @@
     handleFullscreenChange(isFullscreen) {
       isFullscreen && Tools.isInputable(document.activeElement) && document.activeElement.blur();
       !isFullscreen && this.fsWrapper && this.dispatchShortcut(Keyboard.P);
-      this.changeTimeElementDisplay();
+      this.changeTimeDisplay();
     },
     observeWebFullscreenChange() {
-      const handle = (event, { code, type } = event) => {
+      const handle = (e, { code, type } = e) => {
         if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
-        if (this.isInputFocus(event) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
-        Tools.preventDefault(event), Object.is(type, "keydown") && this.dispatchShortcut(code, { bypass: true });
+        if (this.isInputFocus(e) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
+        Tools.preventDefault(e), Object.is(type, "keydown") && this.dispatchShortcut(code, { bypass: true });
       };
       VideoEnhancer.defineProperty(this, "fsWrapper", {
         set(value, setter) {
@@ -545,8 +543,8 @@
       let timer = null;
       const handle = ({ type, clientX, clientY }) => {
         if (Tools.isThrottle(type)) return;
-        this.createEdgeClickElement(this.getVideoForCoord(clientX, clientY));
-        if (this.noVideo()) return;
+        this.createEdgeElement(this.getVideoForCoord(clientX, clientY));
+        if (this.isNoVideo()) return;
         clearTimeout(timer), this.toggleCursor();
         timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
       };
@@ -554,30 +552,30 @@
     },
     toggleCursor(hide = false, cls = "__hc") {
       if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
-      const elements = [...Tools.getParents(this.player, true, 3), this.getVideoIFrame()];
-      elements.forEach((el) => (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
+      const eles = [...Tools.getParents(this.player, true, 3), this.getVideoIFrame()];
+      eles.forEach((el) => (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
     },
-    getVideoForCoord(clientX, clientY) {
+    getVideoForCoord(x, y) {
       if (!Storage.ENABLE_EDGE_CLICK.get()) return;
+      if (Tools.pointInElement(x, y, this.player)) return this.player;
       const getZIndex = (el) => Number(getComputedStyle(el).zIndex) || 0;
-      const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(clientX, clientY, v));
+      const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(x, y, v));
       return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
     },
-    createEdgeClickElement(video) {
+    createEdgeElement(video) {
       if (!video || !Storage.ENABLE_EDGE_CLICK.get()) return;
-      const container = this.getEdgeClickContainer(video);
+      const container = this.getEdgeContainer(video);
       if (video.lArea?.parentNode === container) return;
       if (container instanceof Element && this.lacksRelativePosition(container)) {
         Tools.setStyle(container, "position", "relative");
       }
       Tools.querys(".video-edge-click", container).forEach((el) => el.remove());
       if (video.lArea) return container.prepend(video.lArea, video.rArea);
-      const createEdge = (clas = "") => {
-        const element = Tools.createElement("div", { video, className: `video-edge-click ${clas}` });
+      const createEdge = (cls = "") => {
+        const element = Tools.createElement("div", { video, className: `video-edge-click ${cls}` });
         element.onclick = (e) => {
           Tools.preventDefault(e);
-          const vid = e.target.video;
-          if (this.player !== vid) this.player = vid, this.setVideoInfo(vid);
+          this.setPlayer(e.target.video);
           Tools.microTask(() => this.dispatchShortcut(Keyboard.P, { isTrusted: true }));
         };
         return element;
@@ -585,16 +583,16 @@
       [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
       container.prepend(video.lArea, video.rArea);
     },
-    getEdgeClickContainer(video) {
+    getEdgeContainer(video) {
       if (this.fsWrapper) return video.closest(`[${Consts.webFull}]`) ?? this.fsWrapper;
-      const parentNode = video.parentNode;
+      const parent = video.parentNode;
       const sroot = video.getRootNode() instanceof ShadowRoot;
-      return sroot ? parentNode : this.findVideoParentContainer(parentNode, void 0, false);
+      return sroot ? parent : this.findVideoContainer(parent, void 0, false);
     },
-    lacksRelativePosition(element) {
-      return Tools.getParents(element, true, 2).every((el) => el && getComputedStyle(el).position === "static");
+    lacksRelativePosition(el) {
+      return Tools.getParents(el, true, 2).every((e) => e && getComputedStyle(e).position === "static");
     },
-    removeEdgeClickElements() {
+    removeEdgeElements() {
       Tools.querys(".video-edge-click").forEach((el) => (el.remove(), delete el.video.lArea, delete el.video.rArea));
     }
   };
@@ -646,19 +644,19 @@
     }
     static #createSiteTests() {
       Object.entries(this._siteRegExps).forEach(([name, regex]) => {
-        const methodName = `is${name.charAt(0).toUpperCase()}${name.slice(1)}`;
-        if (!this[methodName]) this[methodName] = () => regex.test(location.href);
+        const method = `is${name.charAt(0).toUpperCase()}${name.slice(1)}`;
+        if (!this[method]) this[method] = () => regex.test(location.href);
       });
     }
   }
   const Keydown = {
-    isInputFocus: (event) => Tools.isInputable(event.composedPath()[0]),
-    preventKey(event, { code, altKey } = event) {
-      const isNumKeys = Tools.isNumber(event.key) && !this.isDisRate();
+    isInputFocus: (e) => Tools.isInputable(e.composedPath()[0]),
+    preventKey(e, { code, altKey } = e) {
+      const isNumKeys = Tools.isNumber(e.key) && !this.isDisRate();
       const isOverrideKeys = this.isOverrideKey() && [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
       const isPreventKeys = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
       const isZoomKeys = altKey && !this.isDisZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
-      if (isNumKeys || isOverrideKeys || isPreventKeys || isZoomKeys) Tools.preventDefault(event);
+      if (isNumKeys || isOverrideKeys || isPreventKeys || isZoomKeys) Tools.preventDefault(e);
     },
     dispatchShortcut(code, { bypass = false, isTrusted = false } = {}) {
       const key = this.processShortcutKey({ code });
@@ -670,20 +668,21 @@
       return keys.filter(Boolean).join("_").toUpperCase();
     },
     setupKeydownListener() {
-      _unsafeWindow.addEventListener("keyup", (event) => this.preventKey(event), true);
-      _unsafeWindow.addEventListener("keydown", (event) => this.handleKeydown(event), true);
+      _unsafeWindow.addEventListener("keyup", (e) => this.preventKey(e), true);
+      _unsafeWindow.addEventListener("keydown", (e) => this.handleKeydown(e), true);
       _unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
     },
-    handleKeydown(event, { key, code, isTrusted } = event) {
-      if (this.noVideo() || this.isInputFocus(event)) return;
+    handleKeydown(e, { key, code, isTrusted } = e) {
+      if (this.isNoVideo() || this.isInputFocus(e)) return;
       if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
-      this.preventKey(event);
-      key = this.processShortcutKey(event);
+      this.preventKey(e);
+      key = this.processShortcutKey(e);
       const specialKeys = [Keyboard.N, Keyboard.P, Keyboard.Enter, Keyboard.NumEnter];
       if (specialKeys.includes(code)) return Tools.postMessage(window.top, { key, isTrusted });
       this.processEvent({ key, isTrusted });
     },
     processEvent(data) {
+      if (this.videoInfo?.iFrame && this.player) delete this.player;
       if (!this.player) Tools.sendToIFrames(data);
       if (data?.key) this.execKeyActions(data);
     },
@@ -701,16 +700,16 @@
         RIGHT: () => (bypass || this.isOverrideKey()) && this.skipPlayback(Storage.SKIP_INTERVAL.get()),
         SPACE: () => (bypass || this.isOverrideKey()) && this.playToggle(this.player),
         0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
-        SHIFT_A: () => this.toggleAutoNextEnabled(),
-        CTRL_ALT_A: () => this.captureScreenshot(),
-        CTRL_Z: () => this.resetVideoTransform(),
-        SHIFT_R: () => this.toggleMirrorFlip(),
+        SHIFT_A: () => this.autoNextEnabled(),
+        SHIFT_R: () => this.flipHorizontal(),
+        CTRL_ALT_A: () => this.screenshot(),
         ALT_SUB: () => this.zoomVideo(true),
-        ALT_ADD: () => this.zoomVideo()
+        ALT_ADD: () => this.zoomVideo(),
+        CTRL_Z: () => this.resetTsr()
       };
       const step = Storage.SPEED_STEP.get();
       ["A", "S", "ADD", "SUB"].forEach((k, i) => dict[k] = () => this.adjustPlaybackRate((i % 2 ? -1 : 1) * step));
-      ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => dict[k] = () => this.moveVideoPosition(k));
+      ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => dict[k] = () => this.moveVideo(k));
       for (let i = 1; i < 6; i++) dict[`CTRL_${i}`] = () => this.setPlaybackRate(Storage.PRESET_SPEED.get()[i - 1]);
       dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
     },
@@ -723,30 +722,41 @@
       this.processEvent(data);
     },
     handleSettMessage(data) {
-      if ("sw_rateKeep" in data) this.playbackRateKeepDisplay();
-      if ("sw_clockAlw" in data) setTimeout(() => this.changeTimeElementDisplay(), 30);
-      if ("sw_color" in data) this.setTimeElementColor(data.sw_color);
-      if ("sw_edgeClk" in data) this.removeEdgeClickElements();
+      if (data?.sw_zoom) this.resetTsr();
       if (data?.sw_memory) this.delCachedRate();
-      if (data?.sw_zoom) this.resetVideoTransform();
       if (data?.sw_speed) this.setPlaybackRate(Consts.DEF_SPEED);
+      if ("sw_rateKeep" in data) this.playbackRateKeepDisplay();
+      if ("sw_clockAlw" in data) setTimeout(() => this.changeTimeDisplay(), 30);
+      if ("sw_color" in data) this.setTimeColor(data.sw_color);
+      if ("sw_edgeClk" in data) this.removeEdgeElements();
     }
   };
   const Events = {
-    videoEvents: ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "ended"],
+    videoAborts: /* @__PURE__ */ new Map(),
+    videoEvts: ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "ended"],
     setupVideoListeners(video) {
-      const handleEvent = (event) => {
-        const target = video ?? event.target;
-        if (video || target.matches(`video, ${Consts.FAKE_VIDEO}`)) this[event.type](target);
+      const handle = (e) => {
+        const target = video ?? e.target;
+        if (video || target.matches(`video, ${Consts.FAKE_VIDEO}`)) this[e.type](target);
       };
-      this.videoEvents.forEach((type) => (video ?? document).addEventListener(type, handleEvent, true));
+      const ctrl = new AbortController();
+      if (video) this.videoAborts.get(video)?.abort();
+      this.videoEvts.forEach((t) => (video ?? document).addEventListener(t, handle, { capture: true, signal: ctrl.signal }));
+      if (video) this.videoAborts.set(video, ctrl), this.unbindVideoEvts();
     },
-    setupShadowVideoListeners() {
+    setupShadowVideoListener() {
       document.addEventListener("shadow-video", (e) => {
         const { video } = e.detail;
         if (!video || video.hasAttribute("received")) return;
-        this.setupVideoListeners(video), video.setAttribute("received", true);
-        Tools.microTask(() => this.createEdgeClickElement(video));
+        video.setAttribute("received", true);
+        this.setupVideoListeners(video);
+      });
+    },
+    unbindVideoEvts() {
+      if (this.videoAborts.size < 5 || Tools.isThrottle("cleanup")) return;
+      this.videoAborts.forEach((ctrl, video) => {
+        if (Tools.isAttached(video)) return;
+        ctrl.abort(), video.removeAttribute("received"), this.videoAborts.delete(video);
       });
     },
     loadedmetadata(video) {
@@ -768,7 +778,7 @@
     },
     canplay(video) {
       if (!Tools.isVisible(video) || Storage.DISABLE_TRY_PLAY.get()) return;
-      if (video._mfs_tryPlay || Tools.isMultiVideo()) return;
+      if (video._mfs_tryPlay || Tools.isMultiV()) return;
       video._mfs_tryPlay = true;
       this.tryPlay(video);
     },
@@ -814,23 +824,23 @@
       this.setupPlayerClock();
       this.setBiliQuality();
     },
-    remainTime: (video) => Math.floor(video.duration) - Math.floor(video.currentTime),
+    remainTime: (video) => Math.floor(App.getRealDur(video)) - Math.floor(video.currentTime),
     playToggle: (video) => Site.isDouyu() ? video?.click() : video?.[video?.paused ? "play" : "pause"](),
     tryPlay: (video) => video?.paused && (Site.isDouyu() ? video?.click() : video?.play()),
-    setPlaybackRate(playRate) {
-      if (!playRate || !this.player || this.isLive() || this.isDisRate() || +this.player.playbackRate === +playRate) return;
-      VideoEnhancer.setPlaybackRate(this.player, playRate);
+    setPlaybackRate(rate) {
+      if (!rate || !this.player || this.isLive() || this.isDisRate() || +this.player.playbackRate === +rate) return;
+      VideoEnhancer.setPlaybackRate(this.player, rate);
       this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
       this.playbackRateKeepDisplay();
       if (!Storage.NOT_CACHE_SPEED.get()) Storage.CACHED_SPEED.set(this.player.playbackRate);
     },
-    adjustPlaybackRate(step = Storage.SPEED_STEP.get()) {
-      const playRate = Math.max(Consts.MIN_SPEED, +this.player.playbackRate + step);
-      this.setPlaybackRate(Math.min(Consts.MAX_SPEED, playRate));
+    adjustPlaybackRate(step = 0.25) {
+      const rate = Math.max(Consts.MIN_SPEED, +this.player.playbackRate + step);
+      this.setPlaybackRate(Math.min(Consts.MAX_SPEED, rate));
     },
     applyCachedRate: () => Storage.NOT_CACHE_SPEED.get() ? App.delCachedRate() : App.setPlaybackRate(Storage.CACHED_SPEED.get()),
     delCachedRate: () => Storage.CACHED_SPEED.del(),
-    skipPlayback(second = Storage.SKIP_INTERVAL.get()) {
+    skipPlayback(second = 0) {
       if (!this.player || this.isLive() || this.player.ended) return;
       this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
     },
@@ -838,13 +848,13 @@
       if (video !== this.player || !this.topWin || video.duration < 120 || this.isLive()) return;
       if (Tools.isThrottle("cacheTime", Consts.ONE_SEC) || +video.currentTime < Storage.SKIP_INTERVAL.get()) return;
       if (Storage.NOT_CACHE_TIME.get() || this.remainTime(video) <= 10) return this.clearCachedTime(video);
-      Storage.PLAY_TIME.set(+video.currentTime - 1, this.getCacheTimeKey(video), Storage.STORAGE_DAYS.get());
-      this.clearMultiVideoCacheTime();
+      Storage.PLAY_TIME.set(+video.currentTime - 1, this.getUniqueKey(video), Storage.STORAGE_DAYS.get());
+      if (Tools.isMultiV()) this.ensureUniqueCacheTime();
     },
     applyCachedTime(video) {
       if (Storage.NOT_CACHE_TIME.get()) return this.clearCachedTime(video);
       if (video._mfs_hasApplyCTime || !this.topWin || this.isLive()) return;
-      const time = Storage.PLAY_TIME.get(this.getCacheTimeKey(video));
+      const time = Storage.PLAY_TIME.get(this.getUniqueKey(video));
       if (time <= +video.currentTime) return video._mfs_hasApplyCTime = true;
       this.setCurrentTime(time);
       video._mfs_hasApplyCTime = true;
@@ -854,17 +864,16 @@
       });
     },
     setCurrentTime: (currentTime) => currentTime && (App.player.currentTime = Math.max(0, currentTime)),
-    clearCachedTime: (video) => App.topWin && Storage.PLAY_TIME.del(App.getCacheTimeKey(video)),
-    getCacheTimeKey(video, { duration, __duration } = video) {
+    clearCachedTime: (video) => App.topWin && Storage.PLAY_TIME.del(App.getUniqueKey(video)),
+    getUniqueKey(video, { duration, __duration } = video) {
       if (video._mfs_cacheTKey) return video._mfs_cacheTKey;
       const currNumber = this.getCurrentEpisodeNumber();
       const baseKey = `${this.topWin.urlHash}_${Math.floor(__duration || duration)}`;
-      const cacheTimeKey = currNumber ? `${baseKey}_${currNumber}` : baseKey;
-      video._mfs_cacheTKey = cacheTimeKey;
-      return cacheTimeKey;
+      const cacheKey = currNumber ? `${baseKey}_${currNumber}` : baseKey;
+      video._mfs_cacheTKey = cacheKey;
+      return cacheKey;
     },
-    clearMultiVideoCacheTime() {
-      if (!Tools.isMultiVideo()) return;
+    ensureUniqueCacheTime() {
       const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
       const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
       if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
@@ -876,7 +885,7 @@
       const s = Math.floor(seconds % 60);
       return [...h ? [h] : [], m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
     },
-    toggleMirrorFlip() {
+    flipHorizontal() {
       if (!this.player) return;
       const tsr = this.player.tsr;
       tsr.isMirrored = !tsr.isMirrored;
@@ -901,7 +910,7 @@
       this.setTsr("--zoom", zoom / 100);
       this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC);
     },
-    moveVideoPosition(direction) {
+    moveVideo(direction) {
       if (!this.player || this.isDisZoom()) return;
       const tsr = this.player.tsr;
       const step = Storage.MOVING_DISTANCE.get();
@@ -918,7 +927,7 @@
       this.setTsr("--moveX", `${tsr.moveX}px`).setTsr("--moveY", `${tsr.moveY}px`);
       this.showToast(`${desc}：${x ? tsr.moveX : tsr.moveY}px`, Consts.ONE_SEC);
     },
-    resetVideoTransform() {
+    resetTsr() {
       if (!this.player || this.isDisZoom()) return;
       const styles = ["--zoom", "--moveX", "--moveY", "--scale", "--mirror", "--rotate", "--deftsr"];
       styles.forEach((n) => Tools.setStyle(this.player, n));
@@ -943,14 +952,14 @@
       Object.assign(this.player, { muted: !isMuted, volume: +isMuted });
       this.showToast(isMuted ? "🔊 取消静音" : "🔇 已静音", Consts.ONE_SEC);
     },
-    async captureScreenshot() {
+    async screenshot() {
       if (!this.player || Storage.DISABLE_SCREENSHOT.get()) return;
-      const { videoWidth, videoHeight } = this.player;
       this.player.setAttribute("crossorigin", "anonymous");
-      const canvas = Tools.createElement("canvas", { width: videoWidth, height: videoHeight });
+      const { videoWidth: width, videoHeight: height } = this.player;
+      const canvas = Tools.createElement("canvas", { width, height });
       const ctx = canvas.getContext("2d");
       try {
-        ctx.drawImage(this.player, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(this.player, 0, 0, width, height);
         const url = URL.createObjectURL(await new Promise((resolve) => canvas.toBlob(resolve, "image/png")));
         _GM_download({ url, name: `视频截图_${Date.now()}.png`, onload: () => URL.revokeObjectURL(url) });
       } catch (e) {
@@ -966,7 +975,7 @@
       !this.player.paused && this.player.pause();
       this.player.currentTime += (isPrev ? -1 : 1) / 24;
     },
-    toggleAutoNextEnabled() {
+    autoNextEnabled() {
       const status = !Storage.IS_AUTO_NEXT.get();
       Storage.IS_AUTO_NEXT.set(status);
       this.showToast(`已${status ? "启" : "禁"}用自动切换下集`);
@@ -981,8 +990,8 @@
       return new Promise((resolve) => {
         if (isRemove) Tools.query(".monkey-toast")?.remove();
         const el = Tools.createElement("div", { className: "monkey-toast" });
-        content instanceof Element ? el.appendChild(content) : el.innerHTML = content;
-        (this.findControlBarContainer() ?? this.findVideoParentContainer(null, 2, false)).prepend(el), resolve(el);
+        content instanceof Element ? el.appendChild(content) : el.textContent = content;
+        this.findVideoContainer(null, 2, false).prepend(el), resolve(el);
         setTimeout(() => (el.style.opacity = 0, setTimeout(() => el.remove(), Consts.HALF_SEC)), duration);
       });
     }
@@ -1005,7 +1014,7 @@
       if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcut(Keyboard.P);
     },
     toggleWebFullscreen(isTrusted) {
-      if (this.noVideo() || Tools.isThrottle("toggleWeb")) return;
+      if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
       if (Site.isGmMatch() && !Site.isBiliLive()) return this.triggerIconElement(Site.icons.webFull);
       if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen();
       this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
@@ -1052,11 +1061,11 @@
       return Tools.query(`iframe[src*="${pathname + partial}"]`);
     },
     getVideoContainer() {
-      const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin?.host)?.trim();
+      const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin?.host ?? this.host)?.trim();
       const container = selector ? this.player.closest(selector) ?? Tools.query(selector) : null;
-      return container ?? this.findVideoParentContainer(this.findControlBarContainer());
+      return container ?? this.findVideoContainer(this.findCtrlContainer());
     },
-    findControlBarContainer() {
+    findCtrlContainer() {
       const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";
       const selector = `[class*="contr" i]${ignore}, [id*="control"], [class*="ctrl"], [class*="progress"], [class*="volume"]`;
       let parent = Tools.getParent(this.player);
@@ -1067,20 +1076,20 @@
       return null;
     },
     videoParents: /* @__PURE__ */ new Set(),
-    findVideoParentContainer(container, maxLevel = 4, track = true) {
+    findVideoContainer(container, max = 4, track = true) {
       container = container ?? Tools.getParent(this.player);
       if (!container.offsetHeight) container = Tools.getParent(container);
       const { offsetWidth: cw, offsetHeight: ch } = container;
       if (track) this.videoParents.clear();
-      for (let parent = container, level = 0; parent && level < maxLevel; parent = Tools.getParent(parent), level++) {
+      for (let parent = container, deep = 0; parent && deep < max; parent = Tools.getParent(parent), deep++) {
         if (parent.offsetWidth === cw && parent.offsetHeight === ch) container = parent;
         if (this.hasExplicitlySize(parent)) return container;
         if (track) this.videoParents.add(parent);
       }
       return container;
     },
-    hasExplicitlySize(element) {
-      const style = element.style;
+    hasExplicitlySize(el) {
+      const style = el.style;
       const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
       return ["width", "height"].some((prop) => {
         const value = style?.getPropertyValue(prop);
@@ -1088,13 +1097,13 @@
       });
     },
     ensureWebFullscreen() {
-      const { viewWidth, viewHeight } = this.topWin;
+      const { vw, vh } = this.topWin;
       const elements = [...this.videoParents].reverse();
-      for (const element of elements) {
-        if (!this.fsWrapper.contains(element)) continue;
+      for (const el of elements) {
+        if (!this.fsWrapper.contains(el)) continue;
         const { offsetWidth: width, offsetHeight: height } = this.player;
-        if (width === viewWidth && height === viewHeight && element.offsetHeight === viewHeight) continue;
-        Tools.attr(element, Consts.webFull, true);
+        if (width === vw && height === vh && el.offsetHeight === vh) continue;
+        Tools.attr(el, Consts.webFull, true);
       }
     }
   };
@@ -1115,10 +1124,10 @@
       this.dispatchShortcut(Keyboard.P);
     },
     async isWebFull(video) {
-      const { viewWidth } = this.topWin;
-      if (video.offsetWidth < viewWidth) return false;
+      const { vw } = this.topWin;
+      if (video.offsetWidth < vw) return false;
       await Tools.sleep(Consts.HALF_SEC);
-      return video.offsetWidth >= viewWidth;
+      return video.offsetWidth >= vw;
     },
     autoExitWebFullscreen() {
       if (!Site.isBili() && !Site.isAcFun()) return;
@@ -1156,33 +1165,33 @@
       }).map(this.getEpisodeWrapper).filter((el) => this.getAllEpisodes(el).map(this.getEpisodeNumber).filter(Boolean).length > 1);
       return eles.length <= 1 ? eles[0] : eles.find((el) => Tools.hasCls(el, "cur", "active") || !!this.getEpisodeNumber(el));
     },
-    getEpisodeNumber: (ele) => Tools.getNumbers(ele?.innerText?.replace(/-|\./g, Consts.EMPTY))?.shift(),
-    getTargetEpisode(element, isPrev = false) {
-      if (!element) return;
-      const episodes = this.getAllEpisodes(element);
+    getEpisodeNumber: (el) => Tools.getNumbers(el?.innerText?.replace(/-|\./g, Consts.EMPTY))?.shift(),
+    getTargetEpisode(el, isPrev = false) {
+      if (!el) return;
+      const episodes = this.getAllEpisodes(el);
       const numbers = episodes.map(this.getEpisodeNumber).filter(Boolean);
       if (numbers.length < 2) return;
-      const index = episodes.indexOf(element);
-      const currNumber = this.getEpisodeNumber(element);
+      const index = episodes.indexOf(el);
+      const currNumber = this.getEpisodeNumber(el);
       const { lSmall, rLarge } = this.compareNumSize(numbers, currNumber, index);
       return (lSmall || rLarge) === isPrev ? episodes[index - 1] : episodes[index + 1];
     },
     getAllEpisodes(element) {
       if (!element) return [];
       const numSet = /* @__PURE__ */ new Set();
-      const eleName = element.tagName;
-      const eleClass = Array.from(element.classList);
+      const elName = element.tagName;
+      const elCls = Array.from(element.classList);
       const children = Array.from(element.parentNode.children);
-      return children.filter((ele) => {
-        const currClass = Array.from(ele.classList).filter((cls) => !["on", "cur", "active"].includes(cls));
-        const hasSameClass = eleClass.some((value) => currClass.includes(value));
-        const isMatch = currClass.length ? hasSameClass : ele.tagName === eleName;
-        if (!isMatch || numSet.has(ele.innerText)) return false;
-        return numSet.add(ele.innerText);
+      return children.filter((el) => {
+        const curCls = Array.from(el.classList).filter((cls) => !["on", "cur", "active"].includes(cls));
+        const hasCls = elCls.some((value) => curCls.includes(value));
+        const isMatch = curCls.length ? hasCls : el.tagName === elName;
+        if (!isMatch || numSet.has(el.innerText)) return false;
+        return numSet.add(el.innerText);
       });
     },
-    jumpToTargetEpisode(element) {
-      const stack = [element].filter(Boolean);
+    jumpToTargetEpisode(el) {
+      const stack = [el].filter(Boolean);
       while (stack.length > 0) {
         const current = stack.pop();
         if (current.matches("a, button")) return current?.click();
@@ -1190,11 +1199,11 @@
         current?.click && current.click();
       }
     },
-    getEpisodeWrapper(element) {
-      while (element?.parentElement) {
-        const sibs = Array.from(element.parentElement.children);
-        if (sibs.filter((s) => s.tagName === element.tagName).length > 1) return element;
-        element = element.parentElement;
+    getEpisodeWrapper(el) {
+      while (el?.parentElement) {
+        const sibs = Array.from(el.parentElement.children);
+        if (sibs.filter((s) => s.tagName === el.tagName).length > 1) return el;
+        el = el.parentElement;
       }
       return null;
     },
@@ -1212,12 +1221,10 @@
     })
   };
   const EpisodePicker = {
-    setupPickerEpisodeListener() {
-      if (Site.isGmMatch() || this.hasPickerListener) return;
-      this.hasPickerListener = true;
+    setupEpisodePickerListener() {
+      if (Site.isGmMatch() || this.isExecuted("isBindPicker")) return;
       const handle = (event, { target, ctrlKey, altKey, isTrusted } = event) => {
-        if (!ctrlKey || !altKey || !isTrusted || this.isLive()) return;
-        if (!Tools.isTopWin()) return Tools.notyf("此页面不能抓取 (•ิ_•ิ)?", true);
+        if (!ctrlKey || !altKey || !isTrusted || this.isNoVideo() || this.isLive()) return;
         Tools.preventDefault(event);
         const curSelector = Storage.CURRENT_EPISODE.get(this.host);
         const relSelector = Storage.RELATIVE_EPISODE.get(this.host);
@@ -1228,10 +1235,10 @@
       };
       document.addEventListener("click", handle, true);
     },
-    pickerCurrentEpisodePath(element) {
+    pickerCurrentEpisodePath(el) {
       if (Storage.CURRENT_EPISODE.get(this.host)) return;
-      this.pickerEpisodePopup(element, {
-        validBtnCallback(value) {
+      this.pickerEpisodePopup(el, {
+        onVerify(value) {
           try {
             const number = this.getEpisodeNumber(Tools.query(value));
             number ? Tools.notyf(`当前集数：${number}`) : Tools.notyf("获取集数失败 〒▽〒", true);
@@ -1240,16 +1247,16 @@
             console.error(e);
           }
         },
-        confirmCallback(value) {
+        onSave(value) {
           Storage.CURRENT_EPISODE.set(value, this.host);
           Tools.notyf("继续拾取元素 ＼(＞０＜)／");
         }
       });
     },
-    pickerRelativeEpisodePath(element) {
+    pickerRelativeEpisodePath(el) {
       if (Storage.RELATIVE_EPISODE.get(this.host)) return;
-      this.pickerEpisodePopup(element, {
-        validBtnCallback(value) {
+      this.pickerEpisodePopup(el, {
+        onVerify(value) {
           try {
             const container = this.getEpisodeWrapper(Tools.query(value));
             const numbers = this.getAllEpisodes(container)?.map(this.getEpisodeNumber);
@@ -1259,7 +1266,7 @@
             console.error(e);
           }
         },
-        confirmCallback(value) {
+        onSave(value) {
           Storage.RELATIVE_EPISODE.set(value, this.host);
           Tools.notyf("操作完成 []~(￣▽￣)~* 干杯");
         }
@@ -1275,7 +1282,7 @@
       const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(Storage.RELATIVE_EPISODE.get(this.host))));
       return episodes.includes(current) ? current : episodes.find((el) => this.getEpisodeNumber(el) === num);
     },
-    pickerEpisodePopup(element, { validBtnCallback, confirmCallback }) {
+    pickerEpisodePopup(el, { onVerify, onSave }) {
       Swal.fire({
         html: Tools.safeHTML(`<h4>验证能正确取到集数，再确定保存</h4>
       <textarea id="__picker" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
@@ -1290,11 +1297,11 @@
         focusDeny: true,
         preDeny: () => {
           const value = Tools.query("#__picker").value.trim();
-          return value ? validBtnCallback.call(this, value) ?? false : Tools.notyf("元素选择器不能为空！", true);
+          return value ? onVerify.call(this, value) ?? false : Tools.notyf("元素选择器不能为空！", true);
         },
         preConfirm: () => Tools.query("#__picker").value.trim() || Tools.notyf("元素选择器不能为空！", true),
-        didOpen: () => Tools.query("#__picker").value = Tools.getElementPath(element)
-      }).then((result) => result.isConfirmed && confirmCallback.call(this, result.value));
+        didOpen: () => Tools.query("#__picker").value = Tools.getElementPath(el)
+      }).then((res) => res.isConfirmed && onSave.call(this, res.value));
     }
   };
   class Clock {
@@ -1374,27 +1381,27 @@
       if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(this.player.parentNode).start();
       this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
     },
-    getRealDuration(video) {
+    getRealDur(video) {
       if (!Site.isQiyi()) return video.duration;
       return _unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
     },
     videoProgress(video, bypass) {
       if (!video || !bypass && video.paused || this.player !== video || this.isMutedLoop(video)) return;
       if (video.duration <= 30 || this.isLive() || this.shouldHideTime()) return this.removeProgressElement();
-      const duration = this.getRealDuration(video);
+      const duration = this.getRealDur(video);
       if (duration > 86400) return this.removeProgressElement();
       const percent = Tools.toFixed(video.currentTime / duration * 100, 1);
-      const timeLeft = this.formatTime(duration - video.currentTime);
-      const element = this.createProgressElement();
-      element.firstChild.textContent = `${timeLeft} / ${percent}`;
-      this.prependElement(element);
+      const remain = this.formatTime(duration - video.currentTime);
+      const el = this.createProgressElement();
+      el.firstChild.textContent = `${remain} / ${percent}`;
+      this.prependElement(el);
     },
     createProgressElement() {
       if (this.progressNode) return this.progressNode;
-      const element = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
-      element.append(document.createTextNode("00:00"), Tools.createElement("b", { textContent: "%" }));
-      this.progressNode = element;
-      return element;
+      const el = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
+      el.append(document.createTextNode("00:00"), Tools.createElement("b", { textContent: "%" }));
+      this.progressNode = el;
+      return el;
     },
     removeProgressElement: () => App.progressNode?.remove(),
     playbackRateKeepDisplay() {
@@ -1409,17 +1416,17 @@
       this.playbackRateKeepDisplay();
     },
     removeRateKeepDisplay: () => App.rateKeepElement?.remove(),
-    createDisplayElement(clss, color) {
-      const element = Tools.createElement("div", { className: clss, style: `color: ${color}` });
-      this.prependElement(element);
-      return element;
+    createDisplayElement(cls, color) {
+      const el = Tools.createElement("div", { className: cls, style: `color: ${color}` });
+      this.prependElement(el);
+      return el;
     },
-    prependElement(element) {
+    prependElement(el) {
       const container = this.player?.parentNode;
-      if (element && !container?.contains(element)) container?.prepend(element);
+      if (el && !container?.contains(el)) container?.prepend(el);
     },
-    changeTimeElementDisplay: () => (App.setupPlayerClock(), App.videoProgress(App.player, true)),
-    setTimeElementColor: (color) => Tools.setStyle([App.progressNode, App.Clock?.element], "color", color)
+    changeTimeDisplay: () => (App.setupPlayerClock(), App.videoProgress(App.player, true)),
+    setTimeColor: (color) => Tools.setStyle([App.progressNode, App.Clock?.element], "color", color)
   };
   const Ignore = {
     setupIgnoreUrlsChangeListener() {
@@ -1456,18 +1463,17 @@
     isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
     isDisZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
     isAutoSite: () => Storage.IS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window.topWin?.host),
-    setupScriptMenuCommand() {
-      if (this.hasMenu || !Tools.isTopWin()) return;
-      this.setupMenuChangeListener();
-      this.registMenuCommand();
-      this.hasMenu = true;
+    initMenuCmds() {
+      if (this.isExecuted("hasMenu") || !Tools.isTopWin()) return;
+      this.setupMenuStorageListener();
+      this.setupMenuCmds();
     },
-    setupMenuChangeListener() {
+    setupMenuStorageListener() {
       [Storage.IS_SITE_AUTO.name + this.host, Storage.CURRENT_EPISODE.name + this.host].forEach(
-        (key) => _GM_addValueChangeListener(key, () => this.registMenuCommand())
+        (key) => _GM_addValueChangeListener(key, () => this.setupMenuCmds())
       );
     },
-    registMenuCommand() {
+    setupMenuCmds() {
       const noPicker = !Storage.CURRENT_EPISODE.get(this.host);
       const siteTitle = `此站${this.isAutoSite() ? "禁" : "启"}用自动网页全屏`;
       const siteFun = ({ host, cache }) => cache.set(!cache.get(host), host);
@@ -1531,11 +1537,11 @@
       });
     },
     settingPopup() {
-      const { html: basicsHtml, cacheMap: basicsMap } = this.genBasicsItems();
-      const { html: assistHtml, cacheMap: assistMap } = this.genAssistItems();
-      const { html: paramsHtml, cacheMap: paramsMap } = this.genParamsItems();
-      const { html: ignoreHtml, cacheMap: ignoreMap } = this.genIgnoreItems();
-      const cacheMap = { ...basicsMap, ...assistMap, ...paramsMap, ...ignoreMap };
+      const { html: basic, cacheMap: bCache } = this.genBasics();
+      const { html: assist, cacheMap: aCache } = this.genAssist();
+      const { html: params, cacheMap: pCache } = this.genParams();
+      const { html: ignore, cacheMap: iCache } = this.genIgnore();
+      const cacheMap = { ...bCache, ...aCache, ...pCache, ...iCache };
       const modalHtml = `
         <div class="swal2-tabs">
           <!-- Tabs 标题栏 -->
@@ -1547,10 +1553,10 @@
           </div>
           <!-- Tabs 内容区 -->
           <div class="swal2-tabs-content">
-            <div class="swal2-tab-panel active" id="tab1">${basicsHtml}</div>
-            <div class="swal2-tab-panel" id="tab2">${assistHtml}</div>
-            <div class="swal2-tab-panel" id="tab3">${paramsHtml}</div>
-            <div class="swal2-tab-panel" id="tab4">${ignoreHtml}</div>
+            <div class="swal2-tab-panel active" id="tab1">${basic}</div>
+            <div class="swal2-tab-panel" id="tab2">${assist}</div>
+            <div class="swal2-tab-panel" id="tab3">${params}</div>
+            <div class="swal2-tab-panel" id="tab4">${ignore}</div>
           </div>
         </div>`;
       Swal.fire({
@@ -1579,8 +1585,8 @@
         }
       });
     },
-    genBasicsItems() {
-      const configs = [
+    genBasics() {
+      const confs = [
         { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_SPEED, attrs: ["send", "delay"] },
         { name: "memory", text: "禁用 记忆倍速", cache: Storage.NOT_CACHE_SPEED, attrs: ["send"] },
         { name: "time", text: "禁用 记忆进度", cache: Storage.NOT_CACHE_TIME },
@@ -1589,15 +1595,15 @@
         { name: "next", text: "启用 自动切换下集", cache: Storage.IS_AUTO_NEXT },
         { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEY }
       ];
-      const renderItem = ({ text, dataset, name, value }) => `
+      const render = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
           <input ${dataset} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
-      return this.generateCommonItems(configs, renderItem);
+      return this.generate(confs, render);
     },
-    genAssistItems() {
-      const configs = [
+    genAssist() {
+      const confs = [
         { name: "fit", text: "禁用 默认自动", cache: Storage.NO_AUTO_DEF },
         { name: "pic", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
         { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, attrs: ["send"] },
@@ -1606,15 +1612,15 @@
         { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },
         { name: "edgeClk", text: "启用 侧边单击网页全屏", cache: Storage.ENABLE_EDGE_CLICK, attrs: ["send"] }
       ].filter(({ isHidden }) => !isHidden);
-      const renderItem = ({ text, dataset, name, value }) => `
+      const render = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
           <input ${dataset} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
-      return this.generateCommonItems(configs, renderItem);
+      return this.generate(confs, render);
     },
-    genParamsItems() {
-      const configs = [
+    genParams() {
+      const confs = [
         { name: "step", text: "倍速步进", cache: Storage.SPEED_STEP },
         { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
         { name: "zero", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL },
@@ -1625,36 +1631,35 @@
         { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR, attrs: ["send"] },
         { name: "preset", text: "常用倍速", cache: Storage.PRESET_SPEED }
       ];
-      const renderItem = ({ text, dataset, name, value }) => `
+      const render = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
           <input ${dataset} value="${value}" name="${name}" type="text" autocomplete="off"/>
         </label>`;
-      return this.generateCommonItems(configs, renderItem);
+      return this.generate(confs, render);
     },
-    genIgnoreItems() {
-      const configs = [
+    genIgnore() {
+      const confs = [
         { name: "custom", text: "自定义此站视频容器", cache: Storage.CUSTOM_WEB_FULL, isHide: Site.isGmMatch(), useHost: true },
         { name: "nextIg", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: Storage.NEXT_IGNORE_URLS },
         { name: "fsIg", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: Storage.FULL_IGNORE_URLS }
       ];
-      const renderItem = ({ text, dataset, name, value }) => `
+      const render = ({ text, dataset, name, value }) => `
         <div class="others-sett"><p>${text}</p>
           <textarea ${dataset} name="${name}" type="text" spellcheck="false" autocomplete="off">${value}</textarea>
         </div>`;
-      return this.generateCommonItems(configs, renderItem);
+      return this.generate(confs, render);
     },
-    generateCommonItems(baseConfigs, renderItem) {
+    generate(confs, render) {
       const getDataset = (attrs = [], host) => attrs.map((key) => `data-${key}="${key === "host" ? host : true}"`).join(" ");
-      const filteredConfigs = baseConfigs.filter(({ isHide }) => !isHide);
-      const processedConfigs = filteredConfigs.map((config) => {
-        const { cache, attrs = [], useHost } = config;
+      const finalConfs = confs.filter(({ isHide }) => !isHide).map((conf) => {
+        const { cache, attrs = [], useHost } = conf;
         const host = useHost ? this.host : Consts.EMPTY;
         const value = useHost ? cache.get(this.host) : cache.get();
         if (useHost && !attrs.includes("host")) attrs.push("host");
-        return { ...config, host, value, dataset: getDataset(attrs, this.host) };
+        return { ...conf, host, value, dataset: getDataset(attrs, this.host) };
       });
-      const html = processedConfigs.map((config) => renderItem(config)).join(Consts.EMPTY);
-      const cacheMap = Object.fromEntries(processedConfigs.map((item) => [item.name, item.cache]));
+      const html = finalConfs.map((conf) => render(conf)).join(Consts.EMPTY);
+      const cacheMap = Object.fromEntries(finalConfs.map((e) => [e.name, e.cache]));
       return { html, cacheMap };
     }
   };
