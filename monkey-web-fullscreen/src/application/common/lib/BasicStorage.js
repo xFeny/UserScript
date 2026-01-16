@@ -41,6 +41,7 @@ export default class BasicStorage {
   set(value, key, expires) {
     const val = expires ? JSON.stringify({ value, expires: Date.now() + expires * 864e5 }) : value;
     this.storage.setItem(this.#getFinalKey(key), val);
+    return value;
   }
 
   /**

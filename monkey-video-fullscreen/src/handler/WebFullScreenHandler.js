@@ -21,10 +21,10 @@ export default {
   enterWebFullscreen() {
     // video的宿主容器元素
     const container = (this.fsWrapper = this.getVideoHostContainer());
-    if (!container || container.matches(":is(html, body)")) return this.ensureWebFullscreen();
+    if (!container || container.matches(":is(html, body)")) return this.adaptToWebFullscreen();
 
     container.scrollY = window.scrollY;
-    const parents = Tools.getParents(container, true);
+    const parents = Tools.getParents(container);
     container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(location.host)
       ? parents.forEach((el) => {
           Tools.emitEvent("addStyle", { shadowRoot: el.getRootNode() });
@@ -32,8 +32,8 @@ export default {
         })
       : this.detachForFullscreen();
 
-    // 确保网页全屏成功
-    this.ensureWebFullscreen();
+    // 视频容器大小适应网页全屏变化
+    this.adaptToWebFullscreen();
   },
   detachForFullscreen() {
     if (this.fsParent) return;
@@ -81,7 +81,7 @@ export default {
   },
   getVideoContainer() {
     // 自定义网页全屏元素，支持多个选择器，返回第一个找到的元素
-    const selector = Storage.CUSTOM_CONTAINER.get(this.topWin?.host ?? location.host)?.trim();
+    const selector = Storage.CUSTOM_CONTAINER.get(this.topWin?.host)?.trim();
     const container = selector ? this.player.closest(selector) ?? Tools.query(selector) : null;
     return container ?? this.findVideoContainer(this.findCtrlContainer());
   },
@@ -121,18 +121,13 @@ export default {
       return value && sizeRegex.test(value);
     });
   },
-  ensureWebFullscreen() {
+  adaptToWebFullscreen() {
     const { vw, vh } = this.topWin;
-    const elements = [...this.videoParents].reverse();
-
-    // 核心目的：确保视频父元素宽高与视窗完全匹配，保障网页全屏正常显示
-    // 背景说明：当父元素因外联CSS设置了固定宽高值；当进入网页全屏后，父元素宽高未适应视窗，因此需要重新计算并修正元素宽高；
-    // 如：https://www.toutiao.com/video/7579134807163060782、https://www.163.com/v/video/VO3QRCEH5.html
-    for (const el of elements) {
-      if (!this.fsWrapper.contains(el)) continue;
+    [...this.videoParents].reverse().forEach((el) => {
+      if (!this.fsWrapper.contains(el)) return; // 元素不在全屏容器内，跳过
       const { offsetWidth: width, offsetHeight: height } = this.player;
-      if (width === vw && height === vh && el.offsetHeight === vh) continue;
+      if (width === vw && height === vh && el.offsetHeight === vh) return; // 宽高已匹配，无需适配
       Tools.attr(el, Consts.webFull, true);
-    }
+    });
   },
 };

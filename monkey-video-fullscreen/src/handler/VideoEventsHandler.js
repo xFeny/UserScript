@@ -22,7 +22,7 @@ export default {
     });
   },
   unbindVideoEvts() {
-    if (this.videoAborts.size < 5 || Tools.isThrottle("cleanup")) return;
+    if (Tools.isThrottle("cleanup", 100)) return;
     this.videoAborts.forEach((ctrl, video) => {
       if (Tools.isAttached(video)) return;
       ctrl.abort(), video.removeAttribute("received"), this.videoAborts.delete(video);

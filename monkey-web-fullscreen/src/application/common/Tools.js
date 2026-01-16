@@ -13,7 +13,7 @@ export default unsafeWindow.FyTools = {
   query: (selector, ctx) => querySelector(selector, ctx),
   querys: (selector, ctx) => querySelectorAll(selector, ctx),
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
-  toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, Consts.EMPTY),
+  toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, ""),
   postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
   getNumbers: (str) => (typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : []),
   log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
@@ -72,19 +72,19 @@ export default unsafeWindow.FyTools = {
    * @param {Element} el
    * @returns
    */
-  hasValidDomId: (el) => el.id && !/[\d\u4e00-\u9fa5]/.test(el.id),
+  isValidId: (el) => el.id && !/[\d\u4e00-\u9fa5]/.test(el.id),
   getElementPath(element) {
     const parents = [];
     let current = element;
     while (current && !current.matches("body")) {
       parents.unshift(this.getSelector(current));
-      if (this.hasValidDomId(current)) break;
+      if (this.isValidId(current)) break;
       current = this.getParent(current);
     }
     return parents.join(" > ");
   },
   getSelector(el) {
-    if (this.hasValidDomId(el)) return `#${el.id}`;
+    if (this.isValidId(el)) return `#${el.id}`;
     const tag = el.tagName.toLowerCase();
     const validCls = Array.from(el.classList).filter((cls) => !/[\[\]\d]/.test(cls)); // 排除含[]或数字的类名
     return validCls.length ? `${tag}.${validCls.join(".")}` : tag;
@@ -95,7 +95,7 @@ export default unsafeWindow.FyTools = {
     if (parent instanceof ShadowRoot) return parent.host;
     return parent === document ? null : parent;
   },
-  getParents(el, self = false, max = Infinity) {
+  getParents(el, max = Infinity, self = true) {
     const parents = self && el ? [el] : [];
     for (let current = el, deep = 0; current && deep < max; deep++) {
       current = this.getParent(current);
@@ -118,11 +118,10 @@ export default unsafeWindow.FyTools = {
    * @returns {Element[]} 匹配的元素数组
    */
   findByText(mode, ...texts) {
-    const flatTexts = texts.flat();
-    const expr = Object.is(mode, "text")
-      ? `.//*[${flatTexts.map((t) => `contains(text(), '${t.replace(/'/g, "\\'")}')`).join(" or ")}]`
-      : `.//*[${flatTexts.map((t) => `@*[contains(., '${t.replace(/'/g, "\\'")}')]`).join(" or ")}]`;
-    const nodes = document.evaluate(expr, document.body, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+    const flatTexts = texts.flat().map((t) => t.replace(/'/g, "\\'"));
+    const part = (t) => (mode === "text" ? `contains(text(), '${t}')` : `@*[contains(., '${t}')]`);
+    const expr = `.//*[${flatTexts.map(part).join(" or ")}]`;
+    const nodes = document.evaluate(expr, document.body, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE);
     return Array.from({ length: nodes.snapshotLength }, (_, i) => nodes.snapshotItem(i)).filter((el) => !el.matches("script"));
   },
   safeHTML(html) {

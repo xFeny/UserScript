@@ -1,5 +1,4 @@
 import Tools from "./Tools";
-import Consts from "./Consts";
 import Storage from "./Storage";
 
 export default class Site {
@@ -37,7 +36,7 @@ export default class Site {
   }
 
   static isGmMatch() {
-    return this.gmMatches.some((m) => m.test(location.href.replace(location.search, Consts.EMPTY)));
+    return this.gmMatches.some((m) => m.test(location.href.replace(location.search, "")));
   }
 
   static #loadRemote() {
@@ -46,7 +45,7 @@ export default class Site {
       .then((res) => {
         const remoteConf = JSON.parse(res.responseText ?? "{}");
         this.selectors = { ...this.selectors, ...remoteConf };
-        Storage.ICONS_SELECTOR.set(this.selectors, Consts.EMPTY, 1 / 3); // 缓存8小时
+        Storage.ICONS_SELECTOR.set(this.selectors, "", 1 / 3); // 缓存8小时
       })
       .catch((e) => console.error("加载远程配置失败", e));
   }

@@ -21,7 +21,7 @@ export default {
     Tools.postMessage(window.top, { key, bypass, isTrusted });
   },
   processShortcutKey({ key, code, ctrlKey, shiftKey, altKey }) {
-    code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
+    code = code.replace(/key|arrow|numpad|tract/gi, "");
     const keys = [ctrlKey && "ctrl", shiftKey && "shift", altKey && "alt", /[0-9]/.test(key) ? key : code];
     return keys.filter(Boolean).join("_").toUpperCase();
   },
@@ -38,7 +38,7 @@ export default {
     this.preventKey(e);
     key = this.processShortcutKey(e);
     const specialKeys = [Keyboard.N, Keyboard.P, Keyboard.Enter, Keyboard.NumEnter];
-    if (specialKeys.includes(code)) return Tools.postMessage(window.top, { key, isTrusted });
+    if (specialKeys.includes(code)) return this.dispatchShortcut(key, { isTrusted });
     this.processEvent({ key, isTrusted });
   },
   processEvent(data) {
@@ -49,25 +49,25 @@ export default {
     if (!this.player) Tools.sendToIFrames(data);
     if (data?.key) this.execKeyActions(data);
   },
-  execKeyActions({ key, isTrusted, bypass }) {
+  execKeyActions({ key, bypass, isTrusted }) {
     // Tools.log("按下的键：", { key, isTrusted });
     const dict = {
       M: () => this.toggleMute(),
       R: () => this.rotateVideo(),
       L: () => this.freezeVideoFrame(),
-      K: () => this.freezeVideoFrame(true),
+      K: () => this.freezeVideoFrame(!0),
       ENTER: () => this.toggleFullscreen(),
       P: () => this.toggleWebFullscreen(isTrusted),
       D: () => Site.isGmMatch() && this.triggerIconElement(Site.icons.danmaku),
       N: () => (Site.isGmMatch() ? this.triggerIconElement(Site.icons.next) : this.switchEpisode()),
-      LEFT: () => (bypass || this.isOverrideKey()) && this.skipPlayback(-Storage.SKIP_INTERVAL.get()),
-      RIGHT: () => (bypass || this.isOverrideKey()) && this.skipPlayback(Storage.SKIP_INTERVAL.get()),
       SPACE: () => (bypass || this.isOverrideKey()) && this.playToggle(this.player),
-      0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP_INTERVAL.get()) ?? true,
+      LEFT: () => this.skipPlayback(-Storage.SKIP_INTERVAL.get(), bypass),
+      RIGHT: () => this.skipPlayback(Storage.SKIP_INTERVAL.get(), bypass),
+      0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP.get(), !0) || 0,
       SHIFT_A: () => this.autoNextEnabled(),
       SHIFT_R: () => this.flipHorizontal(),
       CTRL_ALT_A: () => this.screenshot(),
-      ALT_SUB: () => this.zoomVideo(true),
+      ALT_SUB: () => this.zoomVideo(!0),
       ALT_ADD: () => this.zoomVideo(),
       CTRL_Z: () => this.resetTsr(),
     };
@@ -102,9 +102,9 @@ export default {
     // 处理在 “更多设置” 中操作功能切换（启用/禁用）时发来的消息
     if (data?.sw_zoom) this.resetTsr(); // 禁用缩放
     if (data?.sw_memory) this.delCachedRate(); // 禁用记忆倍速
-    if (data?.sw_speed) this.setPlaybackRate(Consts.DEF_SPEED); // 禁用倍速调节
+    if (data?.sw_speed) this.setPlaybackRate(1); // 禁用倍速调节
 
-    if ("sw_rateKeep" in data) this.playbackRateKeepDisplay(); // 左上角常显倍速
+    if ("sw_rateKeep" in data) this.playbackRateDisplay(); // 左上角常显倍速
     if ("sw_clockAlw" in data) setTimeout(() => this.changeTimeDisplay(), 30); // 非全屏显示时间
     if ("sw_color" in data) this.setTimeColor(data.sw_color); // 时间颜色
     if ("sw_edgeClk" in data) this.removeEdgeElements(); // 禁用侧边触发网页全屏

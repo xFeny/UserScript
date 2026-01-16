@@ -161,7 +161,7 @@ export default {
   toggleCursor(hide = false, cls = "__hc") {
     if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
 
-    const eles = [...Tools.getParents(this.player, true, 3), this.getVideoIFrame()];
+    const eles = [...Tools.getParents(this.player, 3), this.getVideoIFrame()];
     eles.forEach((el) => (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
   },
   // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
@@ -187,17 +187,17 @@ export default {
     }
 
     // 已创建过侧边元素，重新插入到父容器中
-    Tools.querys(".video-edge-click", container).forEach((el) => el.remove());
+    Tools.querys(".__edgeClick", container).forEach((el) => el.remove());
     if (video.lArea) return container.prepend(video.lArea, video.rArea);
 
     // 复用元素创建逻辑
     const createEdge = (cls = "") => {
-      const element = Tools.createElement("div", { video, className: `video-edge-click ${cls}` });
+      const element = Tools.createElement("div", { video, className: `__edgeClick ${cls}` });
 
       element.onclick = (e) => {
         Tools.preventDefault(e);
         this.setPlayer(e.target.video);
-        Tools.microTask(() => this.dispatchShortcut(Keyboard.P, { isTrusted: true }));
+        Tools.sleep(5).then(() => this.dispatchShortcut(Keyboard.P, { isTrusted: true }));
       };
 
       return element;
@@ -215,10 +215,10 @@ export default {
     return sroot ? parent : this.findVideoContainer(parent, undefined, false);
   },
   lacksRelativePosition(el) {
-    return Tools.getParents(el, true, 2).every((e) => e && getComputedStyle(e).position === "static");
+    return Tools.getParents(el, 2).every((e) => e && getComputedStyle(e).position === "static");
   },
   removeEdgeElements() {
-    Tools.querys(".video-edge-click").forEach((el) => (el.remove(), delete el.video.lArea, delete el.video.rArea));
+    Tools.querys(".__edgeClick").forEach((el) => (el.remove(), delete el.video.lArea, delete el.video.rArea));
   },
   // ====================⇑⇑⇑ 侧边点击相关逻辑 ⇑⇑⇑====================
 };

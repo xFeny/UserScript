@@ -37,7 +37,7 @@ export default unsafeWindow.FyStorage = {
   /** 快进秒数相关：快进/退秒数 */
   SKIP_INTERVAL: new BasicStorage("VIDEO_SKIP_INTERVAL", 5, false, Number),
   /** 快进秒数相关：零键快进秒数 */
-  ZERO_KEY_SKIP_INTERVAL: new BasicStorage("ZERO_KEY_SKIP_INTERVAL", 30, false, Number),
+  ZERO_KEY_SKIP: new BasicStorage("ZERO_KEY_SKIP_INTERVAL", 30, false, Number),
   /** 快进秒数相关：启用 空格 ◀▶ 键控制 */
   OVERRIDE_KEY: new BasicStorage("OVERRIDE_KEYBOARD", false, false, Boolean),
 

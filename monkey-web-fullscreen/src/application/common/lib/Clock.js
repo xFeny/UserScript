@@ -15,11 +15,11 @@
  * clock.destroy();
  */
 export default class Clock {
-  options = { color: null, clss: "Clock" };
+  opts = { color: null, clss: "__Clock" };
 
-  constructor(container, options) {
+  constructor(container, opts) {
     if (!container) throw new Error("时钟创建失败：container不能为空");
-    this.options = Object.assign(this.options, options);
+    this.opts = Object.assign(this.opts, opts);
     this.container = container;
     this.initClockElement();
     this.start();
@@ -28,7 +28,7 @@ export default class Clock {
   initClockElement() {
     if (this.element) return;
 
-    const { color, clss } = this.options;
+    const { color, clss } = this.opts;
     this.element = document.createElement("div");
     if (color) this.element.style.setProperty("color", color);
     this.element.classList.add(clss);
@@ -50,24 +50,24 @@ export default class Clock {
   }
 
   update() {
-    if (!this.isRunning) return; // 防止停止后仍执行
+    if (!this.isRun) return; // 防止停止后仍执行
 
     this.element.textContent = this.formatTime(new Date());
     if (!this.container.contains(this.element)) this.container.prepend(this.element);
   }
 
   start() {
-    if (this.isRunning) return;
+    if (this.isRun) return;
 
-    this.isRunning = true; // 先标记运行状态，避免重复执行
+    this.isRun = true; // 先标记运行状态，避免重复执行
     this.element.style.setProperty("display", "unset");
-    this.intervalId = setInterval(() => this.update(), 500);
+    this.timerId = setInterval(() => this.update(), 500);
     this.update();
   }
 
   stop(hide = false) {
-    this.isRunning = false; // 优先标记停止，阻断update循环
-    if (this.intervalId) clearInterval(this.intervalId), delete this.intervalId;
+    this.isRun = false; // 优先标记停止，阻断update循环
+    if (this.timerId) clearInterval(this.timerId), delete this.timerId;
     if (hide) this.element?.style.setProperty("display", "none");
   }
 

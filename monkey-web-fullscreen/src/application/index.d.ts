@@ -21,12 +21,12 @@ declare global {
     /**
      * 显示进度的元素
      */
-    progressNode: HTMLDivElement;
+    progNode: HTMLDivElement;
 
     /**
      * 倍速常显元素
      */
-    rateKeepElement: HTMLDivElement;
+    rateDisplay: HTMLDivElement;
 
     /**
      * 时钟类

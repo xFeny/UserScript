@@ -38,16 +38,17 @@ export default {
 
     this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
   },
+  // ====================⇓⇓⇓ 进度显示相关逻辑 ⇓⇓⇓====================
   getRealDur(video) {
     if (!Site.isQiyi()) return video.duration;
     return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
   },
   videoProgress(video, bypass) {
     if (!video || (!bypass && video.paused) || this.player !== video || this.isMutedLoop(video)) return;
-    if (video.duration <= 30 || this.isLive() || this.shouldHideTime()) return this.removeProgressElement();
+    if (video.duration <= 30 || this.isLive() || this.shouldHideTime()) return this.removeProgElement();
 
     const duration = this.getRealDur(video);
-    if (duration > 864e2) return this.removeProgressElement();
+    if (duration > 864e2) return this.removeProgElement();
 
     const percent = Tools.toFixed((video.currentTime / duration) * 100, 1);
     const remain = this.formatTime(duration - video.currentTime);
@@ -57,29 +58,34 @@ export default {
     this.prependElement(el);
   },
   createProgressElement() {
-    if (this.progressNode) return this.progressNode;
+    if (this.progNode) return this.progNode;
 
     // 创建播放进度元素
     const el = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
     el.append(document.createTextNode("00:00"), Tools.createElement("b", { textContent: "%" }));
-    this.progressNode = el;
+    this.progNode = el;
 
     return el;
   },
-  removeProgressElement: () => App.progressNode?.remove(),
-  playbackRateKeepDisplay() {
-    if (!this.player || this.isLive()) return;
-    if (!Storage.RATE_KEEP_SHOW.get()) return this.removeRateKeepDisplay();
+  removeProgElement: () => App.progNode?.remove(),
+  // ====================⇑⇑⇑ 进度显示相关逻辑 ⇑⇑⇑====================
 
-    if (!this.rateKeepElement) this.rateKeepElement = this.createDisplayElement("__rate-keep-show");
-    this.rateKeepElement.textContent = `倍速: ${this.player.playbackRate}`;
-    this.prependElement(this.rateKeepElement);
+  // ====================⇓⇓⇓ 常显倍速相关逻辑 ⇓⇓⇓====================
+  playbackRateDisplay() {
+    if (!this.player || this.isLive()) return;
+    if (!Storage.RATE_KEEP_SHOW.get()) return this.removeRateDisplay();
+
+    if (!this.rateDisplay) this.rateDisplay = this.createDisplayElement("__rateDisplay");
+    this.rateDisplay.textContent = `倍速: ${this.player.playbackRate}`;
+    this.prependElement(this.rateDisplay);
   },
-  resumeRateKeepDisplay() {
-    if (document.contains(this.rateKeepElement) || Tools.isOverLimit("rateKeep")) return;
-    this.playbackRateKeepDisplay();
+  ensureRateDisplay() {
+    if (document.contains(this.rateDisplay) || Tools.isOverLimit("rateKeep")) return;
+    this.playbackRateDisplay();
   },
-  removeRateKeepDisplay: () => App.rateKeepElement?.remove(),
+  removeRateDisplay: () => App.rateDisplay?.remove(),
+  // ====================⇑⇑⇑ 常显倍速相关逻辑 ⇑⇑⇑====================
+
   createDisplayElement(cls, color) {
     const el = Tools.createElement("div", { className: cls, style: `color: ${color}` });
     this.prependElement(el);
@@ -90,5 +96,5 @@ export default {
     if (el && !container?.contains(el)) container?.prepend(el);
   },
   changeTimeDisplay: () => (App.setupPlayerClock(), App.videoProgress(App.player, true)),
-  setTimeColor: (color) => Tools.setStyle([App.progressNode, App.Clock?.element], "color", color),
+  setTimeColor: (color) => Tools.setStyle([App.progNode, App.Clock?.element], "color", color),
 };

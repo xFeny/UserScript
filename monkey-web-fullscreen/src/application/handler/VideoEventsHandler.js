@@ -29,7 +29,7 @@ export default {
     });
   },
   unbindVideoEvts() {
-    if (this.videoAborts.size < 5 || Tools.isThrottle("cleanup")) return;
+    if (Tools.isThrottle("cleanup", 100)) return;
     this.videoAborts.forEach((ctrl, video) => {
       if (Tools.isAttached(video)) return;
       ctrl.abort(), video.removeAttribute("received"), this.videoAborts.delete(video);
@@ -48,12 +48,12 @@ export default {
     if (isNaN(video.duration)) return;
     if (!this.player) this.playing(video);
 
-    this.resumeRateKeepDisplay();
     this.autoWebFullscreen(video);
     this.autoNextEpisode(video);
 
     this.cachePlayTime(video);
     this.videoProgress(video);
+    this.ensureRateDisplay();
   },
   canplay(video) {
     if (!Tools.isVisible(video) || Storage.DISABLE_TRY_PLAY.get()) return;

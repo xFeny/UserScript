@@ -16,9 +16,9 @@ class VideoEnhancer {
    * 通用属性拦截方法（支持DOM元素/普通对象/自定义元素）
    * @param {HTMLElement|Object|Array|Function} target 目标（支持DOM、对象、数组、类/函数）
    * @param {string} prop 要拦截的属性名
-   * @param {Object} descs 拦截器 { get?: (value) => *, set?: (value, setter) => void }
+   * @param {Object} hooks 拦截器 { get?: (value) => *, set?: (value, setter) => void }
    */
-  static defineProperty(target, prop, descs) {
+  static defineProperty(target, prop, hooks) {
     try {
       const original = this.getPropertyDescriptor(target, prop);
       if (!original) throw new Error(`属性 ${prop} 不存在`);
@@ -26,12 +26,12 @@ class VideoEnhancer {
       Object.defineProperty(target, prop, {
         get() {
           const value = original.get ? original.get.call(this) : original.value;
-          return descs.get ? descs.get.call(this, value) : value;
+          return hooks.get ? hooks.get.call(this, value) : value;
         },
         set(value) {
           // 执行属性赋值（原生set/直接赋值），返回传入值
           const setter = (v) => (original.set ? original.set.call(this, v) : (original.value = v), v);
-          descs.set ? descs.set.call(this, value, setter) : setter(value);
+          hooks.set ? hooks.set.call(this, value, setter) : setter(value);
         },
         configurable: true,
       });

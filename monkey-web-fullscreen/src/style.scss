@@ -400,9 +400,9 @@ body > #loading:not(:has(video)),
 }
 /** 隐藏一些元素 END **/
 
-.Clock,
+.__Clock,
 .__timeupdate,
-.__rate-keep-show {
+.__rateDisplay {
   color: #e0e0e0;
   text-indent: 0 !important;
   text-shadow: 0 0 2px #000;
@@ -414,7 +414,7 @@ body > #loading:not(:has(video)),
 }
 
 /** 全屏时钟样式 **/
-.Clock {
+.__Clock {
   top: 10px !important;
   right: 20px !important;
   width: auto !important;
@@ -457,7 +457,7 @@ body > #loading:not(:has(video)),
 }
 
 /** 视频左上角此终显示倍速 **/
-.__rate-keep-show {
+.__rateDisplay {
   color: #c9c9c9;
   top: 5px !important;
   left: 5px !important;
@@ -470,7 +470,7 @@ body > #loading:not(:has(video)),
 }
 
 /** 视频侧边双击元素样式 */
-.video-edge-click {
+.__edgeClick {
   cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC"),
     pointer !important;
   left: 0 !important;

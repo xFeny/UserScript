@@ -38,8 +38,8 @@ export default {
     Tools.resetLimit("rateKeep", "autoWide");
 
     // 移除相关的自定义元素
-    this.removeRateKeepDisplay();
-    this.removeProgressElement();
+    this.removeRateDisplay();
+    this.removeProgElement();
   },
   initVideoPlay(video) {
     if (video._mfs_hasInited) return;
@@ -49,7 +49,7 @@ export default {
     this.applyCachedRate();
     this.applyCachedTime(video);
 
-    this.playbackRateKeepDisplay();
+    this.playbackRateDisplay();
     this.setupPlayerClock();
     this.setBiliQuality();
   },
@@ -64,20 +64,21 @@ export default {
     // 设置倍速
     VideoEnhancer.setPlaybackRate(this.player, rate);
     this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
-    this.playbackRateKeepDisplay(); // 倍速始终显示
+    this.playbackRateDisplay(); // 倍速始终显示
 
     if (!Storage.NOT_CACHE_SPEED.get()) Storage.CACHED_SPEED.set(this.player.playbackRate);
   },
   adjustPlaybackRate(step = 0.25) {
-    const rate = Math.max(Consts.MIN_SPEED, +this.player.playbackRate + step);
-    this.setPlaybackRate(Math.min(Consts.MAX_SPEED, rate));
+    const rate = Math.max(0.1, +this.player.playbackRate + step);
+    this.setPlaybackRate(Math.min(16, rate));
   },
   applyCachedRate: () => (Storage.NOT_CACHE_SPEED.get() ? App.delCachedRate() : App.setPlaybackRate(Storage.CACHED_SPEED.get())),
   delCachedRate: () => Storage.CACHED_SPEED.del(),
   // ====================⇑⇑⇑ 调节播放倍速相关逻辑 ⇑⇑⇑====================
 
   // ====================⇓⇓⇓ 调节播放进度相关逻辑 ⇓⇓⇓====================
-  skipPlayback(second = 0) {
+  skipPlayback(second = 0, bypass = false) {
+    if (!bypass && !this.isOverrideKey()) return;
     if (!this.player || this.isLive() || this.player.ended) return;
     this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
   },
@@ -102,11 +103,10 @@ export default {
     this.setCurrentTime(time);
     video._mfs_hasApplyCTime = true;
     this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
-      if (video.playbackRate === Consts.DEF_SPEED) return;
-      Tools.setStyle(el, "transform", `translateY(${-5 - el.offsetHeight}px)`);
+      if (Tools.query(".monkey-toast")) Tools.setStyle(el, "transform", `translateY(${-5 - el.offsetHeight}px)`);
     });
   },
-  setCurrentTime: (currentTime) => currentTime && (App.player.currentTime = Math.max(0, currentTime)),
+  setCurrentTime: (ct) => ct && (App.player.currentTime = Math.max(0, ct)),
   clearCachedTime: (video) => App.topWin && Storage.PLAY_TIME.del(App.getUniqueKey(video)),
   getUniqueKey(video, { duration, __duration } = video) {
     if (video._mfs_cacheTKey) return video._mfs_cacheTKey;
@@ -157,7 +157,7 @@ export default {
     const tsr = this.player.tsr;
     const step = Storage.ZOOM_PERCENT.get();
     const zoom = tsr.zoom + (isDown ? -step : step);
-    if (zoom < Consts.MIN_ZOOM || zoom > Consts.MAX_ZOOM) return;
+    if (zoom < 25 || zoom > 400) return;
 
     tsr.zoom = zoom;
     this.setTsr("--zoom", zoom / 100);
@@ -230,7 +230,7 @@ export default {
       GM_download({ url, name: `视频截图_${Date.now()}.png`, onload: () => URL.revokeObjectURL(url) });
     } catch (e) {
       Tools.setStyle(canvas, "max-width", "97vw");
-      const popup = window.open(Consts.EMPTY, "_blank", "width=1000,height=570,top=130,left=270");
+      const popup = window.open("", "_blank", "width=1000,height=570,top=130,left=270");
       popup.document.title = "鼠标右键选择「图片另存为」";
       popup.document.body.appendChild(canvas);
       console.error(e);
@@ -242,8 +242,7 @@ export default {
     this.player.currentTime += (isPrev ? -1 : 1) / 24;
   },
   autoNextEnabled() {
-    const status = !Storage.IS_AUTO_NEXT.get();
-    Storage.IS_AUTO_NEXT.set(status);
+    const status = Storage.IS_AUTO_NEXT.set(!Storage.IS_AUTO_NEXT.get());
     this.showToast(`已${status ? "启" : "禁"}用自动切换下集`);
   },
   customToast(startText, colorText, endText, duration, isRemove) {

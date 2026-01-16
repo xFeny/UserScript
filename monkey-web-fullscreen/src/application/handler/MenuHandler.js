@@ -1,5 +1,4 @@
 import Storage from "../common/Storage";
-import Consts from "../common/Consts";
 import Tools from "../common/Tools";
 import Site from "../common/Site";
 import Swal from "sweetalert2";
@@ -44,7 +43,7 @@ export default {
       GM_unregisterMenuCommand(this[id]);
       if (isHidden) return;
 
-      const host = useHost ? this.host : Consts.EMPTY;
+      const host = useHost ? this.host : "";
       this[id] = GM_registerMenuCommand(title, () => {
         if (fn) return fn.call(this, { host, cache, title }); // 自定义逻辑
 
@@ -80,11 +79,11 @@ export default {
     // 偶数索引时创建新行，奇数索引时补充到上一行
     const rows = shortcutKeys.reduce((acc, item, i) => {
       if (i % 2 === 0) {
-        const next = shortcutKeys[i + 1] || { key: Consts.EMPTY, desc: Consts.EMPTY };
+        const next = shortcutKeys[i + 1] || { key: "", desc: "" };
         return acc + `<tr><td>${item.key}</td><td>${item.desc}</td><td>${next.key}</td><td>${next.desc}</td></tr>`;
       }
       return acc;
-    }, Consts.EMPTY);
+    }, "");
 
     Swal.fire({
       width: 650,
@@ -191,7 +190,7 @@ export default {
     const confs = [
       { name: "step", text: "倍速步进", cache: Storage.SPEED_STEP },
       { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
-      { name: "zero", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP_INTERVAL },
+      { name: "zero", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP },
       { name: "advance", text: "下集提前秒数", cache: Storage.NEXT_ADVANCE_SEC },
       { name: "days", text: "进度保存天数", cache: Storage.STORAGE_DAYS },
       { name: "percent", text: "缩放百分比", cache: Storage.ZOOM_PERCENT },
@@ -228,15 +227,15 @@ export default {
       .filter(({ isHide }) => !isHide)
       .map((conf) => {
         const { cache, attrs = [], useHost } = conf;
-        const host = useHost ? this.host : Consts.EMPTY;
         const value = useHost ? cache.get(this.host) : cache.get();
+        const host = useHost ? this.host : "";
 
         if (useHost && !attrs.includes("host")) attrs.push("host");
         return { ...conf, host, value, dataset: getDataset(attrs, this.host) };
       });
 
     // 生成HTML字符串
-    const html = finalConfs.map((conf) => render(conf)).join(Consts.EMPTY);
+    const html = finalConfs.map((conf) => render(conf)).join("");
 
     // name-cache 关系映射
     const cacheMap = Object.fromEntries(finalConfs.map((e) => [e.name, e.cache]));

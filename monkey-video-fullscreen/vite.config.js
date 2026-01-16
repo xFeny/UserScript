@@ -19,10 +19,10 @@ export default defineConfig({
       entry: "src/main.js",
       userscript: {
         author: "Feny",
-        version: "3.8.9",
+        version: "3.9.0",
         match: ["*://*/*"],
-        license: "GPL-3.0-only",
         name: "视频网页全屏",
+        license: "GPL-3.0-only",
         "run-at": "document-start",
         description: description.join("；"),
         namespace: "npm/vite-plugin-monkey",

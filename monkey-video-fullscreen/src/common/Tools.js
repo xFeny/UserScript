@@ -16,6 +16,7 @@ export default {
   attr: (el, name, val) => el && name && el[val ? "setAttribute" : "removeAttribute"](name, val),
   emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
   isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
+  createElement: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
   sendToIFrames(data) {
     this.getIFrames().forEach((el) => this.postMessage(el?.contentWindow, data));
   },
@@ -49,7 +50,7 @@ export default {
     if (parent instanceof ShadowRoot) return parent.host;
     return parent === document ? null : parent;
   },
-  getParents(el, self = false, max = Infinity) {
+  getParents(el, max = Infinity, self = true) {
     const parents = self && el ? [el] : [];
     for (let current = el, deep = 0; current && deep < max; deep++) {
       current = this.getParent(current);
