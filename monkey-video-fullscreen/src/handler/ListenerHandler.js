@@ -6,7 +6,7 @@ import Consts from "../common/Consts";
  */
 export default {
   isMutedLoop: (video) => video?.muted && video?.loop,
-  isNoVideo: () => !window.videoInfo && !window.topWin,
+  isNoVideo: () => !window.vMeta && !window.topWin,
   init(isNonFirst = false) {
     this.docElement = document.documentElement;
 

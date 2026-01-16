@@ -43,7 +43,7 @@ export default {
   },
   processEvent(data) {
     // 规避父窗口视频对 iframe 内视频网页全屏的干扰
-    if (this.videoInfo?.iFrame && this.player) delete this.player;
+    if (this.vMeta?.iFrame && this.player) delete this.player;
 
     // 视频可能在 iframe 中，向 iframe 传递操作
     if (!this.player) Tools.sendToIFrames(data);
@@ -88,7 +88,7 @@ export default {
   handleMessage(data) {
     // Tools.log(location.href, "接收到消息：", data);
     if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
-    if (data?.videoInfo) return this.syncVideoToParentWin(data.videoInfo);
+    if (data?.vMeta) return this.syncMetaToParentWin(data.vMeta);
     if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
     if (data?.topWin) window.topWin = this.topWin = data.topWin;
 

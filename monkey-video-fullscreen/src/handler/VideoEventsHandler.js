@@ -56,12 +56,12 @@ export default {
   },
   setPlayer(video) {
     this.player = video;
-    const videoInfo = { isLive: video.duration === Infinity, timestamp: Date.now() };
-    this.syncVideoToParentWin(videoInfo);
+    const vMeta = { isLive: video.duration === Infinity, timestamp: Date.now() };
+    this.syncMetaToParentWin(vMeta);
   },
-  syncVideoToParentWin(videoInfo) {
-    window.videoInfo = this.videoInfo = videoInfo;
-    if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { videoInfo: { ...videoInfo, iFrame: location.href } });
+  syncMetaToParentWin(vMeta) {
+    window.vMeta = this.vMeta = vMeta;
+    if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { vMeta: { ...vMeta, iFrame: location.href } });
     Tools.microTask(() => this.initMenuCmds());
     this.sendTopWinInfo();
   },

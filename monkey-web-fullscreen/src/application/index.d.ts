@@ -11,7 +11,7 @@ declare global {
     /**
      * 视频信息
      */
-    videoInfo?: { isLive: Boolean; iFrame: string; centerX: Number; centerY: Number };
+    vMeta?: { isLive: Boolean; iFrame: string };
 
     /**
      * 顶级窗口信息

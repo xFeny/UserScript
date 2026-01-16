@@ -73,9 +73,9 @@ export default {
     return this.getVideoIFrame() ?? Tools.getIFrames().find(Tools.isVisible);
   },
   getVideoIFrame() {
-    if (!this.videoInfo?.iFrame) return null;
+    if (!this.vMeta?.iFrame) return null;
 
-    const { pathname, search } = new URL(this.videoInfo.iFrame);
+    const { pathname, search } = new URL(this.vMeta.iFrame);
     const partial = ((s) => s.slice(0, s.length * 0.8))(decodeURIComponent(search));
     return Tools.query(`iframe[src*="${pathname + partial}"]`);
   },

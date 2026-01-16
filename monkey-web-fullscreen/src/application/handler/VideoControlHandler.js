@@ -10,8 +10,8 @@ import VideoEnhancer from "../VideoEnhancer";
  */
 export default {
   isLive() {
-    if (!this.videoInfo || !this.player) return false;
-    return this.videoInfo.isLive || this.player?.duration === Infinity || this.isDynamicDur(this.player);
+    if (!this.vMeta || !this.player) return false;
+    return this.vMeta.isLive || this.player?.duration === Infinity || this.isDynamicDur(this.player);
   },
   isDynamicDur(video) {
     if (video._mfs_isDynamic || video.currentTime > video.__duration) return true;
