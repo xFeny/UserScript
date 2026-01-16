@@ -52,10 +52,10 @@ export default {
   execKeyActions({ key, bypass, isTrusted }) {
     // Tools.log("按下的键：", { key, isTrusted });
     const dict = {
-      M: () => this.toggleMute(),
+      M: () => this.muteVideo(),
       R: () => this.rotateVideo(),
-      L: () => this.freezeVideoFrame(),
-      K: () => this.freezeVideoFrame(!0),
+      L: () => this.freezeFrame(),
+      K: () => this.freezeFrame(!0),
       ENTER: () => this.toggleFullscreen(),
       P: () => this.toggleWebFullscreen(isTrusted),
       D: () => Site.isGmMatch() && this.triggerIconElement(Site.icons.danmaku),
@@ -65,16 +65,16 @@ export default {
       RIGHT: () => this.skipPlayback(Storage.SKIP_INTERVAL.get(), bypass),
       0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP.get(), !0) || 0,
       SHIFT_A: () => this.autoNextEnabled(),
-      SHIFT_R: () => this.flipHorizontal(),
       CTRL_ALT_A: () => this.screenshot(),
       ALT_SUB: () => this.zoomVideo(!0),
       ALT_ADD: () => this.zoomVideo(),
+      SHIFT_R: () => this.horizFlip(),
       CTRL_Z: () => this.resetTsr(),
     };
 
     // 倍速加减
     const step = Storage.SPEED_STEP.get();
-    ["A", "S", "ADD", "SUB"].forEach((k, i) => (dict[k] = () => this.adjustPlaybackRate((i % 2 ? -1 : 1) * step)));
+    ["A", "S", "ADD", "SUB"].forEach((k, i) => (dict[k] = () => this.adjustPlayRate((i % 2 ? -1 : 1) * step)));
 
     // 视频移动
     ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => (dict[k] = () => this.moveVideo(k)));
@@ -93,12 +93,12 @@ export default {
     if (data?.topWin) window.topWin = this.topWin = data.topWin;
 
     // 处理设置时传递过来的消息
-    this.handleSettMessage(data);
+    this.handleConfsMessage(data);
 
     // 处理键盘按键消息和继续分发消息
     this.processEvent(data);
   },
-  handleSettMessage(data) {
+  handleConfsMessage(data) {
     // 处理在 “更多设置” 中操作功能切换（启用/禁用）时发来的消息
     if (data?.sw_zoom) this.resetTsr(); // 禁用缩放
     if (data?.sw_memory) this.delCachedRate(); // 禁用记忆倍速

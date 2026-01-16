@@ -68,7 +68,7 @@ export default {
 
     if (!Storage.NOT_CACHE_SPEED.get()) Storage.CACHED_SPEED.set(this.player.playbackRate);
   },
-  adjustPlaybackRate(step = 0.25) {
+  adjustPlayRate(step = 0.25) {
     const rate = Math.max(0.1, +this.player.playbackRate + step);
     this.setPlaybackRate(Math.min(16, rate));
   },
@@ -134,22 +134,22 @@ export default {
   // ====================⇑⇑⇑ 调节播放进度相关逻辑 ⇑⇑⇑====================
 
   // ====================⇓⇓⇓ 视频画面变换相关逻辑 ⇓⇓⇓====================
-  flipHorizontal() {
+  horizFlip() {
     if (!this.player) return;
 
     const tsr = this.player.tsr;
-    tsr.isMirrored = !tsr.isMirrored;
-    this.setTsr("--mirror", tsr.isMirrored ? -1 : 1);
+    tsr.isMirror = !tsr.isMirror;
+    this.setTsr("--mirror", tsr.isMirror ? -1 : 1);
   },
   rotateVideo() {
     if (!this.player) return;
 
     const tsr = this.player.tsr;
-    tsr.rotation = (tsr.rotation + 90) % 360;
+    tsr.rotate = (tsr.rotate + 90) % 360;
     const { videoWidth, videoHeight } = this.player;
-    const isVertical = [90, 270].includes(tsr.rotation);
+    const isVertical = [90, 270].includes(tsr.rotate);
     const scale = isVertical ? videoHeight / videoWidth : 1;
-    this.setTsr("--scale", scale).setTsr("--rotate", `${tsr.rotation}deg`);
+    this.setTsr("--scale", scale).setTsr("--rotate", `${tsr.rotate}deg`);
   },
   zoomVideo(isDown) {
     if (!this.player || this.isDisZoom()) return;
@@ -177,9 +177,9 @@ export default {
     let { x, y, x: _x, desc } = dirs[direction];
 
     // 修正翻转后的移动方向
-    if (tsr.isMirrored) (x = -x), (_x = x);
+    if (tsr.isMirror) (x = -x), (_x = x);
     // 修正旋转后的移动方向
-    ({ 90: () => ((x = y), (y = -_x)), 180: () => ((x = -x), (y = -y)), 270: () => ((x = -y), (y = _x)) })[tsr.rotation]?.();
+    ({ 90: () => ((x = y), (y = -_x)), 180: () => ((x = -x), (y = -y)), 270: () => ((x = -y), (y = _x)) })[tsr.rotate]?.();
 
     // 赋值
     (tsr.moveX += x), (tsr.moveY += y);
@@ -208,7 +208,7 @@ export default {
   },
   // ====================⇑⇑⇑ 视频画面变换相关逻辑 ⇑⇑⇑====================
 
-  toggleMute() {
+  muteVideo() {
     if (!this.player) return;
 
     // 判断当前是否为静音状态（同时检查 muted 和 volume）
@@ -236,7 +236,7 @@ export default {
       console.error(e);
     }
   },
-  freezeVideoFrame(isPrev) {
+  freezeFrame(isPrev) {
     if (!this.player) return;
     !this.player.paused && this.player.pause();
     this.player.currentTime += (isPrev ? -1 : 1) / 24;
@@ -245,21 +245,21 @@ export default {
     const status = Storage.IS_AUTO_NEXT.set(!Storage.IS_AUTO_NEXT.get());
     this.showToast(`已${status ? "启" : "禁"}用自动切换下集`);
   },
-  customToast(startText, colorText, endText, duration, isRemove) {
+  customToast(start, text, end, dealy, isRemove) {
     // 最终呈现：<span>正在以<span class="cText">1.15x</span>倍速播放</span>
     const span = document.createElement("span");
-    const child = Tools.createElement("span", { textContent: colorText, className: "cText" });
-    span.append(document.createTextNode(startText), child, document.createTextNode(endText));
-    return this.showToast(span, duration, isRemove);
+    const child = Tools.createElement("span", { textContent: text, className: "cText" });
+    span.append(document.createTextNode(start), child, document.createTextNode(end));
+    return this.showToast(span, dealy, isRemove);
   },
-  showToast(content, duration = Consts.THREE_SEC, isRemove = true) {
+  showToast(content, dealy = Consts.THREE_SEC, isRemove = true) {
     return new Promise((resolve) => {
       if (isRemove) Tools.query(".monkey-toast")?.remove();
       const el = Tools.createElement("div", { className: "monkey-toast" });
       content instanceof Element ? el.appendChild(content) : (el.textContent = content);
 
       this.findVideoContainer(null, 2, false).prepend(el), resolve(el);
-      setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.HALF_SEC)), duration);
+      setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.HALF_SEC)), dealy);
     });
   },
 };

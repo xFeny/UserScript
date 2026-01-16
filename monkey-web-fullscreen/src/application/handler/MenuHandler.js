@@ -11,7 +11,7 @@ export default {
   noAutoDefault: () => Storage.NO_AUTO_DEF.get(),
   isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
   isDisZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
-  isAutoSite: () => Storage.IS_SITE_AUTO.get(Tools.isTopWin() ? location.host : window.topWin?.host),
+  isAutoSite: () => Storage.IS_SITE_AUTO.get(window.topWin?.host ?? location.host),
   initMenuCmds() {
     if (this.isExecuted("hasMenu") || !Tools.isTopWin()) return;
     this.setupMenuStorageListener();
@@ -100,14 +100,12 @@ export default {
     const cacheMap = Object.assign({}, ...[a, b, c, d].map((it) => it.eCache));
     const html = `
         <div class="swal2-tabs">
-          <!-- Tabs 标题栏 -->
           <div class="swal2-tabs-header">
               <div class="swal2-tab active" data-id="tab1">播放设置</div>
               <div class="swal2-tab" data-id="tab2">辅助设置</div>
               <div class="swal2-tab" data-id="tab3">参数设置</div>
               <div class="swal2-tab" data-id="tab4">其他设置</div>
           </div>
-          <!-- Tabs 内容区 -->
           <div class="swal2-tabs-content">
             <div class="swal2-tab-panel active" id="tab1">${a.html}</div>
             <div class="swal2-tab-panel" id="tab2">${b.html}</div>

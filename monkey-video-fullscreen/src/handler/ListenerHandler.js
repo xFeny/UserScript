@@ -17,7 +17,7 @@ export default {
 
     if (isNonFirst) return;
     this.setupDocumentObserver();
-    this.setupIgnoreUrlsChangeListener();
+    this.setupIgnoreChangeListener();
     this.setupShadowVideoListener();
   },
   /**

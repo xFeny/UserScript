@@ -5,7 +5,7 @@ import Storage from "../common/Storage";
  * 脚本菜单相关逻辑处理
  */
 export default {
-  isAuto: () => Storage.IS_AUTO.get(Tools.isTopWin() ? location.host : window.topWin?.host),
+  isAuto: () => Storage.IS_AUTO.get(window.topWin?.host ?? location.host),
   initMenuCmds() {
     if (this.hasMenu || !Tools.isTopWin()) return;
     GM_addValueChangeListener(Storage.IS_AUTO.name + location.host, () => this.setupMenuCmds());

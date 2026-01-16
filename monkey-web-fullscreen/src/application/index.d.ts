@@ -55,7 +55,7 @@ declare global {
      * 调整播放倍速（递增/递减）
      * @param {number} [step=Storage.SPEED_STEP.get()] - 步长
      */
-    adjustPlaybackRate(step?: number): void;
+    adjustPlayRate(step?: number): void;
 
     /**
      * 获取进度缓存 key

@@ -6,7 +6,7 @@ import Storage from "../common/Storage";
  * 自动网页全屏时忽略的网址
  */
 export default {
-  setupIgnoreUrlsChangeListener() {
+  setupIgnoreChangeListener() {
     [Storage.FULL_IGNORE_URLS, Storage.NEXT_IGNORE_URLS].forEach((it) =>
       GM_addValueChangeListener(it.name, (_, oldVal, newVal) => oldVal !== newVal && this.initIgnoreUrls())
     );

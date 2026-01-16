@@ -26,7 +26,7 @@ export default {
     if (isNonFirst) return;
     this.setupDocumentObserver();
     this.observeWebFullscreenChange();
-    this.setupIgnoreUrlsChangeListener();
+    this.setupIgnoreChangeListener();
     this.setupShadowVideoListener();
     this.setupLoadEventListener();
   },
@@ -65,8 +65,7 @@ export default {
   syncMetaToParentWin(vMeta) {
     window.vMeta = this.vMeta = vMeta;
     if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { vMeta: { ...vMeta, iFrame: location.href } });
-    Tools.microTask(() => (this.setupEpisodePickerListener(), this.initMenuCmds()));
-    this.watchVideoIFrameChange();
+    Tools.microTask(() => (this.initMenuCmds(), this.watchIFrameChange(), this.setupPickerListener()));
     this.sendTopWinInfo();
   },
   sendTopWinInfo() {
@@ -90,10 +89,10 @@ export default {
   },
   /**
    * 监听视频所在iframe的src属性变化
-   * 当src发生变动时，自动退出网页全屏状态
-   * 如：https://www.ttdm1.me
+   * 当src发生变动时，自动退出全屏状态
+   * 示例网站：https://www.ttdm1.me
    */
-  watchVideoIFrameChange() {
+  watchIFrameChange() {
     const iFrame = this.getVideoIFrame();
     if (!iFrame || this.isExecuted("observed", iFrame)) return;
 

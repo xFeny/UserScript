@@ -14,7 +14,7 @@ import Swal from "sweetalert2";
  * https://www.freeok123.com/
  */
 export default {
-  setupEpisodePickerListener() {
+  setupPickerListener() {
     if (Site.isGmMatch() || this.isExecuted("isBindPicker")) return;
 
     const handle = (event, { target, ctrlKey, altKey, isTrusted } = event) => {

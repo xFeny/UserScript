@@ -5,7 +5,7 @@ import Storage from "../common/Storage";
  */
 export default {
   initIgnoreUrls: () => (App.urlFilter = App.getIgnoreUrls()),
-  setupIgnoreUrlsChangeListener() {
+  setupIgnoreChangeListener() {
     GM_addValueChangeListener(Storage.IGNORE_URLS.name, (_, oldVal, newVal) => oldVal !== newVal && this.initIgnoreUrls());
   },
   isIgnoreUrl() {
