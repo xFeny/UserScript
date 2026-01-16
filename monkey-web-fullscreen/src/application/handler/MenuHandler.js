@@ -18,21 +18,21 @@ export default {
     this.setupMenuCmds();
   },
   setupMenuStorageListener() {
-    [Storage.IS_SITE_AUTO.name + this.host, Storage.CURRENT_EPISODE.name + this.host].forEach((key) =>
-      GM_addValueChangeListener(key, () => this.setupMenuCmds())
+    [Storage.IS_SITE_AUTO, Storage.CURRENT_EPISODE].forEach((it) =>
+      GM_addValueChangeListener(`${it.name}${this.host}`, () => this.setupMenuCmds())
     );
   },
   setupMenuCmds() {
-    const noPicker = !Storage.CURRENT_EPISODE.get(this.host);
-    const siteTitle = `此站${this.isAutoSite() ? "禁" : "启"}用自动网页全屏`;
-    const siteFun = ({ host, cache }) => cache.set(!cache.get(host), host);
-    const delPicker = ({ host }) => Storage.CURRENT_EPISODE.del(host) & Storage.RELATIVE_EPISODE.del(host);
+    const epHide = !Storage.CURRENT_EPISODE.get(this.host);
+    const tle = `此站${this.isAutoSite() ? "禁" : "启"}用自动网页全屏`;
+    const fn = ({ host, cache }) => cache.set(!cache.get(host), host);
+    const delFn = ({ host }) => Storage.CURRENT_EPISODE.del(host) & Storage.RELATIVE_EPISODE.del(host);
 
     // 菜单配置项
     const configs = [
-      { title: siteTitle, cache: Storage.IS_SITE_AUTO, useHost: true, isHidden: Site.isGmMatch(), fn: siteFun },
+      { title: tle, cache: Storage.IS_SITE_AUTO, useHost: true, isHidden: Site.isGmMatch(), fn },
       { title: "此站脱离式全屏阈值", cache: Storage.DETACH_THRESHOLD, useHost: true, isHidden: Site.isGmMatch() },
-      { title: "删除此站剧集选择器", cache: Storage.CURRENT_EPISODE, useHost: true, isHidden: noPicker, fn: delPicker },
+      { title: "删除此站剧集选择器", cache: Storage.CURRENT_EPISODE, useHost: true, isHidden: epHide, fn: delFn },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: this.shortcutKeysPopup },
       { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: this.settingPopup },
     ];
@@ -54,7 +54,7 @@ export default {
     });
   },
   shortcutKeysPopup() {
-    const shortcutKeys = [
+    const shortKeys = [
       { key: "Enter", desc: "全屏" },
       { key: "P", desc: "网页全屏" },
       { key: "N", desc: "切换下集" },
@@ -77,9 +77,9 @@ export default {
     ];
 
     // 偶数索引时创建新行，奇数索引时补充到上一行
-    const rows = shortcutKeys.reduce((acc, item, i) => {
+    const rows = shortKeys.reduce((acc, item, i) => {
       if (i % 2 === 0) {
-        const next = shortcutKeys[i + 1] || { key: "", desc: "" };
+        const next = shortKeys[i + 1] || { key: "", desc: "" };
         return acc + `<tr><td>${item.key}</td><td>${item.desc}</td><td>${next.key}</td><td>${next.desc}</td></tr>`;
       }
       return acc;
@@ -96,12 +96,9 @@ export default {
     });
   },
   settingPopup() {
-    const { html: basic, cacheMap: bCache } = this.genBasics();
-    const { html: assist, cacheMap: aCache } = this.genAssist();
-    const { html: params, cacheMap: pCache } = this.genParams();
-    const { html: ignore, cacheMap: iCache } = this.genIgnore();
-    const cacheMap = { ...bCache, ...aCache, ...pCache, ...iCache };
-    const modalHtml = `
+    const [a, b, c, d] = [this.genBasics(), this.genAssist(), this.genParams(), this.genIgnore()];
+    const cacheMap = Object.assign({}, ...[a, b, c, d].map((it) => it.eCache));
+    const html = `
         <div class="swal2-tabs">
           <!-- Tabs 标题栏 -->
           <div class="swal2-tabs-header">
@@ -112,10 +109,10 @@ export default {
           </div>
           <!-- Tabs 内容区 -->
           <div class="swal2-tabs-content">
-            <div class="swal2-tab-panel active" id="tab1">${basic}</div>
-            <div class="swal2-tab-panel" id="tab2">${assist}</div>
-            <div class="swal2-tab-panel" id="tab3">${params}</div>
-            <div class="swal2-tab-panel" id="tab4">${ignore}</div>
+            <div class="swal2-tab-panel active" id="tab1">${a.html}</div>
+            <div class="swal2-tab-panel" id="tab2">${b.html}</div>
+            <div class="swal2-tab-panel" id="tab3">${c.html}</div>
+            <div class="swal2-tab-panel" id="tab4">${d.html}</div>
           </div>
         </div>`;
 
@@ -125,7 +122,7 @@ export default {
       showCancelButton: true,
       cancelButtonText: "关闭",
       showConfirmButton: false,
-      html: Tools.safeHTML(modalHtml),
+      html: Tools.safeHTML(html),
       customClass: { container: "monkey-web-fullscreen" },
       didOpen(popup) {
         // 处理Tabs切换
@@ -152,7 +149,7 @@ export default {
     const confs = [
       { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_SPEED, attrs: ["send", "delay"] },
       { name: "memory", text: "禁用 记忆倍速", cache: Storage.NOT_CACHE_SPEED, attrs: ["send"] },
-      { name: "time", text: "禁用 记忆进度", cache: Storage.NOT_CACHE_TIME },
+      { name: "prog", text: "禁用 记忆进度", cache: Storage.NOT_CACHE_TIME },
       { name: "tabs", text: "禁用 不可见暂停", cache: Storage.IS_INVISIBLE_PAUSE },
       { name: "try", text: "禁用 尝试自动播放", cache: Storage.DISABLE_TRY_PLAY },
       { name: "next", text: "启用 自动切换下集", cache: Storage.IS_AUTO_NEXT },
@@ -169,8 +166,8 @@ export default {
   },
   genAssist() {
     const confs = [
-      { name: "fit", text: "禁用 默认自动", cache: Storage.NO_AUTO_DEF },
-      { name: "pic", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
+      { name: "autoDef", text: "禁用 默认自动", cache: Storage.NO_AUTO_DEF },
+      { name: "shot", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
       { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, attrs: ["send"] },
       { name: "clock", text: "禁用 全屏显时间", cache: Storage.DISABLE_CLOCK },
       { name: "clockAlw", text: "启用 非全屏显时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
@@ -208,9 +205,9 @@ export default {
   },
   genIgnore() {
     const confs = [
-      { name: "custom", text: "自定义此站视频容器", cache: Storage.CUSTOM_WEB_FULL, isHide: Site.isGmMatch(), useHost: true },
-      { name: "nextIg", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: Storage.NEXT_IGNORE_URLS },
-      { name: "fsIg", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: Storage.FULL_IGNORE_URLS },
+      { name: "customCnt", text: "自定义此站视频容器", cache: Storage.CUSTOM_WEB_FULL, isHide: Site.isGmMatch(), useHost: true },
+      { name: "ignoreNext", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: Storage.NEXT_IGNORE_URLS },
+      { name: "ignoreFs", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: Storage.FULL_IGNORE_URLS },
     ];
 
     const render = ({ text, dataset, name, value }) => `
@@ -238,8 +235,8 @@ export default {
     const html = finalConfs.map((conf) => render(conf)).join("");
 
     // name-cache 关系映射
-    const cacheMap = Object.fromEntries(finalConfs.map((e) => [e.name, e.cache]));
+    const eCache = Object.fromEntries(finalConfs.map((e) => [e.name, e.cache]));
 
-    return { html, cacheMap };
+    return { html, eCache };
   },
 };

@@ -91,6 +91,8 @@ export default {
     this.videoParents.clear();
     this.fsPlaceholder = this.fsWrapper = this.fsParent = null;
   },
+
+  // ====================⇓⇓⇓ 获取视频容器相关逻辑 ⇓⇓⇓====================
   getVideoHostContainer() {
     if (this.player) return this.getVideoContainer();
     return this.getVideoIFrame() ?? Tools.getIFrames().find(Tools.isVisible);
@@ -144,6 +146,8 @@ export default {
       return value && sizeRegex.test(value);
     });
   },
+  // ====================⇑⇑⇑ 获取视频容器相关逻辑 ⇑⇑⇑====================
+
   /**
    * 适配网页全屏下视频父元素的宽高，确保视频全屏显示正常
    * @description 解决因外联CSS设置固定宽高，导致父元素宽高未适配的问题

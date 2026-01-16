@@ -119,7 +119,7 @@ export default {
     // 全屏时移除输入框焦点（解决B站自动聚焦问题）
     isFullscreen && Tools.isInputable(document.activeElement) && document.activeElement.blur();
 
-    // 如果是通过按`Esc`而不是`Enter`退出全屏模式时
+    // 处理通过Esc键而非Enter键退出全屏模式的场景
     !isFullscreen && this.fsWrapper && this.dispatchShortcut(Keyboard.P);
 
     // 播放器右上角时间的显/隐
