@@ -172,7 +172,7 @@ export default {
     [x, y] = rMap[tsr.rotate]?.() || [x, y];
 
     // 赋值
-    (tsr.mvX += x), (tsr.mvY += y);
+    ((tsr.mvX += x), (tsr.mvY += y));
     this.setTsr("--mvX", `${tsr.mvX}px`).setTsr("--mvY", `${tsr.mvY}px`);
     this.showToast(`向${desc}移动：${x ? tsr.mvX : tsr.mvY}px`, Consts.ONE_SEC);
   },
@@ -248,7 +248,7 @@ export default {
       const el = Tools.createElement("div", { className: "monkey-toast" });
       content instanceof Element ? el.appendChild(content) : (el.textContent = content);
 
-      this.findVideoContainer(null, 2, false).prepend(el), resolve(el);
+      (this.findVideoContainer(null, 2, false).prepend(el), resolve(el));
       setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.HALF_SEC)), dealy);
     });
   },

@@ -46,7 +46,7 @@ export default {
   setupDocumentObserver() {
     new MutationObserver(() => {
       if (this.docElement === document.documentElement) return;
-      this.init(true), document.head.append(gmStyle.cloneNode(true));
+      (this.init(true), document.head.append(gmStyle.cloneNode(true)));
     }).observe(document, { childList: true });
   },
   // ====================⇓⇓⇓ 设置当前视频相关逻辑 ⇓⇓⇓====================
@@ -83,7 +83,7 @@ export default {
     const onChange = (v) => (delete this.topWin, this.setPlayer(v));
     VideoEnhancer.defineProperty(video, isFake ? "srcConfig" : "src", {
       set(value, setter) {
-        setter(value), value && this === App.player && onChange(this);
+        (setter(value), value && this === App.player && onChange(this));
       },
     });
   },
@@ -128,7 +128,7 @@ export default {
     const handle = (e, { code, type } = e) => {
       if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
       if (this.isInputFocus(e) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
-      Tools.preventDefault(e), Object.is(type, "keydown") && this.dispatchShortcut(code, { bypass: true });
+      (Tools.preventDefault(e), Object.is(type, "keydown") && this.dispatchShortcut(code, { bypass: true }));
     };
 
     VideoEnhancer.defineProperty(this, "fsWrapper", {
@@ -151,7 +151,7 @@ export default {
 
       // 有视频信息时才切换鼠标光标的显隐
       if (this.isNoVideo()) return;
-      clearTimeout(timer), this.toggleCursor();
+      (clearTimeout(timer), this.toggleCursor());
       timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
     };
 

@@ -11,7 +11,7 @@ export default {
     if (video) this.videoAborts.get(video)?.abort(); // 防止重复绑定
     const handle = (e) => this[e.type](video ?? e.target);
     this.videoEvts.forEach((t) => (video ?? document).addEventListener(t, handle, { capture: true, signal: ctrl.signal }));
-    if (video) this.videoAborts.set(video, ctrl), this.unbindVideoEvts();
+    if (video) (this.videoAborts.set(video, ctrl), this.unbindVideoEvts());
   },
   setupShadowVideoListener() {
     document.addEventListener("shadow-video", (e) => {
@@ -25,7 +25,7 @@ export default {
     if (Tools.isThrottle("cleanup", 100)) return;
     this.videoAborts.forEach((ctrl, video) => {
       if (Tools.isAttached(video)) return;
-      ctrl.abort(), video.removeAttribute("received"), this.videoAborts.delete(video);
+      (ctrl.abort(), video.removeAttribute("received"), this.videoAborts.delete(video));
     });
   },
   // ====================⇓⇓⇓ 视频监听事件相关逻辑 ⇓⇓⇓====================

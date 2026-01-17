@@ -67,7 +67,7 @@ export default class Clock {
 
   stop(hide = false) {
     this.isRun = false; // 优先标记停止，阻断update循环
-    if (this.timerId) clearInterval(this.timerId), delete this.timerId;
+    if (this.timerId) (clearInterval(this.timerId), delete this.timerId);
     if (hide) this.element?.style.setProperty("display", "none");
   }
 

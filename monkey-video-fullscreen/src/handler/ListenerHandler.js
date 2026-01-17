@@ -27,7 +27,7 @@ export default {
   setupDocumentObserver() {
     new MutationObserver(() => {
       if (this.docElement === document.documentElement) return;
-      this.init(true), document.head.append(gmStyle.cloneNode(true));
+      (this.init(true), document.head.append(gmStyle.cloneNode(true)));
     }).observe(document, { childList: true });
   },
   setupFullscreenListener() {

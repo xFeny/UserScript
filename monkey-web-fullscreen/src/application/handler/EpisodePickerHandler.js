@@ -95,7 +95,7 @@ export default {
       focusDeny: true,
       preDeny: () => {
         const value = Tools.query("#__picker").value.trim();
-        return value ? onVerify.call(this, value) ?? false : Tools.notyf("元素选择器不能为空！", true);
+        return value ? (onVerify.call(this, value) ?? false) : Tools.notyf("元素选择器不能为空！", true);
       },
       preConfirm: () => Tools.query("#__picker").value.trim() || Tools.notyf("元素选择器不能为空！", true),
       didOpen: () => (Tools.query("#__picker").value = Tools.getElementPath(el)),
