@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import monkey, { util, cdn } from "vite-plugin-monkey";
-import AutoImport from "unplugin-auto-import/vite";
 import cleanup from "rollup-plugin-cleanup";
 
 // 使用自带图标进行网页全屏的，使用@match
@@ -56,10 +55,8 @@ export default defineConfig({
     rollupOptions: { plugins: [cleanup({ comments: "none", exclude: ["node_modules/**"] })] },
   },
   plugins: [
-    AutoImport({
-      imports: [util.unimportPreset],
-    }),
     monkey({
+      server: { mountGmApi: true },
       entry: "src/main.js",
       userscript: {
         match,

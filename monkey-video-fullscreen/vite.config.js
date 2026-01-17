@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
-import monkey, { util } from "vite-plugin-monkey";
-import AutoImport from "unplugin-auto-import/vite";
+import monkey from "vite-plugin-monkey";
 import cleanup from "rollup-plugin-cleanup";
 
 const description = ["快捷键：P-网页全屏，Enter-全屏", "支持侧边点击切换网页全屏", "支持自动网页全屏"];
@@ -12,10 +11,8 @@ export default defineConfig({
     rollupOptions: { plugins: [cleanup({ comments: "none", exclude: ["node_modules/**"] })] },
   },
   plugins: [
-    AutoImport({
-      imports: [util.unimportPreset],
-    }),
     monkey({
+      server: { mountGmApi: true },
       entry: "src/main.js",
       userscript: {
         author: "Feny",
