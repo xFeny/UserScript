@@ -1,6 +1,6 @@
 @mixin __tsr($def: null) {
   transform: #{$def} /**默认变换*/ scale(var(--scale, 1)) scale(var(--zoom, 1)) /**放大缩小*/ scaleX(var(--mirror, 1)) /**镜像反转*/
-    rotate(var(--rotate, 0deg)) /**旋转*/ translate(var(--moveX, 0), var(--moveY, 0)) /**平移*/ !important;
+    rotate(var(--rotate, 0deg)) /**旋转*/ translate(var(--mvX, 0), var(--mvY, 0)) /**平移*/ !important;
 }
 
 /** 信息提示 **/

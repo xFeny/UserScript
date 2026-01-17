@@ -137,59 +137,51 @@ export default {
   horizFlip() {
     if (!this.player) return;
 
-    const tsr = this.player.tsr;
-    tsr.isMirror = !tsr.isMirror;
-    this.setTsr("--mirror", tsr.isMirror ? -1 : 1);
+    const { tsr } = this.player;
+    this.setTsr("--mirror", (tsr.mirror = -tsr.mirror));
   },
   rotateVideo() {
     if (!this.player) return;
 
-    const tsr = this.player.tsr;
+    const { tsr } = this.player;
     tsr.rotate = (tsr.rotate + 90) % 360;
-    const { videoWidth, videoHeight } = this.player;
-    const isVertical = [90, 270].includes(tsr.rotate);
-    const scale = isVertical ? videoHeight / videoWidth : 1;
+    const { videoWidth: w, videoHeight: h } = this.player;
+    const scale = [90, 270].includes(tsr.rotate) ? h / w : 1;
     this.setTsr("--scale", scale).setTsr("--rotate", `${tsr.rotate}deg`);
   },
-  zoomVideo(isDown) {
+  zoomVideo(dir = 1) {
     if (!this.player || this.isDisZoom()) return;
 
-    const tsr = this.player.tsr;
+    const { tsr } = this.player;
     const step = Storage.ZOOM_PERCENT.get();
-    const zoom = tsr.zoom + (isDown ? -step : step);
-    if (zoom < 25 || zoom > 400) return;
+    const zoom = Math.max(25, Math.min(500, tsr.zoom + dir * step));
 
     tsr.zoom = zoom;
     this.setTsr("--zoom", zoom / 100);
     this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC);
   },
-  moveVideo(direction) {
+  moveVideo(key) {
     if (!this.player || this.isDisZoom()) return;
 
-    const tsr = this.player.tsr;
-    const step = Storage.MOVING_DISTANCE.get();
-    const dirs = {
-      ALT_UP: { x: 0, y: -step, desc: "向上移动" },
-      ALT_DOWN: { x: 0, y: step, desc: "向下移动" },
-      ALT_LEFT: { y: 0, x: -step, desc: "向左移动" },
-      ALT_RIGHT: { y: 0, x: step, desc: "向右移动" },
-    };
-    let { x, y, x: _x, desc } = dirs[direction];
+    const { tsr } = this.player;
+    const s = Storage.MOVING_DISTANCE.get();
+    const dMap = { ALT_UP: [0, -s, "上"], ALT_DOWN: [0, s, "下"], ALT_LEFT: [-s, 0, "左"], ALT_RIGHT: [s, 0, "右"] };
+    let [x, y, desc] = dMap[key];
+    x = tsr.mirror * x; // 镜像后的移动方向
 
-    // 修正翻转后的移动方向
-    if (tsr.isMirror) (x = -x), (_x = x);
-    // 修正旋转后的移动方向
-    ({ 90: () => ((x = y), (y = -_x)), 180: () => ((x = -x), (y = -y)), 270: () => ((x = -y), (y = _x)) })[tsr.rotate]?.();
+    // 旋转后的移动方向
+    const rMap = { 90: () => [y, -x], 180: () => [-x, -y], 270: () => [-y, x] };
+    [x, y] = rMap[tsr.rotate]?.() || [x, y];
 
     // 赋值
-    (tsr.moveX += x), (tsr.moveY += y);
-    this.setTsr("--moveX", `${tsr.moveX}px`).setTsr("--moveY", `${tsr.moveY}px`);
-    this.showToast(`${desc}：${x ? tsr.moveX : tsr.moveY}px`, Consts.ONE_SEC);
+    (tsr.mvX += x), (tsr.mvY += y);
+    this.setTsr("--mvX", `${tsr.mvX}px`).setTsr("--mvY", `${tsr.mvY}px`);
+    this.showToast(`向${desc}移动：${x ? tsr.mvX : tsr.mvY}px`, Consts.ONE_SEC);
   },
   resetTsr() {
     if (!this.player || this.isDisZoom()) return;
 
-    const styles = ["--zoom", "--moveX", "--moveY", "--scale", "--mirror", "--rotate", "--deftsr"];
+    const styles = ["--zoom", "--mvX", "--mvY", "--scale", "--mirror", "--rotate", "--deftsr"];
     styles.forEach((n) => Tools.setStyle(this.player, n));
     this.player.tsr = { ...Consts.DEF_TSR };
     Tools.delCls(this.player, "__tsr");
@@ -236,10 +228,10 @@ export default {
       console.error(e);
     }
   },
-  freezeFrame(isPrev) {
+  freezeFrame(dir = 1) {
     if (!this.player) return;
     !this.player.paused && this.player.pause();
-    this.player.currentTime += (isPrev ? -1 : 1) / 24;
+    this.player.currentTime += dir / 24;
   },
   autoNextEnabled() {
     const status = Storage.IS_AUTO_NEXT.set(!Storage.IS_AUTO_NEXT.get());
