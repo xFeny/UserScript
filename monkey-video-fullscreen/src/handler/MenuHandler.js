@@ -19,7 +19,7 @@ export default {
       { title: isAuto, cache: Storage.IS_AUTO, fn: (cache, val) => cache.set(!val, host) },
       { title: "此站脱离式全屏阈值", cache: Storage.DETACH_THRESHOLD },
       { title: "自动时忽略的网址", cache: Storage.IGNORE_URLS },
-      { title: "自定义视频容器", cache: Storage.CUSTOM_CONTAINER },
+      { title: "自定义视频容器", cache: Storage.CUSTOM_CTN },
     ];
 
     // 注册菜单项

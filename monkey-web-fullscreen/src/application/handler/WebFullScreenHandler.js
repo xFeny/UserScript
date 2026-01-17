@@ -106,9 +106,9 @@ export default {
   },
   getVideoContainer() {
     // 自定义网页全屏元素，支持多个选择器，返回第一个找到的元素
-    const selector = Storage.CUSTOM_WEB_FULL.get(this.topWin?.host)?.trim();
-    const container = selector ? this.player.closest(selector) ?? Tools.query(selector) : null;
-    return container ?? this.findVideoContainer(this.findCtrlContainer());
+    const selector = Storage.CUSTOM_CTN.get(this.topWin?.host)?.trim();
+    const ctn = selector ? this.player.closest(selector) ?? Tools.query(selector) : null;
+    return ctn ?? this.findVideoContainer(this.findCtrlContainer());
   },
   findCtrlContainer() {
     const ignore = ":not(.Drag-Control, .vjs-controls-disabled, .vjs-control-text, .xgplayer-prompt)";

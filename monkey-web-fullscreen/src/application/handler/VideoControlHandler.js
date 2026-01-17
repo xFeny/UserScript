@@ -123,13 +123,11 @@ export default {
     const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
     if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
   },
-  formatTime(seconds) {
-    if (isNaN(seconds)) return "00:00";
+  formatTime(sec) {
+    if (isNaN(sec)) return "00:00";
 
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
-    return [...(h ? [h] : []), m, s].map((unit) => String(unit).padStart(2, "0")).join(":");
+    const [h, m, s] = [~~(sec / 3600), ~~((sec % 3600) / 60), ~~(sec % 60)];
+    return (h ? [h, m, s] : [m, s]).map((v) => String(v).padStart(2, "0")).join(":");
   },
   // ====================⇑⇑⇑ 调节播放进度相关逻辑 ⇑⇑⇑====================
 

@@ -9,7 +9,7 @@ export default {
   /** 网页全屏相关：脱离原结构网页全屏的阈值 */
   DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, Number),
   /** 网页全屏相关：自定义此站视频容器 */
-  CUSTOM_CONTAINER: new BasicStorage("CUSTOM_CONTAINER_", ""),
+  CUSTOM_CTN: new BasicStorage("CUSTOM_CTN_", ""),
   /** 网页全屏相关：自动网页全屏忽略的网址 */
   IGNORE_URLS: new BasicStorage("IGNORE_URLS_", ""),
 };

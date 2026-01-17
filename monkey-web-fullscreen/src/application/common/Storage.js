@@ -8,7 +8,7 @@ export default unsafeWindow.FyStorage = {
   ICONS_SELECTOR: new BasicStorage("ICONS_SELECTOR", null),
 
   /** 网页全屏相关：自定义此站视频容器 */
-  CUSTOM_WEB_FULL: new BasicStorage("CUSTOM_WEB_FULL_", "", false, String, true),
+  CUSTOM_CTN: new BasicStorage("CUSTOM_WEB_FULL_", "", false, String, true),
   /** 网页全屏相关：禁用`@match`网址自动网页全屏 */
   NO_AUTO_DEF: new BasicStorage("DISABLE_DEFAULT_AUTO", false, false, Boolean),
   /** 网页全屏相关：此站启/禁用自动网页全屏 */

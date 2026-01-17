@@ -171,7 +171,7 @@ export default {
       { name: "clockAlw", text: "启用 非全屏显时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
       { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },
       { name: "edgeClk", text: "启用 侧边单击网页全屏", cache: Storage.ENABLE_EDGE_CLICK, attrs: ["send"] },
-    ].filter(({ isHidden }) => !isHidden);
+    ];
 
     const render = ({ text, dataset, name, value }) => `
         <label class="__menu">${text}
@@ -203,7 +203,7 @@ export default {
   },
   genIgnore() {
     const confs = [
-      { name: "customCnt", text: "自定义此站视频容器", cache: Storage.CUSTOM_WEB_FULL, isHide: Site.isGmMatch(), useHost: true },
+      { name: "customCnt", text: "自定义此站视频容器", cache: Storage.CUSTOM_CTN, isHide: Site.isGmMatch(), useHost: true },
       { name: "ignoreNext", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: Storage.NEXT_IGNORE_URLS },
       { name: "ignoreFs", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: Storage.FULL_IGNORE_URLS },
     ];
