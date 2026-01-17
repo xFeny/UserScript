@@ -140,10 +140,10 @@ export default {
   },
   hasExplicitlySize(el) {
     const style = el.style;
-    const sizeRegex = /^\d+(\.\d+)?(px|em|rem)$/;
+    const regex = /^\d+(\.\d+)?(px|em|rem)$/;
     return ["width", "height"].some((prop) => {
       const value = style?.getPropertyValue(prop);
-      return value && sizeRegex.test(value);
+      return value && regex.test(value);
     });
   },
   // ====================⇑⇑⇑ 获取视频容器相关逻辑 ⇑⇑⇑====================

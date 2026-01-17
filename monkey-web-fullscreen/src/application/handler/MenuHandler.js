@@ -209,8 +209,8 @@ export default {
     ];
 
     const render = ({ text, dataset, name, value }) => `
-        <div class="others-sett"><p>${text}</p>
-          <textarea ${dataset} name="${name}" type="text" spellcheck="false" autocomplete="off">${value}</textarea>
+        <div class="text-group"><p>${text}</p>
+          <textarea ${dataset} name="${name}" spellcheck="false" autocomplete="off">${value}</textarea>
         </div>`;
 
     return this.generate(confs, render);

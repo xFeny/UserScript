@@ -5,7 +5,7 @@ import Control from "./handler/VideoControlHandler";
 import WebFull from "./handler/WebFullScreenHandler";
 import Automatic from "./handler/AutoExecuteHandler";
 import Episode from "./handler/EpisodeSwitchHandler";
-import EpisodePicker from "./handler/EpisodePickerHandler";
+import Picker from "./handler/EpisodePickerHandler";
 import Extend from "./handler/VideoExtendHandler";
 import Ignore from "./handler/IgnoreUrlsHandler";
 import Menu from "./handler/MenuHandler";
@@ -13,7 +13,7 @@ import Menu from "./handler/MenuHandler";
 unsafeWindow.AUTO_WEB_FULLSCREEN = window.App = {};
 
 // 合并处理器方法到App并绑定上下文
-const handlers = [Listen, Keydown, Events, Control, WebFull, Automatic, Episode, EpisodePicker, Extend, Ignore, Menu];
+const handlers = [Listen, Keydown, Events, Control, WebFull, Automatic, Episode, Picker, Extend, Ignore, Menu];
 handlers.forEach((handler) => {
   const entries = Object.entries(handler);
   for (const [key, value] of entries) {
