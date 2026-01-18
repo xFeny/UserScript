@@ -17,6 +17,8 @@ export default unsafeWindow.FyStorage = {
   ENABLE_EDGE_CLICK: new BasicStorage("ENABLE_EDGE_CLICK", false, false, Boolean),
   /** 网页全屏相关：脱离原结构网页全屏的阈值 */
   DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, false, Number, true),
+  /** 网页全屏相关：全屏时要隐藏的元素 */
+  HIDE_ELEMENTS: new BasicStorage("HIDE_ELEMENTS_", "", false, undefined, true),
 
   /** 播放相关：禁用尝试自动播放 */
   DISABLE_TRY_PLAY: new BasicStorage("DISABLE_TRY_PLAY", false, false, Boolean),

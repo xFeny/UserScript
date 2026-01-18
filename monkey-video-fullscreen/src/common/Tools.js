@@ -17,6 +17,8 @@ export default {
   emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
   isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
   createElement: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
+  delCls: (el, ...cls) => el?.classList.remove(...cls),
+  addCls: (el, ...cls) => el?.classList.add(...cls),
   sendToIFrames(data) {
     this.getIFrames().forEach((el) => this.postMessage(el?.contentWindow, data));
   },

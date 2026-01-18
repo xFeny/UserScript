@@ -36,6 +36,7 @@ export default {
     if (Site.isGmMatch() && !Site.isBiliLive()) return this.triggerIconElement(Site.icons.webFull);
     if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
     this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
+    requestAnimationFrame(() => this.hideRelatedOnFullscreen());
   },
   /**
    * 进入网页全屏
@@ -161,5 +162,9 @@ export default {
       if (width === vw && height === vh && el.offsetHeight === vh) return; // 宽高已匹配，无需适配
       Tools.attr(el, Consts.webFull, true);
     });
+  },
+  hideRelatedOnFullscreen(cls = "hide") {
+    const selector = Storage.HIDE_ELEMENTS.get(this.topWin?.host);
+    selector && Tools.querys(selector).forEach((el) => (this.fsWrapper ? Tools.addCls(el, cls) : Tools.delCls(el, cls)));
   },
 };

@@ -1,6 +1,6 @@
 @mixin __tsr($def: null) {
-  transform: #{$def} /**默认变换*/ scale(var(--scale, 1)) scale(var(--zoom, 1)) /**放大缩小*/ scaleX(var(--mirror, 1)) /**镜像反转*/
-    rotate(var(--rotate, 0deg)) /**旋转*/ translate(var(--mvX, 0), var(--mvY, 0)) /**平移*/ !important;
+  transform: #{$def} /**默认变换*/ scale(var(--scale, 1)) scale(var(--zoom, 1)) /**放大缩小*/ scaleX(var(--mirror, 1))
+    /**镜像反转*/ rotate(var(--rotate, 0deg)) /**旋转*/ translate(var(--mvX, 0), var(--mvY, 0)) /**平移*/ !important;
 }
 
 /** 信息提示 **/
@@ -87,6 +87,10 @@ body[gm_webfullscreen] [gm_webfullscreen] video {
   cursor: none !important;
 }
 
+.hide {
+  display: none !important;
+}
+
 /** 拾取剧集、更多设置弹窗样式 **/
 .monkey-web-fullscreen {
   z-index: 2147483647 !important;
@@ -94,10 +98,6 @@ body[gm_webfullscreen] [gm_webfullscreen] video {
   * {
     box-sizing: border-box !important;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-  }
-
-  .hide {
-    display: none !important;
   }
 
   .swal2-popup {
@@ -167,7 +167,7 @@ body[gm_webfullscreen] [gm_webfullscreen] video {
     padding: 8px 0;
     cursor: pointer;
     color: #64748b;
-    font-weight: 500;
+    font-weight: bold;
     text-align: center;
     position: relative;
     transition: all 0.2s ease;
@@ -307,9 +307,9 @@ body[gm_webfullscreen] [gm_webfullscreen] video {
       border-radius: 3px;
       width: 100% !important;
       resize: none !important;
-      height: 75px !important;
+      height: 50px !important;
       font-size: 12px !important;
-      padding: 3px 5px !important;
+      padding: 2px 5px !important;
       border: 1px solid #cbd5e1 !important;
 
       &::-webkit-scrollbar {
@@ -461,7 +461,8 @@ body > #loading:not(:has(video)),
 
 /** 视频侧边双击元素样式 */
 .__edgeClick {
-  cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC"),
+  cursor:
+    url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC"),
     pointer !important;
   left: 0 !important;
   top: 6% !important;

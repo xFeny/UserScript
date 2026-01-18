@@ -17,6 +17,7 @@ export default {
     if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
     if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
     this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
+    requestAnimationFrame(() => this.hideRelatedOnFullscreen());
   },
   enterWebFullscreen() {
     // video的宿主容器元素
@@ -129,5 +130,9 @@ export default {
       if (width === vw && height === vh && el.offsetHeight === vh) return; // 宽高已匹配，无需适配
       Tools.attr(el, Consts.webFull, true);
     });
+  },
+  hideRelatedOnFullscreen(cls = "hide") {
+    const selector = Storage.HIDE_ELEMENTS.get(this.topWin?.host);
+    selector && Tools.querys(selector).forEach((el) => (this.fsWrapper ? Tools.addCls(el, cls) : Tools.delCls(el, cls)));
   },
 };

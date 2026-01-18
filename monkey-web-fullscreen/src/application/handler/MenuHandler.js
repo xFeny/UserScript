@@ -202,15 +202,17 @@ export default {
     return this.generate(confs, render);
   },
   genIgnore() {
+    const disabled = Site.isGmMatch();
     const confs = [
-      { name: "customCnt", text: "自定义此站视频容器", cache: Storage.CUSTOM_CTN, isHide: Site.isGmMatch(), useHost: true },
-      { name: "ignoreNext", text: "自动切换下集时忽略的网址列表（分号隔开）", cache: Storage.NEXT_IGNORE_URLS },
-      { name: "ignoreFs", text: "自动网页全屏时忽略的网址列表（分号隔开）", cache: Storage.FULL_IGNORE_URLS },
+      { name: "custCtn", text: "自定义此站视频容器", cache: Storage.CUSTOM_CTN, disabled, useHost: true },
+      { name: "hideEle", text: "此站全屏时隐藏相关元素（用 , 隔开）", cache: Storage.HIDE_ELEMENTS, disabled, useHost: true },
+      { name: "ignoreNext", text: "自动切换下集时忽略的网址列表（用 ; 隔开）", cache: Storage.NEXT_IGNORE_URLS },
+      { name: "ignoreFs", text: "自动网页全屏时忽略的网址列表（用 ; 隔开）", cache: Storage.FULL_IGNORE_URLS },
     ];
 
-    const render = ({ text, dataset, name, value }) => `
+    const render = ({ text, name, value, dataset, disabled }) => `
         <div class="text-group"><p>${text}</p>
-          <textarea ${dataset} name="${name}" spellcheck="false" autocomplete="off">${value}</textarea>
+          <textarea ${dataset} name="${name}" ${disabled ? "disabled" : ""} spellcheck="false" autocomplete="off">${value}</textarea>
         </div>`;
 
     return this.generate(confs, render);
