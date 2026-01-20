@@ -13,7 +13,7 @@ export default unsafeWindow.FyTools = {
   query: (selector, ctx) => querySelector(selector, ctx),
   querys: (selector, ctx) => querySelectorAll(selector, ctx),
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
-  toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, ""),
+  toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, Consts.EMPTY),
   postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
   getNumbers: (str) => (typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : []),
   log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),

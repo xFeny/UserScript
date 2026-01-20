@@ -1,4 +1,5 @@
 import Tools from "../common/Tools";
+import Consts from "../common/Consts";
 import Storage from "../common/Storage";
 
 /**
@@ -44,7 +45,7 @@ export default {
 
     return eles.length <= 1 ? eles[0] : eles.find((el) => Tools.hasCls(el, "cur", "active") || !!this.getEpisodeNumber(el));
   },
-  getEpisodeNumber: (el) => Tools.getNumbers(el?.innerText?.replace(/-|\./g, ""))?.shift(),
+  getEpisodeNumber: (el) => Tools.getNumbers(el?.innerText?.replace(/-|\./g, Consts.EMPTY))?.shift(),
   getTargetEpisode(el, isPrev = false) {
     if (!el) return;
     const episodes = this.getAllEpisodes(el);

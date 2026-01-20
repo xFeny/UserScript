@@ -217,7 +217,7 @@ export default {
       GM_download({ url, name: `视频截图_${Date.now()}.png`, onload: () => URL.revokeObjectURL(url) });
     } catch (e) {
       Tools.setStyle(canvas, "max-width", "97vw");
-      const popup = window.open("", "_blank", "width=1000,height=570,top=130,left=270");
+      const popup = window.open(Consts.EMPTY, "_blank", "width=1000,height=570,top=130,left=270");
       popup.document.title = "鼠标右键选择「图片另存为」";
       popup.document.body.appendChild(canvas);
       console.error(e);

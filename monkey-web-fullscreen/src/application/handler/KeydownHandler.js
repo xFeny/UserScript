@@ -21,7 +21,7 @@ export default {
     Tools.postMessage(window.top, { key, bypass, isTrusted });
   },
   processShortcutKey({ key, code, ctrlKey, shiftKey, altKey }) {
-    code = code.replace(/key|arrow|numpad|tract/gi, "");
+    code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
     const keys = [ctrlKey && "ctrl", shiftKey && "shift", altKey && "alt", /[0-9]/.test(key) ? key : code];
     return keys.filter(Boolean).join("_").toUpperCase();
   },

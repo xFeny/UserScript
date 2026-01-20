@@ -1,4 +1,5 @@
 import Storage from "../common/Storage";
+import Consts from "../common/Consts";
 import Tools from "../common/Tools";
 import Site from "../common/Site";
 import Swal from "sweetalert2";
@@ -43,7 +44,7 @@ export default {
       GM_unregisterMenuCommand(this[id]);
       if (isHide) return;
 
-      const host = useHost ? this.host : "";
+      const host = useHost ? this.host : Consts.EMPTY;
       this[id] = GM_registerMenuCommand(title, () => {
         if (fn) return fn.call(this, { host, cache, title }); // 自定义逻辑
 
@@ -80,9 +81,9 @@ export default {
     const rows = keys.reduce((acc, it, i) => {
       if (i % 2) return acc;
 
-      const next = keys[i + 1] || { key: "", desc: "" };
+      const next = keys[i + 1] || { key: Consts.EMPTY, desc: Consts.EMPTY };
       return acc + `<tr><td>${it.key}</td><td>${it.desc}</td><td>${next.key}</td><td>${next.desc}</td></tr>`;
-    }, "");
+    }, Consts.EMPTY);
 
     Swal.fire({
       width: 650,
@@ -221,15 +222,15 @@ export default {
 
     const finalConfs = confs.map((conf) => {
       const { cache, attrs = [], useHost } = conf;
+      const host = useHost ? this.host : Consts.EMPTY;
       const value = useHost ? cache.get(this.host) : cache.get();
-      const host = useHost ? this.host : "";
 
       if (useHost && !attrs.includes("host")) attrs.push("host");
       return { ...conf, host, value, dataset: getDataset(attrs, this.host) };
     });
 
     // 生成HTML字符串
-    const html = finalConfs.map((conf) => render(conf)).join("");
+    const html = finalConfs.map((conf) => render(conf)).join(Consts.EMPTY);
 
     // name-cache 关系映射
     const eCache = Object.fromEntries(finalConfs.map((e) => [e.name, e.cache]));
