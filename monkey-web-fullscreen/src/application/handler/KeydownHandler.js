@@ -73,8 +73,7 @@ export default {
     };
 
     // 倍速加减
-    const step = Storage.SPEED_STEP.get();
-    ["A", "S", "ADD", "SUB"].forEach((k, i) => (dict[k] = () => this.adjustPlayRate((i % 2 ? -1 : 1) * step)));
+    ["A", "S", "ADD", "SUB"].forEach((k, i) => (dict[k] = () => this.adjustPlayRate([1, -1][i % 2] * Storage.SPEED_STEP.get())));
 
     // 预设常用倍速值
     for (let i = 1; i < 6; i++) dict[`CTRL_${i}`] = () => this.setPlaybackRate(Storage.PRESET_SPEED.get()[i - 1]);

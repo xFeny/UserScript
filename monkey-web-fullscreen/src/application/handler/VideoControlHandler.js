@@ -42,8 +42,7 @@ export default {
     this.removeProgElement();
   },
   initVideoPlay(video) {
-    if (video._mfs_hasInited) return;
-    video._mfs_hasInited = true;
+    if (this.isExecuted("_mfs_apply", video)) return;
 
     // ====== 应用缓存数据 ======
     this.applyCachedRate();
@@ -93,15 +92,14 @@ export default {
     if (Tools.isMultiV()) this.ensureUniqueCacheTime(); // 清除页面内多视频的播放进度存储，如：抖音网页版
   },
   applyCachedTime(video) {
+    if (!this.topWin || this.isLive()) return;
     if (Storage.NOT_CACHE_TIME.get()) return this.clearCachedTime(video);
-    if (video._mfs_hasApplyCTime || !this.topWin || this.isLive()) return;
 
-    // 从存储中获取该视频的缓存播放时间
+    // 缓存的播放时间
     const time = Storage.PLAY_TIME.get(this.getUniqueKey(video));
-    if (time <= +video.currentTime) return (video._mfs_hasApplyCTime = true);
+    if (time <= +video.currentTime) return;
 
     this.setCurrentTime(time);
-    video._mfs_hasApplyCTime = true;
     this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
       if (Tools.query(".monkey-toast")) Tools.setStyle(el, "transform", `translateY(${-5 - el.offsetHeight}px)`);
     });
@@ -165,11 +163,10 @@ export default {
     const s = Storage.MOVING_DISTANCE.get();
     const dMap = { ALT_UP: [0, -s, "上"], ALT_DOWN: [0, s, "下"], ALT_LEFT: [-s, 0, "左"], ALT_RIGHT: [s, 0, "右"] };
     let [x, y, desc] = dMap[key];
-    x = tsr.mirror * x; // 镜像后的移动方向
+    x *= tsr.mirror; // 镜像后的移动方向
 
     // 旋转后的移动方向
-    const rMap = { 90: () => [y, -x], 180: () => [-x, -y], 270: () => [-y, x] };
-    [x, y] = rMap[tsr.rotate]?.() || [x, y];
+    [x, y] = { 90: [y, -x], 180: [-x, -y], 270: [-y, x] }[tsr.rotate] || [x, y];
 
     // 赋值
     ((tsr.mvX += x), (tsr.mvY += y));

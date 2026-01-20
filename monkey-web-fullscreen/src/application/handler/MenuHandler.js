@@ -30,18 +30,18 @@ export default {
 
     // 菜单配置项
     const configs = [
-      { title: tle, cache: Storage.IS_SITE_AUTO, useHost: true, isHidden: Site.isGmMatch(), fn },
-      { title: "此站脱离式全屏阈值", cache: Storage.DETACH_THRESHOLD, useHost: true, isHidden: Site.isGmMatch() },
-      { title: "删除此站剧集选择器", cache: Storage.CURRENT_EPISODE, useHost: true, isHidden: epHide, fn: delFn },
-      { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, isHidden: false, fn: this.shortcutKeysPopup },
-      { title: "更多设置", cache: { name: "SETTING" }, isHidden: false, fn: this.settingPopup },
+      { title: tle, cache: Storage.IS_SITE_AUTO, useHost: true, isHide: Site.isGmMatch(), fn },
+      { title: "此站脱离式全屏阈值", cache: Storage.DETACH_THRESHOLD, useHost: true, isHide: Site.isGmMatch() },
+      { title: "删除此站剧集选择器", cache: Storage.CURRENT_EPISODE, useHost: true, isHide: epHide, fn: delFn },
+      { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, fn: this.shortcutKeysPopup },
+      { title: "更多设置", cache: { name: "SETTING" }, fn: this.settingPopup },
     ];
 
     // 注册菜单项
-    configs.forEach(({ title, useHost, cache, isHidden, fn }) => {
+    configs.forEach(({ title, isHide, useHost, cache, fn }) => {
       const id = `${cache.name}_MENU_ID`;
       GM_unregisterMenuCommand(this[id]);
-      if (isHidden) return;
+      if (isHide) return;
 
       const host = useHost ? this.host : "";
       this[id] = GM_registerMenuCommand(title, () => {
@@ -54,7 +54,7 @@ export default {
     });
   },
   shortcutKeysPopup() {
-    const shortKeys = [
+    const keys = [
       { key: "Enter", desc: "全屏" },
       { key: "P", desc: "网页全屏" },
       { key: "N", desc: "切换下集" },
@@ -77,12 +77,11 @@ export default {
     ];
 
     // 偶数索引时创建新行，奇数索引时补充到上一行
-    const rows = shortKeys.reduce((acc, item, i) => {
-      if (i % 2 === 0) {
-        const next = shortKeys[i + 1] || { key: "", desc: "" };
-        return acc + `<tr><td>${item.key}</td><td>${item.desc}</td><td>${next.key}</td><td>${next.desc}</td></tr>`;
-      }
-      return acc;
+    const rows = keys.reduce((acc, it, i) => {
+      if (i % 2) return acc;
+
+      const next = keys[i + 1] || { key: "", desc: "" };
+      return acc + `<tr><td>${it.key}</td><td>${it.desc}</td><td>${next.key}</td><td>${next.desc}</td></tr>`;
     }, "");
 
     Swal.fire({
@@ -154,9 +153,9 @@ export default {
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEY },
     ];
 
-    const render = ({ text, dataset, name, value }) => `
+    const render = ({ text, name, value, dataset }) => `
         <label class="__menu">${text}
-          <input ${dataset} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
+          <input name="${name}" ${value ? "checked" : ""} ${dataset} type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
 
@@ -173,9 +172,9 @@ export default {
       { name: "edgeClk", text: "启用 侧边单击网页全屏", cache: Storage.ENABLE_EDGE_CLICK, attrs: ["send"] },
     ];
 
-    const render = ({ text, dataset, name, value }) => `
+    const render = ({ text, name, value, dataset }) => `
         <label class="__menu">${text}
-          <input ${dataset} ${value ? "checked" : ""} name="${name}" type="checkbox"/>
+          <input name="${name}" ${value ? "checked" : ""} ${dataset} type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
 
@@ -194,15 +193,15 @@ export default {
       { name: "preset", text: "常用倍速", cache: Storage.PRESET_SPEED },
     ];
 
-    const render = ({ text, dataset, name, value }) => `
+    const render = ({ text, name, value, dataset }) => `
         <label class="__menu">${text}
-          <input ${dataset} value="${value}" name="${name}" type="text" autocomplete="off"/>
+          <input name="${name}" value="${value}" ${dataset} type="text" autocomplete="off"/>
         </label>`;
 
     return this.generate(confs, render);
   },
   genIgnore() {
-    const disabled = Site.isGmMatch();
+    const disabled = Site.isGmMatch() && !Site.isBiliLive();
     const confs = [
       { name: "custCtn", text: "自定义此站视频容器", cache: Storage.CUSTOM_CTN, disabled, useHost: true },
       { name: "hideEle", text: "此站全屏时隐藏相关元素（用 , 隔开）", cache: Storage.HIDE_ELEMENTS, disabled, useHost: true },
@@ -212,7 +211,7 @@ export default {
 
     const render = ({ text, name, value, dataset, disabled }) => `
         <div class="text-group"><p>${text}</p>
-          <textarea ${dataset} name="${name}" ${disabled ? "disabled" : ""} spellcheck="false" autocomplete="off">${value}</textarea>
+          <textarea name="${name}" ${dataset} ${disabled ? "disabled" : ""} spellcheck="false" autocomplete="off">${value}</textarea>
         </div>`;
 
     return this.generate(confs, render);
@@ -220,16 +219,14 @@ export default {
   generate(confs, render) {
     const getDataset = (attrs = [], host) => attrs.map((key) => `data-${key}="${key === "host" ? host : true}"`).join(" ");
 
-    const finalConfs = confs
-      .filter(({ isHide }) => !isHide)
-      .map((conf) => {
-        const { cache, attrs = [], useHost } = conf;
-        const value = useHost ? cache.get(this.host) : cache.get();
-        const host = useHost ? this.host : "";
+    const finalConfs = confs.map((conf) => {
+      const { cache, attrs = [], useHost } = conf;
+      const value = useHost ? cache.get(this.host) : cache.get();
+      const host = useHost ? this.host : "";
 
-        if (useHost && !attrs.includes("host")) attrs.push("host");
-        return { ...conf, host, value, dataset: getDataset(attrs, this.host) };
-      });
+      if (useHost && !attrs.includes("host")) attrs.push("host");
+      return { ...conf, host, value, dataset: getDataset(attrs, this.host) };
+    });
 
     // 生成HTML字符串
     const html = finalConfs.map((conf) => render(conf)).join("");

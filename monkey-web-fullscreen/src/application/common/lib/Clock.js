@@ -21,11 +21,11 @@ export default class Clock {
     if (!container) throw new Error("时钟创建失败：container不能为空");
     this.opts = Object.assign(this.opts, opts);
     this.container = container;
-    this.initClockElement();
+    this.initClock();
     this.start();
   }
 
-  initClockElement() {
+  initClock() {
     if (this.element) return;
 
     const { color, clss } = this.opts;
@@ -44,9 +44,8 @@ export default class Clock {
     return this;
   }
 
-  formatTime(date) {
-    const pad = (n) => n.toString().padStart(2, "0");
-    return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+  formatTime(date, fmt = "2-digit") {
+    return new Intl.DateTimeFormat("zh-CN", { hour: fmt, minute: fmt, second: fmt }).format(date);
   }
 
   update() {
@@ -60,7 +59,7 @@ export default class Clock {
     if (this.isRun) return;
 
     this.isRun = true; // 先标记运行状态，避免重复执行
-    this.element.style.setProperty("display", "unset");
+    this.element.style.removeProperty("display");
     this.timerId = setInterval(() => this.update(), 500);
     this.update();
   }

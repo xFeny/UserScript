@@ -15,7 +15,7 @@ export default {
     };
 
     const ctrl = new AbortController();
-    if (video) this.videoAborts.get(video)?.abort(); // 防止重复绑定
+    video && this.videoAborts.get(video)?.abort(); // 防止重复绑定
 
     this.videoEvts.forEach((t) => (video ?? document).addEventListener(t, handle, { capture: true, signal: ctrl.signal }));
     if (video) (this.videoAborts.set(video, ctrl), this.unbindVideoEvts());
@@ -29,7 +29,7 @@ export default {
     });
   },
   unbindVideoEvts() {
-    if (Tools.isThrottle("cleanup", 100)) return;
+    if (Tools.isThrottle("cleanup")) return;
     this.videoAborts.forEach((ctrl, video) => {
       if (Tools.isAttached(video)) return;
       (ctrl.abort(), video.removeAttribute("received"), this.videoAborts.delete(video));
