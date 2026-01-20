@@ -1441,22 +1441,22 @@
     setupMenuCmds() {
       const epHide = !Storage.CURRENT_EPISODE.get(this.host);
       const tle = `此站${this.isAutoSite() ? "禁" : "启"}用自动网页全屏`;
-      const fn = ({ host, cache }) => cache.set(!cache.get(host), host);
+      const sFn = ({ host, cache }) => cache.set(!cache.get(host), host);
       const delFn = ({ host }) => Storage.CURRENT_EPISODE.del(host) & Storage.RELATIVE_EPISODE.del(host);
       const configs = [
-        { title: tle, cache: Storage.IS_SITE_AUTO, useHost: true, isHide: Site.isGmMatch(), fn },
+        { title: tle, cache: Storage.IS_SITE_AUTO, useHost: true, isHide: Site.isGmMatch(), fn: sFn },
         { title: "此站脱离式全屏阈值", cache: Storage.DETACH_THRESHOLD, useHost: true, isHide: Site.isGmMatch() },
         { title: "删除此站剧集选择器", cache: Storage.CURRENT_EPISODE, useHost: true, isHide: epHide, fn: delFn },
         { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, fn: this.shortcutKeysPopup },
         { title: "更多设置", cache: { name: "SETTING" }, fn: this.settingPopup }
       ];
-      configs.forEach(({ title, isHide, useHost, cache, fn: fn2 }) => {
+      configs.forEach(({ title, isHide, useHost, cache, fn }) => {
         const id = `${cache.name}_MENU_ID`;
         GM_unregisterMenuCommand(this[id]);
         if (isHide) return;
         const host = useHost ? this.host : Consts.EMPTY;
         this[id] = GM_registerMenuCommand(title, () => {
-          if (fn2) return fn2.call(this, { host, cache, title });
+          if (fn) return fn.call(this, { host, cache, title });
           const input = prompt(title, host ? cache.get(host) : cache.get());
           if (input !== null) host ? cache.set(input, host) : cache.set(input);
         });
