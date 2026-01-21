@@ -1,5 +1,5 @@
 const App = {
-  addStyle(id = "gm_hideSome") {
+  addStyle(id = "gm_hide_some") {
     const cssText = "width:0!important;height:0!important;opacity:0!important;display:none!important;";
 
     const value = this.getValue();
