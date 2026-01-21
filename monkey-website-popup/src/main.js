@@ -1,7 +1,10 @@
 const App = {
-  addStyle() {
-    const css = "width:0!important;height:0!important;opacity:0!important;display:none!important;";
-    GM_addStyle(`${this.getValue()}{${css}}`);
+  addStyle(id = "gm_hideSome") {
+    const cssText = "width:0!important;height:0!important;opacity:0!important;display:none!important;";
+
+    const value = this.getValue();
+    document.querySelector(`#${id}`)?.remove();
+    value && GM_addElement("style", { id, textContent: `${value}{${cssText}}` });
   },
   getValue: () => GM_getValue(location.host),
   setValue: (value) => GM_setValue(location.host, value),
@@ -9,7 +12,7 @@ const App = {
     const title = "此站要隐藏的元素";
     GM_registerMenuCommand(title, () => {
       const input = prompt(title, this.getValue());
-      if (input !== null) (this.setValue(input), input && this.addStyle());
+      if (input !== null) (this.setValue(input), this.addStyle());
     });
   },
   init() {

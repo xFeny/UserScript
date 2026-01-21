@@ -13,7 +13,7 @@ export default defineConfig({
       userscript: {
         author: "Feny",
         license: "MIT",
-        version: "0.2.0",
+        version: "0.3.0",
         match: ["*://*/*"],
         name: "隐藏网站碍眼元素",
         "run-at": "document-start",
