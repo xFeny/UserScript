@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "unplugin-auto-import": "^19.1.2",
     "vite": "^6.0.5",
     "vite-plugin-monkey": "^5.0.3"
   }
