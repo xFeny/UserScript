@@ -9,7 +9,7 @@ const App = {
     const title = "此站要隐藏的元素";
     GM_registerMenuCommand(title, () => {
       const input = prompt(title, this.getValue());
-      if (input !== null) this.setValue(input);
+      if (input !== null) (this.setValue(input), input && this.addStyle());
     });
   },
   init() {
