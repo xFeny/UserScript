@@ -157,7 +157,7 @@ body[gm_webfullscreen] [gm_webfullscreen] video {
   .swal2-tabs-header {
     display: flex;
     position: relative;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     font-size: 15px !important;
     border-bottom: 1px solid #e2e8f0;
   }
@@ -227,7 +227,6 @@ body[gm_webfullscreen] [gm_webfullscreen] video {
 
     &:last-of-type {
       margin-bottom: 0 !important;
-      padding-bottom: 0 !important;
       border-bottom: none !important;
     }
 
@@ -296,9 +295,8 @@ body[gm_webfullscreen] [gm_webfullscreen] video {
     }
 
     p {
-      margin-bottom: 3px;
+      margin-bottom: 2px;
       color: #333 !important;
-      font-size: 13px !important;
       text-align: left !important;
     }
 
