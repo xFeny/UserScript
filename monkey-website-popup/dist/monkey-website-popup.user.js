@@ -18,11 +18,11 @@
 (function () {
   'use strict';
 
+  const cssText = "width:0!important;height:0!important;opacity:0!important;display:none!important;";
   const App = {
     getCache: () => GM_getValue(location.host),
     setCache: (value) => GM_setValue(location.host, value),
     addStyle(id = "gm_hide_some") {
-      const cssText = "width:0!important;height:0!important;opacity:0!important;display:none!important;";
       const selector = this.getCache();
       document.querySelector(`#${id}`)?.remove();
       selector && GM_addElement("style", { id, textContent: `${selector}{${cssText}}` });
