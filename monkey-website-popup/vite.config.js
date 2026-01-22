@@ -1,10 +1,12 @@
 import { defineConfig } from "vite";
 import monkey from "vite-plugin-monkey";
+import cleanup from "rollup-plugin-cleanup";
 
 // https://vitejs.dev/config
 export default defineConfig({
   build: {
     target: "es2022",
+    rollupOptions: { plugins: [cleanup({ comments: "none", exclude: ["node_modules/**"] })] },
   },
   plugins: [
     monkey({
