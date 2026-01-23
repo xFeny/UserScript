@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         隐藏网站碍眼元素
 // @namespace    http://tampermonkey.net
-// @version      0.4.0
+// @version      0.4.1
 // @author       Feny
 // @description  隐藏网站上的一些碍眼元素
 // @license      MIT
@@ -39,23 +39,18 @@
     },
     refreshStyle(value) {
       this.setCache(value);
+      this.syncDataToIFrames(value);
       Promise.resolve().then(() => this.addStyle());
-      if (this.isTopWin()) this.syncDataToIFrames();
     },
-    syncDataToIFrames() {
-      const selector = this.getCache();
+    syncDataToIFrames(selector) {
       const iFrames = document.querySelectorAll("iframe");
       iFrames.forEach((el) => this.postMessage(el?.contentWindow, { selector }));
     },
     setupEventListener() {
+      if (this.isTopWin()) return;
       window.addEventListener("message", ({ data }) => {
         if (!data?.source === MSG_SOURCE) return;
-        if (data?.sync) this.syncDataToIFrames();
         if ("selector" in data) this.refreshStyle(data.selector);
-      });
-      if (this.isTopWin()) return;
-      document.addEventListener("DOMContentLoaded", () => {
-        this.postMessage(window.top, { sync: true });
       });
     },
     init() {

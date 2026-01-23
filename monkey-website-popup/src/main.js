@@ -21,25 +21,18 @@ const App = {
   },
   refreshStyle(value) {
     this.setCache(value);
+    this.syncDataToIFrames(value);
     Promise.resolve().then(() => this.addStyle());
-    if (this.isTopWin()) this.syncDataToIFrames();
   },
-  syncDataToIFrames() {
-    const selector = this.getCache();
+  syncDataToIFrames(selector) {
     const iFrames = document.querySelectorAll("iframe");
     iFrames.forEach((el) => this.postMessage(el?.contentWindow, { selector }));
   },
   setupEventListener() {
+    if (this.isTopWin()) return;
     window.addEventListener("message", ({ data }) => {
       if (!data?.source === MSG_SOURCE) return;
-      if (data?.sync) this.syncDataToIFrames();
       if ("selector" in data) this.refreshStyle(data.selector);
-    });
-
-    // iframe 向 window.top 发起同步数据请求
-    if (this.isTopWin()) return;
-    document.addEventListener("DOMContentLoaded", () => {
-      this.postMessage(window.top, { sync: true });
     });
   },
   init() {
