@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "unplugin-auto-import": "^19.1.2",
+    "rollup-plugin-cleanup": "^3.2.1",
     "vite": "^6.0.5",
     "vite-plugin-monkey": "^5.0.3"
   }
