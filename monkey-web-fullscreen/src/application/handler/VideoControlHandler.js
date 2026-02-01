@@ -48,7 +48,6 @@ export default {
     this.applyCachedRate();
     this.applyCachedTime(video);
 
-    this.playbackRateDisplay();
     this.setupPlayerClock();
     this.setBiliQuality();
   },
@@ -63,8 +62,6 @@ export default {
     // 设置倍速
     VideoEnhancer.setPlaybackRate(this.player, rate);
     this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
-    this.playbackRateDisplay(); // 倍速始终显示
-
     if (!Storage.NOT_CACHE_SPEED.get()) Storage.CACHED_SPEED.set(this.player.playbackRate);
   },
   adjustPlayRate(step = 0.25) {

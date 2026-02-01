@@ -73,6 +73,11 @@ declare global {
      * 播放器播放进度
      */
     videoProgress(): void;
+
+    /**
+     * 左上角常显倍速
+     */
+    playbackRateDisplay(): void;
   }
   const App: App;
 }

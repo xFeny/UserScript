@@ -7,7 +7,7 @@ import Storage from "../common/Storage";
  */
 export default {
   videoAborts: new Map(), // 存储：video -> AbortController（用于事件解绑）
-  videoEvts: ["loadedmetadata", "loadeddata", "timeupdate", "canplay", "playing", "ended"],
+  videoEvts: ["loadedmetadata", "loadeddata", "timeupdate", "ratechange", "canplay", "playing", "ended"],
   setupVideoListeners(video) {
     const handle = (e) => {
       const target = video ?? e.target;
@@ -70,4 +70,5 @@ export default {
     this.autoExitWebFullscreen();
     this.clearCachedTime(video);
   },
+  ratechange: () => App.playbackRateDisplay(),
 };
