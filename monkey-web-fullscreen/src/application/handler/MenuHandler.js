@@ -49,8 +49,8 @@ export default {
         if (fn) return fn.call(this, { host, cache, title }); // 自定义逻辑
 
         // 弹出输入框对话框
-        const input = prompt(title, host ? cache.get(host) : cache.get());
-        if (input !== null) host ? cache.set(input, host) : cache.set(input);
+        const input = prompt(title, cache.get(host));
+        if (input !== null) cache.set(input, host);
       });
     });
   },

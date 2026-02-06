@@ -79,6 +79,11 @@ declare global {
      */
     playbackRateDisplay(): void;
   }
+
+  interface Window {
+    App: App;
+  }
+
   const App: App;
 }
 

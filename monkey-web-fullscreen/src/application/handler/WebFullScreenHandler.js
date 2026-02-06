@@ -10,20 +10,17 @@ import Keyboard from "../common/Keyboard";
  * 非`@match`网站 通过对视频容器父元素添加相关CSS的方式
  */
 export default {
-  triggerIconElement(name) {
-    if (Tools.isThrottle("icon")) return;
-    if (!Site.isBiliLive()) return Tools.query(Site.getIcons()?.[name])?.click();
-    const index = Object.values(Site.icons).indexOf(name);
-    this.getLiveIcons()?.[index]?.click();
-  },
   /**
    * 获取B站直播播放器控制栏右侧的功能图标列表
    * @description 图标从右到左排序：全屏、网页全屏、弹幕设置、弹幕开关、小窗模式（下标[0]为全屏图标）
    * @returns {NodeList} 图标元素的节点列表，按「全屏→网页全屏→弹幕设置→弹幕开关→小窗模式」顺序排列
    */
-  getLiveIcons() {
-    Tools.emitMousemove(this.player);
-    return Tools.querys(".right-area .icon");
+  getLiveIcons: () => (Tools.emitMousemove(App.player), Tools.querys(".right-area .icon")),
+  triggerIconElement(name) {
+    if (Tools.isThrottle("icon")) return;
+    if (!Site.isBiliLive()) return Tools.query(Site.getIcons()?.[name])?.click();
+    const index = Object.values(Site.icons).indexOf(name);
+    this.getLiveIcons()?.[index]?.click();
   },
   toggleFullscreen() {
     if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;

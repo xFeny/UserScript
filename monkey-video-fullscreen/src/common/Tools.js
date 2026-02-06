@@ -20,7 +20,7 @@ export default {
   delCls: (el, ...cls) => el?.classList.remove(...cls),
   addCls: (el, ...cls) => el?.classList.add(...cls),
   sendToIFrames(data) {
-    this.getIFrames().forEach((el) => this.postMessage(el?.contentWindow, data));
+    this.getIFrames().forEach((el) => this.isVisible(el) && this.postMessage(el?.contentWindow, data));
   },
   freqTimes: new Map(),
   isThrottle(key = "throttle", gap = 300) {

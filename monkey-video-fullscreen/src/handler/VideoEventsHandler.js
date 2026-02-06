@@ -1,4 +1,5 @@
 import Tools from "../common/Tools";
+import Consts from "../common/Consts";
 
 /**
  * 视频监听事件逻辑处理
@@ -24,7 +25,7 @@ export default {
     });
   },
   unbindVideoEvts() {
-    if (Tools.isThrottle("cleanup")) return;
+    if (Tools.isThrottle("cleanup", Consts.ONE_SEC)) return;
     this.videoAborts.forEach((ctrl, video) => {
       if (Tools.isAttached(video)) return;
       (ctrl.abort(), video.removeAttribute("received"), this.videoAborts.delete(video));
