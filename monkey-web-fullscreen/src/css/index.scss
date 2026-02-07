@@ -1,0 +1,56 @@
+@use "./fullscreen.scss";
+@use "./transform.scss";
+@use "./extend.scss";
+@use "./popup.scss";
+
+/** 提示样式 START **/
+.monkey-toast {
+  left: 10px !important;
+  bottom: 16% !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  padding: 0 10px !important;
+  line-height: 26px !important;
+  border-radius: 3px !important;
+  position: absolute !important;
+  z-index: 2147483647 !important;
+  font-weight: normal !important;
+  transition: opacity 0.3s ease-in !important;
+  background: rgba(0, 0, 0, 0.75) !important;
+
+  span {
+    display: inline !important;
+  }
+
+  .cText {
+    margin: 0 3px !important;
+    color: #ff5f00 !important;
+  }
+}
+/** 提示样式 END **/
+
+.__hc {
+  cursor: none !important; // 隐藏鼠标光标
+}
+
+.hide,
+#buffer,
+#install,
+.player-overlay,
+.memory-play-wrap,
+.atom-notice-click,
+.dplayer-resume-tip,
+#player #loading-box,
+.dplayer-notice strong,
+.air-player-loading-box,
+#bilibili-player :is(.bpx-player-toast-wrap, .bpx-player-cmd-dm-wrap),
+#bilibili-player .bpx-player-dialog-wrap > :not(.bpx-player-dm-tip) {
+  display: none !important;
+}
+
+@supports selector(:has(*)) {
+  body > #loading:not(:has(video)),
+  *:has(video) :is(#tips, .art-layers) {
+    display: none !important;
+  }
+}

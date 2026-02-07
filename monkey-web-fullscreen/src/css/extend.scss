@@ -1,0 +1,88 @@
+.__Clock,
+.__timeupdate,
+.__rateDisplay {
+  color: #e0e0e0;
+  opacity: 1 !important;
+  text-indent: 0 !important;
+  position: absolute !important;
+  z-index: 2147483647 !important;
+  pointer-events: none !important;
+  text-shadow:
+    0.5px 0 1px #000,
+    -0.5px 0 1px #000 !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+/** 全屏时钟样式 **/
+.__Clock {
+  top: 8px !important;
+  right: 15px !important;
+  width: auto !important;
+  height: auto !important;
+  font-size: 17.5px !important;
+  font-weight: bold !important;
+  text-align: right !important;
+  line-height: 17.5px !important;
+  background-color: transparent !important;
+
+  /** 防止被隐藏 **/
+  // &::after {
+  //   top: 50% !important;
+  //   opacity: 0 !important;
+  //   content: "-" !important;
+  //   position: fixed !important;
+  //   pointer-events: none !important;
+  // }
+}
+
+.__timeupdate,
+.__rateDisplay {
+  font-size: 12px !important;
+  line-height: 12px !important;
+}
+
+/** 全屏模式下的播放进度 **/
+.__timeupdate {
+  top: 25px !important;
+  right: 15px !important;
+  transform: scale(0.9) !important;
+  transform-origin: top right !important;
+
+  & b {
+    font: inherit !important;
+    display: inline-block !important;
+    transform: scale(0.75) !important;
+    vertical-align: text-bottom !important;
+  }
+}
+
+/** 视频左上角此终显示倍速 **/
+.__rateDisplay {
+  color: #d9d9d9;
+  top: 5px !important;
+  left: 5px !important;
+  box-shadow: none !important;
+  display: inline-block !important;
+  transform: scale(0.875) !important;
+}
+
+/** 视频侧边双击元素样式 */
+.__edgeClick {
+  left: 0 !important;
+  top: 6% !important;
+  opacity: 0 !important;
+  width: 25px !important;
+  height: 70% !important;
+  user-select: none !important;
+  position: absolute !important;
+  z-index: 2147483647 !important;
+  background-color: transparent !important;
+  cursor:
+    url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC"),
+    pointer !important;
+
+  &.right {
+    right: 0 !important;
+    left: auto !important;
+  }
+}
