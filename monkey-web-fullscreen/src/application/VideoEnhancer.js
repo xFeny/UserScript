@@ -1,6 +1,14 @@
 import Tools from "./common/Tools";
 
 class VideoEnhancer {
+  // static hookVideoPlay() {
+  //   const original = HTMLMediaElement.prototype.play;
+  //   HTMLMediaElement.prototype.play = function () {
+  //     VideoEnhancer.dispatchShadowVideo(this);
+  //     return original.apply(this, arguments);
+  //   };
+  // }
+
   static setPlaybackRate(video, rate) {
     this.defineProperty(video, "playbackRate", {
       set(value, setter) {
@@ -47,6 +55,11 @@ class VideoEnhancer {
    * @returns {PropertyDescriptor|undefined} 属性描述符
    */
   static getPropertyDescriptor(target, prop) {
+    if (target instanceof HTMLMediaElement) {
+      const desc = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, prop);
+      if (desc) return desc;
+    }
+
     for (let proto = target; proto; proto = Object.getPrototypeOf(proto)) {
       const desc = Object.getOwnPropertyDescriptor(proto, prop);
       if (desc) return desc;
@@ -73,14 +86,14 @@ class VideoEnhancer {
   static detectShadowVideo() {
     if (Tools.isThrottle("shadow", 100)) return;
     const videos = Tools.querys("video:not([received])");
-    if (!videos.length) return;
+    if (videos.length) videos.forEach(this.dispatchShadowVideo);
+  }
 
-    videos.forEach((video) => {
-      const root = video.getRootNode();
-      if (!(root instanceof ShadowRoot)) return;
-      Tools.emitEvent("shadow-video", { video });
-      Tools.emitEvent("addStyle", { shadowRoot: root });
-    });
+  static dispatchShadowVideo(video) {
+    const root = video.getRootNode();
+    if (!(root instanceof ShadowRoot)) return;
+    Tools.emitEvent("shadow-video", { video });
+    Tools.emitEvent("addStyle", { shadowRoot: root });
   }
 }
 

@@ -19,14 +19,14 @@ class VideoEnhancer {
   static detectShadowVideo() {
     if (Tools.isThrottle("shadow", 100)) return;
     const videos = Tools.querys("video:not([received])");
-    if (!videos.length) return;
+    if (videos.length) videos.forEach(this.dispatchShadowVideo);
+  }
 
-    videos.forEach((video) => {
-      const root = video.getRootNode();
-      if (!(root instanceof ShadowRoot)) return;
-      Tools.emitEvent("shadow-video", { video });
-      Tools.emitEvent("addStyle", { shadowRoot: root });
-    });
+  static dispatchShadowVideo(video) {
+    const root = video.getRootNode();
+    if (!(root instanceof ShadowRoot)) return;
+    Tools.emitEvent("shadow-video", { video });
+    Tools.emitEvent("addStyle", { shadowRoot: root });
   }
 }
 
