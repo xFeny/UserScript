@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.9.3.2
+// @version      3.9.4
 // @author       Feny
 // @description  支持所有H5视频的增强脚本，通用网页全屏｜倍速调节；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @license      GPL-3.0-only
@@ -242,6 +242,13 @@
     }
   };
   class VideoEnhancer {
+    static hookVideoPlay() {
+      const original = HTMLMediaElement.prototype.play;
+      HTMLMediaElement.prototype.play = function() {
+        VideoEnhancer.dispatchShadowVideo(this);
+        return original.apply(this, arguments);
+      };
+    }
     static setPlaybackRate(video, rate) {
       this.defineProperty(video, "playbackRate", {
         set(value, setter) {
@@ -271,6 +278,10 @@
       }
     }
     static getPropertyDescriptor(target, prop) {
+      if (target instanceof HTMLMediaElement) {
+        const desc = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, prop);
+        if (desc) return desc;
+      }
       for (let proto = target; proto; proto = Object.getPrototypeOf(proto)) {
         const desc = Object.getOwnPropertyDescriptor(proto, prop);
         if (desc) return desc;
@@ -291,13 +302,13 @@
     static detectShadowVideo() {
       if (Tools.isThrottle("shadow", 100)) return;
       const videos = Tools.querys("video:not([received])");
-      if (!videos.length) return;
-      videos.forEach((video) => {
-        const root = video.getRootNode();
-        if (!(root instanceof ShadowRoot)) return;
-        Tools.emitEvent("shadow-video", { video });
-        Tools.emitEvent("addStyle", { shadowRoot: root });
-      });
+      if (videos.length) videos.forEach(this.dispatchShadowVideo);
+    }
+    static dispatchShadowVideo(video) {
+      const root = video.getRootNode();
+      if (!(root instanceof ShadowRoot)) return;
+      Tools.emitEvent("shadow-video", { video });
+      Tools.emitEvent("addStyle", { shadowRoot: root });
     }
   }
   VideoEnhancer.hackAttachShadow();
@@ -431,6 +442,7 @@
       this.setupIgnoreChangeListener();
       this.setupShadowVideoListener();
       this.setupLoadEventListener();
+      VideoEnhancer.hookVideoPlay();
     },
     setupVisibleListener() {
       window.addEventListener("visibilitychange", () => {

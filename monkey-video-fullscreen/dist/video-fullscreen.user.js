@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频网页全屏
 // @namespace    npm/vite-plugin-monkey
-// @version      3.9.0
+// @version      3.9.1
 // @author       Feny
 // @description  快捷键：P-网页全屏，Enter-全屏；支持侧边点击切换网页全屏；支持自动网页全屏
 // @license      GPL-3.0-only
@@ -148,6 +148,13 @@
     }
   };
   class VideoEnhancer {
+    static hookVideoPlay() {
+      const original = HTMLMediaElement.prototype.play;
+      HTMLMediaElement.prototype.play = function() {
+        VideoEnhancer.dispatchShadowVideo(this);
+        return original.apply(this, arguments);
+      };
+    }
     static hackAttachShadow() {
       if (Element.prototype.__attachShadow) return;
       Element.prototype.__attachShadow = Element.prototype.attachShadow;
@@ -162,13 +169,13 @@
     static detectShadowVideo() {
       if (Tools.isThrottle("shadow", 100)) return;
       const videos = Tools.querys("video:not([received])");
-      if (!videos.length) return;
-      videos.forEach((video) => {
-        const root = video.getRootNode();
-        if (!(root instanceof ShadowRoot)) return;
-        Tools.emitEvent("shadow-video", { video });
-        Tools.emitEvent("addStyle", { shadowRoot: root });
-      });
+      if (videos.length) videos.forEach(this.dispatchShadowVideo);
+    }
+    static dispatchShadowVideo(video) {
+      const root = video.getRootNode();
+      if (!(root instanceof ShadowRoot)) return;
+      Tools.emitEvent("shadow-video", { video });
+      Tools.emitEvent("addStyle", { shadowRoot: root });
     }
   }
   VideoEnhancer.hackAttachShadow();
@@ -185,6 +192,7 @@
       this.setupDocumentObserver();
       this.setupIgnoreChangeListener();
       this.setupShadowVideoListener();
+      VideoEnhancer.hookVideoPlay();
     },
     setupDocumentObserver() {
       new MutationObserver(() => {
