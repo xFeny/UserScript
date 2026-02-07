@@ -29,6 +29,7 @@ export default {
     this.setupIgnoreChangeListener();
     this.setupShadowVideoListener();
     this.setupLoadEventListener();
+    VideoEnhancer.hookVideoPlay();
   },
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {

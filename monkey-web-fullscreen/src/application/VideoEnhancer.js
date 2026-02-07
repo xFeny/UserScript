@@ -1,13 +1,13 @@
 import Tools from "./common/Tools";
 
 class VideoEnhancer {
-  // static hookVideoPlay() {
-  //   const original = HTMLMediaElement.prototype.play;
-  //   HTMLMediaElement.prototype.play = function () {
-  //     VideoEnhancer.dispatchShadowVideo(this);
-  //     return original.apply(this, arguments);
-  //   };
-  // }
+  static hookVideoPlay() {
+    const original = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () {
+      VideoEnhancer.dispatchShadowVideo(this);
+      return original.apply(this, arguments);
+    };
+  }
 
   static setPlaybackRate(video, rate) {
     this.defineProperty(video, "playbackRate", {

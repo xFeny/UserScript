@@ -1,5 +1,6 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
+import VideoEnhancer from "../lib/VideoEnhancer";
 
 /**
  * 应用程序初始化
@@ -19,6 +20,7 @@ export default {
     this.setupDocumentObserver();
     this.setupIgnoreChangeListener();
     this.setupShadowVideoListener();
+    VideoEnhancer.hookVideoPlay();
   },
   /**
    * 解决 document.write 导致监听失效问题
