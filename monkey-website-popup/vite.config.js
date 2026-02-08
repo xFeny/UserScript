@@ -15,7 +15,7 @@ export default defineConfig({
       userscript: {
         author: "Feny",
         license: "MIT",
-        version: "0.4.1",
+        version: "0.5.0",
         match: ["*://*/*"],
         name: "隐藏网站碍眼元素",
         "run-at": "document-start",
