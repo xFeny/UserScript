@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         隐藏网站碍眼元素
 // @namespace    http://tampermonkey.net
-// @version      0.4.1
+// @version      0.5.0
 // @author       Feny
 // @description  隐藏网站上的一些碍眼元素
 // @license      MIT
@@ -17,44 +17,60 @@
 (function () {
   'use strict';
 
-  const MSG_SOURCE = "GM_HIDE_SOME";
-  const cssText = "width:0!important;height:0!important;opacity:0!important;display:none!important;";
+  const Consts = Object.freeze({
+    HIDE: "gm_hide_some",
+    CUSTOM: "gm_custom_some",
+    MSG_SOURCE: "GM_DEFINE_SOME_STYLE"
+  });
   const App = {
     isTopWin: () => window === window.top,
-    getCache: () => GM_getValue(location.host),
-    setCache: (value) => GM_setValue(location.host, value),
-    postMessage: (win, data) => win?.postMessage({ source: MSG_SOURCE, ...data }, "*"),
-    addStyle(id = "gm_hide_some") {
-      const selector = this.getCache();
-      document.querySelector(`#${id}`)?.remove();
-      selector && GM_addElement("style", { id, textContent: `${selector}{${cssText}}` });
-    },
+    getCache: (key = location.host) => GM_getValue(key),
+    setCache: (value, key = location.host) => GM_setValue(key, value),
+    postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
     setupMenuCmds() {
       if (!this.isTopWin()) return;
-      const title = "此站要隐藏的元素";
-      GM_registerMenuCommand(title, () => {
-        const input = prompt(title, this.getCache());
-        if (input !== null) this.refreshStyle(input);
+      [
+        { title: "此站要隐藏的元素", key: void 0, fn: this.setHideStyle },
+        { title: "此站自定义的样式", key: Consts.CUSTOM, fn: this.setCustomStyle }
+      ].forEach(({ title, key, fn }) => {
+        GM_registerMenuCommand(title, () => {
+          const input = prompt(title, this.getCache(key));
+          if (input !== null) fn.call(this, input);
+        });
       });
     },
-    refreshStyle(value) {
-      this.setCache(value);
-      this.syncDataToIFrames(value);
-      Promise.resolve().then(() => this.addStyle());
+    setCustomStyle(style, setCache = true) {
+      if (setCache) this.setCache(style, Consts.CUSTOM), this.syncDataToIFrames({ style });
+      Promise.resolve().then(() => this.addStyle(Consts.CUSTOM, style));
     },
-    syncDataToIFrames(selector) {
+    setHideStyle(selector, setCache = true) {
+      if (setCache) this.setCache(selector), this.syncDataToIFrames({ selector });
+      const cssText = "width:0!important;height:0!important;opacity:0!important;display:none!important;";
+      Promise.resolve().then(() => this.addStyle(Consts.HIDE, `${selector}{${cssText}}`));
+    },
+    addStyle(id, textContent) {
+      document.querySelector(`#${id}`)?.remove();
+      textContent && GM_addElement("style", { id, textContent });
+      return this;
+    },
+    syncDataToIFrames(data) {
       const iFrames = document.querySelectorAll("iframe");
-      iFrames.forEach((el) => this.postMessage(el?.contentWindow, { selector }));
+      iFrames.forEach((el) => this.postMessage(el?.contentWindow, data));
     },
     setupEventListener() {
       if (this.isTopWin()) return;
       window.addEventListener("message", ({ data }) => {
-        if (!data?.source?.includes(MSG_SOURCE)) return;
-        if ("selector" in data) this.refreshStyle(data.selector);
+        if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
+        if ("style" in data) this.setCustomStyle(data.style);
+        if ("selector" in data) this.setHideStyle(data.selector);
       });
     },
+    initStyle() {
+      this.setHideStyle(this.getCache(), false);
+      this.setCustomStyle(this.getCache(Consts.CUSTOM), false);
+    },
     init() {
-      this.addStyle();
+      this.initStyle();
       this.setupMenuCmds();
       this.setupEventListener();
     }
