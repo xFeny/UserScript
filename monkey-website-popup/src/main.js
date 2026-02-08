@@ -1,13 +1,13 @@
 const Consts = Object.freeze({
-  HIDE: "gm_hide_some",
-  CUSTOM: "gm_custom_some",
+  HIDE: "_gm_hide_some",
+  CUSTOM: "_gm_custom_some",
   MSG_SOURCE: "GM_DEFINE_SOME_STYLE",
 });
 
 const App = {
   isTopWin: () => window === window.top,
-  getCache: (key = location.host) => GM_getValue(key),
-  setCache: (value, key = location.host) => GM_setValue(key, value),
+  getCache: (key) => GM_getValue(`${location.host}${key ?? ""}`),
+  setCache: (value, key) => GM_setValue(`${location.host}${key ?? ""}`, value),
   postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
   setupMenuCmds() {
     if (!this.isTopWin()) return;
