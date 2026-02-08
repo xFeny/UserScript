@@ -6,5 +6,5 @@
 | monkey-jsonviewer     | [JSON Viewer](https://greasyfork.org/zh-CN/scripts/508417-json-viewer) |
 | monkey-scrollbar      | [滚动条美化](https://greasyfork.org/zh-CN/scripts/518997-滚动条美化) |
 | monkey-web-fullscreen | [视频网站自动网页全屏｜倍速播放](https://greasyfork.org/zh-CN/scripts/519872-视频网站自动网页全屏-倍速播放) |
-| monkey-website-popup  | [关闭影视动漫网站的公告弹窗](https://greasyfork.org/zh-CN/scripts/519280-关闭影视动漫网站的公告弹窗) |
+| monkey-website-popup  | [隐藏网站碍眼元素](https://greasyfork.org/zh-CN/scripts/519280-关闭影视动漫网站的公告弹窗) |
 
