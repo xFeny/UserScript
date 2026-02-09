@@ -1,14 +1,6 @@
 import Tools from "../common/Tools";
 
 class VideoEnhancer {
-  static hookVideoPlay() {
-    const original = HTMLMediaElement.prototype.play;
-    HTMLMediaElement.prototype.play = function () {
-      VideoEnhancer.dispatchShadowVideo(this);
-      return original.apply(this, arguments);
-    };
-  }
-
   static hackAttachShadow() {
     if (Element.prototype.__attachShadow) return;
     Element.prototype.__attachShadow = Element.prototype.attachShadow;
@@ -31,10 +23,18 @@ class VideoEnhancer {
   }
 
   static dispatchShadowVideo(video) {
-    const root = video.getRootNode();
-    if (!(root instanceof ShadowRoot)) return;
+    const sroot = video.getRootNode();
+    if (!(sroot instanceof ShadowRoot)) return;
     Tools.emitEvent("shadow-video", { video });
-    Tools.emitEvent("addStyle", { shadowRoot: root });
+    Tools.emitEvent("addStyle", { sroot });
+  }
+
+  static hookActiveVideo() {
+    const original = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () {
+      VideoEnhancer.dispatchShadowVideo(this);
+      return original.apply(this, arguments);
+    };
   }
 }
 

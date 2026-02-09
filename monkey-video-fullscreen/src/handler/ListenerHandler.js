@@ -9,18 +9,17 @@ export default {
   isMutedLoop: (video) => video?.muted && video?.loop,
   isNoVideo: () => !window.vMeta && !window.topWin,
   init(isNonFirst = false) {
-    this.docElement = document.documentElement;
-
+    this.setupVideoListeners();
     this.setupKeydownListener();
     this.setupMouseMoveListener();
     this.setupFullscreenListener();
-    this.setupVideoListeners();
+    this.docElement = document.documentElement;
 
     if (isNonFirst) return;
     this.setupDocumentObserver();
-    this.setupIgnoreChangeListener();
     this.setupShadowVideoListener();
-    VideoEnhancer.hookVideoPlay();
+    this.setupIgnoreChangeListener();
+    VideoEnhancer.hookActiveVideo();
   },
   /**
    * 解决 document.write 导致监听失效问题

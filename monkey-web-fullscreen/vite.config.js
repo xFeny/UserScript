@@ -70,18 +70,16 @@ export default defineConfig({
         },
         cssSideEffects: () => {
           return (cssText) => {
-            const styleAdded = Symbol("styleAdded");
+            const added = Symbol("added");
             const style = document.createElement("style");
             style.textContent = cssText;
             window.gmStyle = style;
 
             // 向 Shadow DOM 插入样式
-            document.addEventListener("addStyle", (e) => {
-              const { shadowRoot } = e.detail;
-              if (shadowRoot[styleAdded] || shadowRoot instanceof Document) return;
-
-              shadowRoot.prepend(style.cloneNode(true));
-              shadowRoot[styleAdded] = true;
+            document.addEventListener("addStyle", ({ detail: { sroot } }) => {
+              if (sroot[added] || sroot instanceof Document) return;
+              sroot.prepend(style.cloneNode(true));
+              sroot[added] = true;
             });
 
             // 向 document.head 插入样式

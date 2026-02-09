@@ -15,21 +15,20 @@ export default {
   isExecuted: (key, ctx = window) => ctx[key] || !!((ctx[key] = true), false),
   init(isNonFirst = false) {
     this.host = location.host;
-    this.docElement = document.documentElement;
-
+    this.setupVideoListeners();
     this.setupKeydownListener();
     this.setupVisibleListener();
     this.setupMouseMoveListener();
     this.setupFullscreenListener();
-    this.setupVideoListeners();
+    this.docElement = document.documentElement;
 
     if (isNonFirst) return;
     this.setupDocumentObserver();
-    this.observeWebFullscreenChange();
-    this.setupIgnoreChangeListener();
-    this.setupShadowVideoListener();
     this.setupLoadEventListener();
-    VideoEnhancer.hookVideoPlay();
+    this.setupShadowVideoListener();
+    this.setupIgnoreChangeListener();
+    this.observeWebFullscreenChange();
+    VideoEnhancer.hookActiveVideo();
   },
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {

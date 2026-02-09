@@ -48,7 +48,7 @@ export default {
     const parents = Tools.getParents(container);
     container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(this.host)
       ? parents.forEach((el) => {
-          Tools.emitEvent("addStyle", { shadowRoot: el.getRootNode() });
+          Tools.emitEvent("addStyle", { sroot: el.getRootNode() });
           Tools.attr(el, Consts.webFull, true);
         })
       : this.detachForFullscreen();
