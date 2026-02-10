@@ -14,7 +14,7 @@ export default {
   },
   getIgnoreUrls() {
     const urlsStr = Storage.IGNORE_URLS.get(this.topWin.host);
-    return urlsStr.match(/[^\s;]+/g) || [];
+    return (urlsStr.match(/[^\s;]+/g) || []).filter((url) => new URL(url).pathname !== "/");
   },
   isBlocked(urls = []) {
     const { href, pathname } = new URL(this.topWin.url);

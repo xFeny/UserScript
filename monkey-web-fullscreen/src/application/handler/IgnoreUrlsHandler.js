@@ -29,7 +29,7 @@ export default {
     return this.isBlocked(this.wideFilter);
   },
   processIgnoreUrls(cache, defUrls) {
-    const existUrls = cache.get().match(/[^\s;]+/g) || [];
+    const existUrls = (cache.get().match(/[^\s;]+/g) || []).filter((url) => new URL(url).pathname !== "/");
     return existUrls.length ? existUrls : (cache.set(defUrls.join(";\n")), defUrls);
   },
   isBlocked(urls = []) {
