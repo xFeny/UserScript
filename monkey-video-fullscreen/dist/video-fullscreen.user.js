@@ -17,7 +17,7 @@
 // @run-at       document-start
 // ==/UserScript==
 
-(e=>{const o=Symbol("styleAdded"),t=document.createElement("style");t.textContent=e,window.gmStyle=t,document.addEventListener("addStyle",r=>{const{shadowRoot:n}=r.detail;n[o]||n instanceof Document||(n.prepend(t.cloneNode(!0)),n[o]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(e)})(' @charset "UTF-8";[gm_webfullscreen],body[gm_webfullscreen] [gm_webfullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[gm_webfullscreen] video,body[gm_webfullscreen] [gm_webfullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;transform:none!important;object-fit:contain!important;height:clamp(100vh - 100%,100vh,100%)!important}[gm_webfullscreen]~*:not(.monkey-web-fullscreen){display:none!important}.__edgeClick{left:0!important;top:6%!important;opacity:0!important;width:25px!important;height:70%!important;position:absolute!important;z-index:2147483647!important;cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC),pointer!important}.__edgeClick.right{right:0!important;left:auto!important}.hide{display:none!important} ');
+(e=>{const o=Symbol("added"),t=document.createElement("style");t.textContent=e,window.gmStyle=t,document.addEventListener("addStyle",({detail:{sroot:n}})=>{n[o]||n instanceof Document||(n.prepend(t.cloneNode(!0)),n[o]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(e)})(' @charset "UTF-8";[gm_webfullscreen],body[gm_webfullscreen] [gm_webfullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[gm_webfullscreen] video,body[gm_webfullscreen] [gm_webfullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;transform:none!important;object-fit:contain!important;height:clamp(100vh - 100%,100vh,100%)!important}[gm_webfullscreen]~*:not(.monkey-web-fullscreen){display:none!important}.__edgeClick{left:0!important;top:6%!important;opacity:0!important;width:25px!important;height:70%!important;position:absolute!important;z-index:2147483647!important;cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC),pointer!important}.__edgeClick.right{right:0!important;left:auto!important}.hide{display:none!important} ');
 
 (function () {
   'use strict';
@@ -148,13 +148,6 @@
     }
   };
   class VideoEnhancer {
-    static hookVideoPlay() {
-      const original = HTMLMediaElement.prototype.play;
-      HTMLMediaElement.prototype.play = function() {
-        VideoEnhancer.dispatchShadowVideo(this);
-        return original.apply(this, arguments);
-      };
-    }
     static hackAttachShadow() {
       if (Element.prototype.__attachShadow) return;
       Element.prototype.__attachShadow = Element.prototype.attachShadow;
@@ -172,10 +165,17 @@
       if (videos.length) videos.forEach(this.dispatchShadowVideo);
     }
     static dispatchShadowVideo(video) {
-      const root = video.getRootNode();
-      if (!(root instanceof ShadowRoot)) return;
+      const sroot = video.getRootNode();
+      if (!(sroot instanceof ShadowRoot)) return;
       Tools.emitEvent("shadow-video", { video });
-      Tools.emitEvent("addStyle", { shadowRoot: root });
+      Tools.emitEvent("addStyle", { sroot });
+    }
+    static hookActiveVideo() {
+      const original = HTMLMediaElement.prototype.play;
+      HTMLMediaElement.prototype.play = function() {
+        VideoEnhancer.dispatchShadowVideo(this);
+        return original.apply(this, arguments);
+      };
     }
   }
   VideoEnhancer.hackAttachShadow();
@@ -183,16 +183,16 @@
     isMutedLoop: (video) => video?.muted && video?.loop,
     isNoVideo: () => !window.vMeta && !window.topWin,
     init(isNonFirst = false) {
-      this.docElement = document.documentElement;
+      this.setupVideoListeners();
       this.setupKeydownListener();
       this.setupMouseMoveListener();
       this.setupFullscreenListener();
-      this.setupVideoListeners();
+      this.docElement = document.documentElement;
       if (isNonFirst) return;
       this.setupDocumentObserver();
-      this.setupIgnoreChangeListener();
       this.setupShadowVideoListener();
-      VideoEnhancer.hookVideoPlay();
+      this.setupIgnoreChangeListener();
+      VideoEnhancer.hookActiveVideo();
     },
     setupDocumentObserver() {
       new MutationObserver(() => {
@@ -386,7 +386,7 @@
       container.scrollY = window.scrollY;
       const parents = Tools.getParents(container);
       container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(location.host) ? parents.forEach((el) => {
-        Tools.emitEvent("addStyle", { shadowRoot: el.getRootNode() });
+        Tools.emitEvent("addStyle", { sroot: el.getRootNode() });
         Tools.attr(el, Consts.webFull, true);
       }) : this.detachForFullscreen();
       this.adaptToWebFullscreen();
@@ -496,7 +496,7 @@
     },
     getIgnoreUrls() {
       const urlsStr = Storage.IGNORE_URLS.get(this.topWin.host);
-      return urlsStr.match(/[^\s;]+/g) || [];
+      return (urlsStr.match(/[^\s;]+/g) || []).filter((url) => new URL(url).pathname !== "/");
     },
     isBlocked(urls = []) {
       const { href, pathname } = new URL(this.topWin.url);
