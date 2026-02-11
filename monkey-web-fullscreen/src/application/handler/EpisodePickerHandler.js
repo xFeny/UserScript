@@ -18,7 +18,7 @@ export default {
     if (Site.isGmMatch() || this.isExecuted("isBindPicker")) return;
 
     const handle = (event, { target, ctrlKey, altKey, isTrusted } = event) => {
-      if (!ctrlKey || !altKey || !isTrusted || this.isNoVideo() || this.isLive()) return;
+      if (!ctrlKey || !altKey || !isTrusted || this.isNoVideo()) return;
 
       this.pickerCurrentEpisodePath(target) ??
         this.pickerRelativeEpisodePath(target) ??
@@ -79,22 +79,20 @@ export default {
   async pickerEpisodePopup(el, { onVerify, onSave }) {
     const res = await Swal.fire({
       html: Tools.safeHTML(`<h4>验证能正确取到集数，再确定保存</h4>
-      <textarea id="__picker" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
+      <textarea id="picker" class="swal2-textarea" spellcheck="false"></textarea>
       <p>编辑元素选择器，确保能正确获取到集数</p>`),
       customClass: { container: "monkey-web-fullscreen" },
-      title: "拾取剧集元素选择器",
       confirmButtonText: "保存",
       denyButtonText: "验证",
-      showCloseButton: true,
       showDenyButton: true,
       reverseButtons: true,
       focusDeny: true,
       preDeny: () => {
-        const value = Tools.query("#__picker").value.trim();
-        return value ? (onVerify.call(this, value) ?? false) : Tools.notyf("元素选择器不能为空！", true);
+        const value = Tools.query("#picker").value.trim();
+        return value ? (onVerify.call(this, value) ?? false) : Tools.notyf("选择器不能为空！", true);
       },
-      preConfirm: () => Tools.query("#__picker").value.trim() || Tools.notyf("元素选择器不能为空！", true),
-      didOpen: () => (Tools.query("#__picker").value = Tools.getElementPath(el)),
+      preConfirm: () => Tools.query("#picker").value.trim() || Tools.notyf("选择器不能为空！", true),
+      didOpen: () => (Tools.query("#picker").value = Tools.getElementPath(el)),
     });
 
     return res.isConfirmed && onSave.call(this, res.value);

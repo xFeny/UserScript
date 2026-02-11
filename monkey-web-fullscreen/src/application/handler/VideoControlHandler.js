@@ -35,7 +35,7 @@ export default {
     video.tsr = { ...Consts.DEF_TSR };
 
     // 重置次数限制
-    Tools.resetLimit("rateKeep", "autoWide");
+    Tools.resetLimit("autoWide");
 
     // 移除相关的自定义元素
     this.removeRateDisplay();
@@ -51,9 +51,9 @@ export default {
     this.setupPlayerClock();
     this.setBiliQuality();
   },
-  remainTime: (video) => Math.floor(App.getRealDur(video)) - Math.floor(video.currentTime),
-  playToggle: (video) => (Site.isDouyu() ? video?.click() : video?.[video?.paused ? "play" : "pause"]()),
-  tryPlay: (video) => video?.paused && (Site.isDouyu() ? video?.click() : video?.play()),
+  remainTime: (v) => Math.floor(App.getRealDur(v)) - Math.floor(v.currentTime),
+  playToggle: (v) => (Site.isDouyu() ? v?.click() : v?.[v?.paused ? "play" : "pause"]()),
+  playV: (v) => v?.paused && (Site.isDouyu() ? v?.click() : v?.play()),
 
   // ====================⇓⇓⇓ 调节播放倍速相关逻辑 ⇓⇓⇓====================
   setPlaybackRate(rate) {
@@ -102,7 +102,7 @@ export default {
     });
   },
   setCurrentTime: (ct) => ct && (App.player.currentTime = Math.max(0, ct)),
-  clearCachedTime: (video) => App.topWin && Storage.PLAY_TIME.del(App.getUniqueKey(video)),
+  clearCachedTime: (v) => App.topWin && Storage.PLAY_TIME.del(App.getUniqueKey(v)),
   getUniqueKey(video, { duration, __duration } = video) {
     if (video._mfs_cacheTKey) return video._mfs_cacheTKey;
 

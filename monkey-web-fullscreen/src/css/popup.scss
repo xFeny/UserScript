@@ -45,11 +45,6 @@
     background-color: #757575 !important;
   }
 
-  button:where(.swal2-close) {
-    color: #666 !important;
-    font-size: 1.7em !important;
-  }
-
   /** 拾取下集元素弹窗布局 START **/
   h4 {
     color: red !important;
@@ -63,11 +58,11 @@
     font-size: 12px !important;
   }
 
-  #__picker {
+  #picker {
     margin-bottom: 0;
     height: auto !important;
     font-size: 14px !important;
-    min-height: 10em !important;
+    min-height: 15em !important;
     resize: vertical !important;
     width: -webkit-fill-available;
     width: -moz-available;

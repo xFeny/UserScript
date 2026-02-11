@@ -51,10 +51,8 @@ export default {
     this.ensureRateDisplay();
   },
   canplay(video) {
-    if (!Tools.isVisible(video) || Storage.DISABLE_TRY_PLAY.get()) return;
-    if (video._mfs_tryPlay || Tools.isMultiV()) return;
-    video._mfs_tryPlay = true;
-    this.tryPlay(video);
+    if (!Tools.isVisible(video) || Tools.isMultiV() || Storage.DISABLE_TRY_PLAY.get()) return;
+    if (!this.isExecuted("_mfs_playV", video)) this.playV(video);
   },
   playing(video) {
     this.setCurrentVideo(video);
