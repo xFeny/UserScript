@@ -16,7 +16,7 @@ export default defineConfig({
       entry: "src/main.js",
       userscript: {
         author: "Feny",
-        version: "3.9.1",
+        version: "3.9.2",
         match: ["*://*/*"],
         name: "视频网页全屏",
         license: "GPL-3.0-only",

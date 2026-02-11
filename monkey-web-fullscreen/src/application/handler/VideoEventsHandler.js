@@ -9,20 +9,15 @@ export default {
   videoAborts: new Map(), // 存储：video -> AbortController（用于事件解绑）
   videoEvts: ["loadedmetadata", "loadeddata", "timeupdate", "ratechange", "canplay", "playing", "ended"],
   setupVideoListeners(video) {
-    const handle = (e) => {
-      const target = video ?? e.target;
-      if (video || target.matches(`video, ${Consts.FAKE_VIDEO}`)) this[e.type](target);
-    };
-
     const ctrl = new AbortController();
     video && this.videoAborts.get(video)?.abort(); // 防止重复绑定
 
+    const handle = ({ type, target }) => target.matches(`video, ${Consts.FAKE_VIDEO}`) && this[type](target);
     this.videoEvts.forEach((t) => (video ?? document).addEventListener(t, handle, { capture: true, signal: ctrl.signal }));
     if (video) (this.videoAborts.set(video, ctrl), this.unbindVideoEvts());
   },
   setupShadowVideoListener() {
-    document.addEventListener("shadow-video", (e) => {
-      const { video } = e.detail;
+    document.addEventListener("shadow-video", ({ detail: { video } }) => {
       if (!video || video.hasAttribute("received")) return;
       video.setAttribute("received", true);
       this.setupVideoListeners(video);

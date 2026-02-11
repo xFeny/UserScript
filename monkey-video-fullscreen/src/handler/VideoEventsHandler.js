@@ -11,14 +11,12 @@ export default {
     const ctrl = new AbortController();
     video && this.videoAborts.get(video)?.abort(); // 防止重复绑定
 
-    const handle = (e) => this[e.type](video ?? e.target);
-
+    const handle = ({ type, target }) => this[type](target);
     this.videoEvts.forEach((t) => (video ?? document).addEventListener(t, handle, { capture: true, signal: ctrl.signal }));
     if (video) (this.videoAborts.set(video, ctrl), this.unbindVideoEvts());
   },
   setupShadowVideoListener() {
-    document.addEventListener("shadow-video", (e) => {
-      const { video } = e.detail;
+    document.addEventListener("shadow-video", ({ detail: { video } }) => {
       if (!video || video.hasAttribute("received")) return;
       video.setAttribute("received", true);
       this.setupVideoListeners(video);

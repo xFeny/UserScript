@@ -3,9 +3,9 @@
 .__rateDisplay {
   color: #e0e0e0;
   opacity: 1 !important;
+  z-index: 100 !important;
   text-indent: 0 !important;
   position: absolute !important;
-  z-index: 2147483647 !important;
   pointer-events: none !important;
   text-shadow:
     0.5px 0 1px #000,

@@ -242,7 +242,7 @@ export default {
       const el = Tools.createElement("div", { className: "monkey-toast" });
       content instanceof Element ? el.appendChild(content) : (el.textContent = content);
 
-      (this.findVideoContainer(null, 2, false).prepend(el), resolve(el));
+      (this.findVideoContainer(null, 2, false).appendChild(el), resolve(el));
       setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.HALF_SEC)), dealy);
     });
   },

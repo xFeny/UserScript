@@ -27,8 +27,9 @@
   }
 
   /** 获取集数 */
-  function getEpisodeNumber(element) {
-    return extractNumbers(element?.innerText?.replace(/-/g, ""))?.shift();
+  function getEpisodeNumber(el) {
+    const str = el?.innerText?.match(/第\d+集/i)?.[0] || el?.innerText?.replace(/-|\./g, "");
+    return extractNumbers(str)?.shift();
   }
 
   function getEpisodeWrapper(element) {

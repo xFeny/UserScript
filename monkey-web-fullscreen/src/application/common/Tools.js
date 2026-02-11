@@ -145,9 +145,5 @@ export default unsafeWindow.FyTools = {
    * @param {HTMLElement} el 待检测的DOM元素
    * @returns {boolean} true=元素挂载；false=元素已脱离
    */
-  isAttached(el) {
-    if (!el) return false;
-    const root = el.getRootNode?.();
-    return el.isConnected && (!root || !(root instanceof ShadowRoot) || root.host.isConnected);
-  },
+  isAttached: (el) => !!el && el.isConnected && (!el.getRootNode?.()?.host || el.getRootNode().host.isConnected),
 };

@@ -131,7 +131,7 @@ export default {
       Tools.attr(el, Consts.webFull, true);
     });
   },
-  hideRelatedOnFullscreen(cls = "hide") {
+  hideRelatedOnFullscreen(cls = "_hide") {
     const selector = Storage.HIDE_ELEMENTS.get(this.topWin?.host);
     selector && Tools.querys(selector).forEach((el) => (this.fsWrapper ? Tools.addCls(el, cls) : Tools.delCls(el, cls)));
   },

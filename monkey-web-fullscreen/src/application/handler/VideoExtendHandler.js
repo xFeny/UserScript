@@ -15,15 +15,19 @@ export default {
       this.setFakeBiliUser();
     });
   },
+  /**
+   * 解决：B站未登录观看视频约1分钟弹出登录框问题
+   */
   setFakeBiliUser() {
     if (!Site.isBili() || unsafeWindow.UserStatus?.userInfo?.isLogin) return;
-
-    // 解决：B站未登录观看视频约1分钟弹出登录框问题
     Tools.sleep(Consts.THREE_SEC).then(() => {
       unsafeWindow.__BiliUser__.cache.data.isLogin = true;
       unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
     });
   },
+  /**
+   * B站登录状态下画质设置为 1080P
+   */
   setBiliQuality() {
     if (!Site.isBili() || !document.cookie.includes("DedeUserID") || !unsafeWindow.player) return;
     const current = unsafeWindow.player.getQuality().realQ;
@@ -43,8 +47,8 @@ export default {
     if (!Site.isQiyi()) return video.duration;
     return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
   },
-  videoProgress(video, bypass) {
-    if (!video || (!bypass && video.paused) || this.player !== video || this.isMutedLoop(video)) return;
+  videoProgress(video) {
+    if (!video || this.player !== video || this.isMutedLoop(video)) return;
     if (video.duration <= 30 || this.isLive() || this.shouldHideTime()) return this.removeProgElement();
 
     const duration = this.getRealDur(video);
@@ -79,10 +83,7 @@ export default {
     this.rateDisplay.textContent = `倍速: ${this.player.playbackRate}`;
     this.prependElement(this.rateDisplay);
   },
-  ensureRateDisplay() {
-    if (document.contains(this.rateDisplay) || Tools.isOverLimit("rateKeep")) return;
-    this.playbackRateDisplay();
-  },
+  ensureRateDisplay: () => App.prependElement(App.rateDisplay),
   removeRateDisplay: () => App.rateDisplay?.remove(),
   // ====================⇑⇑⇑ 常显倍速相关逻辑 ⇑⇑⇑====================
 
@@ -95,6 +96,6 @@ export default {
     const container = this.player?.parentNode;
     if (el && !container?.contains(el)) container?.prepend(el);
   },
-  changeTimeDisplay: () => (App.setupPlayerClock(), App.videoProgress(App.player, true)),
+  changeTimeDisplay: () => (App.setupPlayerClock(), App.videoProgress(App.player)),
   setTimeColor: (color) => Tools.setStyle([App.progNode, App.Clock?.element], "color", color),
 };
