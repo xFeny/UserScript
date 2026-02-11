@@ -72,18 +72,13 @@ export default class BasicStorage {
    * 删除指定键名的数据
    * @param {string} [key] 键名后缀（可选，不传则删除基础名对应数据）
    */
-  del(key) {
-    this.storage.removeItem(this.#getFinalKey(key));
-  }
+  del = (key) => this.storage.removeItem(this.#getFinalKey(key));
+  fuzzyDel = (pattern) => this.fuzzyHandle(pattern, (key) => this.storage.removeItem(key));
 
   fuzzyGet(pattern) {
     const result = {};
     this.fuzzyHandle(pattern, (key) => (result[key] = this.storage.getItem(key)));
     return result;
-  }
-
-  fuzzyDel(pattern) {
-    this.fuzzyHandle(pattern, (key) => this.storage.removeItem(key));
   }
 
   fuzzyHandle(pattern, callback) {

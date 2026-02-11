@@ -1,5 +1,6 @@
 import Tools from "../common/Tools";
 import Storage from "../common/Storage";
+import I18n from "../common/I18n";
 
 /**
  * 脚本菜单相关逻辑处理
@@ -14,13 +15,13 @@ export default {
   },
   setupMenuCmds() {
     const host = location.host;
-    const isAuto = `此站${this.isAuto() ? "禁" : "启"}用自动网页全屏`;
+    const isAuto = I18n.t(this.isAuto() ? "disable" : "enable");
     const configs = [
       { title: isAuto, cache: Storage.IS_AUTO, fn: (cache, val) => cache.set(!val, host) },
-      { title: "此站自动时忽略的网址", cache: Storage.IGNORE_URLS },
-      { title: "此站全屏时隐藏的元素", cache: Storage.HIDE_ELEMENTS },
-      { title: "此站脱离式全屏阈值", cache: Storage.DETACH_THRESHOLD },
-      { title: "自定义此站视频容器", cache: Storage.CUSTOM_CTN },
+      { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS },
+      { title: I18n.t("hidden"), cache: Storage.HIDE_ELEMENTS },
+      { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD },
+      { title: I18n.t("custom"), cache: Storage.CUSTOM_CTN },
     ];
 
     // 注册菜单项
