@@ -4,7 +4,7 @@
 // @name:zh-TW      視頻網頁全屏
 // @name:en         Video Fullscreen
 // @namespace       npm/vite-plugin-monkey
-// @version         3.9.2
+// @version         3.9.3
 // @author          Feny
 // @description     Maximize all video players; Shortcut keys: P - Web Fullscreen, Enter - Fullscreen; Support side click to web fullscreen; Support auto web fullscreen
 // @description:zh  让所有视频网页全屏，快捷键：P - 网页全屏，Enter - 全屏; 支持侧边点击切换网页全屏; 支持自动网页全屏
