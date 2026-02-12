@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name            video-fullscreen
-// @name:zh         视频网页全屏
+// @name            视频网页全屏
 // @name:zh-CN      视频网页全屏
 // @name:zh-TW      視頻網頁全屏
+// @name:en         Video Fullscreen
 // @namespace       npm/vite-plugin-monkey
 // @version         3.9.2
 // @author          Feny
