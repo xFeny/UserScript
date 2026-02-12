@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.9.4.1
+// @version      3.9.5
 // @author       Feny
 // @description  支持所有H5视频的增强脚本，通用网页全屏｜倍速调节；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @license      GPL-3.0-only
@@ -50,7 +50,7 @@
 // @note         *://*/*
 // ==/UserScript==
 
-(e=>{const n=Symbol("added"),t=document.createElement("style");t.textContent=e,window.gmStyle=t,document.addEventListener("addStyle",({detail:{sroot:o}})=>{o[n]||o instanceof Document||(o.prepend(t.cloneNode(!0)),o[n]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(e)})(' @charset "UTF-8";[gm_webfullscreen],body[gm_webfullscreen] [gm_webfullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[gm_webfullscreen] video,body[gm_webfullscreen] [gm_webfullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;transform:none!important;object-fit:contain!important;height:clamp(100vh - 100%,100vh,100%)!important}[gm_webfullscreen]~*:not(.monkey-web-fullscreen){display:none!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--mvX, 0),var(--mvY, 0))!important}[gm_webfullscreen] video.__tsr,body[gm_webfullscreen] [gm_webfullscreen] video.__tsr{transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--mvX, 0),var(--mvY, 0))!important}.__Clock,.__timeupdate,.__rateDisplay{color:#e0e0e0;opacity:1!important;text-indent:0!important;position:absolute!important;z-index:2147483647!important;pointer-events:none!important;text-shadow:.5px 0 1px #000,-.5px 0 1px #000!important;font-family:Arial,Helvetica,sans-serif!important}.__Clock{top:8px!important;right:15px!important;width:auto!important;height:auto!important;font-size:17.5px!important;font-weight:700!important;text-align:right!important;line-height:17.5px!important;background-color:transparent!important}.__timeupdate,.__rateDisplay{font-size:12px!important;line-height:12px!important}.__timeupdate{top:25px!important;right:15px!important;transform:scale(.9)!important;transform-origin:top right!important}.__timeupdate b{font:inherit!important;display:inline-block!important;transform:scale(.75)!important;vertical-align:text-bottom!important}.__rateDisplay{color:#d9d9d9;top:5px!important;left:5px!important;box-shadow:none!important;display:inline-block!important;transform:scale(.875)!important}.__edgeClick{left:0!important;top:6%!important;opacity:0!important;width:25px!important;height:70%!important;position:absolute!important;z-index:2147483647!important;cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC),pointer!important}.__edgeClick.right{right:0!important;left:auto!important}.notyf{z-index:2147483647!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:0 0 0 1px #6496c880!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen button:where(.swal2-close){color:#666!important;font-size:1.7em!important;font-weight:bolder!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important;font-weight:400!important}.monkey-web-fullscreen p{color:#999!important;margin-top:0!important;font-size:12px!important}.monkey-web-fullscreen #__picker{width:100%!important;height:auto!important;max-width:25em!important;font-size:14px!important;margin-bottom:0!important;min-height:10em!important;resize:vertical!important}.monkey-web-fullscreen .swal2-tabs-header{display:flex;position:relative;margin-bottom:12px;font-size:15px!important;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;padding:8px 0;cursor:pointer;color:#64748b;font-weight:700;text-align:center;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;visibility:visible;background-color:#3b82f6;border-radius:2px 2px 0 0}.monkey-web-fullscreen .swal2-tab:hover:not(.active){color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%;padding:0 5px;min-height:325px}.monkey-web-fullscreen .swal2-tab-panel{display:none}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 5px!important;padding:0 0 5px!important;float:none!important;height:30px!important;color:#666!important;display:flex!important;font-size:14px!important;line-height:30px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text]{color:#333;border-radius:3px;border:1px solid #cbd5e1!important;text-align:center!important;line-height:12px!important;font-size:12px!important;padding:0 3px!important;height:23px!important;width:75px!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:38px!important;height:18px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:12px!important;height:12px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen .text-group{margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid #f5f5f5}.monkey-web-fullscreen .text-group:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .text-group p{margin-bottom:2px;color:#333!important;text-align:left!important}.monkey-web-fullscreen .text-group textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;height:50px!important;font-size:12px!important;padding:2px 5px!important;line-height:normal!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen .text-group textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen .text-group textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen textarea:focus,.monkey-web-fullscreen input[type=text]:focus{outline:none!important;box-shadow:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #efefef!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.monkey-toast{left:10px!important;bottom:16%!important;color:#fff!important;padding:0 10px!important;border-radius:3px!important;position:absolute!important;z-index:2147483647!important;transition:opacity .3s ease-in!important;font: 13px/26px sans-serif!important;background:#000000bf!important}.monkey-toast span{display:inline!important}.monkey-toast .cText{margin:0 3px!important;color:#ff5f00!important}.__hc{cursor:none!important}.hide,#buffer,#install,.player-overlay,.memory-play-wrap,.atom-notice-click,.dplayer-resume-tip,#player #loading-box,.dplayer-notice strong,.air-player-loading-box,#bilibili-player :is(.bpx-player-toast-wrap,.bpx-player-cmd-dm-wrap),#bilibili-player .bpx-player-dialog-wrap>:not(.bpx-player-dm-tip){display:none!important}@supports selector(:has(*)){body>#loading:not(:has(video)),*:has(video) :is(#tips,.art-layers){display:none!important}} ');
+(o=>{const n=Symbol("added"),t=document.createElement("style");t.textContent=o,window.gmStyle=t,document.addEventListener("addStyle",({detail:{sroot:e}})=>{e[n]||e instanceof Document||(e.prepend(t.cloneNode(!0)),e[n]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(o)})(' @charset "UTF-8";[gm_webfullscreen],body[gm_webfullscreen] [gm_webfullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[gm_webfullscreen] video,body[gm_webfullscreen] [gm_webfullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;transform:none!important;object-fit:contain!important;height:clamp(100vh - 100%,100vh,100%)!important}[gm_webfullscreen]~*:not(.monkey-web-fullscreen){display:none!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--mvX, 0),var(--mvY, 0))!important}[gm_webfullscreen] video.__tsr,body[gm_webfullscreen] [gm_webfullscreen] video.__tsr{transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--mvX, 0),var(--mvY, 0))!important}.__Clock,.__timeupdate,.__rateDisplay{color:#e0e0e0;opacity:1!important;z-index:100!important;text-indent:0!important;position:absolute!important;pointer-events:none!important;text-shadow:.5px 0 1px #000,-.5px 0 1px #000!important;font-family:Arial,Helvetica,sans-serif!important}.__Clock{top:8px!important;right:15px!important;width:auto!important;height:auto!important;font-size:17.5px!important;font-weight:700!important;text-align:right!important;line-height:17.5px!important;background-color:transparent!important}.__timeupdate,.__rateDisplay{font-size:12px!important;line-height:12px!important}.__timeupdate{top:25px!important;right:15px!important;transform:scale(.9)!important;transform-origin:top right!important}.__timeupdate b{font:inherit!important;display:inline-block!important;transform:scale(.75)!important;vertical-align:text-bottom!important}.__rateDisplay{color:#d9d9d9;top:5px!important;left:5px!important;box-shadow:none!important;display:inline-block!important;transform:scale(.875)!important}.__edgeClick{left:0!important;top:6%!important;opacity:0!important;width:25px!important;height:70%!important;position:absolute!important;z-index:2147483647!important;cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC),pointer!important}.__edgeClick.right{right:0!important;left:auto!important}.notyf{z-index:2147483647!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled){line-height:normal}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:none!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important}.monkey-web-fullscreen p{margin:0!important;color:#999!important;font-size:12px!important}.monkey-web-fullscreen #picker{margin-bottom:0;height:auto!important;font-size:14px!important;min-height:15em!important;resize:vertical!important;width:-webkit-fill-available;width:-moz-available}.monkey-web-fullscreen .swal2-tabs-header{display:flex;position:relative;margin-bottom:12px;font-size:15px!important;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;padding:8px 0;cursor:pointer;color:#64748b;font-weight:700;text-align:center;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab:hover,.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;border-radius:2px;background-color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%;padding:0 5px;min-height:325px}.monkey-web-fullscreen .swal2-tab-panel{display:none}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 5px!important;padding:0 0 5px!important;float:none!important;height:30px!important;color:#666!important;display:flex!important;font-size:14px!important;line-height:30px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text]{color:#333;border-radius:3px;border:1px solid #cbd5e1!important;text-align:center!important;line-height:12px!important;font-size:12px!important;padding:0 3px!important;height:23px!important;width:75px!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:38px!important;height:18px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:12px!important;height:12px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen .text-group{margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid #f5f5f5}.monkey-web-fullscreen .text-group:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .text-group p{margin-bottom:2px;color:#333!important;text-align:left!important}.monkey-web-fullscreen .text-group textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;height:50px!important;font-size:12px!important;padding:2px 5px!important;line-height:normal!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen .text-group textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen .text-group textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen textarea:focus,.monkey-web-fullscreen input[type=text]:focus{outline:none!important;box-shadow:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #efefef!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.monkey-toast{left:10px!important;bottom:16%!important;color:#fff!important;padding:0 10px!important;border-radius:3px!important;position:absolute!important;z-index:2147483647!important;transition:opacity .3s ease-in!important;font: 13px/26px sans-serif!important;background:#000000bf!important}.monkey-toast span{display:inline!important}.monkey-toast .cText{margin:0 3px!important;color:#ff5f00!important}.__hc{cursor:none!important}._hide,#buffer,#install,.player-overlay,.memory-play-wrap,.atom-notice-click,.dplayer-resume-tip,#player #loading-box,.dplayer-notice strong,.air-player-loading-box,#bilibili-player :is(.bpx-player-toast-wrap,.bpx-player-cmd-dm-wrap),#bilibili-player .bpx-player-dialog-wrap>:not(.bpx-player-dm-tip){display:none!important}@supports selector(:has(*)){body>#loading:not(:has(video)),*:has(video) :is(#tips,.art-layers){display:none!important}} ');
 
 (function (notyf, Swal) {
   'use strict';
@@ -235,11 +235,7 @@
       const fn = val ? "setProperty" : "removeProperty";
       [].concat(els).forEach((el) => el?.style?.[fn]?.(prop, val, priority));
     },
-    isAttached(el) {
-      if (!el) return false;
-      const root = el.getRootNode?.();
-      return el.isConnected && (!root || !(root instanceof ShadowRoot) || root.host.isConnected);
-    }
+    isAttached: (el) => !!el && el.isConnected && (!el.getRootNode?.()?.host || el.getRootNode().host.isConnected)
   };
   class VideoEnhancer {
     static setPlaybackRate(video, rate) {
@@ -341,16 +337,12 @@
         return this.parser(value ?? this.defVal);
       }
     }
-    del(key) {
-      this.storage.removeItem(this.#getFinalKey(key));
-    }
+    del = (key) => this.storage.removeItem(this.#getFinalKey(key));
+    fuzzyDel = (pattern) => this.fuzzyHandle(pattern, (key) => this.storage.removeItem(key));
     fuzzyGet(pattern) {
       const result = {};
       this.fuzzyHandle(pattern, (key) => result[key] = this.storage.getItem(key));
       return result;
-    }
-    fuzzyDel(pattern) {
-      this.fuzzyHandle(pattern, (key) => this.storage.removeItem(key));
     }
     fuzzyHandle(pattern, callback) {
       const keys = Object.is(this.storage, localStorage) ? Object.keys(localStorage) : GM_listValues();
@@ -722,18 +714,14 @@
     videoAborts: /* @__PURE__ */ new Map(),
     videoEvts: ["loadedmetadata", "loadeddata", "timeupdate", "ratechange", "canplay", "playing", "ended"],
     setupVideoListeners(video) {
-      const handle = (e) => {
-        const target = video ?? e.target;
-        if (video || target.matches(`video, ${Consts.FAKE_VIDEO}`)) this[e.type](target);
-      };
       const ctrl = new AbortController();
       video && this.videoAborts.get(video)?.abort();
+      const handle = ({ type, target }) => target.matches(`video, ${Consts.FAKE_VIDEO}`) && this[type](target);
       this.videoEvts.forEach((t) => (video ?? document).addEventListener(t, handle, { capture: true, signal: ctrl.signal }));
       if (video) this.videoAborts.set(video, ctrl), this.unbindVideoEvts();
     },
     setupShadowVideoListener() {
-      document.addEventListener("shadow-video", (e) => {
-        const { video } = e.detail;
+      document.addEventListener("shadow-video", ({ detail: { video } }) => {
         if (!video || video.hasAttribute("received")) return;
         video.setAttribute("received", true);
         this.setupVideoListeners(video);
@@ -764,10 +752,8 @@
       this.ensureRateDisplay();
     },
     canplay(video) {
-      if (!Tools.isVisible(video) || Storage.DISABLE_TRY_PLAY.get()) return;
-      if (video._mfs_tryPlay || Tools.isMultiV()) return;
-      video._mfs_tryPlay = true;
-      this.tryPlay(video);
+      if (!Tools.isVisible(video) || Tools.isMultiV() || Storage.DISABLE_TRY_PLAY.get()) return;
+      if (!this.isExecuted("_mfs_playV", video)) this.playV(video);
     },
     playing(video) {
       this.setCurrentVideo(video);
@@ -799,7 +785,7 @@
       Object.keys(video).forEach((k) => k.startsWith("_mfs_") && delete video[k]);
       video.__duration = video.duration;
       video.tsr = { ...Consts.DEF_TSR };
-      Tools.resetLimit("rateKeep", "autoWide");
+      Tools.resetLimit("autoWide");
       this.removeRateDisplay();
       this.removeProgElement();
     },
@@ -810,9 +796,9 @@
       this.setupPlayerClock();
       this.setBiliQuality();
     },
-    remainTime: (video) => Math.floor(App.getRealDur(video)) - Math.floor(video.currentTime),
-    playToggle: (video) => Site.isDouyu() ? video?.click() : video?.[video?.paused ? "play" : "pause"](),
-    tryPlay: (video) => video?.paused && (Site.isDouyu() ? video?.click() : video?.play()),
+    remainTime: (v) => Math.floor(App.getRealDur(v)) - Math.floor(v.currentTime),
+    playToggle: (v) => Site.isDouyu() ? v?.click() : v?.[v?.paused ? "play" : "pause"](),
+    playV: (v) => v?.paused && (Site.isDouyu() ? v?.click() : v?.play()),
     setPlaybackRate(rate) {
       if (!rate || !this.player || this.isLive() || this.isDisRate() || +this.player.playbackRate === +rate) return;
       VideoEnhancer.setPlaybackRate(this.player, rate);
@@ -848,7 +834,7 @@
       });
     },
     setCurrentTime: (ct) => ct && (App.player.currentTime = Math.max(0, ct)),
-    clearCachedTime: (video) => App.topWin && Storage.PLAY_TIME.del(App.getUniqueKey(video)),
+    clearCachedTime: (v) => App.topWin && Storage.PLAY_TIME.del(App.getUniqueKey(v)),
     getUniqueKey(video, { duration, __duration } = video) {
       if (video._mfs_cacheTKey) return video._mfs_cacheTKey;
       const currNumber = this.getCurrentEpisodeNumber();
@@ -964,7 +950,7 @@
         if (isRemove) Tools.query(".monkey-toast")?.remove();
         const el = Tools.createElement("div", { className: "monkey-toast" });
         content instanceof Element ? el.appendChild(content) : el.textContent = content;
-        this.findVideoContainer(null, 2, false).prepend(el), resolve(el);
+        this.findVideoContainer(null, 2, false).appendChild(el), resolve(el);
         setTimeout(() => (el.style.opacity = 0, setTimeout(() => el.remove(), Consts.HALF_SEC)), dealy);
       });
     }
@@ -1076,7 +1062,7 @@
         Tools.attr(el, Consts.webFull, true);
       });
     },
-    hideRelatedOnFullscreen(cls = "hide") {
+    hideRelatedOnFullscreen(cls = "_hide") {
       const selector = Storage.HIDE_ELEMENTS.get(this.topWin?.host);
       selector && Tools.querys(selector).forEach((el) => this.fsWrapper ? Tools.addCls(el, cls) : Tools.delCls(el, cls));
     }
@@ -1139,7 +1125,10 @@
       }).map(this.getEpisodeWrapper).filter((el) => this.getAllEpisodes(el).map(this.getEpisodeNumber).filter(Boolean).length > 1);
       return eles.length <= 1 ? eles[0] : eles.find((el) => Tools.hasCls(el, "cur", "active") || !!this.getEpisodeNumber(el));
     },
-    getEpisodeNumber: (el) => Tools.getNumbers(el?.innerText?.replace(/-|\./g, Consts.EMPTY))?.shift(),
+    getEpisodeNumber: (el) => {
+      const str = el?.innerText?.match(/第\d+(集|话|期)/i)?.[0] || el?.innerText?.replace(/-|\./g, Consts.EMPTY);
+      return Tools.getNumbers(str)?.shift();
+    },
     getTargetEpisode(el, isPrev = false) {
       if (!el) return;
       const episodes = this.getAllEpisodes(el);
@@ -1198,20 +1187,15 @@
     setupPickerListener() {
       if (Site.isGmMatch() || this.isExecuted("isBindPicker")) return;
       const handle = (event, { target, ctrlKey, altKey, isTrusted } = event) => {
-        if (!ctrlKey || !altKey || !isTrusted || this.isNoVideo() || this.isLive()) return;
+        if (!ctrlKey || !altKey || !isTrusted || this.isNoVideo()) return;
+        this.pickerCurrentEpisodePath(target) ?? this.pickerRelativeEpisodePath(target) ?? Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
         Tools.preventDefault(event);
-        const curSelector = Storage.CURRENT_EPISODE.get(this.host);
-        const relSelector = Storage.RELATIVE_EPISODE.get(this.host);
-        if (curSelector && relSelector) return Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
-        const number = this.getEpisodeNumber(target);
-        if (!number) return Tools.notyf("点击位置无数字 (•ิ_•ิ)?", true);
-        curSelector ? this.pickerRelativeEpisodePath(target) : this.pickerCurrentEpisodePath(target);
       };
       document.addEventListener("click", handle, true);
     },
     pickerCurrentEpisodePath(el) {
       if (Storage.CURRENT_EPISODE.get(this.host)) return;
-      this.pickerEpisodePopup(el, {
+      return this.pickerEpisodePopup(el, {
         onVerify(value) {
           try {
             const number = this.getEpisodeNumber(Tools.query(value));
@@ -1229,7 +1213,7 @@
     },
     pickerRelativeEpisodePath(el) {
       if (Storage.RELATIVE_EPISODE.get(this.host)) return;
-      this.pickerEpisodePopup(el, {
+      return this.pickerEpisodePopup(el, {
         onVerify(value) {
           try {
             const container = this.getEpisodeWrapper(Tools.query(value));
@@ -1256,26 +1240,25 @@
       const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(Storage.RELATIVE_EPISODE.get(this.host))));
       return episodes.includes(current) ? current : episodes.find((el) => this.getEpisodeNumber(el) === num);
     },
-    pickerEpisodePopup(el, { onVerify, onSave }) {
-      Swal.fire({
+    async pickerEpisodePopup(el, { onVerify, onSave }) {
+      const res = await Swal.fire({
         html: Tools.safeHTML(`<h4>验证能正确取到集数，再确定保存</h4>
-      <textarea id="__picker" class="swal2-textarea" placeholder="请输入元素选择器"></textarea>
+      <textarea id="picker" class="swal2-textarea" spellcheck="false"></textarea>
       <p>编辑元素选择器，确保能正确获取到集数</p>`),
         customClass: { container: "monkey-web-fullscreen" },
-        title: "拾取剧集元素选择器",
         confirmButtonText: "保存",
         denyButtonText: "验证",
-        showCloseButton: true,
         showDenyButton: true,
         reverseButtons: true,
         focusDeny: true,
         preDeny: () => {
-          const value = Tools.query("#__picker").value.trim();
-          return value ? onVerify.call(this, value) ?? false : Tools.notyf("元素选择器不能为空！", true);
+          const value = Tools.query("#picker").value.trim();
+          return value ? onVerify.call(this, value) ?? false : Tools.notyf("选择器不能为空！", true);
         },
-        preConfirm: () => Tools.query("#__picker").value.trim() || Tools.notyf("元素选择器不能为空！", true),
-        didOpen: () => Tools.query("#__picker").value = Tools.getElementPath(el)
-      }).then((res) => res.isConfirmed && onSave.call(this, res.value));
+        preConfirm: () => Tools.query("#picker").value.trim() || Tools.notyf("选择器不能为空！", true),
+        didOpen: () => Tools.query("#picker").value = Tools.getElementPath(el)
+      });
+      return res.isConfirmed && onSave.call(this, res.value);
     }
   };
   class Clock {
@@ -1358,8 +1341,8 @@
       if (!Site.isQiyi()) return video.duration;
       return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
     },
-    videoProgress(video, bypass) {
-      if (!video || !bypass && video.paused || this.player !== video || this.isMutedLoop(video)) return;
+    videoProgress(video) {
+      if (!video || this.player !== video || this.isMutedLoop(video)) return;
       if (video.duration <= 30 || this.isLive() || this.shouldHideTime()) return this.removeProgElement();
       const duration = this.getRealDur(video);
       if (duration > 86400) return this.removeProgElement();
@@ -1384,10 +1367,7 @@
       this.rateDisplay.textContent = `倍速: ${this.player.playbackRate}`;
       this.prependElement(this.rateDisplay);
     },
-    ensureRateDisplay() {
-      if (document.contains(this.rateDisplay) || Tools.isOverLimit("rateKeep")) return;
-      this.playbackRateDisplay();
-    },
+    ensureRateDisplay: () => App.prependElement(App.rateDisplay),
     removeRateDisplay: () => App.rateDisplay?.remove(),
     createDisplayElement(cls, color) {
       const el = Tools.createElement("div", { className: cls, style: `color: ${color}` });
@@ -1398,13 +1378,13 @@
       const container = this.player?.parentNode;
       if (el && !container?.contains(el)) container?.prepend(el);
     },
-    changeTimeDisplay: () => (App.setupPlayerClock(), App.videoProgress(App.player, true)),
+    changeTimeDisplay: () => (App.setupPlayerClock(), App.videoProgress(App.player)),
     setTimeColor: (color) => Tools.setStyle([App.progNode, App.Clock?.element], "color", color)
   };
   const Ignore = {
     setupIgnoreChangeListener() {
       [Storage.FULL_IGNORE_URLS, Storage.NEXT_IGNORE_URLS].forEach(
-        (it) => GM_addValueChangeListener(it.name, (_, oldVal, newVal) => oldVal !== newVal && this.initIgnoreUrls())
+        (it) => GM_addValueChangeListener(it.name, () => this.initIgnoreUrls())
       );
     },
     initIgnoreUrls() {
