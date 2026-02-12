@@ -28,7 +28,7 @@
 
   /** 获取集数 */
   function getEpisodeNumber(el) {
-    const str = el?.innerText?.match(/第\d+集/i)?.[0] || el?.innerText?.replace(/-|\./g, "");
+    const str = el?.innerText?.match(/第\d+(集|话|期)/i)?.[0] || el?.innerText?.replace(/-|\./g, Consts.EMPTY);
     return extractNumbers(str)?.shift();
   }
 

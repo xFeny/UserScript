@@ -46,7 +46,7 @@ export default {
     return eles.length <= 1 ? eles[0] : eles.find((el) => Tools.hasCls(el, "cur", "active") || !!this.getEpisodeNumber(el));
   },
   getEpisodeNumber: (el) => {
-    const str = el?.innerText?.match(/第\d+集/i)?.[0] || el?.innerText?.replace(/-|\./g, Consts.EMPTY);
+    const str = el?.innerText?.match(/第\d+(集|话|期)/i)?.[0] || el?.innerText?.replace(/-|\./g, Consts.EMPTY);
     return Tools.getNumbers(str)?.shift();
   },
   getTargetEpisode(el, isPrev = false) {
