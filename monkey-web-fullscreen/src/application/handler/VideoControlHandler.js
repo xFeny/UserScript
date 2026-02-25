@@ -42,7 +42,7 @@ export default {
     this.removeProgElement();
   },
   initVideoPlay(video) {
-    if (this.isExecuted("_mfs_apply", video)) return;
+    if (this.isExecuted("_mfs_apply", this.player)) return;
 
     // ====== 应用缓存数据 ======
     this.applyCachedRate();

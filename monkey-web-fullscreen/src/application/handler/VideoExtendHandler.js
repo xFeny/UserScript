@@ -19,8 +19,9 @@ export default {
    * 解决：B站未登录观看视频约1分钟弹出登录框问题
    */
   setFakeBiliUser() {
-    if (!Site.isBili() || unsafeWindow.UserStatus?.userInfo?.isLogin) return;
-    Tools.sleep(Consts.THREE_SEC).then(() => {
+    if (!Site.isBili()) return;
+    Tools.sleep(Consts.THREE_SEC * 2).then(() => {
+      if (unsafeWindow.__BiliUser__?.isLogin) return;
       unsafeWindow.__BiliUser__.cache.data.isLogin = true;
       unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
     });
