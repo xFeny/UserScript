@@ -8,13 +8,23 @@ import Storage from "../common/Storage";
  * 非`@match`网站 通过对视频容器父元素添加相关CSS的方式
  */
 export default {
+  triggerIconElement(index) {
+    const content = Storage.ICONS_ELE.get(this.topWin.host);
+    const selector = (content.match(/[^;\n]+/g) || [])?.[index];
+    (this.player.closest(selector) ?? Tools.query(selector))?.click();
+    return selector;
+  },
   toggleFullscreen() {
     if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
+    if (this.triggerIconElement(Consts.ICONS.full)) return;
+
     this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
     if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcut(Consts.P); // 全屏或非网页全屏模式下
   },
   toggleWebFullscreen(isTrusted) {
     if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
+    if (this.triggerIconElement(Consts.ICONS.webFull)) return;
+
     if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
     this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
     requestAnimationFrame(() => this.hideRelatedOnFullscreen());

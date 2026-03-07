@@ -10,6 +10,8 @@ export default {
   DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, Number),
   /** 自定义此站视频容器 */
   CUSTOM_CTN: new BasicStorage("CUSTOM_CTN_", ""),
+  /** 自定义(网页)全屏点击元素 */
+  ICONS_ELE: new BasicStorage("ICONS_ELE_", ""),
   /** 自动网页全屏忽略的网址 */
   IGNORE_URLS: new BasicStorage("IGNORE_URLS_", ""),
   /** 全屏时要隐藏的元素 */

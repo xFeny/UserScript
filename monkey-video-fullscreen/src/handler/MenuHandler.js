@@ -19,9 +19,10 @@ export default {
     const configs = [
       { title: isAuto, cache: Storage.IS_AUTO, fn: (cache, val) => cache.set(!val, host) },
       { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS },
+      { title: I18n.t("element"), cache: Storage.ICONS_ELE },
+      { title: I18n.t("custom"), cache: Storage.CUSTOM_CTN },
       { title: I18n.t("hidden"), cache: Storage.HIDE_ELEMENTS },
       { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD },
-      { title: I18n.t("custom"), cache: Storage.CUSTOM_CTN },
     ];
 
     // 注册菜单项

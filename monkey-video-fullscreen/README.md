@@ -10,13 +10,32 @@
 - [x] 支持多视频页面（如：微博、抖音等）
 - [x] 支持在自动模式下忽略 URLs（前缀匹配，多值用英文 ; 隔开）
   - 示例：https://www.youtube.com/results;https://www.youtube.com/shorts;https://www.youtube.com/@;
+- [x] 支持自定义全屏点击元素（与 `自定义视频容器` 二选一）
+  - 示例 `https://www.bilibili.com`：
+  
+   ```js
+   .bpx-player-ctrl-full; .bpx-player-ctrl-web
+   ```
 
 ## Features
 
 - [x] Support auto web fullscreen
+
 - [x] Support multi-video pages
+
 - [x] Support for custom video container
+
 - [x] Support `iframe` and `shadowRoot` videos
+
 - [x] Support side click to toggle web fullscreen
+
 - [x] URLs ignored in auto mode (prefix match, multiple values separated by semicolons)
   - example：https://www.youtube.com/results;https://www.youtube.com/shorts;https://www.youtube.com/@;
+  
+- [x] Support for custom fullscreen click elements (Choose `Custom Video Container` or this)
+
+  - example `https://www.youtube.com`：
+
+     ```js
+     .ytp-fullscreen-button; .ytp-size-button
+     ```
