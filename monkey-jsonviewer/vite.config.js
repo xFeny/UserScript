@@ -1,16 +1,15 @@
 import { defineConfig } from "vite";
 import monkey, { util, cdn } from "vite-plugin-monkey";
-import AutoImport from "unplugin-auto-import/vite";
+import cleanup from "rollup-plugin-cleanup";
 
 export default defineConfig({
   build: {
-    target: "es2020",
+    target: "es2022",
+    rollupOptions: { plugins: [cleanup({ comments: "none", exclude: ["node_modules/**"] })] },
   },
   plugins: [
-    AutoImport({
-      imports: [util.unimportPreset],
-    }),
     monkey({
+      server: { mountGmApi: true },
       userscript: {
         connect: "*",
         author: "Feny",
@@ -41,19 +40,7 @@ export default defineConfig({
             util.dataUrl(";window.hljs=hljs;")
           ),
         },
-        cssSideEffects: () => {
-          return (e) => {
-            // 是否向document.head插入样式
-            window.addEventListener("message", (event) => {
-              const { data } = event;
-              if (!data?.addStyle) return;
-              if (typeof GM_addStyle === "function") return GM_addStyle(e);
-              const o = document.createElement("style");
-              o.textContent = e;
-              document.head.append(o);
-            });
-          };
-        },
+        cssSideEffects: () => (css) => window.addEventListener("message", ({ data }) => data?.addStyle && GM_addStyle(css)),
       },
     }),
   ],

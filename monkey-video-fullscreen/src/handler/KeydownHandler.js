@@ -33,10 +33,9 @@ export default {
   processEvent(data) {
     // 规避父窗口视频对 iframe 内视频网页全屏的干扰
     if (this.vMeta?.iFrame && this.player) delete this.player;
+    ({ P: this.toggleWebFullscreen, ENTER: this.toggleFullscreen })[data?.key]?.(data?.isTrusted);
 
     // 视频可能在 iframe 中，向 iframe 传递操作
     if (!this.player) Tools.sendToIFrames(data);
-    if (data?.key) this.execKeyActions(data);
   },
-  execKeyActions: ({ key, isTrusted }) => (key === Consts.P ? App.toggleWebFullscreen(isTrusted) : App.toggleFullscreen()),
 };

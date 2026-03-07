@@ -122,7 +122,7 @@ export default {
   },
   videoParents: new Set(),
   findVideoContainer(container, max = 4, track = true) {
-    container = container ?? Tools.getParent(this.player);
+    container ??= Tools.getParent(this.player);
     if (!container.offsetHeight) container = Tools.getParent(container); // Youtube 存在这样的问题
     const { offsetWidth: cw, offsetHeight: ch } = container;
     if (track) this.videoParents.clear(); // 仅网页全屏时

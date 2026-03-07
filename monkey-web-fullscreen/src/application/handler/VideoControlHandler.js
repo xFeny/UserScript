@@ -36,10 +36,6 @@ export default {
 
     // 重置次数限制
     Tools.resetLimit("autoWide");
-
-    // 移除相关的自定义元素
-    this.removeRateDisplay();
-    this.removeProgElement();
   },
   initVideoPlay(video) {
     if (this.isExecuted("_mfs_apply", this.player)) return;
@@ -51,7 +47,7 @@ export default {
     this.setupPlayerClock();
     this.setBiliQuality();
   },
-  remainTime: (v) => Math.floor(App.getRealDur(v)) - Math.floor(v.currentTime),
+  remainTime: (v) => Math.floor(App.getRealDuration(v)) - Math.floor(v.currentTime),
   playToggle: (v) => (Site.isDouyu() ? v?.click() : v?.[v?.paused ? "play" : "pause"]()),
   playV: (v) => v?.paused && (Site.isDouyu() ? v?.click() : v?.play()),
 
@@ -77,6 +73,7 @@ export default {
     if (!bypass && !this.isOverrideKey()) return;
     if (!this.player || this.isLive() || this.player.ended) return;
     this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
+    this.showToast(`快${second > 0 ? "进" : "退"} ${Math.abs(second)} 秒`, Consts.ONE_SEC);
   },
   cachePlayTime(video) {
     if (video !== this.player || !this.topWin || video.duration < 120 || this.isLive()) return;
@@ -151,7 +148,7 @@ export default {
 
     tsr.zoom = zoom;
     this.setTsr("--zoom", zoom / 100);
-    this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC);
+    this.showToast(`缩放: ${zoom}%`, Consts.ONE_SEC);
   },
   moveVideo(key) {
     if (!this.player || this.isDisZoom()) return;
@@ -168,7 +165,7 @@ export default {
     // 赋值
     ((tsr.mvX += x), (tsr.mvY += y));
     this.setTsr("--mvX", `${tsr.mvX}px`).setTsr("--mvY", `${tsr.mvY}px`);
-    this.showToast(`向${desc}移动：${x ? tsr.mvX : tsr.mvY}px`, Consts.ONE_SEC);
+    this.showToast(`${desc}移: ${x ? tsr.mvX : tsr.mvY}px`, Consts.ONE_SEC);
   },
   resetTsr() {
     if (!this.player || this.isDisZoom()) return;
@@ -182,7 +179,7 @@ export default {
   setTsr(name, value) {
     try {
       Tools.addCls(this.player, "__tsr");
-      this.player._mfs_tsr = this.player._mfs_tsr ?? getComputedStyle(this.player).transform;
+      this.player._mfs_tsr ??= getComputedStyle(this.player).transform;
       Tools.setStyle(this.player, "--deftsr", this.player._mfs_tsr);
       Tools.setStyle(this.player, name, value);
     } catch (e) {

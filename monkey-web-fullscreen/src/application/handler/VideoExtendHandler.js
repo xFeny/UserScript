@@ -44,16 +44,15 @@ export default {
     this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
   },
   // ====================⇓⇓⇓ 进度显示相关逻辑 ⇓⇓⇓====================
-  getRealDur(video) {
+  getRealDuration(video) {
     if (!Site.isQiyi()) return video.duration;
     return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
   },
   videoProgress(video) {
     if (!video || this.player !== video || this.isMutedLoop(video)) return;
-    if (video.duration <= 30 || this.isLive() || this.shouldHideTime()) return this.removeProgElement();
 
-    const duration = this.getRealDur(video);
-    if (duration > 864e2) return this.removeProgElement();
+    const duration = this.getRealDuration(video);
+    if (duration <= 30 || duration > 864e2 || this.isLive() || this.shouldHideTime()) return this.progNode?.remove();
 
     const percent = Tools.toFixed((video.currentTime / duration) * 100, 1);
     const remain = this.formatTime(duration - video.currentTime);
@@ -72,20 +71,18 @@ export default {
 
     return el;
   },
-  removeProgElement: () => App.progNode?.remove(),
   // ====================⇑⇑⇑ 进度显示相关逻辑 ⇑⇑⇑====================
 
   // ====================⇓⇓⇓ 常显倍速相关逻辑 ⇓⇓⇓====================
   playbackRateDisplay() {
     if (!this.player || this.isLive()) return;
-    if (!Storage.RATE_KEEP_SHOW.get()) return this.removeRateDisplay();
+    if (!Storage.RATE_KEEP_SHOW.get()) return this.rateDisplay?.remove();
 
-    if (!this.rateDisplay) this.rateDisplay = this.createDisplayElement("__rateDisplay");
+    this.rateDisplay ??= this.createDisplayElement("__rateDisplay");
     this.rateDisplay.textContent = `倍速: ${this.player.playbackRate}`;
     this.prependElement(this.rateDisplay);
   },
-  ensureRateDisplay: () => App.prependElement(App.rateDisplay),
-  removeRateDisplay: () => App.rateDisplay?.remove(),
+  ensureRateDisplay: () => !Tools.isAttached(App.rateDisplay) && App.playbackRateDisplay(),
   // ====================⇑⇑⇑ 常显倍速相关逻辑 ⇑⇑⇑====================
 
   createDisplayElement(cls, color) {

@@ -10,14 +10,16 @@ import Storage from "../common/Storage";
  * - 通过特定元素选择器取目标集
  */
 export default {
-  switchEpisode(isPrev = false) {
-    const target =
-      this.getTargetEpisode(this.getCurrentEpisode(), isPrev) ?? this.getEpisodeByText(isPrev) ?? this.getEpisodeByClass(isPrev);
+  async switchEpisode(isPrev = false) {
+    // iframe延时执行，解决target在topWin和iframe都有值的的情况
+    if (!Tools.isTopWin()) await Tools.sleep(Consts.HALF_SEC);
+    const target = this.getJumpTargetEpisode(isPrev) ?? this.getEpisodeByText(isPrev) ?? this.getEpisodeByClass(isPrev);
     // Tools.log("跳转集元素：", target);
     this.jumpToTargetEpisode(target);
   },
-  getCurrentEpisode() {
-    return Storage.RELATIVE_EPISODE.get(this.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
+  getJumpTargetEpisode(isPrev) {
+    const current = Storage.RELATIVE_EPISODE.get(this.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
+    return this.getTargetEpisode(current, isPrev);
   },
   getCurrentEpisodeByLink() {
     const { pathname, search, hash } = location;
@@ -46,7 +48,7 @@ export default {
     return eles.length <= 1 ? eles[0] : eles.find((el) => Tools.hasCls(el, "cur", "active") || !!this.getEpisodeNumber(el));
   },
   getEpisodeNumber: (el) => {
-    const str = el?.innerText?.match(/第\d+(集|话|期)/i)?.[0] || el?.innerText?.replace(/-|\./g, Consts.EMPTY);
+    const str = el?.innerText?.match(/第\d+(集|话)/i)?.[0] || el?.innerText?.replace(/-|\./g, Consts.EMPTY);
     return Tools.getNumbers(str)?.shift();
   },
   getTargetEpisode(el, isPrev = false) {
@@ -121,14 +123,21 @@ export default {
     }
     return null;
   },
+  /**
+   * 通过相关文本获取上下集按钮
+   * 示例网址：https://www.dmb0u.art、https://www.lincartoon.com
+   *          https://ddys.pro、https://www.5dm.link、https://www.tucao.my、https://www.flixflop.com
+   * @param {Boolean} isPrev
+   */
   getEpisodeByText(isPrev = false) {
-    // 示例网址：https://www.dmb0u.art、https://www.lincartoon.com
-    // https://ddys.pro、https://www.5dm.link、https://www.tucao.my、https://www.flixflop.com
-
     const ignore = (el) => !el?.innerText?.includes("自动");
     const texts = isPrev ? ["上集", "上一集", "上话", "上一话", "上一个"] : ["下集", "下一集", "下话", "下一话", "下一个"];
     return Tools.findByText("attr", texts).filter(ignore).shift() ?? Tools.findByText("text", texts).filter(ignore).shift();
   },
+  /**
+   * 通过相关class获取下集按钮
+   * @param {Boolean} isPrev
+   */
   getEpisodeByClass(isPrev = false) {
     return isPrev ? null : Tools.query("[class*='control'] [class*='next' i]");
   },

@@ -8,9 +8,7 @@ const { EXAMPLE_JSON, LAYUI_JS } = URL;
 (function () {
   "use strict";
 
-  const openInTab = () => GM_openInTab(EXAMPLE_JSON);
-  GM_registerMenuCommand("JSON示例 ( Alt + J )", openInTab);
-  window.addEventListener("keydown", ({ code, altKey }) => altKey && code === "KeyJ" && openInTab());
+  GM_registerMenuCommand("JSON示例", () => GM_openInTab(EXAMPLE_JSON));
 
   const innerText = document.body.innerText;
   const { rawText, jsonpFun } = Utils.matchJsonp(innerText);
