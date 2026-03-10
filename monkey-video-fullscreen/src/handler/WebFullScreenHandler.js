@@ -11,7 +11,9 @@ export default {
   triggerIconElement(index) {
     const content = Storage.ICONS_ELE.get(this.topWin.host);
     const selector = (content.match(/[^;\n]+/g) || [])?.[index];
-    (this.player.closest(selector) ?? Tools.query(selector))?.click();
+    const element = this.player?.closest(selector) ?? Tools.query(selector);
+    if (element) element.click ? element.click() : element.dispatchEvent(new MouseEvent("click"));
+
     return selector;
   },
   toggleFullscreen() {

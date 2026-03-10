@@ -17,7 +17,6 @@ export default {
    */
   getLiveIcons: () => (Tools.emitMousemove(App.player), Tools.querys(".right-area .icon")),
   triggerIconElement(name) {
-    if (Tools.isThrottle("icon")) return;
     if (!Site.isBiliLive()) return Tools.query(Site.getIcons()?.[name])?.click();
     const index = Object.values(Site.icons).indexOf(name);
     this.getLiveIcons()?.[index]?.click();
@@ -25,12 +24,14 @@ export default {
   toggleFullscreen() {
     if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
     if (Site.isGmMatch() && !Site.isBiliLive()) return this.triggerIconElement(Site.icons.full);
+
     this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
     if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcut(Keyboard.P); // 全屏或非网页全屏模式下
   },
   toggleWebFullscreen(isTrusted) {
     if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
     if (Site.isGmMatch() && !Site.isBiliLive()) return this.triggerIconElement(Site.icons.webFull);
+
     if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
     this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
     requestAnimationFrame(() => this.hideRelatedOnFullscreen());

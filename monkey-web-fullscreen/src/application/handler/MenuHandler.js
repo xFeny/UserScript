@@ -115,7 +115,7 @@ export default {
         </div>`;
 
     Swal.fire({
-      width: 410,
+      width: 400,
       title: "设置",
       showCancelButton: true,
       cancelButtonText: "关闭",
