@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.9.6
+// @version      3.9.7
 // @author       Feny
 // @description  支持所有H5视频的增强脚本，通用网页全屏｜倍速调节；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @license      GPL-3.0-only
@@ -625,7 +625,7 @@
     static #createSiteTests() {
       Object.entries(this._siteRegExps).forEach(([name, regex]) => {
         const method = `is${name.charAt(0).toUpperCase()}${name.slice(1)}`;
-        if (!this[method]) this[method] = () => regex.test(location.href);
+        this[method] ??= () => regex.test(location.href);
       });
     }
   }
@@ -757,7 +757,7 @@
     },
     playing(video) {
       this.setCurrentVideo(video);
-      if (!video.tsr) video.tsr = { ...Consts.DEF_TSR };
+      video.tsr ??= { ...Consts.DEF_TSR };
       Tools.sleep(50).then(() => this.initVideoPlay(video));
     },
     ended(video) {
@@ -786,8 +786,6 @@
       video.__duration = video.duration;
       video.tsr = { ...Consts.DEF_TSR };
       Tools.resetLimit("autoWide");
-      this.removeRateDisplay();
-      this.removeProgElement();
     },
     initVideoPlay(video) {
       if (this.isExecuted("_mfs_apply", this.player)) return;
@@ -796,7 +794,7 @@
       this.setupPlayerClock();
       this.setBiliQuality();
     },
-    remainTime: (v) => Math.floor(App.getRealDur(v)) - Math.floor(v.currentTime),
+    remainTime: (v) => Math.floor(App.getRealDuration(v)) - Math.floor(v.currentTime),
     playToggle: (v) => Site.isDouyu() ? v?.click() : v?.[v?.paused ? "play" : "pause"](),
     playV: (v) => v?.paused && (Site.isDouyu() ? v?.click() : v?.play()),
     setPlaybackRate(rate) {
@@ -815,6 +813,7 @@
       if (!bypass && !this.isOverrideKey()) return;
       if (!this.player || this.isLive() || this.player.ended) return;
       this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
+      this.showToast(`快${second > 0 ? "进" : "退"} ${Math.abs(second)} 秒`, Consts.ONE_SEC);
     },
     cachePlayTime(video) {
       if (video !== this.player || !this.topWin || video.duration < 120 || this.isLive()) return;
@@ -873,7 +872,7 @@
       const zoom = Math.max(25, Math.min(500, tsr.zoom + dir * step));
       tsr.zoom = zoom;
       this.setTsr("--zoom", zoom / 100);
-      this.showToast(`缩放：${zoom}%`, Consts.ONE_SEC);
+      this.showToast(`缩放: ${zoom}%`, Consts.ONE_SEC);
     },
     moveVideo(key) {
       if (!this.player || this.isDisZoom()) return;
@@ -885,7 +884,7 @@
       [x, y] = { 90: [y, -x], 180: [-x, -y], 270: [-y, x] }[tsr.rotate] || [x, y];
       tsr.mvX += x, tsr.mvY += y;
       this.setTsr("--mvX", `${tsr.mvX}px`).setTsr("--mvY", `${tsr.mvY}px`);
-      this.showToast(`向${desc}移动：${x ? tsr.mvX : tsr.mvY}px`, Consts.ONE_SEC);
+      this.showToast(`${desc}移: ${x ? tsr.mvX : tsr.mvY}px`, Consts.ONE_SEC);
     },
     resetTsr() {
       if (!this.player || this.isDisZoom()) return;
@@ -898,7 +897,7 @@
     setTsr(name, value) {
       try {
         Tools.addCls(this.player, "__tsr");
-        this.player._mfs_tsr = this.player._mfs_tsr ?? getComputedStyle(this.player).transform;
+        this.player._mfs_tsr ??= getComputedStyle(this.player).transform;
         Tools.setStyle(this.player, "--deftsr", this.player._mfs_tsr);
         Tools.setStyle(this.player, name, value);
       } catch (e) {
@@ -958,7 +957,6 @@
   const WebFull = {
     getLiveIcons: () => (Tools.emitMousemove(App.player), Tools.querys(".right-area .icon")),
     triggerIconElement(name) {
-      if (Tools.isThrottle("icon")) return;
       if (!Site.isBiliLive()) return Tools.query(Site.getIcons()?.[name])?.click();
       const index = Object.values(Site.icons).indexOf(name);
       this.getLiveIcons()?.[index]?.click();
@@ -1034,7 +1032,7 @@
     },
     videoParents: /* @__PURE__ */ new Set(),
     findVideoContainer(container, max = 4, track = true) {
-      container = container ?? Tools.getParent(this.player);
+      container ??= Tools.getParent(this.player);
       if (!container.offsetHeight) container = Tools.getParent(container);
       const { offsetWidth: cw, offsetHeight: ch } = container;
       if (track) this.videoParents.clear();
@@ -1100,12 +1098,14 @@
     }
   };
   const Episode = {
-    switchEpisode(isPrev = false) {
-      const target = this.getTargetEpisode(this.getCurrentEpisode(), isPrev) ?? this.getEpisodeByText(isPrev) ?? this.getEpisodeByClass(isPrev);
+    async switchEpisode(isPrev = false) {
+      if (!Tools.isTopWin()) await Tools.sleep(Consts.HALF_SEC);
+      const target = this.getJumpTargetEpisode(isPrev) ?? this.getEpisodeByText(isPrev) ?? this.getEpisodeByClass(isPrev);
       this.jumpToTargetEpisode(target);
     },
-    getCurrentEpisode() {
-      return Storage.RELATIVE_EPISODE.get(this.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
+    getJumpTargetEpisode(isPrev) {
+      const current = Storage.RELATIVE_EPISODE.get(this.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
+      return this.getTargetEpisode(current, isPrev);
     },
     getCurrentEpisodeByLink() {
       const { pathname, search, hash } = location;
@@ -1126,7 +1126,7 @@
       return eles.length <= 1 ? eles[0] : eles.find((el) => Tools.hasCls(el, "cur", "active") || !!this.getEpisodeNumber(el));
     },
     getEpisodeNumber: (el) => {
-      const str = el?.innerText?.match(/第\d+(集|话|期)/i)?.[0] || el?.innerText?.replace(/-|\./g, Consts.EMPTY);
+      const str = el?.innerText?.match(/第\d+(集|话)/i)?.[0] || el?.innerText?.replace(/-|\./g, Consts.EMPTY);
       return Tools.getNumbers(str)?.shift();
     },
     getTargetEpisode(el, isPrev = false) {
@@ -1338,15 +1338,14 @@
       if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(this.player.parentNode).start();
       this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
     },
-    getRealDur(video) {
+    getRealDuration(video) {
       if (!Site.isQiyi()) return video.duration;
       return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
     },
     videoProgress(video) {
       if (!video || this.player !== video || this.isMutedLoop(video)) return;
-      if (video.duration <= 30 || this.isLive() || this.shouldHideTime()) return this.removeProgElement();
-      const duration = this.getRealDur(video);
-      if (duration > 86400) return this.removeProgElement();
+      const duration = this.getRealDuration(video);
+      if (duration <= 30 || duration > 86400 || this.isLive() || this.shouldHideTime()) return this.progNode?.remove();
       const percent = Tools.toFixed(video.currentTime / duration * 100, 1);
       const remain = this.formatTime(duration - video.currentTime);
       const el = this.createProgressElement();
@@ -1360,16 +1359,14 @@
       this.progNode = el;
       return el;
     },
-    removeProgElement: () => App.progNode?.remove(),
     playbackRateDisplay() {
       if (!this.player || this.isLive()) return;
-      if (!Storage.RATE_KEEP_SHOW.get()) return this.removeRateDisplay();
-      if (!this.rateDisplay) this.rateDisplay = this.createDisplayElement("__rateDisplay");
+      if (!Storage.RATE_KEEP_SHOW.get()) return this.rateDisplay?.remove();
+      this.rateDisplay ??= this.createDisplayElement("__rateDisplay");
       this.rateDisplay.textContent = `倍速: ${this.player.playbackRate}`;
       this.prependElement(this.rateDisplay);
     },
-    ensureRateDisplay: () => App.prependElement(App.rateDisplay),
-    removeRateDisplay: () => App.rateDisplay?.remove(),
+    ensureRateDisplay: () => !Tools.isAttached(App.rateDisplay) && App.playbackRateDisplay(),
     createDisplayElement(cls, color) {
       const el = Tools.createElement("div", { className: cls, style: `color: ${color}` });
       this.prependElement(el);
@@ -1507,7 +1504,7 @@
           </div>
         </div>`;
       Swal.fire({
-        width: 410,
+        width: 400,
         title: "设置",
         showCancelButton: true,
         cancelButtonText: "关闭",

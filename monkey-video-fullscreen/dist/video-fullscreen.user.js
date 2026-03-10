@@ -2,7 +2,7 @@
 // @name            视频网页全屏
 // @name:en         Video Fullscreen
 // @namespace       npm/vite-plugin-monkey
-// @version         3.9.3
+// @version         3.9.4
 // @author          Feny
 // @description     让所有视频网页全屏，快捷键：P - 网页全屏，Enter - 全屏; 支持侧边点击切换网页全屏; 支持自动网页全屏
 // @description:en  Maximize all video players; Shortcut keys: P - Web Fullscreen, Enter - Fullscreen; Support side click to web fullscreen; Support auto web fullscreen
@@ -73,7 +73,8 @@
     HALF_SEC: 500,
     ONE_SEC: 1e3,
     webFull: "gm_webfullscreen",
-    MSG_SOURCE: "SCRIPTS_VIDEO_FULLSCREEN"
+    MSG_SOURCE: "SCRIPTS_VIDEO_FULLSCREEN",
+    ICONS: { full: 0, webFull: 1 }
   });
   const Tools = {
     isTopWin: () => window.top === window,
@@ -272,10 +273,9 @@
     },
     processEvent(data) {
       if (this.vMeta?.iFrame && this.player) delete this.player;
+      ({ P: this.toggleWebFullscreen, ENTER: this.toggleFullscreen })[data?.key]?.(data?.isTrusted);
       if (!this.player) Tools.sendToIFrames(data);
-      if (data?.key) this.execKeyActions(data);
-    },
-    execKeyActions: ({ key, isTrusted }) => key === Consts.P ? App.toggleWebFullscreen(isTrusted) : App.toggleFullscreen()
+    }
   };
   const Events = {
     videoAborts: /* @__PURE__ */ new Map(),
@@ -362,17 +362,27 @@
     IS_AUTO: new BasicStorage("IS_AUTO_", false, Boolean),
     DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, Number),
     CUSTOM_CTN: new BasicStorage("CUSTOM_CTN_", ""),
+    ICONS_ELE: new BasicStorage("ICONS_ELE_", ""),
     IGNORE_URLS: new BasicStorage("IGNORE_URLS_", ""),
     HIDE_ELEMENTS: new BasicStorage("HIDE_ELEMENTS_", "")
   };
   const WebFull = {
+    triggerIconElement(index) {
+      const content = Storage.ICONS_ELE.get(this.topWin.host);
+      const selector = (content.match(/[^;\n]+/g) || [])?.[index];
+      const element = this.player?.closest(selector) ?? Tools.query(selector);
+      if (element) element.click ? element.click() : element.dispatchEvent(new MouseEvent("click"));
+      return selector;
+    },
     toggleFullscreen() {
       if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
+      if (this.triggerIconElement(Consts.ICONS.full)) return;
       this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
       if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcut(Consts.P);
     },
     toggleWebFullscreen(isTrusted) {
       if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
+      if (this.triggerIconElement(Consts.ICONS.webFull)) return;
       if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen();
       this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
       requestAnimationFrame(() => this.hideRelatedOnFullscreen());
@@ -435,7 +445,7 @@
     },
     videoParents: /* @__PURE__ */ new Set(),
     findVideoContainer(container, max = 4, track = true) {
-      container = container ?? Tools.getParent(this.player);
+      container ??= Tools.getParent(this.player);
       if (!container.offsetHeight) container = Tools.getParent(container);
       const { offsetWidth: cw, offsetHeight: ch } = container;
       if (track) this.videoParents.clear();
@@ -505,16 +515,18 @@
       zh: {
         enable: "启用自动网页全屏",
         disable: "禁用自动网页全屏",
-        hidden: "全屏时隐藏的元素",
         ignore: "自动时忽略的网址",
-        detach: "脱离式全屏阈值",
-        custom: "自定义视频容器"
+        element: "定义全屏点击元素",
+        hidden: "全屏时隐藏元素",
+        custom: "自定义视频容器",
+        detach: "脱离式全屏阈值"
       },
       en: {
         enable: "Enable auto web fullscreen",
         disable: "Disable auto web fullscreen",
         hidden: "Elements hidden in fullscreen",
         detach: "Detached fullscreen threshold",
+        element: "fullscreen click elements",
         ignore: "URLs ignored in auto mode",
         custom: "Custom video container"
       }
@@ -536,9 +548,10 @@
       const configs = [
         { title: isAuto, cache: Storage.IS_AUTO, fn: (cache, val) => cache.set(!val, host) },
         { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS },
+        { title: I18n.t("element"), cache: Storage.ICONS_ELE },
+        { title: I18n.t("custom"), cache: Storage.CUSTOM_CTN },
         { title: I18n.t("hidden"), cache: Storage.HIDE_ELEMENTS },
-        { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD },
-        { title: I18n.t("custom"), cache: Storage.CUSTOM_CTN }
+        { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD }
       ];
       configs.forEach(({ title, cache, fn }) => {
         const id = `${cache.name}_MENU_ID`;
