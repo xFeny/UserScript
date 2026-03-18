@@ -121,6 +121,8 @@ export default {
     // 处理通过Esc键而非Enter键退出全屏模式的场景
     !isFullscreen && this.fsWrapper && this.dispatchShortcut(Keyboard.P);
 
+    Tools.microTask(() => this.customFullscreenChangeHandle());
+
     // 播放器右上角时间的显/隐
     this.changeTimeDisplay();
   },
@@ -135,7 +137,16 @@ export default {
       set(value, setter) {
         const method = setter(value) ? "addEventListener" : "removeEventListener";
         ["scroll", "keyup", "keydown"].forEach((type) => unsafeWindow[method](type, handle, true));
+        Tools.microTask(() => this.customFullscreenChangeHandle());
       },
+    });
+  },
+  customFullscreenChangeHandle() {
+    if (Tools.isThrottle("fsChange", Consts.HALF_SEC)) return;
+    // Tools.sleep，尽可能保证代码片段中 isFullscreen 取到正确的状态值
+    Tools.sleep(250).then(() => {
+      const jsCode = Storage.FULL_CHANGE_CODE.get(this.host);
+      this.executeCodeSnippet(jsCode, "fsChange", this.player);
     });
   },
   // ====================⇑⇑⇑ 全屏状态变换时处理相关逻辑 ⇑⇑⇑====================
@@ -165,7 +176,6 @@ export default {
   },
   // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
   getVideoForCoord(x, y) {
-    if (!Storage.ENABLE_EDGE_CLICK.get()) return;
     if (Tools.pointInElement(x, y, this.player)) return this.player;
 
     const getZIndex = (el) => Number(getComputedStyle(el).zIndex) || 0;
@@ -173,7 +183,7 @@ export default {
     return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
   createEdgeElement(video) {
-    if (!video || !Storage.ENABLE_EDGE_CLICK.get()) return;
+    if (!video) return;
 
     const container = this.getEdgeContainer(video);
 
@@ -215,9 +225,6 @@ export default {
   },
   lacksRelativePosition(el) {
     return Tools.getParents(el, 2).every((e) => e && getComputedStyle(e).position === "static");
-  },
-  removeEdgeElements() {
-    Tools.querys(".__edgeClick").forEach((el) => (el.remove(), delete el.video.lArea, delete el.video.rArea));
   },
   // ====================⇑⇑⇑ 侧边点击相关逻辑 ⇑⇑⇑====================
 };

@@ -66,6 +66,7 @@ export default unsafeWindow.FyTools = {
   fireMouseEvt(el, type, clientX, clientY) {
     const dict = { clientX, clientY, bubbles: true };
     el?.dispatchEvent(new MouseEvent(type, dict));
+    return el ? Promise.resolve(el) : null;
   },
   /**
    * 判断元素是否有有效ID（不含数字/中文）

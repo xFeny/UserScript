@@ -9,11 +9,9 @@ import Storage from "../common/Storage";
  */
 export default {
   setupLoadEventListener() {
-    window.addEventListener("load", () => {
-      // 个别需点击元素才加载视频，如：https://www.dadaqu.cc、https://www.jddzx.cc
-      Tools.query("body > #start, #play-button-overlay")?.click?.();
-      this.setFakeBiliUser();
-    });
+    const handle = ({ type }) => this.executeCodeSnippet(Storage.LOAD_EVT_CODE.get(this.host), type, this.player);
+    document.addEventListener("DOMContentLoaded", handle);
+    window.addEventListener("load", handle);
   },
   /**
    * 解决：B站未登录观看视频约1分钟弹出登录框问题
@@ -36,7 +34,7 @@ export default {
     const target = list.find((quality) => quality === 80) ?? list[0];
     if (current !== target) unsafeWindow.player.requestQuality(target);
   },
-  shouldHideTime: () => (App.isFullscreen && Storage.DISABLE_CLOCK.get()) || (!App.isFullscreen && !Storage.PAGE_CLOCK.get()),
+  shouldHideTime: () => !App.isFullscreen && !Storage.PAGE_CLOCK.get(),
   setupPlayerClock() {
     if (!this.player || this.shouldHideTime()) return this.Clock?.stop(true);
     if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(this.player.parentNode).start();

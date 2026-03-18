@@ -45,7 +45,6 @@ export default {
     this.applyCachedTime(video);
 
     this.setupPlayerClock();
-    this.setBiliQuality();
   },
   remainTime: (v) => Math.floor(App.getRealDuration(v)) - Math.floor(v.currentTime),
   playToggle: (v) => (Site.isDouyu() ? v?.click() : v?.[v?.paused ? "play" : "pause"]()),
@@ -79,15 +78,14 @@ export default {
     if (video !== this.player || !this.topWin || video.duration < 120 || this.isLive()) return;
     if (Tools.isThrottle("cacheTime", Consts.ONE_SEC) || +video.currentTime < Storage.SKIP_INTERVAL.get()) return;
 
-    // 禁用记忆、距离结束10秒，清除记忆缓存
-    if (Storage.NOT_CACHE_TIME.get() || this.remainTime(video) <= 10) return this.clearCachedTime(video);
+    // 距离结束10秒，清除记忆缓存
+    if (this.remainTime(video) <= 10) return this.clearCachedTime(video);
 
     Storage.PLAY_TIME.set(+video.currentTime - 1, this.getUniqueKey(video), Storage.STORAGE_DAYS.get());
     if (Tools.isMultiV()) this.ensureUniqueCacheTime(); // 清除页面内多视频的播放进度存储，如：抖音网页版
   },
   applyCachedTime(video) {
-    if (!this.topWin || this.isLive()) return;
-    if (Storage.NOT_CACHE_TIME.get()) return this.clearCachedTime(video);
+    if (!this.topWin || this.isLive() || Tools.querys("video").length > 2) return;
 
     // 缓存的播放时间
     const time = Storage.PLAY_TIME.get(this.getUniqueKey(video));
@@ -140,7 +138,7 @@ export default {
     this.setTsr("--scale", scale).setTsr("--rotate", `${tsr.rotate}deg`);
   },
   zoomVideo(dir = 1) {
-    if (!this.player || this.isDisZoom()) return;
+    if (!this.player) return;
 
     const { tsr } = this.player;
     const step = Storage.ZOOM_PERCENT.get();
@@ -151,7 +149,7 @@ export default {
     this.showToast(`缩放: ${zoom}%`, Consts.ONE_SEC);
   },
   moveVideo(key) {
-    if (!this.player || this.isDisZoom()) return;
+    if (!this.player) return;
 
     const { tsr } = this.player;
     const s = Storage.MOVING_DISTANCE.get();
@@ -168,7 +166,7 @@ export default {
     this.showToast(`${desc}移: ${x ? tsr.mvX : tsr.mvY}px`, Consts.ONE_SEC);
   },
   resetTsr() {
-    if (!this.player || this.isDisZoom()) return;
+    if (!this.player) return;
 
     const styles = ["--zoom", "--mvX", "--mvY", "--scale", "--mirror", "--rotate", "--deftsr"];
     styles.forEach((n) => Tools.setStyle(this.player, n));
@@ -198,7 +196,7 @@ export default {
     this.showToast(isMuted ? "🔊 取消静音" : "🔇 已静音", Consts.ONE_SEC);
   },
   async screenshot() {
-    if (!this.player || Storage.DISABLE_SCREENSHOT.get()) return;
+    if (!this.player) return;
 
     this.player.setAttribute("crossorigin", "anonymous");
     const { videoWidth: width, videoHeight: height } = this.player;
@@ -224,7 +222,7 @@ export default {
   },
   autoNextEnabled() {
     const status = Storage.IS_AUTO_NEXT.set(!Storage.IS_AUTO_NEXT.get());
-    this.showToast(`已${status ? "启" : "禁"}用自动切换下集`);
+    this.showToast(`已${status ? "启" : "禁"}用 自动切换下集`);
   },
   customToast(start, text, end, dealy, isRemove) {
     // 最终呈现：<span>正在以<span class="cText">1.15x</span>倍速播放</span>

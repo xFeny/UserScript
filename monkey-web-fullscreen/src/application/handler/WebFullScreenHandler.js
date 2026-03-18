@@ -17,24 +17,26 @@ export default {
    */
   getLiveIcons: () => (Tools.emitMousemove(App.player), Tools.querys(".right-area .icon")),
   triggerIconElement(name) {
-    if (!Site.isBiliLive()) return Tools.query(Site.getIcons()?.[name])?.click();
     const index = Object.values(Site.icons).indexOf(name);
-    this.getLiveIcons()?.[index]?.click();
+    const element = Site.isBiliLive() ? this.getLiveIcons()?.[index] : Tools.query(Site.getIcons()?.[name]);
+    return Tools.fireMouseEvt(element, "click");
+  },
+  toggleFullscreenForClick(name) {
+    this.triggerIconElement(name)?.then(() => this.customFullscreenChangeHandle());
   },
   toggleFullscreen() {
     if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
-    if (Site.isGmMatch() && !Site.isBiliLive()) return this.triggerIconElement(Site.icons.full);
+    if (Site.isGmMatch() && !Site.isBiliLive()) return this.toggleFullscreenForClick(Site.icons.full);
 
     this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
     if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcut(Keyboard.P); // 全屏或非网页全屏模式下
   },
   toggleWebFullscreen(isTrusted) {
     if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
-    if (Site.isGmMatch() && !Site.isBiliLive()) return this.triggerIconElement(Site.icons.webFull);
+    if (Site.isGmMatch() && !Site.isBiliLive()) return this.toggleFullscreenForClick(Site.icons.webFull);
 
     if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
     this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
-    requestAnimationFrame(() => this.hideRelatedOnFullscreen());
   },
   /**
    * 进入网页全屏
@@ -160,9 +162,5 @@ export default {
       if (width === vw && height === vh && el.offsetHeight === vh) return; // 宽高已匹配，无需适配
       Tools.attr(el, Consts.webFull, true);
     });
-  },
-  hideRelatedOnFullscreen(cls = "_hide") {
-    const selector = Storage.HIDE_ELEMENTS.get(this.topWin?.host);
-    selector && Tools.querys(selector).forEach((el) => (this.fsWrapper ? Tools.addCls(el, cls) : Tools.delCls(el, cls)));
   },
 };

@@ -11,7 +11,6 @@ export default {
   isDisRate: () => Storage.DISABLE_SPEED.get(),
   noAutoDefault: () => Storage.NO_AUTO_DEF.get(),
   isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
-  isDisZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
   isAutoSite: () => Storage.IS_SITE_AUTO.get(window.topWin?.host ?? location.host),
   initMenuCmds() {
     if (this.isExecuted("hasMenu") || !Tools.isTopWin()) return;
@@ -63,13 +62,13 @@ export default {
       { key: "M", desc: "静音切换" },
       { key: "D", desc: "弹幕切换" },
       { key: "K / L", desc: "上下帧" },
+      { key: "Ctrl Z", desc: "复位缩移" },
       { key: "Shift R", desc: "水平镜像" },
-      { key: "Ctrl Z", desc: "复位缩放移动" },
-      { key: "Shift A", desc: "启/禁自动下集" },
-      { key: "Ctrl Alt A", desc: "截图 (默禁)" },
-      { key: "Alt ➕ / ➖", desc: "缩放 (默禁)" },
-      { key: "A / S 或 ➕ / ➖", desc: "倍速 ±0.25" },
-      { key: "Alt ◀️🔼🔽▶️", desc: "移动 (默禁)" },
+      { key: "Shift A", desc: "🔛自动下集" },
+      { key: "Ctrl Alt S", desc: "截图" },
+      { key: "Alt + / -", desc: "缩放" },
+      { key: "Alt ◀️🔼", desc: "移动" },
+      { key: "A / S 或 + / -", desc: "±倍速" },
       { key: "Ctrl 1️~5️", desc: "预设倍速" },
       { key: "1️~9️", desc: "1️~9️ 倍速" },
       { key: "数字 0️", desc: "快进 N 秒" },
@@ -96,21 +95,24 @@ export default {
     });
   },
   settingPopup() {
-    const [a, b, c, d] = [this.genBasics(), this.genAssist(), this.genParams(), this.genIgnore()];
-    const cacheMap = Object.assign({}, ...[a, b, c, d].map((it) => it.eCache));
+    const [a, b, c, d, e] = [this.genBasics(), this.genParams(), this.genIgnore(), this.genFull(), this.genCode()];
+    const cacheMap = Object.assign({}, ...[a, b, c, d, e].map((it) => it.eCache));
+
     const html = `
         <div class="swal2-tabs">
           <div class="swal2-tabs-header">
-              <div class="swal2-tab active" data-id="tab1">播放设置</div>
-              <div class="swal2-tab" data-id="tab2">辅助设置</div>
-              <div class="swal2-tab" data-id="tab3">参数设置</div>
-              <div class="swal2-tab" data-id="tab4">其他设置</div>
+              <div class="swal2-tab active" data-id="tab1">播放</div>
+              <div class="swal2-tab" data-id="tab2">参数</div>
+              <div class="swal2-tab" data-id="tab3">忽略</div>
+              <div class="swal2-tab" data-id="tab4">全屏</div>
+              <div class="swal2-tab" data-id="tab5">事件</div>
           </div>
           <div class="swal2-tabs-content">
             <div class="swal2-tab-panel active" id="tab1">${a.html}</div>
             <div class="swal2-tab-panel" id="tab2">${b.html}</div>
             <div class="swal2-tab-panel" id="tab3">${c.html}</div>
             <div class="swal2-tab-panel" id="tab4">${d.html}</div>
+            <div class="swal2-tab-panel" id="tab5">${e.html}</div>
           </div>
         </div>`;
 
@@ -145,32 +147,15 @@ export default {
   },
   genBasics() {
     const confs = [
+      { name: "autoDef", text: "禁用 默认自动", cache: Storage.NO_AUTO_DEF },
       { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_SPEED, attrs: ["send", "delay"] },
       { name: "memory", text: "禁用 记忆倍速", cache: Storage.NOT_CACHE_SPEED, attrs: ["send"] },
-      { name: "prog", text: "禁用 记忆进度", cache: Storage.NOT_CACHE_TIME },
       { name: "tabs", text: "禁用 不可见暂停", cache: Storage.IS_INVISIBLE_PAUSE },
       { name: "try", text: "禁用 尝试自动播放", cache: Storage.DISABLE_TRY_PLAY },
       { name: "next", text: "启用 自动切换下集", cache: Storage.IS_AUTO_NEXT },
-      { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEY },
-    ];
-
-    const render = ({ text, name, value, dataset }) => `
-        <label class="__menu">${text}
-          <input name="${name}" ${value ? "checked" : ""} ${dataset} type="checkbox"/>
-          <span class="toggle-track"></span>
-        </label>`;
-
-    return this.generate(confs, render);
-  },
-  genAssist() {
-    const confs = [
-      { name: "autoDef", text: "禁用 默认自动", cache: Storage.NO_AUTO_DEF },
-      { name: "shot", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
-      { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, attrs: ["send"] },
-      { name: "clock", text: "禁用 全屏显时间", cache: Storage.DISABLE_CLOCK },
       { name: "clockAlw", text: "启用 非全屏显时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
       { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },
-      { name: "edgeClk", text: "启用 侧边单击网页全屏", cache: Storage.ENABLE_EDGE_CLICK, attrs: ["send"] },
+      { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEY },
     ];
 
     const render = ({ text, name, value, dataset }) => `
@@ -202,12 +187,36 @@ export default {
     return this.generate(confs, render);
   },
   genIgnore() {
-    const disd = Site.isGmMatch() && !Site.isBiliLive();
     const confs = [
-      { name: "custCtn", text: "自定义此站视频容器", cache: Storage.CUSTOM_CTN, disable: disd, useHost: true },
-      { name: "hideEle", text: "此站全屏时隐藏的元素（用 , 隔开）", cache: Storage.HIDE_ELEMENTS, disable: disd, useHost: true },
       { name: "ignoreNext", text: "自动切换下集时忽略的网址（用 ; 隔开）", cache: Storage.NEXT_IGNORE_URLS },
       { name: "ignoreFs", text: "自动网页全屏时忽略的网址（用 ; 隔开）", cache: Storage.FULL_IGNORE_URLS },
+    ];
+
+    const render = ({ text, name, value, dataset, disable }) => `
+        <div class="text-group"><p>${text}</p>
+          <textarea name="${name}" ${dataset} ${disable ? "disabled" : ""} spellcheck="false" autocomplete="off">${value}</textarea>
+        </div>`;
+
+    return this.generate(confs, render);
+  },
+  genFull() {
+    const disd = Site.isGmMatch() && !Site.isBiliLive();
+    const confs = [
+      { name: "custCtn", text: "自定义此站全屏视频容器", cache: Storage.CUSTOM_CTN, disable: disd, useHost: true },
+      { name: "fsCode", text: "自定义此站全屏切换处理逻辑", cache: Storage.FULL_CHANGE_CODE, useHost: true, attrs: ["send"] },
+    ];
+
+    const render = ({ text, name, value, dataset, disable }) => `
+        <div class="text-group"><p>${text}</p>
+          <textarea name="${name}" ${dataset} ${disable ? "disabled" : ""} spellcheck="false" autocomplete="off">${value}</textarea>
+        </div>`;
+
+    return this.generate(confs, render);
+  },
+  genCode() {
+    const confs = [
+      { name: "loadEvt", text: "自定义此站 load 事件处理逻辑", cache: Storage.LOAD_EVT_CODE, useHost: true, attrs: ["send"] },
+      { name: "videoEvt", text: "自定义此站视频事件处理逻辑", cache: Storage.VIDEO_EVT_CODE, useHost: true, attrs: ["send"] },
     ];
 
     const render = ({ text, name, value, dataset, disable }) => `

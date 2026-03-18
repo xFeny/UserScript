@@ -18,9 +18,9 @@
 | N | 切换下集               | R              | 旋转 90°         |
 | M                                                            | 静音切换       | D          | 弹幕显/隐      |
 | K / L                                                        | 上下帧         | Shift <b style='color:#bbb'>+</b> R                          | 水平镜像         |
-| Ctrl <b style='color:#bbb'>+</b> Z | 复位缩放移动     | Shift <b style='color:#bbb'>+</b> A                         | 启/禁自动下集  |
-| Ctrl <b style='color:#bbb'>+</b> Alt <b style='color:#bbb'>+</b> A | 截图 (默禁)      | Alt <b style='color:#bbb'>+</b> <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 缩放 (默禁)    |
-| A / S  或  <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 倍速 ±0.25       | Alt <b style='color:#bbb'>+</b> ◀️🔼🔽▶️                         | 移动 (默禁)    |
+| Ctrl <b style='color:#bbb'>+</b> Z | 复位缩移     | Shift <b style='color:#bbb'>+</b> A                         | 启/禁自动下集  |
+| Ctrl <b style='color:#bbb'>+</b> Alt <b style='color:#bbb'>+</b> S | 截图      | Alt <b style='color:#bbb'>+</b> <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 缩放    |
+| A / S  或  <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | ±倍速     | Alt <b style='color:#bbb'>+</b> ◀️🔼                         | 移动    |
 | Ctrl 1️⃣~5️⃣                                                     | 预设倍速         | 1️⃣~9️⃣                                                          | 1️⃣ - 9️⃣ 倍速     |
 | 数字 0️⃣                                                       | 快进 30 秒       | ◀️▶️                                                           | 快退/进 (默禁) |
 | 空格                                                         | 播放/暂停 (默禁) |                                                              |                |
@@ -95,7 +95,7 @@
 
 「此站启用自动网页全屏」后，将对目标域名下的所有页面生效（例如 YouTube 的搜索结果、短视频等场景）。若需排除不需要自动的页面，可按以下步骤操作：
 
-1. 进入「更多设置」→「其他设置」→「自动网页全屏时忽略的网址」
+1. 进入「更多设置」→「忽略设置」→「自动网页全屏时忽略的网址」
 2. 添加目标页面的网址（如输入：`https://www.youtube.com/shorts` 即可排除短视频页）
 
 > ⚠️ 注意：该功能不支持模糊匹配，仅采用「前缀匹配」逻辑（即仅匹配以输入网址开头的页面）
@@ -141,7 +141,7 @@
 **自定义选项**：
 
 - 提前切换秒数：「参数设置」→「下集提前秒数」（视频距离结束前 N 秒切换）
-- 忽略网址：「其他设置」→「自动切换下集时忽略的网址」（如 B 站非番剧页）
+- 忽略网址：「忽略设置」→「自动切换下集时忽略的网址」（如 B 站非番剧页）
 
 > 限制：时长小于 5 分钟的视频不会触发自动切换下集
 
@@ -205,7 +205,7 @@
 
 ### 自定义此站视频容器
 
-设置路径：「更多设置」→「其他设置」→「自定义此站视频容器」
+设置路径：「更多设置」→「全屏设置」→「自定义此站视频容器」
 
 该功能允许您为当前网站设置个性化的视频容器，解决网页全屏时可能出现的各种适配问题，例如：
 
@@ -245,7 +245,7 @@ this.autoExitWebFullscreen();
 
 默认启用：自动记录视频播放进度，下次打开同一视频时恢复至上次位置。
 
-- 关闭路径：「更多设置」→「禁用 记忆进度」
+- 保存天数设置：「更多设置」→「参数」→「进度保存天数」
 - 限制：时长＜2 分钟的视频不记录进度
 
 #### 4. 标签页不可见时自动暂停
@@ -269,7 +269,6 @@ this.autoExitWebFullscreen();
 
 **自定义选项**：
 
-- 关闭显示：在设置中禁用「全屏显时间」
 - 调整颜色：「参数设置」→「时间颜色」
 - 非全屏显示：启用「非全屏显时间」功能
 
@@ -278,8 +277,6 @@ this.autoExitWebFullscreen();
 #### 7. 侧边单击网页全屏
 
 将鼠标移至视频左右两侧边缘区域，当鼠标光标发生变化时 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAipJREFUSEutlTFoFEEUhr+3nKhFwMouKIqNFhYixC6m0E5UMFhI0F4UBY1GbzPZQyVJF7BSUBCNuZBLaWVMp6LYaaWiSBAtFLSKhH2yc3thd2/nbk6cbtl//n/+ef97I/SwNOJZApeQg77bxBeY4DRCUwHvfd7A/yKgExiEbWzghlzlfdFdJwd6k92scQnls4xjWntzDjTiHnAaeEnMETF8z4q4BFLyOrAHuC8hZ8oFmqdoAZ+whWNyjtUWOD1AUuR1ggL5WyoMyxjvSgXsPWdFhHmpMtwpCBrxGtgHtJHbQJRtXhcR3kiVkS4CSXT7qDCSPbnTQS+x9cF6xVQNm4DtbGZFRvntQ9yTAzUMEjS7GHiMcEeqLPkISdr+gwVwLmo6SR+r/CpgPgB3iamL4aNLrFxAmZZxLhd6YBY46SBqAHPENMSwlsV41cDGt8YQytMu1/IFmCVmUQwvnDF1kWhkx8dOn7sHloipeTuwLiKuALc8BRLYcnmjzbCRn0wDP7KDSw07CEiK23kJ34BHwO02ATVsJeABcCgZehIyUCj2AnDcofAKqKfFtsnKT9Mau1AeAvutvZKXSyM7m+baBISzBDTkGl+dKdKIReCoi9zWwVAhsLnvzxAtE3NYDH+KwnkHzQdnLzEXxPCpQ5omIdcnoxIyVYbvKUUtAjUMEPA8/V4h4IBcJ+mBkpvrlgjHf41s0w0BMxJy3kXzTw5sLSY4gXAK4aJU3dH9C5MTtb2fy3n/AAAAAElFTkSuQmCC" style="width:21px; vertical-align: text-top" /> ，点击即可切换网页全屏状态。
-
-**设置路径**：「辅助设置」→「启用 侧边单击网页全屏」。
 
 **解决的问题：** 
 
@@ -292,3 +289,79 @@ this.autoExitWebFullscreen();
 
 **示例网站：** 在 [YouTube Shorts](https://www.youtube.com/shorts)、[新版贴吧](https://tieba.baidu.com) 未修改阈值时切换网页全屏异常，修改阈值为 `10` 后可正常切换。
 
+#### 9. 自定义事件处理逻辑
+
+可访问的值：type, video, unsafeWindow, Tools, App
+
+- **自定义页面加载事件处理逻辑**
+
+  事件类型（type）：`DOMContentLoaded`、`load`
+
+  示例一：https://www.bilibili.com/
+  
+  ```js
+  // if(type === "DOMContentLoaded") console.log('DOM 树已构建完成，可以操作 DOM 元素了！');
+  // if(type === "load") console.log('页面资源已加载完！');
+  
+  Tools.sleep(3000).then(() => {
+    // 设置音量均衡-标准
+    Tools.query('.bpx-player-ctrl-setting-loudness input[value="1"]')?.click();
+    
+    // 解决B站未登录时，播放一分钟左右弹出登录窗的问题
+    if (unsafeWindow.__BiliUser__?.isLogin) return;
+    unsafeWindow.__BiliUser__.cache.data.isLogin = true;
+    unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
+  });
+  ```
+  
+  示例二：https://www.dadaqu.cc/、https://www.jddzx.cc/
+  
+  ```js
+  // 需要点击才会加载视频资源
+  if(type === "load") Tools.query("body > #start")?.click();
+  ```
+  
+- **自定义视频事件列表处理逻辑**
+
+    事件类型（type）：`loadedmetadata`、`loadeddata`、`timeupdate`、`ratechange`、`canplay`、`playing`、`ended`
+  
+    示例一：https://www.bilibili.com/
+  
+    ```js
+    // B站已登录时，清晰度切换为 1080P
+    if(type === "playing"){
+      if (!document.cookie.includes("DedeUserID") || !unsafeWindow.player) return;
+      const current = unsafeWindow.player.getQuality().realQ;
+      const list = unsafeWindow.player.getSupportedQualityList();
+      const target = list.find((quality) => quality === 80) ?? list[0];
+      if (current !== target) unsafeWindow.player.requestQuality(target);
+    }
+    ```
+  
+    > 也可以放到页面 `load` 事件中处理，这里只是用于举例。
+  
+  示例二：https://live.bilibili.com/
+  ```js
+  // B站直播切换最高清晰度
+  if (type === "playing") {
+    Tools.sleep(1500).then(() => {
+      const info = unsafeWindow.top?.livePlayer?.getPlayerInfo();
+      const qn = info?.qualityCandidates?.[0]?.qn ?? "10000";
+      if (info?.quality !== qn) unsafeWindow.top?.livePlayer?.switchQuality(qn);
+    });
+  }
+  ```
+
+- **自定义全屏切换处理逻辑**
+
+  ```js
+  if (App.isFullscreen) {
+    console.log("进入全屏模式！");
+  } else if (App.fsWrapper || (App.player?.offsetWidth === screen.width && App.player?.offsetHeight - innerHeight < 60)) {
+    console.log("进入网页全屏！");
+  } else {
+    console.log("退出(网页)全屏！");
+  }
+  ```
+
+  

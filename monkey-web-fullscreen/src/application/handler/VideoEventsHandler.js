@@ -12,7 +12,11 @@ export default {
     const ctrl = new AbortController();
     video && this.videoAborts.get(video)?.abort(); // 防止重复绑定
 
-    const handle = ({ type, target }) => target.matches(`video, ${Consts.FAKE_VIDEO}`) && this[type](target);
+    const handle = ({ type, target }) => {
+      if (!target.matches(`video, ${Consts.FAKE_VIDEO}`)) return;
+      (this[type]?.(target), this.customVideoEvtHandle(type, target));
+    };
+
     this.videoEvts.forEach((t) => (video ?? document).addEventListener(t, handle, { capture: true, signal: ctrl.signal }));
     if (video) (this.videoAborts.set(video, ctrl), this.unbindVideoEvts());
   },
@@ -64,4 +68,20 @@ export default {
     this.clearCachedTime(video);
   },
   ratechange: () => App.playbackRateDisplay(),
+  customVideoEvtHandle(type, video) {
+    if (this.isMutedLoop(video)) return;
+    if (type === "timeupdate" && Tools.isThrottle("codeSnippet", Consts.ONE_SEC)) return;
+    Tools.microTask(() => this.executeCodeSnippet(Storage.VIDEO_EVT_CODE.get(this.host), type, video));
+  },
+  codeSnippetCache: new Map(),
+  executeCodeSnippet(jsCode, type, video) {
+    try {
+      if (!jsCode) return;
+      const args = ["type", "video", "unsafeWindow", "Tools", "App"];
+      const handler = this.codeSnippetCache.get(type) || this.codeSnippetCache.set(type, new Function(...args, jsCode)).get(type);
+      handler(type, video, unsafeWindow, Tools, App);
+    } catch (e) {
+      console.error("JS代码片段执行出错：", e);
+    }
+  },
 };

@@ -13,15 +13,15 @@ export default unsafeWindow.FyStorage = {
   NO_AUTO_DEF: new BasicStorage("DISABLE_DEFAULT_AUTO", false, false, Boolean),
   /** 网页全屏相关：此站启/禁用自动网页全屏 */
   IS_SITE_AUTO: new BasicStorage("ENABLE_THIS_SITE_AUTO_", false, false, Boolean, true),
-  /** 网页全屏相关：启/禁用侧边触发网页全屏 */
-  ENABLE_EDGE_CLICK: new BasicStorage("ENABLE_EDGE_CLICK", false, false, Boolean),
   /** 网页全屏相关：脱离原结构网页全屏的阈值 */
   DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, false, Number, true),
-  /** 网页全屏相关：全屏时要隐藏的元素 */
-  HIDE_ELEMENTS: new BasicStorage("HIDE_ELEMENTS_", "", false, undefined, true),
+  /** 网页全屏相关：全屏变换时的自定义处理逻辑 */
+  FULL_CHANGE_CODE: new BasicStorage("FULL_CHANGE_CODE_", "", false, String, true),
 
   /** 播放相关：禁用尝试自动播放 */
   DISABLE_TRY_PLAY: new BasicStorage("DISABLE_TRY_PLAY", false, false, Boolean),
+  /** 播放相关：禁用标签页隐藏暂停 */
+  IS_INVISIBLE_PAUSE: new BasicStorage("DISABLE_INVISIBLE_PAUSE", false, false, Boolean),
 
   /** 倍速相关：倍速步进 */
   SPEED_STEP: new BasicStorage("PLAY_RATE_STEP", 0.25, false, parseFloat),
@@ -43,8 +43,6 @@ export default unsafeWindow.FyStorage = {
   /** 快进秒数相关：启用 空格 ◀▶ 键控制 */
   OVERRIDE_KEY: new BasicStorage("OVERRIDE_KEYBOARD", false, false, Boolean),
 
-  /** 缩放和移动相关：禁用缩放和移动 */
-  DISABLE_ZOOM_MOVE: new BasicStorage("DISABLE_ZOOM_MOVE", true, false, Boolean),
   /** 缩放和移动相关：移动距离 */
   MOVING_DISTANCE: new BasicStorage("MOVING_DISTANCE", 10, false, Number),
   /** 缩放和移动相关：缩放百分比 */
@@ -59,15 +57,11 @@ export default unsafeWindow.FyStorage = {
   /** 下集切换相关：自定义下集切换—集数列表中的任意一集 拾取的CSS选择器 */
   CURRENT_EPISODE: new BasicStorage("CURRENT_EPISODE_SELECTOR_", "", false, String, true),
 
-  /** 时间显示相关：禁用全屏时间显示 */
-  DISABLE_CLOCK: new BasicStorage("DISABLE_CLOCK", false, false, Boolean),
   /** 时间显示相关：非全屏模式下显示时间 */
   PAGE_CLOCK: new BasicStorage("UNFULL_CLOCK", false, false, Boolean),
   /** 时间显示相关：时间颜色 */
   CLOCK_COLOR: new BasicStorage("CLOCK_COLOR", "#e0e0e0"),
 
-  /** 播放进度相关：禁用播放进度记录 */
-  NOT_CACHE_TIME: new BasicStorage("DISABLE_MEMORY_TIME", false, false, Boolean),
   /** 播放进度相关：播放进度保存天数 */
   STORAGE_DAYS: new BasicStorage("STORAGE_DAYS", 7, false, parseFloat),
   /** 播放进度相关：记录的视频播放进度 */
@@ -78,8 +72,8 @@ export default unsafeWindow.FyStorage = {
   /** 忽略网址相关：自动网页全屏时忽略的网址列表 */
   FULL_IGNORE_URLS: new BasicStorage("FULL_IGNORE_URLS", ""),
 
-  /** 其他：禁用标签页隐藏暂停 */
-  IS_INVISIBLE_PAUSE: new BasicStorage("DISABLE_INVISIBLE_PAUSE", false, false, Boolean),
-  /** 其他：禁用视频截图 */
-  DISABLE_SCREENSHOT: new BasicStorage("DISABLE_SCREENSHOT", true, false, Boolean),
+  /** 事件：load 事件回调代码片段 */
+  LOAD_EVT_CODE: new BasicStorage("LOAD_EVT_CODE_", "", false, String, true),
+  /** 事件：video 事件回调代码片段 */
+  VIDEO_EVT_CODE: new BasicStorage("VIDEO_EVT_CODE_", "", false, String, true),
 };

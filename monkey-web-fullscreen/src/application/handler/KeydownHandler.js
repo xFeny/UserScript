@@ -13,8 +13,8 @@ export default {
     const isNumKeys = Tools.isNumber(e.key) && !this.isDisRate();
     const isOverrideKeys = this.isOverrideKey() && [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
     const isPreventKeys = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
-    const isZoomKeys = altKey && !this.isDisZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
-    if (isNumKeys || isOverrideKeys || isPreventKeys || isZoomKeys) Tools.preventDefault(e);
+    const isMoveKeys = altKey && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
+    if (isNumKeys || isOverrideKeys || isPreventKeys || isMoveKeys) Tools.preventDefault(e);
   },
   dispatchShortcut(code, { bypass = false, isTrusted = false } = {}) {
     const key = this.processShortcutKey({ code });
@@ -65,7 +65,7 @@ export default {
       RIGHT: () => this.skipPlayback(Storage.SKIP_INTERVAL.get(), bypass),
       0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP.get(), !0) || 0,
       SHIFT_A: () => this.autoNextEnabled(),
-      CTRL_ALT_A: () => this.screenshot(),
+      CTRL_ALT_S: () => this.screenshot(),
       ALT_SUB: () => this.zoomVideo(-1),
       ALT_ADD: () => this.zoomVideo(),
       SHIFT_R: () => this.horizFlip(),
@@ -99,13 +99,15 @@ export default {
   },
   handleConfsMessage(data) {
     // 处理在 “更多设置” 中操作功能切换（启用/禁用）时发来的消息
-    if (data?.sw_zoom) this.resetTsr(); // 禁用缩放
     if (data?.sw_memory) this.delCachedRate(); // 禁用记忆倍速
     if (data?.sw_speed) this.setPlaybackRate(1); // 禁用倍速调节
+    if (data?.sw_loadEvt) Storage.LOAD_EVT_CODE.set(data.sw_loadEvt, this.host);
+    if (data?.sw_videoEvt) Storage.VIDEO_EVT_CODE.set(data.sw_videoEvt, this.host);
+    if (data?.sw_fsCode) Storage.FULL_CHANGE_CODE.set(data.sw_fsCode, this.host);
+    if (data?.sw_videoEvt || data?.sw_fsCode) this.codeSnippetCache.clear();
 
     if ("sw_rateKeep" in data) this.playbackRateDisplay(); // 左上角常显倍速
     if ("sw_clockAlw" in data) setTimeout(() => this.changeTimeDisplay(), 30); // 非全屏显示时间
     if ("sw_color" in data) this.setTimeColor(data.sw_color); // 时间颜色
-    if ("sw_edgeClk" in data) this.removeEdgeElements(); // 禁用侧边触发网页全屏
   },
 };
