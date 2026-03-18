@@ -4,6 +4,9 @@ import Storage from "../common/Storage";
 import Keyboard from "../common/Keyboard";
 import VideoEnhancer from "../VideoEnhancer";
 
+// 只在开发环境下执行，打包时会移除该代码
+if (import.meta.env.DEV) Tools.isTopWin() && window.addEventListener("resize", () => App.sendTopWinInfo());
+
 /**
  * 应用程序初始化
  */
@@ -134,7 +137,7 @@ export default {
     };
 
     VideoEnhancer.defineProperty(this, "fsWrapper", {
-      set(value, setter) {
+      set: (value, setter) => {
         const method = setter(value) ? "addEventListener" : "removeEventListener";
         ["scroll", "keyup", "keydown"].forEach((type) => unsafeWindow[method](type, handle, true));
         Tools.microTask(() => this.customFullscreenChangeHandle());
@@ -143,10 +146,17 @@ export default {
   },
   customFullscreenChangeHandle() {
     if (Tools.isThrottle("fsChange", Consts.HALF_SEC)) return;
-    // Tools.sleep，尽可能保证代码片段中 isFullscreen 取到正确的状态值
-    Tools.sleep(250).then(() => {
+    Tools.sleep(100).then(() => {
+      const { width, height } = window.screen;
+      const { topWin, player, fsWrapper } = this;
+      const { offsetWidth, offsetHeight } = fsWrapper ?? player ?? this.getVideoHostContainer();
+
+      const isWFs = offsetWidth === topWin.vw && offsetHeight >= topWin.vh;
+      const isFs = offsetWidth === width && offsetHeight === height;
+      const type = isFs ? "isFull" : isWFs ? "isWFull" : "default";
+
       const jsCode = Storage.FULL_CHANGE_CODE.get(this.host);
-      this.executeCodeSnippet(jsCode, "fsChange", this.player);
+      this.executeCodeSnippet(jsCode, type, player);
     });
   },
   // ====================⇑⇑⇑ 全屏状态变换时处理相关逻辑 ⇑⇑⇑====================

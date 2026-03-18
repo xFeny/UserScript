@@ -1,14 +1,19 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
+import Storage from "../common/Storage";
 import VideoEnhancer from "../lib/VideoEnhancer";
 
 /**
  * 应用程序初始化
  */
 export default {
-  isMutedLoop: (video) => video?.muted && video?.loop,
+  fsWrapper: null,
+  isFullscreen: false,
   isNoVideo: () => !window.vMeta && !window.topWin,
+  isMutedLoop: (video) => video?.muted && video?.loop,
+  isExecuted: (key, ctx = window) => ctx[key] || !!((ctx[key] = true), false),
   init(isNonFirst = false) {
+    this.host = location.host;
     this.setupVideoListeners();
     this.setupKeydownListener();
     this.setupMouseMoveListener();
@@ -19,6 +24,7 @@ export default {
     this.setupDocumentObserver();
     this.setupShadowVideoListener();
     this.setupIgnoreChangeListener();
+    this.observeWebFullscreenChange();
     VideoEnhancer.hookActiveVideo();
   },
   /**
@@ -31,13 +37,62 @@ export default {
       (this.init(true), document.head.append(gmStyle.cloneNode(true)));
     }).observe(document, { childList: true });
   },
+
+  // ====================⇓⇓⇓ 全屏状态变换时处理相关逻辑 ⇓⇓⇓====================
   setupFullscreenListener() {
     document.addEventListener("fullscreenchange", () => {
-      const isFullscreen = !!document.fullscreenElement;
-      !isFullscreen && this.fsWrapper && this.dispatchShortcut(Consts.P); // 按`Esc`退出全屏模式时
-      Tools.postMessage(window.top, { isFullscreen });
+      Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
+    });
+
+    if (this.isExecuted("isDefined")) return;
+    VideoEnhancer.defineProperty(this, "isFullscreen", {
+      set: (value, setter) => (setter(value), this.handleFullscreenChange(value)),
     });
   },
+  handleFullscreenChange(isFullscreen) {
+    // 全屏时移除输入框焦点（解决B站自动聚焦问题）
+    isFullscreen && Tools.isInputable(document.activeElement) && document.activeElement.blur();
+
+    // 处理通过Esc键而非Enter键退出全屏模式的场景
+    !isFullscreen && this.fsWrapper && this.dispatchShortcut(Keyboard.P);
+
+    Tools.microTask(() => this.customFullscreenChangeHandle());
+  },
+  observeWebFullscreenChange() {
+    VideoEnhancer.defineProperty(this, "fsWrapper", {
+      set: (value, setter) => {
+        (setter(value), Tools.microTask(() => this.customFullscreenChangeHandle()));
+      },
+    });
+  },
+  customFullscreenChangeHandle() {
+    if (Tools.isThrottle("fsChange", Consts.HALF_SEC)) return;
+    Tools.sleep(100).then(() => {
+      const { width, height } = window.screen;
+      const { topWin, player, fsWrapper } = this;
+      const { offsetWidth, offsetHeight } = fsWrapper ?? player ?? this.getVideoHostContainer();
+
+      const isWFs = offsetWidth === topWin.vw && offsetHeight >= topWin.vh;
+      const isFs = offsetWidth === width && offsetHeight === height;
+      const type = isFs ? "isFull" : isWFs ? "isWFull" : "default";
+
+      const jsCode = Storage.FS_CHANGE_CODE.get(topWin.host);
+      this.executeCodeSnippet(jsCode, type, player);
+    });
+  },
+  codeSnippetCache: new Map(),
+  executeCodeSnippet(jsCode, type, video) {
+    try {
+      if (!jsCode) return;
+      const args = ["type", "video", "unsafeWindow", "Tools", "App"];
+      const handler = this.codeSnippetCache.get(type) || this.codeSnippetCache.set(type, new Function(...args, jsCode)).get(type);
+      handler(type, video, unsafeWindow, Tools, App);
+    } catch (e) {
+      console.error("JS代码片段执行出错：", e);
+    }
+  },
+  // ====================⇑⇑⇑ 全屏状态变换时处理相关逻辑 ⇑⇑⇑====================
+
   // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
   setupMouseMoveListener() {
     const handle = ({ type, clientX, clientY }) => {

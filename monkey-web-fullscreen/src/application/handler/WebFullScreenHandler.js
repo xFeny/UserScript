@@ -16,6 +16,7 @@ export default {
    * @returns {NodeList} 图标元素的节点列表，按「全屏→网页全屏→弹幕设置→弹幕开关→小窗模式」顺序排列
    */
   getLiveIcons: () => (Tools.emitMousemove(App.player), Tools.querys(".right-area .icon")),
+  isGMatch: () => Site.isGmMatch() && !Site.isBiliLive(),
   triggerIconElement(name) {
     const index = Object.values(Site.icons).indexOf(name);
     const element = Site.isBiliLive() ? this.getLiveIcons()?.[index] : Tools.query(Site.getIcons()?.[name]);
@@ -26,14 +27,14 @@ export default {
   },
   toggleFullscreen() {
     if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
-    if (Site.isGmMatch() && !Site.isBiliLive()) return this.toggleFullscreenForClick(Site.icons.full);
+    if (this.isGMatch()) return this.toggleFullscreenForClick(Site.icons.full);
 
     this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
     if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcut(Keyboard.P); // 全屏或非网页全屏模式下
   },
   toggleWebFullscreen(isTrusted) {
     if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
-    if (Site.isGmMatch() && !Site.isBiliLive()) return this.toggleFullscreenForClick(Site.icons.webFull);
+    if (this.isGMatch()) return this.toggleFullscreenForClick(Site.icons.webFull);
 
     if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
     this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();

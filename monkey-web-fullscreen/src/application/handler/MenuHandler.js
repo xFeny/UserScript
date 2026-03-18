@@ -101,11 +101,11 @@ export default {
     const html = `
         <div class="swal2-tabs">
           <div class="swal2-tabs-header">
-              <div class="swal2-tab active" data-id="tab1">播放</div>
+              <div class="swal2-tab active" data-id="tab1">控制</div>
               <div class="swal2-tab" data-id="tab2">参数</div>
               <div class="swal2-tab" data-id="tab3">忽略</div>
               <div class="swal2-tab" data-id="tab4">全屏</div>
-              <div class="swal2-tab" data-id="tab5">事件</div>
+              <div class="swal2-tab" data-id="tab5">增强</div>
           </div>
           <div class="swal2-tabs-content">
             <div class="swal2-tab-panel active" id="tab1">${a.html}</div>
@@ -200,10 +200,9 @@ export default {
     return this.generate(confs, render);
   },
   genFull() {
-    const disd = Site.isGmMatch() && !Site.isBiliLive();
     const confs = [
-      { name: "custCtn", text: "自定义此站全屏视频容器", cache: Storage.CUSTOM_CTN, disable: disd, useHost: true },
-      { name: "fsCode", text: "自定义此站全屏切换处理逻辑", cache: Storage.FULL_CHANGE_CODE, useHost: true, attrs: ["send"] },
+      { name: "custCtn", text: "此站(网页)全屏视频容器", cache: Storage.CUSTOM_CTN, disable: this.isGMatch(), useHost: true },
+      { name: "fsCode", text: "此站(网页)全屏切换时扩展代码", cache: Storage.FULL_CHANGE_CODE, useHost: true, attrs: ["send"] },
     ];
 
     const render = ({ text, name, value, dataset, disable }) => `
@@ -215,8 +214,8 @@ export default {
   },
   genCode() {
     const confs = [
-      { name: "loadEvt", text: "自定义此站 load 事件处理逻辑", cache: Storage.LOAD_EVT_CODE, useHost: true, attrs: ["send"] },
-      { name: "videoEvt", text: "自定义此站视频事件处理逻辑", cache: Storage.VIDEO_EVT_CODE, useHost: true, attrs: ["send"] },
+      { name: "loadEvt", text: "此站 load 事件扩展代码", cache: Storage.LOAD_EVT_CODE, useHost: true, attrs: ["send"] },
+      { name: "videoEvt", text: "此站视频事件扩展代码", cache: Storage.VIDEO_EVT_CODE, useHost: true, attrs: ["send"] },
     ];
 
     const render = ({ text, name, value, dataset, disable }) => `

@@ -35,7 +35,7 @@ export default {
   autoExitWebFullscreen() {
     if (!Site.isBili() && !Site.isAcFun()) return;
     const isWide = this.player.offsetWidth === innerWidth;
-    if (isWide) this.toggleFullViaClickElement(this.isFullscreen ? Site.icons.full : Site.icons.webFull);
+    if (isWide) this.toggleFullscreenForClick(this.isFullscreen ? Site.icons.full : Site.icons.webFull);
 
     // 取消连播触发条件：
     // - B站普通视频（非番剧）播放结束时

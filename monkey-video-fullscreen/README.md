@@ -4,22 +4,42 @@
 ## 特性
 
 - [x] 支持自动网页全屏
+
 - [x] 支持自定义视频容器
+
 - [x] 支持侧边点击切换网页全屏
+
 - [x] 支持 `iframe` 、`shadowRoot` 视频
+
 - [x] 支持多视频页面（如：微博、抖音等）
+
 - [x] 支持在自动模式下忽略 URLs（前缀匹配，多值用英文 ; 隔开）
   - 示例：https://www.youtube.com/results;https://www.youtube.com/shorts;https://www.youtube.com/@;
-- [x] 支持自定义全屏点击元素
-  - 示例 `https://www.bilibili.com`：
   
+- [x] 支持(网页)全屏切换时执行额外的代码逻辑
+
+  ```js
+  if (type === "isFull") {
+    console.log("进入全屏模式！");
+  } else if (type === "isWFull") {
+    console.log("进入网页全屏模式！");
+  } else {
+    console.log("退出(网页)全屏模式！");
+  }
+  ```
+
+  - 示例 `https://www.bilibili.com`：
+
    ```js
-   .bpx-player-ctrl-full; .bpx-player-ctrl-web
+   if (type === "default") return;
+   setTimeout(() => {
+     document.querySelector('.bpx-player-mini-close')?.click();
+   }, 1000);
    ```
 
 ## Features
 
-- [x] Support auto web fullscreen
+- [x] Support auto web full-screen
 
 - [x] Support multi-video pages
 
@@ -27,15 +47,23 @@
 
 - [x] Support `iframe` and `shadowRoot` videos
 
-- [x] Support side click to toggle web fullscreen
+- [x] Support side click to toggle web full-screen
 
 - [x] URLs ignored in auto mode (prefix match, multiple values separated by semicolons)
   - example：https://www.youtube.com/results;https://www.youtube.com/shorts;https://www.youtube.com/@;
   
-- [x] Support for custom fullscreen click elements
+- [x] Supports additional processing when full-screen changes
 
   - example `https://www.youtube.com`：
 
-     ```js
-     .ytp-fullscreen-button; .ytp-size-button
-     ```
+  ```js
+  if (type === "isFull") {
+  console.log("Enter full-screen mode!");
+  } else if (type === "isWFull") {
+  console.log("Enter full-screen web mode!");
+  } else {
+  console.log("Exit (Web) full-screen Mode!");
+  }
+  ```
+
+  
