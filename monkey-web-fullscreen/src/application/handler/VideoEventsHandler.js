@@ -77,11 +77,30 @@ export default {
   executeCodeSnippet(jsCode, type, video) {
     try {
       if (!jsCode) return;
-      const args = ["type", "video", "unsafeWindow", "Tools", "App"];
-      const handler = this.codeSnippetCache.get(type) || this.codeSnippetCache.set(type, new Function(...args, jsCode)).get(type);
-      handler(type, video, unsafeWindow, Tools, App);
+      const code = `(async () => { ${jsCode} })()`;
+      const args = ["type", "App", "video", "Tools", "unsafeWindow"];
+      const handler = this.codeSnippetCache.get(type) || this.codeSnippetCache.set(type, new Function(...args, code)).get(type);
+      handler(type, App, video, Tools, unsafeWindow);
     } catch (e) {
-      console.error("JS代码片段执行出错：", e);
+      const unsafe = e.message.includes("unsafe-eval");
+      unsafe ? this.injectCodeSnippet(jsCode, type, video) : console.error("JS代码片段执行出错：", e);
     }
+  },
+  injectCodeSnippet(jsCode, type, video) {
+    const evt = `gm_code_inject_${type}`;
+    const injectCode = `
+      (() => {
+        document.addEventListener('${evt}', (e) => {
+          try {
+            const { type, App, video, Tools, unsafeWindow } = e.detail;
+            (async () => { ${jsCode} })();
+          } catch (err) { console.error('动态代码执行出错:', err); }
+        }, { once: true });
+      })();
+      `;
+
+    Tools.query(`#${evt}`)?.remove();
+    GM_addElement("script", { id: evt, textContent: injectCode, type: "text/javascript" });
+    document.dispatchEvent(new CustomEvent(evt, { detail: { type, App, video, Tools, unsafeWindow } }));
   },
 };

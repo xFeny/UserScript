@@ -15,11 +15,18 @@ export default {
   },
   setupMenuCmds() {
     const isAuto = I18n.t(this.isAuto() ? "disable" : "enable");
+    const fsChange = ({ title, cache, value }) => {
+      const input = prompt(title, value);
+      if (input === null) return;
+      cache.set(input, this.host);
+      this.codeSnippetCache.clear();
+    };
+
     const configs = [
-      { title: isAuto, cache: Storage.IS_AUTO, fn: (cache, val) => cache.set(!val, this.host) },
+      { title: isAuto, cache: Storage.IS_AUTO, fn: ({ cache, value }) => cache.set(!value, this.host) },
       { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS },
       { title: I18n.t("custom"), cache: Storage.CUSTOM_CTN },
-      { title: I18n.t("fsChange"), cache: Storage.FS_CHANGE_CODE },
+      { title: I18n.t("fsChange"), cache: Storage.FS_CHANGE_CODE, fn: fsChange },
       { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD },
     ];
 
@@ -29,7 +36,7 @@ export default {
       GM_unregisterMenuCommand(this[id]);
       this[id] = GM_registerMenuCommand(title, () => {
         const value = cache.get(this.host);
-        if (fn) return fn.call(this, cache, value); // 自定义逻辑
+        if (fn) return fn.call(this, { title, cache, value }); // 自定义逻辑
 
         // 弹出输入框对话框
         const input = prompt(title, value);
