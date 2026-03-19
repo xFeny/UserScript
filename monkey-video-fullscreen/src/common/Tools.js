@@ -19,9 +19,6 @@ export default {
   createElement: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
   delCls: (el, ...cls) => el?.classList.remove(...cls),
   addCls: (el, ...cls) => el?.classList.add(...cls),
-  sendToIFrames(data) {
-    this.getIFrames().forEach((el) => this.isVisible(el) && this.postMessage(el?.contentWindow, data));
-  },
   freqTimes: new Map(),
   isThrottle(key = "throttle", gap = 300) {
     const now = Date.now();

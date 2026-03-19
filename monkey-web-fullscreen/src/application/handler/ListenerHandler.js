@@ -62,11 +62,11 @@ export default {
   },
   setPlayer(video) {
     this.player = video;
-    const vMeta = { isLive: video.duration === Infinity, timestamp: Date.now() };
+    const vMeta = this.vMeta ?? { isLive: video.duration === Infinity, vw: innerWidth, vh: innerHeight };
     this.syncMetaToParentWin(vMeta);
   },
   syncMetaToParentWin(vMeta) {
-    window.vMeta = this.vMeta = vMeta;
+    window.vMeta = this.vMeta = { ...vMeta, timestamp: Date.now() };
     if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { vMeta: { ...vMeta, iFrame: location.href } });
     Tools.microTask(() => (this.initMenuCmds(), this.watchIFrameChange(), this.setupPickerListener()));
     this.sendTopWinInfo();
@@ -77,7 +77,11 @@ export default {
     const { innerWidth: vw, innerHeight: vh } = window;
     const topWin = { vw, vh, url, host, urlHash: Tools.hashCode(url) };
     window.topWin = this.topWin = topWin;
-    Tools.sendToIFrames({ topWin });
+    this.sendToVideoIFrame({ topWin });
+  },
+  sendToVideoIFrame(data) {
+    const vFrame = this.getVideoIFrame();
+    Tools.postMessage(vFrame?.contentWindow, data);
   },
   observeVideoSrcChange(video) {
     if (this.isExecuted("observed", video)) return;
@@ -149,7 +153,7 @@ export default {
     Tools.sleep(100).then(() => {
       const { width, height } = window.screen;
       const { topWin, player, fsWrapper } = this;
-      const { offsetWidth, offsetHeight } = fsWrapper ?? player ?? this.getVideoHostContainer();
+      const { offsetWidth, offsetHeight } = fsWrapper ?? player ?? {};
 
       const isWFs = offsetWidth === topWin.vw && offsetHeight >= topWin.vh;
       const isFs = offsetWidth === width && offsetHeight === height;

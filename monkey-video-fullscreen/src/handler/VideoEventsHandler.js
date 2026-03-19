@@ -57,11 +57,11 @@ export default {
   },
   setPlayer(video) {
     this.player = video;
-    const vMeta = { isLive: video.duration === Infinity, timestamp: Date.now() };
+    const vMeta = this.vMeta ?? { isLive: video.duration === Infinity, vw: innerWidth, vh: innerHeight };
     this.syncMetaToParentWin(vMeta);
   },
   syncMetaToParentWin(vMeta) {
-    window.vMeta = this.vMeta = vMeta;
+    window.vMeta = this.vMeta = { ...vMeta, timestamp: Date.now() };
     if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { vMeta: { ...vMeta, iFrame: location.href } });
     Tools.microTask(() => this.initMenuCmds());
     this.sendTopWinInfo();
@@ -70,8 +70,12 @@ export default {
     // 向iframe传递顶级窗口信息
     const { host, href: url } = location;
     const { innerWidth: vw, innerHeight: vh } = window;
-    const topWin = { url, host, vw, vh };
+    const topWin = { vw, vh, url, host };
     window.topWin = this.topWin = topWin;
-    Tools.sendToIFrames({ topWin });
+    this.sendToVideoIFrame({ topWin });
+  },
+  sendToVideoIFrame(data) {
+    const vFrame = this.getVideoIFrame();
+    Tools.postMessage(vFrame?.contentWindow, data);
   },
 };

@@ -46,7 +46,7 @@ export default {
     if (this.vMeta?.iFrame && this.player) delete this.player;
 
     // 视频可能在 iframe 中，向 iframe 传递操作
-    if (!this.player) Tools.sendToIFrames(data);
+    if (!this.player) this.sendToVideoIFrame(data);
     if (data?.key) this.execKeyActions(data);
   },
   execKeyActions({ key, bypass, isTrusted }) {

@@ -36,6 +36,6 @@ export default {
     ({ P: this.toggleWebFullscreen, ENTER: this.toggleFullscreen })[data?.key]?.(data?.isTrusted);
 
     // 视频可能在 iframe 中，向 iframe 传递操作
-    if (!this.player) Tools.sendToIFrames(data);
+    if (!this.player) this.sendToVideoIFrame(data);
   },
 };

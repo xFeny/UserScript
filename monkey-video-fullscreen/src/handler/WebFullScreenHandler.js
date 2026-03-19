@@ -71,15 +71,21 @@ export default {
     this.fsPlaceholder = this.fsWrapper = this.fsParent = null;
   },
   getVideoHostContainer() {
-    if (this.player) return this.getVideoContainer();
-    return this.getVideoIFrame() ?? Tools.getIFrames().find(Tools.isVisible);
+    return this.player ? this.getVideoContainer() : this.getVideoIFrame();
   },
   getVideoIFrame() {
     if (!this.vMeta?.iFrame) return null;
 
-    const { pathname, search } = new URL(this.vMeta.iFrame);
-    const partial = ((s) => s.slice(0, s.length * 0.8))(decodeURIComponent(search));
-    return Tools.query(`iframe[src*="${pathname + partial}"]`);
+    const { vw, vh, iFrame } = this.vMeta;
+    const { pathname, search } = new URL(iFrame);
+    const partial = ((s) => s.slice(0, Math.floor(s.length * 0.8)))(decodeURIComponent(search));
+    const vFrame = Tools.query(`iframe[src*="${pathname + partial}"]`);
+    if (vFrame) return vFrame;
+
+    const tol = 10; // 偏差值
+    const iFrames = Tools.getIFrames();
+    const matchSize = ({ offsetWidth: w, offsetHeight: h }) => Math.abs(w - vw) < tol && Math.abs(h - vh) < tol;
+    return iFrames.find(matchSize) ?? iFrames.find(Tools.isVisible);
   },
   getVideoContainer() {
     // 自定义网页全屏元素，支持多个选择器，返回第一个找到的元素

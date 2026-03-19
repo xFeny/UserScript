@@ -70,7 +70,7 @@ export default {
     Tools.sleep(100).then(() => {
       const { width, height } = window.screen;
       const { topWin, player, fsWrapper } = this;
-      const { offsetWidth, offsetHeight } = fsWrapper ?? player ?? this.getVideoHostContainer();
+      const { offsetWidth, offsetHeight } = fsWrapper ?? player ?? {};
 
       const isWFs = offsetWidth === topWin.vw && offsetHeight >= topWin.vh;
       const isFs = offsetWidth === width && offsetHeight === height;

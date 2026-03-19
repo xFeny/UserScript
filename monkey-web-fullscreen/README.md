@@ -289,7 +289,7 @@ this.autoExitWebFullscreen();
 
 **示例网站：** 在 [YouTube Shorts](https://www.youtube.com/shorts)、[新版贴吧](https://tieba.baidu.com) 未修改阈值时切换网页全屏异常，修改阈值为 `10` 后可正常切换。
 
-#### 9. 自定义事件处理逻辑
+#### 9. 事件回调执行扩展代码逻辑
 
 可访问的值：type, video, unsafeWindow, Tools, App
 
@@ -304,9 +304,6 @@ this.autoExitWebFullscreen();
   // if(type === "load") console.log('页面资源已加载完！');
   
   Tools.sleep(3000).then(() => {
-    // 设置音量均衡-标准
-    Tools.query('.bpx-player-ctrl-setting-loudness input[value="1"]')?.click();
-    
     // 解决B站未登录时，播放一分钟左右弹出登录窗的问题
     if (unsafeWindow.__BiliUser__?.isLogin) return;
     unsafeWindow.__BiliUser__.cache.data.isLogin = true;
@@ -365,5 +362,13 @@ this.autoExitWebFullscreen();
     console.log("退出(网页)全屏模式！");
   }
   ```
+  
+    示例一：https://www.bilibili.com/
+  ```js
+  // 设置音量均衡
+  if(type === "default") return;
+  Tools.query('.bpx-player-ctrl-setting-loudness input[value="1"]')?.click();
+  ```
+  
   
 
