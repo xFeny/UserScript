@@ -10,15 +10,21 @@ import Storage from "../common/Storage";
 export default {
   toggleFullscreen() {
     if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
-
     this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-    if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcut(Consts.P); // 全屏或非网页全屏模式下
   },
   toggleWebFullscreen(isTrusted) {
     if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
 
-    if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
-    this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
+    Tools.microTask(() => {
+      if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
+      this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
+    }).then(async () => {
+      if (!this.fsWrapper || !this.isFullscreen) return this.customFullChangeHandle();
+
+      const { offsetHeight: oh } = this.fsWrapper;
+      await Tools.poll(() => !this.fsWrapper || !Object.is(this.fsWrapper.offsetHeight, oh));
+      this.customFullChangeHandle();
+    });
   },
   enterWebFullscreen() {
     // video的宿主容器元素
@@ -75,6 +81,7 @@ export default {
   },
   getVideoIFrame() {
     if (!this.vMeta?.iFrame) return null;
+    if (this.fsWrapper) return this.fsWrapper;
 
     const { vw, vh, iFrame } = this.vMeta;
     const { pathname, search } = new URL(iFrame);
@@ -82,7 +89,7 @@ export default {
     const vFrame = Tools.query(`iframe[src*="${pathname + partial}"]`);
     if (vFrame) return vFrame;
 
-    const tol = 10; // 偏差值
+    const tol = 5; // 偏差值
     const iFrames = Tools.getIFrames();
     const matchSize = ({ offsetWidth: w, offsetHeight: h }) => Math.abs(w - vw) < tol && Math.abs(h - vh) < tol;
     return iFrames.find(matchSize) ?? iFrames.find(Tools.isVisible);
@@ -137,5 +144,48 @@ export default {
       if (width === vw && height === vh && el.offsetHeight === vh) return; // 宽高已匹配，无需适配
       Tools.attr(el, Consts.webFull, true);
     });
+  },
+  customFullChangeHandle() {
+    if (Tools.isThrottle("fsChange", Consts.HALF_SEC)) return;
+    Tools.sleep(50).then(() => {
+      const tol = 5; // 偏差值
+      const { width, height } = window.screen;
+      const { topWin, player, fsWrapper } = this;
+      const { offsetWidth: ew, offsetHeight: eh } = fsWrapper ?? player ?? {};
+
+      const isWFs = Math.abs(ew - topWin.vw) < tol && Math.abs(eh - topWin.vh) < tol;
+      const isFs = Math.abs(ew - width) < tol && Math.abs(eh - height) < tol;
+      const type = isFs ? "isFull" : isWFs ? "isWFull" : "default";
+
+      const jsCode = Storage.FS_CHANGE_CODE.get(topWin.host);
+      this.executeCodeSnippet(jsCode, type, player);
+    });
+  },
+  executeCodeSnippet(jsCode, type, video) {
+    try {
+      if (!jsCode) return;
+      const code = `(async () => { ${jsCode} })()`;
+      const args = ["type", "App", "video", "Tools", "unsafeWindow"];
+      const handler = (this.codeSnippetCache ??= new Function(...args, code));
+      handler(type, App, video, Tools, unsafeWindow);
+    } catch (e) {
+      const unsafe = e.message.includes("unsafe-eval");
+      unsafe ? this.injectCodeSnippet(jsCode, type, video) : console.error("代码执行出错：", e);
+    }
+  },
+  injectCodeSnippet(jsCode, type, video) {
+    const evt = `gm_code_inject_${type}`;
+    const injectCode = `
+        (() => {
+          document.addEventListener('${evt}', (e) => {
+            const { type, App, video, Tools, unsafeWindow } = e.detail;
+            (async () => { try { ${jsCode} } catch (err) { console.error('代码执行出错：', err); } })();
+          }, { once: true });
+        })();
+        `;
+
+    Tools.query(`#${evt}`)?.remove();
+    GM_addElement("script", { id: evt, textContent: injectCode, type: "text/javascript" });
+    document.dispatchEvent(new CustomEvent(evt, { detail: { type, App, video, Tools, unsafeWindow } }));
   },
 };

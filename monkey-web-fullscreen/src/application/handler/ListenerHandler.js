@@ -15,7 +15,7 @@ export default {
   isFullscreen: false,
   isNoVideo: () => !window.vMeta && !window.topWin,
   isMutedLoop: (video) => video?.muted && video?.loop,
-  isExecuted: (key, ctx = window) => ctx[key] || !!((ctx[key] = true), false),
+  isExecuted: (key, ctx = (window.e9x ??= {})) => ctx[key] || !!((ctx[key] = true), false),
   init(isNonFirst = false) {
     this.host = location.host;
     this.setupVideoListeners();
@@ -125,10 +125,11 @@ export default {
     // 全屏时移除输入框焦点（解决B站自动聚焦问题）
     isFullscreen && Tools.isInputable(document.activeElement) && document.activeElement.blur();
 
-    // 处理通过Esc键而非Enter键退出全屏模式的场景
-    !isFullscreen && this.fsWrapper && this.dispatchShortcut(Keyboard.P);
+    // 默认 <=> 全屏、 全屏 => 网页全屏
+    if (!this.isGMatch() && !(isFullscreen && this.fsWrapper)) this.toggleWebFullscreen();
 
-    Tools.microTask(() => this.customFullscreenChangeHandle());
+    // 执行自定义的代码片段
+    Tools.microTask(() => this.customFullChangeHandle());
 
     // 播放器右上角时间的显/隐
     this.changeTimeDisplay();
@@ -144,19 +145,20 @@ export default {
       set: (value, setter) => {
         const method = setter(value) ? "addEventListener" : "removeEventListener";
         ["scroll", "keyup", "keydown"].forEach((type) => unsafeWindow[method](type, handle, true));
-        Tools.microTask(() => this.customFullscreenChangeHandle());
+        Tools.microTask(() => this.customFullChangeHandle());
       },
     });
   },
-  customFullscreenChangeHandle() {
+  customFullChangeHandle() {
     if (Tools.isThrottle("fsChange", Consts.HALF_SEC)) return;
-    Tools.sleep(100).then(() => {
+    Tools.sleep(50).then(() => {
+      const tol = 5; // 偏差值
       const { width, height } = window.screen;
       const { topWin, player, fsWrapper } = this;
-      const { offsetWidth, offsetHeight } = fsWrapper ?? player ?? {};
+      const { offsetWidth: ew, offsetHeight: eh } = fsWrapper ?? player ?? {};
 
-      const isWFs = offsetWidth === topWin.vw && offsetHeight >= topWin.vh;
-      const isFs = offsetWidth === width && offsetHeight === height;
+      const isWFs = Math.abs(ew - topWin.vw) < tol && Math.abs(eh - topWin.vh) < tol;
+      const isFs = Math.abs(ew - width) < tol && Math.abs(eh - height) < tol;
       const type = isFs ? "isFull" : isWFs ? "isWFull" : "default";
 
       const jsCode = Storage.FULL_CHANGE_CODE.get(this.host);

@@ -19,7 +19,7 @@ export default {
       const input = prompt(title, value);
       if (input === null) return;
       cache.set(input, this.host);
-      this.codeSnippetCache.clear();
+      this.codeSnippetCache = null;
     };
 
     const configs = [

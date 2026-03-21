@@ -13,11 +13,13 @@ export default {
     video && this.videoAborts.get(video)?.abort(); // 防止重复绑定
 
     const handle = ({ type, target }) => {
-      if (!target.matches(`video, ${Consts.FAKE_VIDEO}`)) return;
+      if (!target?.matches(`video, ${Consts.FAKE_VIDEO}`)) return;
       (this[type]?.(target), this.customVideoEvtHandle(type, target));
     };
 
-    this.videoEvts.forEach((t) => (video ?? document).addEventListener(t, handle, { capture: true, signal: ctrl.signal }));
+    this.videoEvts.forEach((t) =>
+      (video ?? document).addEventListener(t, handle, { capture: true, passive: true, signal: ctrl.signal })
+    );
     if (video) (this.videoAborts.set(video, ctrl), this.unbindVideoEvts());
   },
   setupShadowVideoListener() {
@@ -44,15 +46,18 @@ export default {
     this.initVideoProps(video);
   },
   timeupdate(video) {
-    if (isNaN(video.duration)) return;
+    if (isNaN(video.duration) || !Tools.isVisible(video)) return;
     if (!this.player) this.playing(video);
 
-    this.autoWebFullscreen(video);
-    this.autoNextEpisode(video);
+    // 微任务执行，不阻塞视频渲染
+    Tools.microTask(() => {
+      this.autoWebFullscreen(video);
+      this.autoNextEpisode(video);
 
-    this.cachePlayTime(video);
-    this.videoProgress(video);
-    this.ensureRateDisplay();
+      this.cachePlayTime(video);
+      this.videoProgress(video);
+      this.ensureRateDisplay();
+    });
   },
   canplay(video) {
     if (!Tools.isVisible(video) || Tools.isMultiV() || Storage.DISABLE_TRY_PLAY.get()) return;
@@ -71,7 +76,7 @@ export default {
   customVideoEvtHandle(type, video) {
     if (this.isMutedLoop(video)) return;
     if (type === "timeupdate" && Tools.isThrottle("codeSnippet", Consts.ONE_SEC)) return;
-    Tools.microTask(() => this.executeCodeSnippet(Storage.VIDEO_EVT_CODE.get(this.host), type, video));
+    Tools.sleep(10).then(() => this.executeCodeSnippet(Storage.VIDEO_EVT_CODE.get(this.host), type, video));
   },
   codeSnippetCache: new Map(),
   executeCodeSnippet(jsCode, type, video) {
@@ -83,7 +88,7 @@ export default {
       handler(type, App, video, Tools, unsafeWindow);
     } catch (e) {
       const unsafe = e.message.includes("unsafe-eval");
-      unsafe ? this.injectCodeSnippet(jsCode, type, video) : console.error("JS代码片段执行出错：", e);
+      unsafe ? this.injectCodeSnippet(jsCode, type, video) : console.error("代码执行出错：", e);
     }
   },
   injectCodeSnippet(jsCode, type, video) {
@@ -91,16 +96,14 @@ export default {
     const injectCode = `
       (() => {
         document.addEventListener('${evt}', (e) => {
-          try {
-            const { type, App, video, Tools, unsafeWindow } = e.detail;
-            (async () => { ${jsCode} })();
-          } catch (err) { console.error('动态代码执行出错:', err); }
-        }, { once: true });
+          const { type, App, video, Tools, unsafeWindow } = e.detail;
+          (async () => { try { ${jsCode} } catch (err) { console.error('代码执行出错：', err); } })();
+        }, { once: true, passive: true });
       })();
       `;
 
     Tools.query(`#${evt}`)?.remove();
     GM_addElement("script", { id: evt, textContent: injectCode, type: "text/javascript" });
-    document.dispatchEvent(new CustomEvent(evt, { detail: { type, App, video, Tools, unsafeWindow } }));
+    document.dispatchEvent(new CustomEvent(evt, { bubbles: false, detail: { type, App, video, Tools, unsafeWindow } }));
   },
 };

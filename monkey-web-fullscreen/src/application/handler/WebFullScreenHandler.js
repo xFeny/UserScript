@@ -23,14 +23,19 @@ export default {
     return Tools.fireMouseEvt(element, "click");
   },
   toggleFullscreenForClick(name) {
-    this.triggerIconElement(name)?.then(() => this.customFullscreenChangeHandle());
+    if (!this.triggerIconElement(name)) return;
+
+    const { offsetHeight: oh } = this.player;
+    new ResizeObserver(async (_, obs) => {
+      await Tools.poll(() => !Object.is(this.player.offsetHeight, oh));
+      (obs.disconnect(), this.customFullChangeHandle());
+    }).observe(this.player);
   },
   toggleFullscreen() {
     if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
     if (this.isGMatch()) return this.toggleFullscreenForClick(Site.icons.full);
 
     this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-    if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcut(Keyboard.P); // 全屏或非网页全屏模式下
   },
   toggleWebFullscreen(isTrusted) {
     if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
@@ -100,6 +105,7 @@ export default {
   },
   getVideoIFrame() {
     if (!this.vMeta?.iFrame) return null;
+    if (this.fsWrapper) return this.fsWrapper;
 
     const { vw, vh, iFrame } = this.vMeta;
     const { pathname, search } = new URL(iFrame);
@@ -107,7 +113,7 @@ export default {
     const vFrame = Tools.query(`iframe[src*="${pathname + partial}"]`);
     if (vFrame) return vFrame;
 
-    const tol = 10; // 偏差值
+    const tol = 5; // 偏差值
     const iFrames = Tools.getIFrames();
     const matchSize = ({ offsetWidth: w, offsetHeight: h }) => Math.abs(w - vw) < tol && Math.abs(h - vh) < tol;
     return iFrames.find(matchSize) ?? iFrames.find(Tools.isVisible);

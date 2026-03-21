@@ -62,8 +62,7 @@ export default unsafeWindow.FyTools = {
   },
   fireMouseEvt(el, type, clientX, clientY) {
     const dict = { clientX, clientY, bubbles: true };
-    el?.dispatchEvent(new MouseEvent(type, dict));
-    return el ? Promise.resolve(el) : null;
+    return el?.dispatchEvent(new MouseEvent(type, dict));
   },
   /**
    * 判断元素是否有有效ID（不含数字/中文）
@@ -144,4 +143,26 @@ export default unsafeWindow.FyTools = {
    * @returns {boolean} true=元素挂载；false=元素已脱离
    */
   isAttached: (el) => !!el && el.isConnected && (!el.getRootNode?.()?.host || el.getRootNode().host.isConnected),
+  /**
+   * 轮询检测指定条件，直到条件满足或超时
+   * @param {Function} condition - 检测条件函数，需返回布尔值（true/false）
+   * @param {Object} [opts={}] - 配置选项
+   * @param {boolean} [opts.immediate=false] - 是否立即执行首次检测（true=立即执行，false=延迟interval后执行）
+   * @param {number} [opts.interval=50] - 每次检测的间隔时间（毫秒），默认50ms
+   * @param {number} [opts.timeout=3000] - 最大超时时间（毫秒），默认3000ms（3秒）
+   * @returns {Promise<void>} - 条件满足时resolve（无返回值），超时/执行出错时reject
+   */
+  poll(condition, opts = {}) {
+    const start = Date.now();
+    const { immediate = false, interval = 50, timeout = 3000 } = opts;
+
+    return new Promise((resolve, reject) => {
+      const checkCondition = () => {
+        if (Date.now() - start > timeout) return reject(new Error("检测超时"));
+        condition() ? resolve() : setTimeout(checkCondition, interval);
+      };
+
+      immediate ? checkCondition() : setTimeout(checkCondition, interval); // 执行第一次检测
+    });
+  },
 };

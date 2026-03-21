@@ -12,7 +12,9 @@ export default {
     video && this.videoAborts.get(video)?.abort(); // 防止重复绑定
 
     const handle = ({ type, target }) => this[type](target);
-    this.videoEvts.forEach((t) => (video ?? document).addEventListener(t, handle, { capture: true, signal: ctrl.signal }));
+    this.videoEvts.forEach((t) =>
+      (video ?? document).addEventListener(t, handle, { capture: true, passive: true, signal: ctrl.signal })
+    );
     if (video) (this.videoAborts.set(video, ctrl), this.unbindVideoEvts());
   },
   setupShadowVideoListener() {
@@ -36,7 +38,7 @@ export default {
   },
   timeupdate(video) {
     if (isNaN(video.duration)) return;
-    this.autoWebFullscreen(video);
+    Tools.microTask(() => this.autoWebFullscreen(video)); // 微任务执行，不阻塞视频渲染
   },
   playing(video) {
     this.setCurrentVideo(video);
