@@ -170,7 +170,6 @@ export default {
       { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
       { name: "zero", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP },
       { name: "advance", text: "下集提前秒数", cache: Storage.NEXT_ADVANCE_SEC },
-      { name: "days", text: "进度保存天数", cache: Storage.STORAGE_DAYS },
       { name: "percent", text: "缩放百分比", cache: Storage.ZOOM_PERCENT },
       { name: "move", text: "移动距离", cache: Storage.MOVING_DISTANCE },
       { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR, attrs: ["send"] },
