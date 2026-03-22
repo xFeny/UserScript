@@ -74,17 +74,4 @@ export default {
    * @returns {boolean} true=元素挂载；false=元素已脱离
    */
   isAttached: (el) => !!el && el.isConnected && (!el.getRootNode?.()?.host || el.getRootNode().host.isConnected),
-  poll(condition, opts = {}) {
-    const start = Date.now();
-    const { immediate = false, interval = 50, timeout = 3000 } = opts;
-
-    return new Promise((resolve, reject) => {
-      const checkCondition = () => {
-        if (Date.now() - start > timeout) return reject(new Error("检测超时"));
-        condition() ? resolve() : setTimeout(checkCondition, interval);
-      };
-
-      immediate ? checkCondition() : setTimeout(checkCondition, interval); // 执行第一次检测
-    });
-  },
 };

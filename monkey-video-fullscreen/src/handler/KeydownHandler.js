@@ -21,7 +21,7 @@ export default {
     this.dispatchShortcut(key, isTrusted);
   },
   handleMessage(data) {
-    // Tools.log(location.href, "接收到消息：", data);
+    // console.log(location.href, "接收到消息：", data);
     if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
     if (data?.vMeta) return this.syncMetaToParentWin(data.vMeta);
     if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;

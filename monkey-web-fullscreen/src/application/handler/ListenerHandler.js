@@ -68,7 +68,7 @@ export default {
   syncMetaToParentWin(vMeta) {
     window.vMeta = this.vMeta = { ...vMeta, timestamp: Date.now() };
     if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { vMeta: { ...vMeta, iFrame: location.href } });
-    Tools.microTask(() => (this.initMenuCmds(), this.watchIFrameChange(), this.setupPickerListener()));
+    Tools.microTask(() => (this.initMenuCmds(), this.setupPickerListener()));
     this.sendTopWinInfo();
   },
   sendTopWinInfo() {
@@ -82,6 +82,7 @@ export default {
   sendToVideoIFrame(data) {
     const vFrame = this.getVideoIFrame();
     Tools.postMessage(vFrame?.contentWindow, data);
+    if (vFrame) this.observeIFrameChange(vFrame);
   },
   observeVideoSrcChange(video) {
     if (this.isExecuted("observed", video)) return;
@@ -95,18 +96,17 @@ export default {
     });
   },
   /**
-   * 监听视频所在iframe的src属性变化
-   * 当src发生变动时，自动退出全屏状态
-   * 示例网站：https://www.ttdm1.me
+   * 核心功能：
+   * 1. 观察iframe的src属性变化，自动退出(网页)全屏，如：https://www.ttdm6.me 下集切换
+   * 2. 自动聚焦iframe，使空格能控制视频播放
    */
-  watchIFrameChange() {
-    const iFrame = this.getVideoIFrame();
+  observeIFrameChange(iFrame) {
     if (!iFrame || this.isExecuted("observed", iFrame)) return;
 
     new MutationObserver(() =>
       this.isFullscreen ? this.toggleFullscreen() : this.fsWrapper && this.exitWebFullscreen()
     ).observe(iFrame, { attributes: true, attributeFilter: ["src"] });
-    iFrame.focus(); // 自动聚焦：单层嵌套场景下，「启用 空格◀️▶️ 控制」时，能切换视频播放状态
+    iFrame.focus(); // 使「启用 空格◀️▶️ 控制」时，能控制视频播放
   },
   // ====================⇑⇑⇑ 设置当前视频相关逻辑 ⇑⇑⇑====================
 
@@ -151,11 +151,11 @@ export default {
   },
   customFullChangeHandle() {
     if (Tools.isThrottle("fsChange", Consts.HALF_SEC)) return;
-    Tools.sleep(50).then(() => {
-      const tol = 5; // 偏差值
+    Tools.sleep(10).then(() => {
+      const tol = 5; // 允许的偏差
       const { width, height } = window.screen;
       const { topWin, player, fsWrapper } = this;
-      const { offsetWidth: ew, offsetHeight: eh } = fsWrapper ?? player ?? {};
+      const { offsetWidth: ew, offsetHeight: eh } = this.isGMatch() ? player : fsWrapper || {};
 
       const isWFs = Math.abs(ew - topWin.vw) < tol && Math.abs(eh - topWin.vh) < tol;
       const isFs = Math.abs(ew - width) < tol && Math.abs(eh - height) < tol;

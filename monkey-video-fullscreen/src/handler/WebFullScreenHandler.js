@@ -14,17 +14,9 @@ export default {
   },
   toggleWebFullscreen(isTrusted) {
     if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
-
-    Tools.microTask(() => {
-      if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
-      this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
-    }).then(async () => {
-      if (!this.fsWrapper || !this.isFullscreen) return this.customFullChangeHandle();
-
-      const { offsetHeight: oh } = this.fsWrapper;
-      await Tools.poll(() => !this.fsWrapper || !Object.is(this.fsWrapper.offsetHeight, oh));
-      this.customFullChangeHandle();
-    });
+    if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
+    this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
+    Tools.microTask(() => this.customFullChangeHandle());
   },
   enterWebFullscreen() {
     // video的宿主容器元素
@@ -80,7 +72,7 @@ export default {
     return this.player ? this.getVideoContainer() : this.getVideoIFrame();
   },
   getVideoIFrame() {
-    if (!this.vMeta?.iFrame) return null;
+    if (!this.vMeta?.iFrame) return Tools.getIFrames().find(Tools.isVisible);
     if (this.fsWrapper) return this.fsWrapper;
 
     const { vw, vh, iFrame } = this.vMeta;
@@ -147,11 +139,11 @@ export default {
   },
   customFullChangeHandle() {
     if (Tools.isThrottle("fsChange", Consts.HALF_SEC)) return;
-    Tools.sleep(50).then(() => {
+    Tools.sleep(10).then(() => {
       const tol = 5; // 偏差值
       const { width, height } = window.screen;
       const { topWin, player, fsWrapper } = this;
-      const { offsetWidth: ew, offsetHeight: eh } = fsWrapper ?? player ?? {};
+      const { offsetWidth: ew, offsetHeight: eh } = fsWrapper ?? {};
 
       const isWFs = Math.abs(ew - topWin.vw) < tol && Math.abs(eh - topWin.vh) < tol;
       const isFs = Math.abs(ew - width) < tol && Math.abs(eh - height) < tol;

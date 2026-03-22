@@ -45,7 +45,7 @@ export default {
         this._isFullscreen = value;
 
         // 默认 <=> 全屏、 全屏 => 网页全屏
-        if (!value || !this.fsWrapper) this.toggleWebFullscreen();
+        if (!(value && this.fsWrapper)) this.toggleWebFullscreen();
         Tools.microTask(() => this.customFullChangeHandle());
       },
     });

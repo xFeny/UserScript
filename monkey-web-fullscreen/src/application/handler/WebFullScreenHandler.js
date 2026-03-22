@@ -24,8 +24,9 @@ export default {
   },
   toggleFullscreenForClick(name) {
     if (!this.triggerIconElement(name)) return;
+    if (!this.player) return;
 
-    const { offsetHeight: oh } = this.player;
+    const oh = this.player.offsetHeight;
     new ResizeObserver(async (_, obs) => {
       await Tools.poll(() => !Object.is(this.player.offsetHeight, oh));
       (obs.disconnect(), this.customFullChangeHandle());
@@ -104,7 +105,8 @@ export default {
     return this.player ? this.getVideoContainer() : this.getVideoIFrame();
   },
   getVideoIFrame() {
-    if (!this.vMeta?.iFrame) return null;
+    // 脚本猫 v0.16.11：多层嵌套 iframe 存在 this.vMeta 无值的问题（如 www.ttdm6.me）
+    if (!this.vMeta?.iFrame) return Tools.getIFrames().find(Tools.isVisible);
     if (this.fsWrapper) return this.fsWrapper;
 
     const { vw, vh, iFrame } = this.vMeta;
@@ -113,7 +115,7 @@ export default {
     const vFrame = Tools.query(`iframe[src*="${pathname + partial}"]`);
     if (vFrame) return vFrame;
 
-    const tol = 5; // 偏差值
+    const tol = 5; // 允许的偏差
     const iFrames = Tools.getIFrames();
     const matchSize = ({ offsetWidth: w, offsetHeight: h }) => Math.abs(w - vw) < tol && Math.abs(h - vh) < tol;
     return iFrames.find(matchSize) ?? iFrames.find(Tools.isVisible);
