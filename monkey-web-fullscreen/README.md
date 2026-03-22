@@ -311,7 +311,7 @@ this.autoExitWebFullscreen();
   });
   ```
   
-  示例二：https://www.dadaqu.cc/、https://www.jddzx.cc/
+  示例二：https://www.dadaqu.cc/、https://www.jddzx.cc/、https://jnvod.cc/
   
   ```js
   // 需要点击才会加载视频资源

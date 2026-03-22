@@ -106,7 +106,7 @@ export default {
     new MutationObserver(() =>
       this.isFullscreen ? this.toggleFullscreen() : this.fsWrapper && this.exitWebFullscreen()
     ).observe(iFrame, { attributes: true, attributeFilter: ["src"] });
-    iFrame.focus(); // 使「启用 空格◀️▶️ 控制」时，能控制视频播放
+    iFrame.focus(); // 使空格能控制视频播放
   },
   // ====================⇑⇑⇑ 设置当前视频相关逻辑 ⇑⇑⇑====================
 
@@ -135,17 +135,12 @@ export default {
     this.changeTimeDisplay();
   },
   observeWebFullscreenChange() {
-    const handle = (e, { code, type } = e) => {
-      if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
-      if (this.isInputFocus(e) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
-      (Tools.preventDefault(e), Object.is(type, "keydown") && this.dispatchShortcut(code, { bypass: true }));
-    };
-
+    const handle = () => Tools.scrollTop(this.fsWrapper.scrollY);
     VideoEnhancer.defineProperty(this, "fsWrapper", {
       set: (value, setter) => {
         const method = setter(value) ? "addEventListener" : "removeEventListener";
-        ["scroll", "keyup", "keydown"].forEach((type) => unsafeWindow[method](type, handle, true));
         Tools.microTask(() => this.customFullChangeHandle());
+        unsafeWindow[method]("scroll", handle, true);
       },
     });
   },

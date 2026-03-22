@@ -11,14 +11,14 @@ export default {
   isInputFocus: (e) => Tools.isInputable(e.composedPath()[0]),
   preventKey(e, { code, altKey } = e) {
     const isNumKeys = Tools.isNumber(e.key) && !this.isDisRate();
-    const isOverrideKeys = this.isOverrideKey() && [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
-    const isPreventKeys = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
+    const isOverrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
+    const isPreventKey = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
     const isMoveKeys = altKey && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
-    if (isNumKeys || isOverrideKeys || isPreventKeys || isMoveKeys) Tools.preventDefault(e);
+    if (isNumKeys || isOverrideKey || isPreventKey || isMoveKeys) Tools.preventDefault(e);
   },
-  dispatchShortcut(code, { bypass = false, isTrusted = false } = {}) {
+  dispatchShortcut(code, { isTrusted = false } = {}) {
     const key = this.processShortcutKey({ code });
-    Tools.postMessage(window.top, { key, bypass, isTrusted });
+    Tools.postMessage(window.top, { key, isTrusted });
   },
   processShortcutKey({ key, code, ctrlKey, shiftKey, altKey }) {
     code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
@@ -49,7 +49,7 @@ export default {
     if (!this.player) this.sendToVideoIFrame(data);
     if (data?.key) this.execKeyActions(data);
   },
-  execKeyActions({ key, bypass, isTrusted }) {
+  execKeyActions({ key, isTrusted }) {
     // Tools.log("按下的键：", { key, isTrusted });
     const dict = {
       M: () => this.muteVideo(),
@@ -60,10 +60,10 @@ export default {
       P: () => this.toggleWebFullscreen(isTrusted),
       D: () => Site.isGmMatch() && this.triggerIconElement(Site.icons.danmaku),
       N: () => (Site.isGmMatch() ? this.triggerIconElement(Site.icons.next) : this.switchEpisode()),
-      SPACE: () => (bypass || this.isOverrideKey()) && this.playToggle(this.player),
-      LEFT: () => this.skipPlayback(-Storage.SKIP_INTERVAL.get(), bypass),
-      RIGHT: () => this.skipPlayback(Storage.SKIP_INTERVAL.get(), bypass),
       0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP.get(), !0) || 0,
+      LEFT: () => this.skipPlayback(-Storage.SKIP_INTERVAL.get()),
+      RIGHT: () => this.skipPlayback(Storage.SKIP_INTERVAL.get()),
+      SPACE: () => this.playToggle(this.player),
       SHIFT_A: () => this.autoNextEnabled(),
       CTRL_ALT_S: () => this.screenshot(),
       ALT_SUB: () => this.zoomVideo(-1),
@@ -101,13 +101,13 @@ export default {
     // 处理在 “更多设置” 中操作功能切换（启用/禁用）时发来的消息
     if (data?.sw_memory) this.delCachedRate(); // 禁用记忆倍速
     if (data?.sw_speed) this.setPlaybackRate(1); // 禁用倍速调节
-    if (data?.sw_loadEvt) Storage.LOAD_EVT_CODE.set(data.sw_loadEvt, this.host);
-    if (data?.sw_videoEvt) Storage.VIDEO_EVT_CODE.set(data.sw_videoEvt, this.host);
+    if (data?.sw_lCode) Storage.LOAD_EVT_CODE.set(data.sw_lCode, this.host);
+    if (data?.sw_vCode) Storage.VIDEO_EVT_CODE.set(data.sw_vCode, this.host);
     if (data?.sw_fsCode) Storage.FULL_CHANGE_CODE.set(data.sw_fsCode, this.host);
-    if (data?.sw_videoEvt || data?.sw_fsCode) this.codeSnippetCache.clear();
+    if (data?.sw_vCode || data?.sw_fsCode) this.codeSnippetCache.clear();
 
-    if ("sw_rateKeep" in data) this.playbackRateDisplay(); // 左上角常显倍速
-    if ("sw_clockAlw" in data) setTimeout(() => this.changeTimeDisplay(), 30); // 非全屏显示时间
+    if ("sw_sRate" in data) this.playbackRateDisplay(); // 左上角常显倍速
     if ("sw_color" in data) this.setTimeColor(data.sw_color); // 时间颜色
+    if ("sw_wClock" in data) setTimeout(() => this.changeTimeDisplay(), 30); // 非全屏显示时间
   },
 };

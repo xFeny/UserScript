@@ -40,8 +40,6 @@ export default unsafeWindow.FyStorage = {
   SKIP_INTERVAL: new BasicStorage("VIDEO_SKIP_INTERVAL", 5, false, Number),
   /** 快进秒数相关：零键快进秒数 */
   ZERO_KEY_SKIP: new BasicStorage("ZERO_KEY_SKIP_INTERVAL", 30, false, Number),
-  /** 快进秒数相关：启用 空格 ◀▶ 键控制 */
-  OVERRIDE_KEY: new BasicStorage("OVERRIDE_KEYBOARD", false, false, Boolean),
 
   /** 缩放和移动相关：移动距离 */
   MOVING_DISTANCE: new BasicStorage("MOVING_DISTANCE", 10, false, Number),
@@ -63,7 +61,7 @@ export default unsafeWindow.FyStorage = {
   CLOCK_COLOR: new BasicStorage("CLOCK_COLOR", "#e0e0e0"),
 
   /** 播放进度相关：播放进度保存天数 */
-  STORAGE_DAYS: new BasicStorage("STORAGE_DAYS", 7, false, parseFloat),
+  STORAGE_DAYS: new BasicStorage("STORAGE_DAYS", 8, false, parseFloat),
   /** 播放进度相关：记录的视频播放进度 */
   PLAY_TIME: new BasicStorage("PLAY_TIME_", 0, true, undefined, true),
 
