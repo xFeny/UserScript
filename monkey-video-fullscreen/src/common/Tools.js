@@ -57,12 +57,6 @@ export default {
     }
     return parents;
   },
-  cloneAttrs(source, target, ...attrs) {
-    attrs.flat().forEach((attr) => {
-      const value = source.getAttribute(attr);
-      if (value) target.setAttribute(attr, value);
-    });
-  },
   setStyle(els, prop, val, priority) {
     if (!els || !prop) return;
     const fn = val ? "setProperty" : "removeProperty";

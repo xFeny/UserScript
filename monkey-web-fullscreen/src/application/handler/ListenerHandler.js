@@ -62,7 +62,7 @@ export default {
   },
   setPlayer(video) {
     this.player = video;
-    const vMeta = this.vMeta ?? { isLive: video.duration === Infinity, vw: innerWidth, vh: innerHeight };
+    const vMeta = this.vMeta ?? { vw: innerWidth, vh: innerHeight };
     this.syncMetaToParentWin(vMeta);
   },
   syncMetaToParentWin(vMeta) {
@@ -150,7 +150,8 @@ export default {
       const tol = 5; // 允许的偏差
       const { width, height } = window.screen;
       const { topWin, player, fsWrapper } = this;
-      const { offsetWidth: ew, offsetHeight: eh } = this.isGMatch() ? player : fsWrapper || {};
+      const element = player ?? this.getVideoIFrame();
+      const { offsetWidth: ew, offsetHeight: eh } = this.isGMatch() ? element : fsWrapper || {};
 
       const isWFs = Math.abs(ew - topWin.vw) < tol && Math.abs(eh - topWin.vh) < tol;
       const isFs = Math.abs(ew - width) < tol && Math.abs(eh - height) < tol;

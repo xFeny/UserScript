@@ -10,8 +10,8 @@ import VideoEnhancer from "../VideoEnhancer";
  */
 export default {
   isLive() {
-    if (!this.vMeta || !this.player) return false;
-    return this.vMeta.isLive || this.player?.duration === Infinity || this.isDynamicDur(this.player);
+    if (!this.player) return false;
+    return this.player.duration === Infinity || this.isDynamicDur(this.player);
   },
   isDynamicDur(video) {
     if (video._mfs_isDynamic || video.currentTime > video.__duration) return true;
@@ -37,14 +37,13 @@ export default {
     // 重置次数限制
     Tools.resetLimit("autoWide");
   },
-  initVideoPlay(video) {
+  applySettings(video) {
+    this.setupClockForPlayer();
     if (this.isExecuted("_mfs_apply", this.player)) return;
 
     // ====== 应用缓存数据 ======
     this.applyCachedRate();
     this.applyCachedTime(video);
-
-    this.setupPlayerClock();
   },
   remainTime: (v) => Math.floor(App.getRealDuration(v)) - Math.floor(v.currentTime),
   playToggle: (v) => (Site.isDouyu() ? v?.click() : v?.[v?.paused ? "play" : "pause"]()),

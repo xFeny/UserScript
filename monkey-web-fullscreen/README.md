@@ -22,8 +22,8 @@
 | Ctrl <b style='color:#bbb'>+</b> Alt <b style='color:#bbb'>+</b> S | 截图      | Alt <b style='color:#bbb'>+</b> <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | 缩放    |
 | A / S  或  <b style='font-size:14px'>➕</b> / <b style='font-size:14px'>➖</b> | ±倍速     | Alt <b style='color:#bbb'>+</b> ◀️🔼                         | 移动    |
 | Ctrl 1️⃣~5️⃣                                                     | 预设倍速         | 1️⃣~9️⃣                                                          | 1️⃣ - 9️⃣ 倍速     |
-| 数字 0️⃣                                                       | 快进 30 秒       | ◀️▶️                                                           | 快退/进 (默禁) |
-| 空格                                                         | 播放/暂停 (默禁) |                                                              |                |
+| 数字 0️⃣                                                       | 快进 30 秒       | ◀️▶️                                                           | 快退/进 |
+| 空格                                                         | 播放/暂停 |                                                              |                |
 
 ### 网页全屏 | 倍速
 
@@ -222,17 +222,7 @@
 
 ### 其他功能
 
-#### 1. 空格◀️▶️ 控制
-
-默认处于禁用状态，需手动开启后使用。
-
-**设置路径**：「更多设置」→「控制」→「启用 空格◀️▶️ 控制」
-
-**自定义选项**：「更多设置」→「参数」→「快进/退秒数」
-
-若播放器自带的快退 / 快进秒数不符合使用习惯（例如默认快进 5 秒，需调整为 10 秒），或希望不聚焦播放器也能操控视频，可通过启用此功能实现。
-
-#### 2. 自动退出网页全屏
+#### 1. 自动退出网页全屏
 
 脚本默认支持 B 站和 AcFun 弹幕网，在视频播放结束后自动退出全屏状态（番剧页面不支持）。对于 B 站，还会自动点击「取消连播」按钮，避免自动播放下一个视频。
 
@@ -241,20 +231,20 @@
 ```js
 this.autoExitWebFullscreen();
 ```
-#### 3. 记忆播放位置
+#### 2. 记忆播放位置
 
 默认启用：自动记录视频播放进度，下次打开同一视频时恢复至上次位置。
 
 - 保存天数设置：「更多设置」→「参数」→「进度保存天数」
 - 限制：时长＜2 分钟的视频不记录进度
 
-#### 4. 标签页不可见时自动暂停
+#### 3. 标签页不可见时自动暂停
 
 默认启用：视频标签页切换到后台（不可见）时自动暂停，切回时自动播放。
 
 - 关闭路径：「更多设置」→「控制」→「禁用 不可见暂停」
 
-#### 5. 预设常用倍速
+#### 4. 预设常用倍速
 
 支持自定义常用的播放倍速，通过 `Ctrl + 数字键【1~5】` 一键设置，提升效率。
 
@@ -263,7 +253,7 @@ this.autoExitWebFullscreen();
 - 映射规则：`Ctrl + 1` 至 `Ctrl + 5` 分别对应预设倍速列表的第 1 至第 5 项
   - 示例：预设值为 `1.15,1.45,1.75` 时，`Ctrl + 1` 对应 1.15 倍、`Ctrl + 2` 对应 1.45 倍、`Ctrl + 3` 对应 1.75 倍
 
-#### 6. 全屏模式下显示时间
+#### 5. 全屏模式下显示时间
 
 默认在全屏模式右上角显示：系统时间、视频剩余时长、进度百分比。
 
@@ -274,7 +264,7 @@ this.autoExitWebFullscreen();
 
 > 限制：≤30秒视频不显示剩余时长和进度百分比
 
-#### 7. 侧边单击网页全屏
+#### 6. 侧边单击网页全屏
 
 将鼠标移至视频左右两侧边缘区域，当鼠标光标发生变化时 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAipJREFUSEutlTFoFEEUhr+3nKhFwMouKIqNFhYixC6m0E5UMFhI0F4UBY1GbzPZQyVJF7BSUBCNuZBLaWVMp6LYaaWiSBAtFLSKhH2yc3thd2/nbk6cbtl//n/+ef97I/SwNOJZApeQg77bxBeY4DRCUwHvfd7A/yKgExiEbWzghlzlfdFdJwd6k92scQnls4xjWntzDjTiHnAaeEnMETF8z4q4BFLyOrAHuC8hZ8oFmqdoAZ+whWNyjtUWOD1AUuR1ggL5WyoMyxjvSgXsPWdFhHmpMtwpCBrxGtgHtJHbQJRtXhcR3kiVkS4CSXT7qDCSPbnTQS+x9cF6xVQNm4DtbGZFRvntQ9yTAzUMEjS7GHiMcEeqLPkISdr+gwVwLmo6SR+r/CpgPgB3iamL4aNLrFxAmZZxLhd6YBY46SBqAHPENMSwlsV41cDGt8YQytMu1/IFmCVmUQwvnDF1kWhkx8dOn7sHloipeTuwLiKuALc8BRLYcnmjzbCRn0wDP7KDSw07CEiK23kJ34BHwO02ATVsJeABcCgZehIyUCj2AnDcofAKqKfFtsnKT9Mau1AeAvutvZKXSyM7m+baBISzBDTkGl+dKdKIReCoi9zWwVAhsLnvzxAtE3NYDH+KwnkHzQdnLzEXxPCpQ5omIdcnoxIyVYbvKUUtAjUMEPA8/V4h4IBcJ+mBkpvrlgjHf41s0w0BMxJy3kXzTw5sLSY4gXAK4aJU3dH9C5MTtb2fy3n/AAAAAElFTkSuQmCC" style="width:21px; vertical-align: text-top" /> ，点击即可切换网页全屏状态。
 
@@ -283,13 +273,19 @@ this.autoExitWebFullscreen();
 - 在微博、X、Instagram 等平台浏览视频时，无需抬手按键盘快捷键，即可便捷切换网页全屏。
 - 避免外层父窗口视频影响内嵌 iframe 视频的网页全屏（www.reddit.com）
 
-#### 8. 脱离式全屏阈值
+#### 7. 脱离式全屏阈值
 
-在单页应用（SPA）或多视频列表页中，如果通过「自定义此站视频容器」仍无法解决全屏异常，可尝试调整此阈值。
+**解决的问题：** 
 
-**示例网站：** 在 [YouTube Shorts](https://www.youtube.com/shorts)、[新版贴吧](https://tieba.baidu.com) 未修改阈值时切换网页全屏异常，修改阈值为 `10` 后可正常切换。
+- 在单页应用（SPA）或多视频列表页中，如果通过「自定义此站视频容器」仍无法解决全屏异常，可尝试调整此阈值。
 
-#### 9. 事件回调执行扩展代码逻辑
+  **示例：** 在 [YouTube Shorts](https://www.youtube.com/shorts)、[新版贴吧](https://tieba.baidu.com) 未修改阈值时切换网页全屏异常，修改阈值为 `10` 后可正常切换。
+
+- 缓解(网页)全屏切换卡顿、不流畅问题。
+
+  **示例：** 在 www.reddit.com 无限滚动加载内容，切换(网页)全屏存在明显延迟（iframe无法解决o(╥﹏╥)o）
+
+#### 8. 执行自定义代码逻辑
 
 可访问的值：type, video, unsafeWindow, Tools, App
 
@@ -318,9 +314,9 @@ this.autoExitWebFullscreen();
   if(type === "load") Tools.query("body > #start")?.click();
   ```
   
-- **自定义视频事件列表处理逻辑**
+- **自定义视频各种事件处理逻辑**
 
-    事件类型（type）：`loadedmetadata`、`loadeddata`、`timeupdate`、`ratechange`、`canplay`、`playing`、`ended`
+    事件类型（type）：`loadstart`、`loadedmetadata`、`loadeddata`、`timeupdate`、`ratechange`、`canplay`、`playing`、`ended`
   
     示例一：https://www.bilibili.com/
   

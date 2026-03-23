@@ -35,7 +35,7 @@ export default {
     if (current !== target) unsafeWindow.player.requestQuality(target);
   },
   shouldHideTime: () => !App.isFullscreen && !Storage.PAGE_CLOCK.get(),
-  setupPlayerClock() {
+  setupClockForPlayer() {
     if (!this.player || this.shouldHideTime()) return this.Clock?.stop(true);
     if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(this.player.parentNode).start();
 
@@ -46,7 +46,7 @@ export default {
     if (!Site.isQiyi()) return video.duration;
     return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
   },
-  videoProgress(video) {
+  renderProgress(video) {
     if (!video || this.player !== video || this.isMutedLoop(video)) return;
 
     const duration = this.getRealDuration(video);
@@ -92,6 +92,6 @@ export default {
     const container = this.player?.parentNode;
     if (el && !container?.contains(el)) container?.prepend(el);
   },
-  changeTimeDisplay: () => (App.setupPlayerClock(), App.videoProgress(App.player)),
+  changeTimeDisplay: () => (App.setupClockForPlayer(), App.renderProgress(App.player)),
   setTimeColor: (color) => Tools.setStyle([App.progNode, App.Clock?.element], "color", color),
 };

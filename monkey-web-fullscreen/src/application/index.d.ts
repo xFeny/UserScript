@@ -67,12 +67,12 @@ declare global {
     /**
      * 设置播放器时钟
      */
-    setupPlayerClock(): void;
+    setupClockForPlayer(): void;
 
     /**
      * 播放器播放进度
      */
-    videoProgress(): void;
+    renderProgress(): void;
 
     /**
      * 左上角常显倍速

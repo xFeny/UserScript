@@ -25,12 +25,8 @@ export default {
 
     container.scrollY = window.scrollY;
     const parents = Tools.getParents(container);
-    container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(this.host)
-      ? parents.forEach((el) => {
-          Tools.emitEvent("addStyle", { sroot: el.getRootNode() });
-          Tools.attr(el, Consts.webFull, true);
-        })
-      : this.detachForFullscreen();
+    const unDetach = container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(this.host);
+    unDetach ? parents.forEach((el) => this.setWebFullAttr(el)) : this.detachForFullscreen();
 
     // 视频容器宽高适应网页全屏变化
     this.adaptToWebFullscreen();
@@ -38,17 +34,14 @@ export default {
   detachForFullscreen() {
     if (this.fsParent) return;
     this.fsParent = Tools.getParent(this.fsWrapper);
-
-    // 创建占位元素（保持原布局不塌陷）
-    this.fsPlaceholder = document.createElement("div");
-    Tools.cloneAttrs(this.fsWrapper, this.fsPlaceholder, ["id", "class", "style"]);
+    this.fsPlaceholder = this.fsWrapper.cloneNode();
 
     // 替换并移动视频容器
     this.fsParent.replaceChild(this.fsPlaceholder, this.fsWrapper);
     document.body.insertAdjacentElement("beforeend", this.fsWrapper);
 
     this.fsWrapper.querySelector("video")?.play();
-    Tools.attr(this.fsWrapper, Consts.webFull, true);
+    this.setWebFullAttr(this.fsWrapper);
   },
   exitWebFullscreen() {
     if (!this.fsWrapper) return;
@@ -64,9 +57,8 @@ export default {
     // 滚动到全屏前位置、恢复默认滚动效果
     requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(this.docElement, "scroll-behavior")));
 
-    // 清理相关变量
-    this.videoParents.clear();
     this.fsPlaceholder = this.fsWrapper = this.fsParent = null;
+    this.videoParents.clear();
   },
   getVideoHostContainer() {
     return this.player ? this.getVideoContainer() : this.getVideoIFrame();
@@ -134,8 +126,14 @@ export default {
       if (!this.fsWrapper.contains(el)) return; // 元素不在全屏容器内，跳过
       const { offsetWidth: width, offsetHeight: height } = this.player;
       if (width === vw && height === vh && el.offsetHeight === vh) return; // 宽高已匹配，无需适配
-      Tools.attr(el, Consts.webFull, true);
+      this.setWebFullAttr(el);
     });
+  },
+  setWebFullAttr(el) {
+    const sroot = el.getRootNode();
+    Tools.attr(el, Consts.webFull, true);
+    if (this.isExecuted("__Added__", sroot)) return;
+    if (sroot instanceof ShadowRoot) Tools.emitEvent("addStyle", { sroot });
   },
   customFullChangeHandle() {
     if (Tools.isThrottle("fsChange", Consts.HALF_SEC)) return;
@@ -178,6 +176,6 @@ export default {
 
     Tools.query(`#${evt}`)?.remove();
     GM_addElement("script", { id: evt, textContent: injectCode, type: "text/javascript" });
-    document.dispatchEvent(new CustomEvent(evt, { detail: { type, App, video, Tools, unsafeWindow } }));
+    Tools.emitEvent(evt, { type, App, video, Tools, unsafeWindow });
   },
 };

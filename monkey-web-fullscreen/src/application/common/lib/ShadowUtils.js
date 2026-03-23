@@ -25,37 +25,25 @@ export const getSRoot = (node) => node?._shadowRoot ?? node?.shadowRoot ?? null;
 /**
  * 遍历给定节点，查找所有子元素中包含的 shadow root。
  *
- * @param node 要遍历的起始节点
- * @param deep 是否递归遍历 shadow root 内部
+ * @param root 要遍历的起始节点
  * @yields 发现的 shadow root
  */
-export function* getShadowRoots(node, deep = false) {
-  if (!node || (!isElement(node) && !isDocument(node))) return;
+export function* getShadowRoots(root) {
+  if (!root || ![Element, Document, ShadowRoot].some((type) => root instanceof type)) return;
 
-  if (isElement(node) && getSRoot(node)) yield getSRoot(node);
+  // 使用 TreeWalker 高效遍历所有元素节点
+  const acceptNode = (node) => (isElement(node) && getSRoot(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP);
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, { acceptNode }, false);
 
-  const doc = isDocument(node) ? node : node.getRootNode({ composed: true });
-  if (!doc.createTreeWalker) return;
-
-  let currentNode;
-  const toWalk = [node];
-  while ((currentNode = toWalk.pop())) {
-    const walker = doc.createTreeWalker(currentNode, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_DOCUMENT_FRAGMENT, {
-      acceptNode: (child) => (isElement(child) && getSRoot(child) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP),
-    });
-
-    let walkerNode = walker.nextNode();
-    while (walkerNode) {
-      const shadowRoot = getSRoot(walkerNode);
-      if (isElement(walkerNode) && shadowRoot) {
-        if (deep) toWalk.push(shadowRoot);
-        yield shadowRoot;
-      }
-      walkerNode = walker.nextNode();
+  let walkerNode;
+  while ((walkerNode = walker.nextNode())) {
+    if (walkerNode === root) continue; // 跳过根节点
+    const sRoot = getSRoot(walkerNode);
+    if (sRoot) {
+      yield sRoot;
+      yield* getShadowRoots(sRoot);
     }
   }
-
-  return;
 }
 
 /**
@@ -66,12 +54,12 @@ export function* getShadowRoots(node, deep = false) {
  * @return 找到的第一个匹配元素
  */
 export function querySelector(selector, ctx = document) {
+  if (!ctx?.querySelector) return null;
   const direct = ctx.querySelector(selector);
   if (direct) return direct;
 
-  const shadowRoots = [...getShadowRoots(ctx, true)];
-  for (const root of shadowRoots) {
-    const match = root.querySelector(selector);
+  for (const root of getShadowRoots(ctx)) {
+    const match = root?.querySelector(selector);
     if (match) return match;
   }
 
@@ -86,10 +74,12 @@ export function querySelector(selector, ctx = document) {
  * @return 找到的所有匹配元素集合
  */
 export function querySelectorAll(selector, ctx = document) {
+  if (!ctx?.querySelectorAll) return [];
   const results = [...ctx.querySelectorAll(selector)];
-  const shadowRoots = [...getShadowRoots(ctx, true)];
-  for (const root of shadowRoots) {
-    results.push(...root.querySelectorAll(selector));
+
+  for (const root of getShadowRoots(ctx)) {
+    if (root?.querySelectorAll) results.push(...root.querySelectorAll(selector));
   }
+
   return results;
 }

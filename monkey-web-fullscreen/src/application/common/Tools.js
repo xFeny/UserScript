@@ -126,12 +126,6 @@ export default unsafeWindow.FyTools = {
     const policy = trustedTypes.defaultPolicy ?? trustedTypes.createPolicy("default", { createHTML: (input) => input });
     return policy.createHTML(html);
   },
-  cloneAttrs(source, target, ...attrs) {
-    attrs.flat().forEach((attr) => {
-      const value = source.getAttribute(attr);
-      if (value) target.setAttribute(attr, value);
-    });
-  },
   setStyle(els, prop, val, priority) {
     if (!els || !prop) return;
     const fn = val ? "setProperty" : "removeProperty";
@@ -152,7 +146,7 @@ export default unsafeWindow.FyTools = {
    * @param {number} [opts.timeout=3000] - 最大超时时间（毫秒），默认3000ms（3秒）
    * @returns {Promise<void>} - 条件满足时resolve（无返回值），超时/执行出错时reject
    */
-  poll(condition, opts = {}) {
+  waitFor(condition, opts = {}) {
     const start = Date.now();
     const { immediate = false, interval = 50, timeout = 3000 } = opts;
 

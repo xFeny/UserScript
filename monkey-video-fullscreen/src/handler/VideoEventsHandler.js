@@ -59,7 +59,7 @@ export default {
   },
   setPlayer(video) {
     this.player = video;
-    const vMeta = this.vMeta ?? { isLive: video.duration === Infinity, vw: innerWidth, vh: innerHeight };
+    const vMeta = this.vMeta ?? { vw: innerWidth, vh: innerHeight };
     this.syncMetaToParentWin(vMeta);
   },
   syncMetaToParentWin(vMeta) {

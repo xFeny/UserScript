@@ -7,7 +7,7 @@ import Storage from "../common/Storage";
  */
 export default {
   videoAborts: new Map(), // 存储：video -> AbortController（用于事件解绑）
-  videoEvts: ["loadedmetadata", "loadeddata", "timeupdate", "ratechange", "canplay", "playing", "ended"],
+  videoEvts: ["loadstart", "loadedmetadata", "loadeddata", "timeupdate", "ratechange", "canplay", "playing", "ended"],
   setupVideoListeners(video) {
     const ctrl = new AbortController();
     video && this.videoAborts.get(video)?.abort(); // 防止重复绑定
@@ -37,6 +37,9 @@ export default {
     });
   },
   // ====================⇓⇓⇓ 视频监听事件相关逻辑 ⇓⇓⇓====================
+  loadstart(video) {
+    if (!this.player) this.setCurrentVideo(video);
+  },
   loadedmetadata(video) {
     if (video.matches(Consts.FAKE_VIDEO)) this.loadeddata(video);
     if (!this.player) this.setCurrentVideo(video);
@@ -55,7 +58,7 @@ export default {
       this.autoNextEpisode(video);
 
       this.cachePlayTime(video);
-      this.videoProgress(video);
+      this.renderProgress(video);
       this.ensureRateDisplay();
     });
   },
@@ -66,7 +69,7 @@ export default {
   playing(video) {
     this.setCurrentVideo(video);
     video.tsr ??= { ...Consts.DEF_TSR };
-    Tools.sleep(50).then(() => this.initVideoPlay(video));
+    Tools.waitFor(() => this.topWin).then(() => this.applySettings(video));
   },
   ended(video) {
     this.autoExitWebFullscreen();
@@ -104,6 +107,6 @@ export default {
 
     Tools.query(`#${evt}`)?.remove();
     GM_addElement("script", { id: evt, textContent: injectCode, type: "text/javascript" });
-    document.dispatchEvent(new CustomEvent(evt, { bubbles: false, detail: { type, App, video, Tools, unsafeWindow } }));
+    Tools.emitEvent(evt, { type, App, video, Tools, unsafeWindow });
   },
 };
