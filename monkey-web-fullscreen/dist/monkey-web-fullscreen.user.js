@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.9.7
+// @version      3.10.0
 // @author       Feny
 // @description  支持所有H5视频的增强脚本，通用网页全屏｜倍速调节；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @license      GPL-3.0-only
@@ -29,11 +29,11 @@
 // @require      https://unpkg.com/notyf@3.10.0/notyf.min.js
 // @require      data:application/javascript,%3Bwindow.notyf%3D%7BNotyf%7D%3B
 // @require      https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.js
-// @require      data:application/javascript,%3Bwindow.sweetalert2%3DSwal%3B
-// @resource     notyf/notyf.min.css  https://unpkg.com/notyf@3.10.0/notyf.min.css
-// @resource     sweetalert2          https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.css
+// @resource     Swal   https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.css
+// @resource     notyf  https://unpkg.com/notyf@3.10.0/notyf.min.css
 // @connect      gitee.com
 // @grant        GM.xmlHttpRequest
+// @grant        GM_addElement
 // @grant        GM_addStyle
 // @grant        GM_addValueChangeListener
 // @grant        GM_deleteValue
@@ -50,52 +50,42 @@
 // @note         *://*/*
 // ==/UserScript==
 
-(o=>{const n=Symbol("added"),t=document.createElement("style");t.textContent=o,window.gmStyle=t,document.addEventListener("addStyle",({detail:{sroot:e}})=>{e[n]||e instanceof Document||(e.prepend(t.cloneNode(!0)),e[n]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(o)})(' @charset "UTF-8";[gm_webfullscreen],body[gm_webfullscreen] [gm_webfullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[gm_webfullscreen] video,body[gm_webfullscreen] [gm_webfullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;transform:none!important;object-fit:contain!important;height:clamp(100vh - 100%,100vh,100%)!important}[gm_webfullscreen]~*:not(.monkey-web-fullscreen){display:none!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--mvX, 0),var(--mvY, 0))!important}[gm_webfullscreen] video.__tsr,body[gm_webfullscreen] [gm_webfullscreen] video.__tsr{transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--mvX, 0),var(--mvY, 0))!important}.__Clock,.__timeupdate,.__rateDisplay{color:#e0e0e0;opacity:1!important;z-index:100!important;text-indent:0!important;position:absolute!important;pointer-events:none!important;text-shadow:.5px 0 1px #000,-.5px 0 1px #000!important;font-family:Arial,Helvetica,sans-serif!important}.__Clock{top:8px!important;right:15px!important;width:auto!important;height:auto!important;font-size:17.5px!important;font-weight:700!important;text-align:right!important;line-height:17.5px!important;background-color:transparent!important}.__timeupdate,.__rateDisplay{font-size:12px!important;line-height:12px!important}.__timeupdate{top:25px!important;right:15px!important;transform:scale(.9)!important;transform-origin:top right!important}.__timeupdate b{font:inherit!important;display:inline-block!important;transform:scale(.75)!important;vertical-align:text-bottom!important}.__rateDisplay{color:#d9d9d9;top:5px!important;left:5px!important;box-shadow:none!important;display:inline-block!important;transform:scale(.875)!important}.__edgeClick{left:0!important;top:6%!important;opacity:0!important;width:25px!important;height:70%!important;position:absolute!important;z-index:2147483647!important;cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC),pointer!important}.__edgeClick.right{right:0!important;left:auto!important}.notyf{z-index:2147483647!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled){line-height:normal}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:none!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important}.monkey-web-fullscreen p{margin:0!important;color:#999!important;font-size:12px!important}.monkey-web-fullscreen #picker{margin-bottom:0;height:auto!important;font-size:14px!important;min-height:15em!important;resize:vertical!important;width:-webkit-fill-available;width:-moz-available}.monkey-web-fullscreen .swal2-tabs-header{display:flex;position:relative;margin-bottom:12px;font-size:15px!important;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;padding:8px 0;cursor:pointer;color:#64748b;font-weight:700;text-align:center;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab:hover,.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;border-radius:2px;background-color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%;padding:0 5px;min-height:325px}.monkey-web-fullscreen .swal2-tab-panel{display:none}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 5px!important;padding:0 0 5px!important;float:none!important;height:30px!important;color:#666!important;display:flex!important;font-size:14px!important;line-height:30px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text]{color:#333;border-radius:3px;border:1px solid #cbd5e1!important;text-align:center!important;line-height:12px!important;font-size:12px!important;padding:0 3px!important;height:23px!important;width:75px!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:38px!important;height:18px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:12px!important;height:12px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen .text-group{margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid #f5f5f5}.monkey-web-fullscreen .text-group:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .text-group p{margin-bottom:2px;color:#333!important;text-align:left!important}.monkey-web-fullscreen .text-group textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;height:50px!important;font-size:12px!important;padding:2px 5px!important;line-height:normal!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen .text-group textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen .text-group textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen textarea:focus,.monkey-web-fullscreen input[type=text]:focus{outline:none!important;box-shadow:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #efefef!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.monkey-toast{left:10px!important;bottom:16%!important;color:#fff!important;padding:0 10px!important;border-radius:3px!important;position:absolute!important;z-index:2147483647!important;transition:opacity .3s ease-in!important;font: 13px/26px sans-serif!important;background:#000000bf!important}.monkey-toast span{display:inline!important}.monkey-toast .cText{margin:0 3px!important;color:#ff5f00!important}.__hc{cursor:none!important}._hide,#buffer,#install,.player-overlay,.memory-play-wrap,.atom-notice-click,.dplayer-resume-tip,#player #loading-box,.dplayer-notice strong,.air-player-loading-box,#bilibili-player :is(.bpx-player-toast-wrap,.bpx-player-cmd-dm-wrap),#bilibili-player .bpx-player-dialog-wrap>:not(.bpx-player-dm-tip){display:none!important}@supports selector(:has(*)){body>#loading:not(:has(video)),*:has(video) :is(#tips,.art-layers){display:none!important}} ');
+(o=>{const n=Symbol("added"),t=document.createElement("style");t.textContent=o,window.gmStyle=t,document.addEventListener("addStyle",({detail:{sroot:e}})=>{e[n]||e instanceof Document||(e.prepend(t.cloneNode(!0)),e[n]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(o)})(' @charset "UTF-8";[gm_webfullscreen],body[gm_webfullscreen] [gm_webfullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[gm_webfullscreen] video,body[gm_webfullscreen] [gm_webfullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;transform:none!important;object-fit:contain!important;height:clamp(100vh - 100%,100vh,100%)!important}[gm_webfullscreen]~*:not(.monkey-web-fullscreen){display:none!important}.__tsr{object-fit:contain!important;transform-origin:center!important;transition:transform .35s!important;transform:var(--deftsr, matrix(1, 0, 0, 1, 0, 0)) scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--mvX, 0),var(--mvY, 0))!important}[gm_webfullscreen] video.__tsr,body[gm_webfullscreen] [gm_webfullscreen] video.__tsr{transform:scale(var(--scale, 1)) scale(var(--zoom, 1)) scaleX(var(--mirror, 1)) rotate(var(--rotate, 0deg)) translate(var(--mvX, 0),var(--mvY, 0))!important}.__Clock,.__timeupdate,.__rateDisplay{color:#e0e0e0;opacity:1!important;z-index:100!important;text-indent:0!important;position:absolute!important;pointer-events:none!important;text-shadow:.5px 0 1px #000,-.5px 0 1px #000!important;font-family:Arial,Helvetica,sans-serif!important}.__Clock{top:8px!important;right:15px!important;width:auto!important;height:auto!important;font-size:17.5px!important;font-weight:700!important;text-align:right!important;line-height:17.5px!important;background-color:transparent!important}.__timeupdate,.__rateDisplay{font-size:12px!important;line-height:12px!important}.__timeupdate{top:25px!important;right:15px!important;transform:scale(.9)!important;transform-origin:top right!important}.__timeupdate b{font:inherit!important;display:inline-block!important;transform:scale(.75)!important;vertical-align:text-bottom!important}.__rateDisplay{color:#d9d9d9;top:5px!important;left:5px!important;box-shadow:none!important;display:inline-block!important;transform:scale(.875)!important}.__edgeClick{left:0!important;top:6%!important;opacity:0!important;width:25px!important;height:70%!important;position:absolute!important;z-index:2147483647!important;cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC),pointer!important}.__edgeClick.right{right:0!important;left:auto!important}@media (min-width: 2200px){.__Clock{font-size:23px!important;line-height:23px!important}.__timeupdate,.__rateDisplay{font-size:16px!important;line-height:16px!important}.__timeupdate{top:30.5px!important}}.notyf{z-index:2147483647!important}.notyf .notyf__message{overflow:hidden;display:-webkit-box;line-clamp:4;-webkit-line-clamp:4;text-overflow:ellipsis;-webkit-box-orient:vertical;color:#fff!important}.monkey-web-fullscreen{z-index:2147483647!important}.monkey-web-fullscreen *{box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.monkey-web-fullscreen .swal2-popup{font-size:14px!important}.monkey-web-fullscreen button:where(.swal2-styled){line-height:normal}.monkey-web-fullscreen button:where(.swal2-styled):focus{box-shadow:none!important}.monkey-web-fullscreen .swal2-confirm{background-color:#7066e0!important}.monkey-web-fullscreen .swal2-deny{background-color:#dc3741!important}.monkey-web-fullscreen .swal2-cancel{background-color:#757575!important}.monkey-web-fullscreen h4{color:red!important;margin:0 auto!important;font-size:18px!important}.monkey-web-fullscreen p{margin:0!important;color:#999!important;font-size:12px!important}.monkey-web-fullscreen #picker{margin-bottom:0;height:auto!important;font-size:14px!important;min-height:15em!important;resize:vertical!important;width:-webkit-fill-available;width:-moz-available}.monkey-web-fullscreen .swal2-tabs-header{display:flex;position:relative;margin-bottom:12px;font-size:15px!important;border-bottom:1px solid #e2e8f0}.monkey-web-fullscreen .swal2-tab{flex:1;padding:8px 0;cursor:pointer;color:#64748b;font-weight:700;text-align:center;position:relative;transition:all .2s ease}.monkey-web-fullscreen .swal2-tab:hover,.monkey-web-fullscreen .swal2-tab.active{color:#3b82f6}.monkey-web-fullscreen .swal2-tab.active:after{left:0;content:"";width:100%;height:2px;bottom:-1px;position:absolute;border-radius:2px;background-color:#3b82f6}.monkey-web-fullscreen .swal2-tabs-content{width:100%;padding:0 5px;min-height:325px}.monkey-web-fullscreen .swal2-tab-panel{display:none}.monkey-web-fullscreen .swal2-tab-panel.active{display:block}.monkey-web-fullscreen .__menu{margin:0 0 5px!important;padding:0 0 5px!important;float:none!important;height:30px!important;color:#666!important;display:flex!important;font-size:14px!important;line-height:30px!important;font-weight:400!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f5f5f5!important}.monkey-web-fullscreen .__menu:last-of-type{margin-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .__menu input[type=text]{color:#333;border-radius:3px;border:1px solid #cbd5e1!important;text-align:center!important;line-height:12px!important;font-size:12px!important;padding:0 3px!important;height:23px!important;width:75px!important}.monkey-web-fullscreen .__menu input[type=checkbox]{position:absolute!important;opacity:0!important}.monkey-web-fullscreen .__menu .toggle-track{width:38px!important;height:18px!important;cursor:pointer!important;position:relative!important;border-radius:13px!important;background-color:#ccc!important;transition:background-color .3s ease!important}.monkey-web-fullscreen .__menu .toggle-track:after{top:3px!important;left:3px!important;content:""!important;width:12px!important;height:12px!important;position:absolute!important;border-radius:50%!important;background-color:#fff!important;transition:transform .3s ease!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track{background-color:#2196f3!important}.monkey-web-fullscreen .__menu input[type=checkbox]:checked+.toggle-track:after{transform:translate(20px)!important}.monkey-web-fullscreen .text-group{margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid #f5f5f5}.monkey-web-fullscreen .text-group:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.monkey-web-fullscreen .text-group p{margin-bottom:2px;color:#333!important;text-align:left!important}.monkey-web-fullscreen .text-group textarea{color:#333;border-radius:3px;width:100%!important;resize:none!important;height:130px!important;font-size:12px!important;padding:2px 5px!important;line-height:normal!important;border:1px solid #cbd5e1!important}.monkey-web-fullscreen .text-group textarea::-webkit-scrollbar{width:4px}.monkey-web-fullscreen .text-group textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.monkey-web-fullscreen textarea:focus,.monkey-web-fullscreen input[type=text]:focus{outline:none!important;box-shadow:none!important;border-color:#3b82f6!important}.monkey-web-fullscreen table{width:100%!important;border-collapse:collapse!important}.monkey-web-fullscreen table th,.monkey-web-fullscreen table td{line-height:2!important;font-size:13px!important;vertical-align:middle!important;border:1px solid #efefef!important}.monkey-web-fullscreen table tr:nth-child(odd){background-color:#f8f8f8!important}.monkey-toast{left:10px!important;bottom:16%!important;color:#fff!important;padding:0 10px!important;border-radius:3px!important;position:absolute!important;z-index:2147483647!important;transition:opacity .3s ease-in!important;font: 13px/26px sans-serif!important;background:#000000bf!important}.monkey-toast span{display:inline!important}.monkey-toast .cText{margin:0 3px!important;color:#ff5f00!important}.__hc{cursor:none!important}#buffer,#install,.player-overlay,.memory-play-wrap,.atom-notice-click,.dplayer-resume-tip,#player #loading-box,.dplayer-notice strong,.air-player-loading-box,#bilibili-player :is(.bpx-player-toast-wrap,.bpx-player-cmd-dm-wrap),#bilibili-player .bpx-player-dialog-wrap>:not(.bpx-player-dm-tip){display:none!important}@supports selector(:has(*)){body>#loading:not(:has(video)),*:has(video) :is(#tips,.art-layers){display:none!important}} ');
 
 (function (notyf, Swal) {
   'use strict';
 
   const isElement = (node) => node instanceof Element;
-  const isDocument = (node) => node instanceof Document;
   const getSRoot = (node) => node?._shadowRoot ?? node?.shadowRoot ?? null;
-  function* getShadowRoots(node, deep = false) {
-    if (!node || !isElement(node) && !isDocument(node)) return;
-    if (isElement(node) && getSRoot(node)) yield getSRoot(node);
-    const doc = isDocument(node) ? node : node.getRootNode({ composed: true });
-    if (!doc.createTreeWalker) return;
-    let currentNode;
-    const toWalk = [node];
-    while (currentNode = toWalk.pop()) {
-      const walker = doc.createTreeWalker(currentNode, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_DOCUMENT_FRAGMENT, {
-        acceptNode: (child) => isElement(child) && getSRoot(child) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
-      });
-      let walkerNode = walker.nextNode();
-      while (walkerNode) {
-        const shadowRoot = getSRoot(walkerNode);
-        if (isElement(walkerNode) && shadowRoot) {
-          if (deep) toWalk.push(shadowRoot);
-          yield shadowRoot;
-        }
-        walkerNode = walker.nextNode();
+  function* getShadowRoots(root) {
+    if (!root || ![Element, Document, ShadowRoot].some((type) => root instanceof type)) return;
+    const acceptNode = (node) => isElement(node) && getSRoot(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, { acceptNode }, false);
+    let walkerNode;
+    while (walkerNode = walker.nextNode()) {
+      if (walkerNode === root) continue;
+      const sRoot = getSRoot(walkerNode);
+      if (sRoot) {
+        yield sRoot;
+        yield* getShadowRoots(sRoot);
       }
     }
-    return;
   }
   function querySelector(selector, ctx = document) {
+    if (!ctx?.querySelector) return null;
     const direct = ctx.querySelector(selector);
     if (direct) return direct;
-    const shadowRoots = [...getShadowRoots(ctx, true)];
-    for (const root of shadowRoots) {
-      const match = root.querySelector(selector);
+    for (const root of getShadowRoots(ctx)) {
+      const match = root?.querySelector(selector);
       if (match) return match;
     }
     return null;
   }
   function querySelectorAll(selector, ctx = document) {
+    if (!ctx?.querySelectorAll) return [];
     const results = [...ctx.querySelectorAll(selector)];
-    const shadowRoots = [...getShadowRoots(ctx, true)];
-    for (const root of shadowRoots) {
-      results.push(...root.querySelectorAll(selector));
+    for (const root of getShadowRoots(ctx)) {
+      if (root?.querySelectorAll) results.push(...root.querySelectorAll(selector));
     }
     return results;
   }
@@ -131,7 +121,7 @@
     attr: (el, name, val) => el && name && el[val ? "setAttribute" : "removeAttribute"](name, val),
     emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
     isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
-    createElement: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
+    newEle: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
     hasCls: (el, ...cls) => cls.flat().some((c) => el?.classList.contains(c)),
     delCls: (el, ...cls) => el?.classList.remove(...cls),
     addCls: (el, ...cls) => el?.classList.add(...cls),
@@ -139,9 +129,6 @@
       const notyf$1 = new notyf.Notyf({ duration: Consts.THREE_SEC, position: { x: "center", y: "top" } });
       isError ? notyf$1.error(msg) : notyf$1.success(msg);
       return false;
-    },
-    sendToIFrames(data) {
-      this.getIFrames().forEach((el) => this.isVisible(el) && this.postMessage(el?.contentWindow, data));
     },
     freqTimes: /* @__PURE__ */ new Map(),
     isThrottle(key = "throttle", gap = 300) {
@@ -171,7 +158,7 @@
     },
     fireMouseEvt(el, type, clientX, clientY) {
       const dict = { clientX, clientY, bubbles: true };
-      el?.dispatchEvent(new MouseEvent(type, dict));
+      return el?.dispatchEvent(new MouseEvent(type, dict));
     },
     isValidId: (el) => el.id && !/[\d\u4e00-\u9fa5]/.test(el.id),
     getElementPath(element) {
@@ -224,18 +211,23 @@
       const policy = trustedTypes.defaultPolicy ?? trustedTypes.createPolicy("default", { createHTML: (input) => input });
       return policy.createHTML(html);
     },
-    cloneAttrs(source, target, ...attrs) {
-      attrs.flat().forEach((attr) => {
-        const value = source.getAttribute(attr);
-        if (value) target.setAttribute(attr, value);
-      });
-    },
     setStyle(els, prop, val, priority) {
       if (!els || !prop) return;
       const fn = val ? "setProperty" : "removeProperty";
       [].concat(els).forEach((el) => el?.style?.[fn]?.(prop, val, priority));
     },
-    isAttached: (el) => !!el && el.isConnected && (!el.getRootNode?.()?.host || el.getRootNode().host.isConnected)
+    isAttached: (el) => !!el && el.isConnected && (!el.getRootNode?.()?.host || el.getRootNode().host.isConnected),
+    waitFor(condition, opts = {}) {
+      const start = Date.now();
+      const { immediate = false, interval = 50, timeout = 3e3 } = opts;
+      return new Promise((resolve, reject) => {
+        const checkCondition = () => {
+          if (Date.now() - start > timeout) return reject(new Error("检测超时"));
+          condition() ? resolve() : setTimeout(checkCondition, interval);
+        };
+        immediate ? checkCondition() : setTimeout(checkCondition, interval);
+      });
+    }
   };
   class VideoEnhancer {
     static setPlaybackRate(video, rate) {
@@ -362,10 +354,10 @@
     CUSTOM_CTN: new BasicStorage("CUSTOM_WEB_FULL_", "", false, String, true),
     NO_AUTO_DEF: new BasicStorage("DISABLE_DEFAULT_AUTO", false, false, Boolean),
     IS_SITE_AUTO: new BasicStorage("ENABLE_THIS_SITE_AUTO_", false, false, Boolean, true),
-    ENABLE_EDGE_CLICK: new BasicStorage("ENABLE_EDGE_CLICK", false, false, Boolean),
     DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, false, Number, true),
-    HIDE_ELEMENTS: new BasicStorage("HIDE_ELEMENTS_", "", false, void 0, true),
+    FULL_CHANGE_CODE: new BasicStorage("FULL_CHANGE_CODE_", "", false, String, true),
     DISABLE_TRY_PLAY: new BasicStorage("DISABLE_TRY_PLAY", false, false, Boolean),
+    IS_INVISIBLE_PAUSE: new BasicStorage("DISABLE_INVISIBLE_PAUSE", false, false, Boolean),
     SPEED_STEP: new BasicStorage("PLAY_RATE_STEP", 0.25, false, parseFloat),
     DISABLE_SPEED: new BasicStorage("CLOSE_PLAY_RATE", false, false, Boolean),
     RATE_KEEP_SHOW: new BasicStorage("RATE_KEEP_SHOW", false, false, Boolean),
@@ -374,24 +366,20 @@
     PRESET_SPEED: new BasicStorage("PRESET_SPEED", "1.15,1.45,1.75", false, (value) => value.split(",")),
     SKIP_INTERVAL: new BasicStorage("VIDEO_SKIP_INTERVAL", 5, false, Number),
     ZERO_KEY_SKIP: new BasicStorage("ZERO_KEY_SKIP_INTERVAL", 30, false, Number),
-    OVERRIDE_KEY: new BasicStorage("OVERRIDE_KEYBOARD", false, false, Boolean),
-    DISABLE_ZOOM_MOVE: new BasicStorage("DISABLE_ZOOM_MOVE", true, false, Boolean),
     MOVING_DISTANCE: new BasicStorage("MOVING_DISTANCE", 10, false, Number),
     ZOOM_PERCENT: new BasicStorage("ZOOM_PERCENT", 10, false, Number),
     IS_AUTO_NEXT: new BasicStorage("ENABLE_AUTO_NEXT_EPISODE", false, false, Boolean),
     NEXT_ADVANCE_SEC: new BasicStorage("AUTO_NEXT_ADVANCE_SECONDS", 75, false, Number),
     RELATIVE_EPISODE: new BasicStorage("RELATIVE_EPISODE_SELECTOR_", "", false, String, true),
     CURRENT_EPISODE: new BasicStorage("CURRENT_EPISODE_SELECTOR_", "", false, String, true),
-    DISABLE_CLOCK: new BasicStorage("DISABLE_CLOCK", false, false, Boolean),
     PAGE_CLOCK: new BasicStorage("UNFULL_CLOCK", false, false, Boolean),
     CLOCK_COLOR: new BasicStorage("CLOCK_COLOR", "#e0e0e0"),
-    NOT_CACHE_TIME: new BasicStorage("DISABLE_MEMORY_TIME", false, false, Boolean),
-    STORAGE_DAYS: new BasicStorage("STORAGE_DAYS", 7, false, parseFloat),
+    STORAGE_DAYS: new BasicStorage("STORAGE_DAYS", 8, false, parseFloat),
     PLAY_TIME: new BasicStorage("PLAY_TIME_", 0, true, void 0, true),
     NEXT_IGNORE_URLS: new BasicStorage("NEXT_IGNORE_URLS", ""),
     FULL_IGNORE_URLS: new BasicStorage("FULL_IGNORE_URLS", ""),
-    IS_INVISIBLE_PAUSE: new BasicStorage("DISABLE_INVISIBLE_PAUSE", false, false, Boolean),
-    DISABLE_SCREENSHOT: new BasicStorage("DISABLE_SCREENSHOT", true, false, Boolean)
+    LOAD_EVT_CODE: new BasicStorage("LOAD_EVT_CODE_", "", false, String, true),
+    VIDEO_EVT_CODE: new BasicStorage("VIDEO_EVT_CODE_", "", false, String, true)
   };
   const Keyboard = Object.freeze({
     A: "KeyA",
@@ -419,7 +407,7 @@
     isFullscreen: false,
     isNoVideo: () => !window.vMeta && !window.topWin,
     isMutedLoop: (video) => video?.muted && video?.loop,
-    isExecuted: (key, ctx = window) => ctx[key] || !!(ctx[key] = true, false),
+    isExecuted: (key, ctx = window.e9x ??= {}) => ctx[key] || !!(ctx[key] = true, false),
     init(isNonFirst = false) {
       this.host = location.host;
       this.setupVideoListeners();
@@ -458,13 +446,13 @@
     },
     setPlayer(video) {
       this.player = video;
-      const vMeta = { isLive: video.duration === Infinity, timestamp: Date.now() };
+      const vMeta = this.vMeta ?? { vw: innerWidth, vh: innerHeight };
       this.syncMetaToParentWin(vMeta);
     },
     syncMetaToParentWin(vMeta) {
-      window.vMeta = this.vMeta = vMeta;
+      window.vMeta = this.vMeta = { ...vMeta, timestamp: Date.now() };
       if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { vMeta: { ...vMeta, iFrame: location.href } });
-      Tools.microTask(() => (this.initMenuCmds(), this.watchIFrameChange(), this.setupPickerListener()));
+      Tools.microTask(() => (this.initMenuCmds(), this.setupPickerListener()));
       this.sendTopWinInfo();
     },
     sendTopWinInfo() {
@@ -472,7 +460,12 @@
       const { innerWidth: vw, innerHeight: vh } = window;
       const topWin = { vw, vh, url, host, urlHash: Tools.hashCode(url) };
       window.topWin = this.topWin = topWin;
-      Tools.sendToIFrames({ topWin });
+      this.sendToVideoIFrame({ topWin });
+    },
+    sendToVideoIFrame(data) {
+      const vFrame = this.getVideoIFrame();
+      Tools.postMessage(vFrame?.contentWindow, data);
+      if (vFrame) this.observeIFrameChange(vFrame);
     },
     observeVideoSrcChange(video) {
       if (this.isExecuted("observed", video)) return;
@@ -484,8 +477,7 @@
         }
       });
     },
-    watchIFrameChange() {
-      const iFrame = this.getVideoIFrame();
+    observeIFrameChange(iFrame) {
       if (!iFrame || this.isExecuted("observed", iFrame)) return;
       new MutationObserver(
         () => this.isFullscreen ? this.toggleFullscreen() : this.fsWrapper && this.exitWebFullscreen()
@@ -498,25 +490,38 @@
       });
       if (this.isExecuted("isDefined")) return;
       VideoEnhancer.defineProperty(this, "isFullscreen", {
-        set: (value, setter) => (setter(value), this.handleFullscreenChange(value))
+        set: (value, setter) => (setter(value), this.onFullChange(value))
       });
     },
-    handleFullscreenChange(isFullscreen) {
-      isFullscreen && Tools.isInputable(document.activeElement) && document.activeElement.blur();
-      !isFullscreen && this.fsWrapper && this.dispatchShortcut(Keyboard.P);
+    onFullChange(isFull) {
+      isFull && Tools.isInputable(document.activeElement) && document.activeElement.blur();
+      if (!this.isGMatch() && !(isFull && this.fsWrapper)) this.toggleWebFullscreen();
+      Tools.microTask(() => this.customFullChangeHandle());
       this.changeTimeDisplay();
     },
     observeWebFullscreenChange() {
-      const handle = (e, { code, type } = e) => {
-        if (type === "scroll") return Tools.scrollTop(this.fsWrapper.scrollY);
-        if (this.isInputFocus(e) || ![Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code)) return;
-        Tools.preventDefault(e), Object.is(type, "keydown") && this.dispatchShortcut(code, { bypass: true });
-      };
+      const handle = () => Tools.scrollTop(this.fsWrapper.scrollY);
       VideoEnhancer.defineProperty(this, "fsWrapper", {
-        set(value, setter) {
+        set: (value, setter) => {
           const method = setter(value) ? "addEventListener" : "removeEventListener";
-          ["scroll", "keyup", "keydown"].forEach((type) => unsafeWindow[method](type, handle, true));
+          Tools.microTask(() => this.customFullChangeHandle());
+          unsafeWindow[method]("scroll", handle, true);
         }
+      });
+    },
+    customFullChangeHandle() {
+      if (Tools.isThrottle("fsChange", Consts.HALF_SEC)) return;
+      Tools.sleep(10).then(() => {
+        const tol = 5;
+        const { width, height } = window.screen;
+        const { topWin, player, fsWrapper } = this;
+        const element = player ?? this.getVideoIFrame();
+        const { offsetWidth: ew, offsetHeight: eh } = this.isGMatch() ? element : fsWrapper || {};
+        const isWFs = Math.abs(ew - topWin.vw) < tol && Math.abs(eh - topWin.vh) < tol;
+        const isFs = Math.abs(ew - width) < tol && Math.abs(eh - height) < tol;
+        const type = isFs ? "isFull" : isWFs ? "isWFull" : "default";
+        const jsCode = Storage.FULL_CHANGE_CODE.get(this.host);
+        this.executeCodeSnippet(jsCode, type, player);
       });
     },
     setupMouseMoveListener() {
@@ -536,14 +541,13 @@
       eles.forEach((el) => (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
     },
     getVideoForCoord(x, y) {
-      if (!Storage.ENABLE_EDGE_CLICK.get()) return;
       if (Tools.pointInElement(x, y, this.player)) return this.player;
       const getZIndex = (el) => Number(getComputedStyle(el).zIndex) || 0;
       const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(x, y, v));
       return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
     },
     createEdgeElement(video) {
-      if (!video || !Storage.ENABLE_EDGE_CLICK.get()) return;
+      if (!video) return;
       const container = this.getEdgeContainer(video);
       if (video.lArea?.parentNode === container) return;
       if (container instanceof Element && this.lacksRelativePosition(container)) {
@@ -552,7 +556,7 @@
       Tools.querys(".__edgeClick", container).forEach((el) => el.remove());
       if (video.lArea) return container.prepend(video.lArea, video.rArea);
       const createEdge = (cls = "") => {
-        const element = Tools.createElement("div", { video, className: `__edgeClick ${cls}` });
+        const element = Tools.newEle("div", { video, className: `__edgeClick ${cls}` });
         element.onclick = (e) => {
           Tools.preventDefault(e);
           this.setPlayer(e.target.video);
@@ -571,9 +575,6 @@
     },
     lacksRelativePosition(el) {
       return Tools.getParents(el, 2).every((e) => e && getComputedStyle(e).position === "static");
-    },
-    removeEdgeElements() {
-      Tools.querys(".__edgeClick").forEach((el) => (el.remove(), delete el.video.lArea, delete el.video.rArea));
     }
   };
   class Site {
@@ -633,14 +634,14 @@
     isInputFocus: (e) => Tools.isInputable(e.composedPath()[0]),
     preventKey(e, { code, altKey } = e) {
       const isNumKeys = Tools.isNumber(e.key) && !this.isDisRate();
-      const isOverrideKeys = this.isOverrideKey() && [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
-      const isPreventKeys = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
-      const isZoomKeys = altKey && !this.isDisZoom() && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
-      if (isNumKeys || isOverrideKeys || isPreventKeys || isZoomKeys) Tools.preventDefault(e);
+      const isOverrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
+      const isPreventKey = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
+      const isMoveKeys = altKey && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
+      if (isNumKeys || isOverrideKey || isPreventKey || isMoveKeys) Tools.preventDefault(e);
     },
-    dispatchShortcut(code, { bypass = false, isTrusted = false } = {}) {
+    dispatchShortcut(code, { isTrusted = false } = {}) {
       const key = this.processShortcutKey({ code });
-      Tools.postMessage(window.top, { key, bypass, isTrusted });
+      Tools.postMessage(window.top, { key, isTrusted });
     },
     processShortcutKey({ key, code, ctrlKey, shiftKey, altKey }) {
       code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
@@ -663,10 +664,10 @@
     },
     processEvent(data) {
       if (this.vMeta?.iFrame && this.player) delete this.player;
-      if (!this.player) Tools.sendToIFrames(data);
+      if (!this.player) this.sendToVideoIFrame(data);
       if (data?.key) this.execKeyActions(data);
     },
-    execKeyActions({ key, bypass, isTrusted }) {
+    execKeyActions({ key, isTrusted }) {
       const dict = {
         M: () => this.muteVideo(),
         R: () => this.rotateVideo(),
@@ -676,12 +677,12 @@
         P: () => this.toggleWebFullscreen(isTrusted),
         D: () => Site.isGmMatch() && this.triggerIconElement(Site.icons.danmaku),
         N: () => Site.isGmMatch() ? this.triggerIconElement(Site.icons.next) : this.switchEpisode(),
-        SPACE: () => (bypass || this.isOverrideKey()) && this.playToggle(this.player),
-        LEFT: () => this.skipPlayback(-Storage.SKIP_INTERVAL.get(), bypass),
-        RIGHT: () => this.skipPlayback(Storage.SKIP_INTERVAL.get(), bypass),
         0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP.get(), true) || 0,
+        LEFT: () => this.skipPlayback(-Storage.SKIP_INTERVAL.get()),
+        RIGHT: () => this.skipPlayback(Storage.SKIP_INTERVAL.get()),
+        SPACE: () => this.playToggle(this.player),
         SHIFT_A: () => this.autoNextEnabled(),
-        CTRL_ALT_A: () => this.screenshot(),
+        CTRL_ALT_S: () => this.screenshot(),
         ALT_SUB: () => this.zoomVideo(-1),
         ALT_ADD: () => this.zoomVideo(),
         SHIFT_R: () => this.horizFlip(),
@@ -701,23 +702,31 @@
       this.processEvent(data);
     },
     handleConfsMessage(data) {
-      if (data?.sw_zoom) this.resetTsr();
       if (data?.sw_memory) this.delCachedRate();
       if (data?.sw_speed) this.setPlaybackRate(1);
-      if ("sw_rateKeep" in data) this.playbackRateDisplay();
-      if ("sw_clockAlw" in data) setTimeout(() => this.changeTimeDisplay(), 30);
+      if (data?.sw_lCode) Storage.LOAD_EVT_CODE.set(data.sw_lCode, this.host);
+      if (data?.sw_vCode) Storage.VIDEO_EVT_CODE.set(data.sw_vCode, this.host);
+      if (data?.sw_fsCode) Storage.FULL_CHANGE_CODE.set(data.sw_fsCode, this.host);
+      if (data?.sw_vCode || data?.sw_fsCode) this.codeSnippetCache.clear();
+      if ("sw_sRate" in data) this.playbackRateDisplay();
       if ("sw_color" in data) this.setTimeColor(data.sw_color);
-      if ("sw_edgeClk" in data) this.removeEdgeElements();
+      if ("sw_wClock" in data) setTimeout(() => this.changeTimeDisplay(), 30);
     }
   };
   const Events = {
     videoAborts: /* @__PURE__ */ new Map(),
-    videoEvts: ["loadedmetadata", "loadeddata", "timeupdate", "ratechange", "canplay", "playing", "ended"],
+    videoEvts: ["loadstart", "loadedmetadata", "loadeddata", "timeupdate", "ratechange", "canplay", "playing", "ended"],
     setupVideoListeners(video) {
       const ctrl = new AbortController();
       video && this.videoAborts.get(video)?.abort();
-      const handle = ({ type, target }) => target.matches(`video, ${Consts.FAKE_VIDEO}`) && this[type](target);
-      this.videoEvts.forEach((t) => (video ?? document).addEventListener(t, handle, { capture: true, signal: ctrl.signal }));
+      const handle = ({ type, target }) => {
+        if (this.isMutedLoop(target)) return;
+        if (!target?.matches(`video, ${Consts.FAKE_VIDEO}`)) return;
+        this[type]?.(target), this.customVideoEvtHandle(type, target);
+      };
+      this.videoEvts.forEach(
+        (t) => (video ?? document).addEventListener(t, handle, { capture: true, passive: true, signal: ctrl.signal })
+      );
       if (video) this.videoAborts.set(video, ctrl), this.unbindVideoEvts();
     },
     setupShadowVideoListener() {
@@ -734,6 +743,9 @@
         ctrl.abort(), video.removeAttribute("received"), this.videoAborts.delete(video);
       });
     },
+    loadstart(video) {
+      if (!this.player) this.setCurrentVideo(video);
+    },
     loadedmetadata(video) {
       if (video.matches(Consts.FAKE_VIDEO)) this.loadeddata(video);
       if (!this.player) this.setCurrentVideo(video);
@@ -743,13 +755,15 @@
       this.initVideoProps(video);
     },
     timeupdate(video) {
-      if (isNaN(video.duration)) return;
+      if (isNaN(video.duration) || !Tools.isVisible(video)) return;
       if (!this.player) this.playing(video);
-      this.autoWebFullscreen(video);
-      this.autoNextEpisode(video);
-      this.cachePlayTime(video);
-      this.videoProgress(video);
-      this.ensureRateDisplay();
+      Tools.microTask(() => {
+        this.autoWebFullscreen(video);
+        this.autoNextEpisode(video);
+        this.cachePlayTime(video);
+        this.renderProgress(video);
+        this.ensureRateDisplay();
+      });
     },
     canplay(video) {
       if (!Tools.isVisible(video) || Tools.isMultiV() || Storage.DISABLE_TRY_PLAY.get()) return;
@@ -758,18 +772,49 @@
     playing(video) {
       this.setCurrentVideo(video);
       video.tsr ??= { ...Consts.DEF_TSR };
-      Tools.sleep(50).then(() => this.initVideoPlay(video));
+      Tools.waitFor(() => this.topWin).then(() => this.applySettings(video));
     },
     ended(video) {
       this.autoExitWebFullscreen();
       this.clearCachedTime(video);
     },
-    ratechange: () => App.playbackRateDisplay()
+    ratechange: (video) => App.playbackRateDisplay(),
+    customVideoEvtHandle(type, video) {
+      if (type === "timeupdate" && Tools.isThrottle("codeSnippet", Consts.ONE_SEC)) return;
+      Tools.sleep(10).then(() => this.executeCodeSnippet(Storage.VIDEO_EVT_CODE.get(this.host), type, video));
+    },
+    codeSnippetCache: /* @__PURE__ */ new Map(),
+    executeCodeSnippet(jsCode, type, video) {
+      try {
+        if (!jsCode) return;
+        const code = `(async () => { ${jsCode} })()`;
+        const args = ["type", "App", "video", "Tools", "unsafeWindow"];
+        const handler = this.codeSnippetCache.get(type) || this.codeSnippetCache.set(type, new Function(...args, code)).get(type);
+        handler(type, App, video, Tools, unsafeWindow);
+      } catch (e) {
+        const unsafe = e.message.includes("unsafe-eval");
+        unsafe ? this.injectCodeSnippet(jsCode, type, video) : console.error("代码执行出错：", e);
+      }
+    },
+    injectCodeSnippet(jsCode, type, video) {
+      const evt = `gm_code_inject_${type}`;
+      const injectCode = `
+      (() => {
+        document.addEventListener('${evt}', (e) => {
+          const { type, App, video, Tools, unsafeWindow } = e.detail;
+          (async () => { try { ${jsCode} } catch (err) { console.error('代码执行出错：', err); } })();
+        }, { once: true, passive: true });
+      })();
+      `;
+      Tools.query(`#${evt}`)?.remove();
+      GM_addElement("script", { id: evt, textContent: injectCode, type: "text/javascript" });
+      Tools.emitEvent(evt, { type, App, video, Tools, unsafeWindow });
+    }
   };
   const Control = {
     isLive() {
-      if (!this.vMeta || !this.player) return false;
-      return this.vMeta.isLive || this.player?.duration === Infinity || this.isDynamicDur(this.player);
+      if (!this.player) return false;
+      return this.player.duration === Infinity || this.isDynamicDur(this.player);
     },
     isDynamicDur(video) {
       if (video._mfs_isDynamic || video.currentTime > video.__duration) return true;
@@ -781,18 +826,17 @@
       return isDynamic;
     },
     initVideoProps(video) {
-      if (!Tools.isAttached(this.player)) delete this.player;
+      if (!Tools.isAttached(this.player)) this.player = void 0;
       Object.keys(video).forEach((k) => k.startsWith("_mfs_") && delete video[k]);
       video.__duration = video.duration;
       video.tsr = { ...Consts.DEF_TSR };
       Tools.resetLimit("autoWide");
     },
-    initVideoPlay(video) {
+    applySettings(video) {
+      this.setupClockForPlayer();
       if (this.isExecuted("_mfs_apply", this.player)) return;
       this.applyCachedRate();
       this.applyCachedTime(video);
-      this.setupPlayerClock();
-      this.setBiliQuality();
     },
     remainTime: (v) => Math.floor(App.getRealDuration(v)) - Math.floor(v.currentTime),
     playToggle: (v) => Site.isDouyu() ? v?.click() : v?.[v?.paused ? "play" : "pause"](),
@@ -809,22 +853,20 @@
     },
     applyCachedRate: () => Storage.NOT_CACHE_SPEED.get() ? App.delCachedRate() : App.setPlaybackRate(Storage.CACHED_SPEED.get()),
     delCachedRate: () => Storage.CACHED_SPEED.del(),
-    skipPlayback(second = 0, bypass = false) {
-      if (!bypass && !this.isOverrideKey()) return;
-      if (!this.player || this.isLive() || this.player.ended) return;
+    skipPlayback(second = 0) {
+      if (!this.player || this.isLive()) return;
       this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
       this.showToast(`快${second > 0 ? "进" : "退"} ${Math.abs(second)} 秒`, Consts.ONE_SEC);
     },
     cachePlayTime(video) {
       if (video !== this.player || !this.topWin || video.duration < 120 || this.isLive()) return;
       if (Tools.isThrottle("cacheTime", Consts.ONE_SEC) || +video.currentTime < Storage.SKIP_INTERVAL.get()) return;
-      if (Storage.NOT_CACHE_TIME.get() || this.remainTime(video) <= 10) return this.clearCachedTime(video);
+      if (this.remainTime(video) <= 10) return this.clearCachedTime(video);
       Storage.PLAY_TIME.set(+video.currentTime - 1, this.getUniqueKey(video), Storage.STORAGE_DAYS.get());
       if (Tools.isMultiV()) this.ensureUniqueCacheTime();
     },
     applyCachedTime(video) {
-      if (!this.topWin || this.isLive()) return;
-      if (Storage.NOT_CACHE_TIME.get()) return this.clearCachedTime(video);
+      if (!this.topWin || this.isLive() || Tools.querys("video").length > 2) return;
       const time = Storage.PLAY_TIME.get(this.getUniqueKey(video));
       if (time <= +video.currentTime) return;
       this.setCurrentTime(time);
@@ -866,7 +908,7 @@
       this.setTsr("--scale", scale).setTsr("--rotate", `${tsr.rotate}deg`);
     },
     zoomVideo(dir = 1) {
-      if (!this.player || this.isDisZoom()) return;
+      if (!this.player) return;
       const { tsr } = this.player;
       const step = Storage.ZOOM_PERCENT.get();
       const zoom = Math.max(25, Math.min(500, tsr.zoom + dir * step));
@@ -875,7 +917,7 @@
       this.showToast(`缩放: ${zoom}%`, Consts.ONE_SEC);
     },
     moveVideo(key) {
-      if (!this.player || this.isDisZoom()) return;
+      if (!this.player) return;
       const { tsr } = this.player;
       const s = Storage.MOVING_DISTANCE.get();
       const dMap = { ALT_UP: [0, -s, "上"], ALT_DOWN: [0, s, "下"], ALT_LEFT: [-s, 0, "左"], ALT_RIGHT: [s, 0, "右"] };
@@ -887,7 +929,7 @@
       this.showToast(`${desc}移: ${x ? tsr.mvX : tsr.mvY}px`, Consts.ONE_SEC);
     },
     resetTsr() {
-      if (!this.player || this.isDisZoom()) return;
+      if (!this.player) return;
       const styles = ["--zoom", "--mvX", "--mvY", "--scale", "--mirror", "--rotate", "--deftsr"];
       styles.forEach((n) => Tools.setStyle(this.player, n));
       this.player.tsr = { ...Consts.DEF_TSR };
@@ -912,10 +954,10 @@
       this.showToast(isMuted ? "🔊 取消静音" : "🔇 已静音", Consts.ONE_SEC);
     },
     async screenshot() {
-      if (!this.player || Storage.DISABLE_SCREENSHOT.get()) return;
+      if (!this.player) return;
       this.player.setAttribute("crossorigin", "anonymous");
       const { videoWidth: width, videoHeight: height } = this.player;
-      const canvas = Tools.createElement("canvas", { width, height });
+      const canvas = Tools.newEle("canvas", { width, height });
       const ctx = canvas.getContext("2d");
       try {
         ctx.drawImage(this.player, 0, 0, width, height);
@@ -936,18 +978,18 @@
     },
     autoNextEnabled() {
       const status = Storage.IS_AUTO_NEXT.set(!Storage.IS_AUTO_NEXT.get());
-      this.showToast(`已${status ? "启" : "禁"}用自动切换下集`);
+      this.showToast(`已${status ? "启" : "禁"}用 自动切换下集`);
     },
     customToast(start, text, end, dealy, isRemove) {
       const span = document.createElement("span");
-      const child = Tools.createElement("span", { textContent: text, className: "cText" });
+      const child = Tools.newEle("span", { textContent: text, className: "cText" });
       span.append(document.createTextNode(start), child, document.createTextNode(end));
       return this.showToast(span, dealy, isRemove);
     },
     showToast(content, dealy = Consts.THREE_SEC, isRemove = true) {
       return new Promise((resolve) => {
         if (isRemove) Tools.query(".monkey-toast")?.remove();
-        const el = Tools.createElement("div", { className: "monkey-toast" });
+        const el = Tools.newEle("div", { className: "monkey-toast" });
         content instanceof Element ? el.appendChild(content) : el.textContent = content;
         this.findVideoContainer(null, 2, false).appendChild(el), resolve(el);
         setTimeout(() => (el.style.opacity = 0, setTimeout(() => el.remove(), Consts.HALF_SEC)), dealy);
@@ -956,44 +998,47 @@
   };
   const WebFull = {
     getLiveIcons: () => (Tools.emitMousemove(App.player), Tools.querys(".right-area .icon")),
+    isGMatch: () => Site.isGmMatch() && !Site.isBiliLive(),
     triggerIconElement(name) {
-      if (!Site.isBiliLive()) return Tools.query(Site.getIcons()?.[name])?.click();
       const index = Object.values(Site.icons).indexOf(name);
-      this.getLiveIcons()?.[index]?.click();
+      const element = Site.isBiliLive() ? this.getLiveIcons()?.[index] : Tools.query(Site.getIcons()?.[name]);
+      return Tools.fireMouseEvt(element, "click");
+    },
+    toggleFullByIcon(name) {
+      const el = this.player ?? this.getVideoIFrame();
+      const { height } = Tools.getRect(el) ?? { height: 0 };
+      if (!this.triggerIconElement(name) || !el) return;
+      const condition = () => Boolean(Tools.getRect(el).height - height);
+      Tools.waitFor(condition).then(() => this.customFullChangeHandle());
     },
     toggleFullscreen() {
       if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
-      if (Site.isGmMatch() && !Site.isBiliLive()) return this.triggerIconElement(Site.icons.full);
-      this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-      if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcut(Keyboard.P);
+      if (this.isGMatch()) return this.toggleFullByIcon(Site.icons.full);
+      document.exitFullscreen().catch(() => this.getVideoHostContainer()?.requestFullscreen());
     },
     toggleWebFullscreen(isTrusted) {
       if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
-      if (Site.isGmMatch() && !Site.isBiliLive()) return this.triggerIconElement(Site.icons.webFull);
+      if (this.isGMatch()) return this.toggleFullByIcon(Site.icons.webFull);
       if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen();
       this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
-      requestAnimationFrame(() => this.hideRelatedOnFullscreen());
     },
     enterWebFullscreen() {
       const container = this.fsWrapper = this.getVideoHostContainer();
       if (!container || container.matches(":is(html, body)")) return this.adaptToWebFullscreen();
       container.scrollY = window.scrollY;
       const parents = Tools.getParents(container);
-      container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(this.host) ? parents.forEach((el) => {
-        Tools.emitEvent("addStyle", { sroot: el.getRootNode() });
-        Tools.attr(el, Consts.webFull, true);
-      }) : this.detachForFullscreen();
+      const unDetach = container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(this.host);
+      unDetach ? parents.forEach((el) => this.setWebFullAttr(el)) : this.detachForFullscreen();
       this.adaptToWebFullscreen();
     },
     detachForFullscreen() {
       if (this.fsParent) return;
       this.fsParent = Tools.getParent(this.fsWrapper);
-      this.fsPlaceholder = document.createElement("div");
-      Tools.cloneAttrs(this.fsWrapper, this.fsPlaceholder, ["id", "class", "style"]);
+      this.fsPlaceholder = this.fsWrapper.cloneNode();
       this.fsParent.replaceChild(this.fsPlaceholder, this.fsWrapper);
       document.body.insertAdjacentElement("beforeend", this.fsWrapper);
       this.fsWrapper.querySelector("video")?.play();
-      Tools.attr(this.fsWrapper, Consts.webFull, true);
+      this.setWebFullAttr(this.fsWrapper);
     },
     exitWebFullscreen() {
       if (!this.fsWrapper) return;
@@ -1002,18 +1047,24 @@
       if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
       Tools.querys(`[${Consts.webFull}]`).forEach((el) => Tools.attr(el, Consts.webFull));
       requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(this.docElement, "scroll-behavior")));
-      this.videoParents.clear();
       this.fsPlaceholder = this.fsWrapper = this.fsParent = null;
+      this.videoParents.clear();
     },
     getVideoHostContainer() {
-      if (this.player) return this.getVideoContainer();
-      return this.getVideoIFrame() ?? Tools.getIFrames().find(Tools.isVisible);
+      return this.player ? this.getVideoContainer() : this.getVideoIFrame();
     },
     getVideoIFrame() {
-      if (!this.vMeta?.iFrame) return null;
-      const { pathname, search } = new URL(this.vMeta.iFrame);
-      const partial = ((s) => s.slice(0, s.length * 0.8))(decodeURIComponent(search));
-      return Tools.query(`iframe[src*="${pathname + partial}"]`);
+      if (!this.vMeta?.iFrame) return Tools.getIFrames().find(Tools.isVisible);
+      if (this.fsWrapper) return this.fsWrapper;
+      const { vw, vh, iFrame } = this.vMeta;
+      const { pathname, search } = new URL(iFrame);
+      const partial = ((s) => s.slice(0, Math.floor(s.length * 0.8)))(decodeURIComponent(search));
+      const vFrame = Tools.query(`iframe[src*="${pathname + partial}"]`);
+      if (vFrame) return vFrame;
+      const tol = 5;
+      const iFrames = Tools.getIFrames();
+      const matchSize = ({ offsetWidth: w, offsetHeight: h }) => Math.abs(w - vw) < tol && Math.abs(h - vh) < tol;
+      return iFrames.find(matchSize) ?? iFrames.find(Tools.isVisible);
     },
     getVideoContainer() {
       const selector = Storage.CUSTOM_CTN.get(this.topWin?.host)?.trim();
@@ -1057,12 +1108,14 @@
         if (!this.fsWrapper.contains(el)) return;
         const { offsetWidth: width, offsetHeight: height } = this.player;
         if (width === vw && height === vh && el.offsetHeight === vh) return;
-        Tools.attr(el, Consts.webFull, true);
+        this.setWebFullAttr(el);
       });
     },
-    hideRelatedOnFullscreen(cls = "_hide") {
-      const selector = Storage.HIDE_ELEMENTS.get(this.topWin?.host);
-      selector && Tools.querys(selector).forEach((el) => this.fsWrapper ? Tools.addCls(el, cls) : Tools.delCls(el, cls));
+    setWebFullAttr(el) {
+      const sroot = el.getRootNode();
+      Tools.attr(el, Consts.webFull, true);
+      if (this.isExecuted("__Added__", sroot)) return;
+      if (sroot instanceof ShadowRoot) Tools.emitEvent("addStyle", { sroot });
     }
   };
   const Automatic = {
@@ -1074,7 +1127,6 @@
       video._mfs_hasTriedNext = true;
     },
     async autoWebFullscreen(video) {
-      if (!this.topWin) await Tools.sleep(50);
       if (!this.topWin || !video.offsetWidth || this.player !== video) return;
       if (video._mfs_isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
       if (Site.isGmMatch() ? this.noAutoDefault() : !this.isAutoSite()) return;
@@ -1090,7 +1142,7 @@
     autoExitWebFullscreen() {
       if (!Site.isBili() && !Site.isAcFun()) return;
       const isWide = this.player.offsetWidth === innerWidth;
-      if (isWide) this.triggerIconElement(this.isFullscreen ? Site.icons.full : Site.icons.webFull);
+      if (isWide) this.toggleFullByIcon(this.isFullscreen ? Site.icons.full : Site.icons.webFull);
       requestAnimationFrame(() => {
         const isLast = Tools.query('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
         if (!Tools.query(".video-pod") || isLast) Tools.query(".bpx-player-ending-related-item-cancel")?.click();
@@ -1312,10 +1364,9 @@
   }
   const Extend = {
     setupLoadEventListener() {
-      window.addEventListener("load", () => {
-        Tools.query("body > #start, #play-button-overlay")?.click?.();
-        this.setFakeBiliUser();
-      });
+      const handle = ({ type }) => this.executeCodeSnippet(Storage.LOAD_EVT_CODE.get(this.host), type, this.player);
+      document.addEventListener("DOMContentLoaded", handle);
+      window.addEventListener("load", handle);
     },
     setFakeBiliUser() {
       if (!Site.isBili()) return;
@@ -1332,8 +1383,8 @@
       const target = list.find((quality) => quality === 80) ?? list[0];
       if (current !== target) unsafeWindow.player.requestQuality(target);
     },
-    shouldHideTime: () => App.isFullscreen && Storage.DISABLE_CLOCK.get() || !App.isFullscreen && !Storage.PAGE_CLOCK.get(),
-    setupPlayerClock() {
+    shouldHideTime: () => !App.isFullscreen && !Storage.PAGE_CLOCK.get(),
+    setupClockForPlayer() {
       if (!this.player || this.shouldHideTime()) return this.Clock?.stop(true);
       if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(this.player.parentNode).start();
       this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
@@ -1342,7 +1393,7 @@
       if (!Site.isQiyi()) return video.duration;
       return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
     },
-    videoProgress(video) {
+    renderProgress(video) {
       if (!video || this.player !== video || this.isMutedLoop(video)) return;
       const duration = this.getRealDuration(video);
       if (duration <= 30 || duration > 86400 || this.isLive() || this.shouldHideTime()) return this.progNode?.remove();
@@ -1355,7 +1406,7 @@
     createProgressElement() {
       if (this.progNode) return this.progNode;
       const el = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
-      el.append(document.createTextNode("00:00"), Tools.createElement("b", { textContent: "%" }));
+      el.append(document.createTextNode("00:00"), Tools.newEle("b", { textContent: "%" }));
       this.progNode = el;
       return el;
     },
@@ -1368,7 +1419,7 @@
     },
     ensureRateDisplay: () => !Tools.isAttached(App.rateDisplay) && App.playbackRateDisplay(),
     createDisplayElement(cls, color) {
-      const el = Tools.createElement("div", { className: cls, style: `color: ${color}` });
+      const el = Tools.newEle("div", { className: cls, style: `color: ${color}` });
       this.prependElement(el);
       return el;
     },
@@ -1376,7 +1427,7 @@
       const container = this.player?.parentNode;
       if (el && !container?.contains(el)) container?.prepend(el);
     },
-    changeTimeDisplay: () => (App.setupPlayerClock(), App.videoProgress(App.player)),
+    changeTimeDisplay: () => (App.setupClockForPlayer(), App.renderProgress(App.player)),
     setTimeColor: (color) => Tools.setStyle([App.progNode, App.Clock?.element], "color", color)
   };
   const Ignore = {
@@ -1411,8 +1462,6 @@
   const Menu = {
     isDisRate: () => Storage.DISABLE_SPEED.get(),
     noAutoDefault: () => Storage.NO_AUTO_DEF.get(),
-    isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
-    isDisZoom: () => Storage.DISABLE_ZOOM_MOVE.get(),
     isAutoSite: () => Storage.IS_SITE_AUTO.get(window.topWin?.host ?? location.host),
     initMenuCmds() {
       if (this.isExecuted("hasMenu") || !Tools.isTopWin()) return;
@@ -1457,18 +1506,18 @@
         { key: "M", desc: "静音切换" },
         { key: "D", desc: "弹幕切换" },
         { key: "K / L", desc: "上下帧" },
+        { key: "Ctrl Z", desc: "复位缩移" },
         { key: "Shift R", desc: "水平镜像" },
-        { key: "Ctrl Z", desc: "复位缩放移动" },
-        { key: "Shift A", desc: "启/禁自动下集" },
-        { key: "Ctrl Alt A", desc: "截图 (默禁)" },
-        { key: "Alt ➕ / ➖", desc: "缩放 (默禁)" },
-        { key: "A / S 或 ➕ / ➖", desc: "倍速 ±0.25" },
-        { key: "Alt ◀️🔼🔽▶️", desc: "移动 (默禁)" },
+        { key: "Shift A", desc: "🔛自动下集" },
+        { key: "Ctrl Alt S", desc: "截图" },
+        { key: "Alt + / -", desc: "缩放" },
+        { key: "Alt ◀️🔼", desc: "移动" },
+        { key: "A / S 或 + / -", desc: "±倍速" },
         { key: "Ctrl 1️~5️", desc: "预设倍速" },
         { key: "1️~9️", desc: "1️~9️ 倍速" },
         { key: "数字 0️", desc: "快进 N 秒" },
-        { key: "◀️▶️", desc: "快退/进 (默禁)" },
-        { key: "空格", desc: "播放/暂停 (默禁)" }
+        { key: "◀️▶️", desc: "快退/进" },
+        { key: "空格", desc: "播放/暂停" }
       ];
       const rows = keys.reduce((acc, it, i) => {
         if (i % 2) return acc;
@@ -1486,21 +1535,23 @@
       });
     },
     settingPopup() {
-      const [a, b, c, d] = [this.genBasics(), this.genAssist(), this.genParams(), this.genIgnore()];
-      const cacheMap = Object.assign({}, ...[a, b, c, d].map((it) => it.eCache));
+      const [a, b, c, d, e] = [this.genBasics(), this.genParams(), this.genIgnore(), this.genFull(), this.genCode()];
+      const cacheMap = Object.assign({}, ...[a, b, c, d, e].map((it) => it.eCache));
       const html = `
         <div class="swal2-tabs">
           <div class="swal2-tabs-header">
-              <div class="swal2-tab active" data-id="tab1">播放设置</div>
-              <div class="swal2-tab" data-id="tab2">辅助设置</div>
-              <div class="swal2-tab" data-id="tab3">参数设置</div>
-              <div class="swal2-tab" data-id="tab4">其他设置</div>
+              <div class="swal2-tab active" data-id="tab1">控制</div>
+              <div class="swal2-tab" data-id="tab2">参数</div>
+              <div class="swal2-tab" data-id="tab3">忽略</div>
+              <div class="swal2-tab" data-id="tab4">全屏</div>
+              <div class="swal2-tab" data-id="tab5">增强</div>
           </div>
           <div class="swal2-tabs-content">
             <div class="swal2-tab-panel active" id="tab1">${a.html}</div>
             <div class="swal2-tab-panel" id="tab2">${b.html}</div>
             <div class="swal2-tab-panel" id="tab3">${c.html}</div>
             <div class="swal2-tab-panel" id="tab4">${d.html}</div>
+            <div class="swal2-tab-panel" id="tab5">${e.html}</div>
           </div>
         </div>`;
       Swal.fire({
@@ -1531,30 +1582,14 @@
     },
     genBasics() {
       const confs = [
+        { name: "autoDef", text: "禁用 默认自动", cache: Storage.NO_AUTO_DEF },
         { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_SPEED, attrs: ["send", "delay"] },
         { name: "memory", text: "禁用 记忆倍速", cache: Storage.NOT_CACHE_SPEED, attrs: ["send"] },
-        { name: "prog", text: "禁用 记忆进度", cache: Storage.NOT_CACHE_TIME },
         { name: "tabs", text: "禁用 不可见暂停", cache: Storage.IS_INVISIBLE_PAUSE },
         { name: "try", text: "禁用 尝试自动播放", cache: Storage.DISABLE_TRY_PLAY },
         { name: "next", text: "启用 自动切换下集", cache: Storage.IS_AUTO_NEXT },
-        { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEY }
-      ];
-      const render = ({ text, name, value, dataset }) => `
-        <label class="__menu">${text}
-          <input name="${name}" ${value ? "checked" : ""} ${dataset} type="checkbox"/>
-          <span class="toggle-track"></span>
-        </label>`;
-      return this.generate(confs, render);
-    },
-    genAssist() {
-      const confs = [
-        { name: "autoDef", text: "禁用 默认自动", cache: Storage.NO_AUTO_DEF },
-        { name: "shot", text: "禁用 视频截图", cache: Storage.DISABLE_SCREENSHOT },
-        { name: "zoom", text: "禁用 缩放移动", cache: Storage.DISABLE_ZOOM_MOVE, attrs: ["send"] },
-        { name: "clock", text: "禁用 全屏显时间", cache: Storage.DISABLE_CLOCK },
-        { name: "clockAlw", text: "启用 非全屏显时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
-        { name: "rateKeep", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },
-        { name: "edgeClk", text: "启用 侧边单击网页全屏", cache: Storage.ENABLE_EDGE_CLICK, attrs: ["send"] }
+        { name: "wClock", text: "启用 非全屏显时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
+        { name: "sRate", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] }
       ];
       const render = ({ text, name, value, dataset }) => `
         <label class="__menu">${text}
@@ -1569,7 +1604,6 @@
         { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
         { name: "zero", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP },
         { name: "advance", text: "下集提前秒数", cache: Storage.NEXT_ADVANCE_SEC },
-        { name: "days", text: "进度保存天数", cache: Storage.STORAGE_DAYS },
         { name: "percent", text: "缩放百分比", cache: Storage.ZOOM_PERCENT },
         { name: "move", text: "移动距离", cache: Storage.MOVING_DISTANCE },
         { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR, attrs: ["send"] },
@@ -1582,12 +1616,31 @@
       return this.generate(confs, render);
     },
     genIgnore() {
-      const disd = Site.isGmMatch() && !Site.isBiliLive();
       const confs = [
-        { name: "custCtn", text: "自定义此站视频容器", cache: Storage.CUSTOM_CTN, disable: disd, useHost: true },
-        { name: "hideEle", text: "此站全屏时隐藏的元素（用 , 隔开）", cache: Storage.HIDE_ELEMENTS, disable: disd, useHost: true },
         { name: "ignoreNext", text: "自动切换下集时忽略的网址（用 ; 隔开）", cache: Storage.NEXT_IGNORE_URLS },
         { name: "ignoreFs", text: "自动网页全屏时忽略的网址（用 ; 隔开）", cache: Storage.FULL_IGNORE_URLS }
+      ];
+      const render = ({ text, name, value, dataset, disable }) => `
+        <div class="text-group"><p>${text}</p>
+          <textarea name="${name}" ${dataset} ${disable ? "disabled" : ""} spellcheck="false" autocomplete="off">${value}</textarea>
+        </div>`;
+      return this.generate(confs, render);
+    },
+    genFull() {
+      const confs = [
+        { name: "custCtn", text: "此站(网页)全屏视频容器", cache: Storage.CUSTOM_CTN, disable: this.isGMatch(), useHost: true },
+        { name: "fsCode", text: "此站(网页)全屏切换扩展代码", cache: Storage.FULL_CHANGE_CODE, useHost: true, attrs: ["send"] }
+      ];
+      const render = ({ text, name, value, dataset, disable }) => `
+        <div class="text-group"><p>${text}</p>
+          <textarea name="${name}" ${dataset} ${disable ? "disabled" : ""} spellcheck="false" autocomplete="off">${value}</textarea>
+        </div>`;
+      return this.generate(confs, render);
+    },
+    genCode() {
+      const confs = [
+        { name: "lCode", text: "此站 load 事件扩展代码", cache: Storage.LOAD_EVT_CODE, useHost: true, attrs: ["send"] },
+        { name: "vCode", text: "此站视频事件扩展代码", cache: Storage.VIDEO_EVT_CODE, useHost: true, attrs: ["send"] }
       ];
       const render = ({ text, name, value, dataset, disable }) => `
         <div class="text-group"><p>${text}</p>
@@ -1608,7 +1661,7 @@
       return { html, eCache };
     }
   };
-  unsafeWindow.AUTO_WEB_FULLSCREEN = window.App = {};
+  unsafeWindow.GM_E9X_FS = window.App = {};
   const handlers = [Listen, Keydown, Events, Control, WebFull, Automatic, Episode, Picker, Extend, Ignore, Menu];
   handlers.forEach((handler) => {
     const entries = Object.entries(handler);
@@ -1621,7 +1674,7 @@
     const t = GM_getResourceText(e);
     return GM_addStyle(t), t;
   };
-  cssLoader("sweetalert2");
-  cssLoader("notyf/notyf.min.css");
+  cssLoader("Swal");
+  cssLoader("notyf");
 
-})(notyf, sweetalert2);
+})(notyf, Swal);

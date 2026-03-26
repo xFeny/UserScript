@@ -2,13 +2,14 @@
 // @name            视频网页全屏
 // @name:en         Video Fullscreen
 // @namespace       npm/vite-plugin-monkey
-// @version         3.9.4
+// @version         3.10.0
 // @author          Feny
 // @description     让所有视频网页全屏，快捷键：P - 网页全屏，Enter - 全屏; 支持侧边点击切换网页全屏; 支持自动网页全屏
 // @description:en  Maximize all video players; Shortcut keys: P - Web Fullscreen, Enter - Fullscreen; Support side click to web fullscreen; Support auto web fullscreen
 // @license         GPL-3.0-only
 // @icon            data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAABNNJREFUeF7tm09oHFUcx79vNtkElgQDwYMgaUJulVhIwXoIFAvtQRAPXnopQXZfchD00ksPKoh4KUQJksx7C4UUihREcvFQhB70UMmuYhXBGMRDmrAJ+Wf+2MSwP/kNb5fNZrPzkt3ZzCT7IIfszve93+/z+/NmZmcEzvkQ59x/HAIgpXwI4AoRrRHR9XQ6nWNIUsonAF6zAHZfKXWLj0smk72O4/xloQER3dZa3zW6m47jPLDRAbihlHrEx46MjHxORO9b6DYB/EJE6gAAKSWViR8ppW7wZ8PDwy/E4/E/ALzot4AQ4q7rureNUdeI6Ds/DX9PRLe01vcN8DsAPrXQ5WKx2PWJiYmnRjcN4C0LnXdIEYCU8ihhMaKpVOqSEOJnm8lLIyqlTALQNrrSiEopWcPaqoOInra3tw+Nj4//YyD8CuAVP105gGcAXqokKo2olPJtAN/YTF4WUY4mR9Vv5IQQQ67r/mmc4ey55icCUMzW0dHRC/l8/jcACT9daQaUp/8BbVlEPwAw5je5+X5IKfWDKYcHRHTTT8cRFUJcVkr9Z0rvJwC9fjoApf3nquM4j/001gBMjb6jtf7aOGPbcHL5fP5yOp2eNxG1babFiB6n9EqzNZVKDQsh7lWDcCwAPJFxJmucsWo4HFGt9ausMen5o00zLY3ocUoPwHtKqS+NjR8D+OgoCMcGACD3/Pnzi1NTUysmPb+3bDjFiCaTSav0NEZ/opT60DhjXXpCiDdd1/3WZOs9Ihqu2N8KH1bYAo/MnNKImvTkGvdtOACUUmqEJ7ZJz4IBQoh3Xdf1UllKyb2HQfgOIcRF13V/N+s9FkJcLRedJAO8OYhoWmvNOwIbdZyd4Y7W+jOb9Cwz9g2llNfUpJS8C3lr+4xcIpHoHRsb+9eUHusvlGpODMBA+EJr7UVDSmmdnrwTaK2/8kvPcuccx+mdnJz825QeO3PJj4AQ4onruq/zcZVKr3kt4EfwrH9fzICZmZlDDeKsO8/+FQFkMpmqZ4JnFUYTQCGyzQxolkCzBzSb4Fnt9NX8au4CjdoFOjo6EI/HEYvFsLW1hZ2dnVAkXOAZ0NLSgv7+fiQSB6+Wt7e3kcvlsLa2dqogAgfQ19eHrq6uI51kAAyCgZzGCBzAwMAAWltbfX1jCEtLS9jb2/M9tp4HBA5gcHDQ2l52niEwjEaNUAEoON3I/hBKAAUQjegPoQZQABFkf4gEAAYRVH+IDICg+kPkABRALC4uYmFhoebNIrIA2PN6QIg0gM3NTczOztaUBZEGwJ5ns97vtCcekQawsbGBubm5EzvPwkgDOLc9YH9/H/Pz81hZWakp+pHMgOXlZe9iaXd3t2bnIwVgfX3du1Lkzl/PEfoewLfOOOKrq6v19Ls4V2gBcJ2z4/xHFNwd+1ACqHedV0udUAEIqs5PFYDNPcGg6/xUAVS7K9yoOj9VALx4T08Puru7i3bk83nvJKae+/lJt4jAe0DBsM7OTrS1tXn/8r0+jn4YRsMAhMHZSjY0ARSoNB+RaT4i03xEJrgT7rB2wEbcEQqx755pxV0gm80+I6KKL02F3Yla7Ct9VnhaCGH9vl0ti4ZJe+Bx+fO4FR56XyCTyTwkoitCiJfDFKk621L51dk6LxKJ6c79GyP/A7T+4JsF5qmXAAAAAElFTkSuQmCC
 // @match           *://*/*
+// @grant           GM_addElement
 // @grant           GM_addStyle
 // @grant           GM_addValueChangeListener
 // @grant           GM_getValue
@@ -19,52 +20,42 @@
 // @run-at          document-start
 // ==/UserScript==
 
-(e=>{const o=Symbol("added"),t=document.createElement("style");t.textContent=e,window.gmStyle=t,document.addEventListener("addStyle",({detail:{sroot:n}})=>{n[o]||n instanceof Document||(n.prepend(t.cloneNode(!0)),n[o]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(e)})(' @charset "UTF-8";[gm_webfullscreen],body[gm_webfullscreen] [gm_webfullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[gm_webfullscreen] video,body[gm_webfullscreen] [gm_webfullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;transform:none!important;object-fit:contain!important;height:clamp(100vh - 100%,100vh,100%)!important}[gm_webfullscreen]~*:not(.monkey-web-fullscreen){display:none!important}.__edgeClick{left:0!important;top:6%!important;opacity:0!important;width:25px!important;height:70%!important;position:absolute!important;z-index:2147483647!important;cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC),pointer!important}.__edgeClick.right{right:0!important;left:auto!important}._hide{display:none!important} ');
+(e=>{const o=Symbol("added"),t=document.createElement("style");t.textContent=e,window.gmStyle=t,document.addEventListener("addStyle",({detail:{sroot:n}})=>{n[o]||n instanceof Document||(n.prepend(t.cloneNode(!0)),n[o]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(e)})(' @charset "UTF-8";[gm_webfullscreen],body[gm_webfullscreen] [gm_webfullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[gm_webfullscreen] video,body[gm_webfullscreen] [gm_webfullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;transform:none!important;object-fit:contain!important;height:clamp(100vh - 100%,100vh,100%)!important}[gm_webfullscreen]~*:not(.monkey-web-fullscreen){display:none!important}.__edgeClick{left:0!important;top:6%!important;opacity:0!important;width:25px!important;height:70%!important;position:absolute!important;z-index:2147483647!important;cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC),pointer!important}.__edgeClick.right{right:0!important;left:auto!important} ');
 
 (function () {
   'use strict';
 
   const isElement = (node) => node instanceof Element;
-  const isDocument = (node) => node instanceof Document;
   const getSRoot = (node) => node?._shadowRoot ?? node?.shadowRoot ?? null;
-  function* getShadowRoots(node, deep = false) {
-    if (!node || !isElement(node) && !isDocument(node)) return;
-    if (isElement(node) && getSRoot(node)) yield getSRoot(node);
-    const doc = isDocument(node) ? node : node.getRootNode({ composed: true });
-    if (!doc.createTreeWalker) return;
-    let currentNode;
-    const toWalk = [node];
-    while (currentNode = toWalk.pop()) {
-      const walker = doc.createTreeWalker(currentNode, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_DOCUMENT_FRAGMENT, {
-        acceptNode: (child) => isElement(child) && getSRoot(child) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
-      });
-      let walkerNode = walker.nextNode();
-      while (walkerNode) {
-        const shadowRoot = getSRoot(walkerNode);
-        if (isElement(walkerNode) && shadowRoot) {
-          if (deep) toWalk.push(shadowRoot);
-          yield shadowRoot;
-        }
-        walkerNode = walker.nextNode();
+  function* getShadowRoots(root) {
+    if (!root || ![Element, Document, ShadowRoot].some((type) => root instanceof type)) return;
+    const acceptNode = (node) => isElement(node) && getSRoot(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, { acceptNode }, false);
+    let walkerNode;
+    while (walkerNode = walker.nextNode()) {
+      if (walkerNode === root) continue;
+      const sRoot = getSRoot(walkerNode);
+      if (sRoot) {
+        yield sRoot;
+        yield* getShadowRoots(sRoot);
       }
     }
-    return;
   }
   function querySelector(selector, ctx = document) {
+    if (!ctx?.querySelector) return null;
     const direct = ctx.querySelector(selector);
     if (direct) return direct;
-    const shadowRoots = [...getShadowRoots(ctx, true)];
-    for (const root of shadowRoots) {
-      const match = root.querySelector(selector);
+    for (const root of getShadowRoots(ctx)) {
+      const match = root?.querySelector(selector);
       if (match) return match;
     }
     return null;
   }
   function querySelectorAll(selector, ctx = document) {
+    if (!ctx?.querySelectorAll) return [];
     const results = [...ctx.querySelectorAll(selector)];
-    const shadowRoots = [...getShadowRoots(ctx, true)];
-    for (const root of shadowRoots) {
-      results.push(...root.querySelectorAll(selector));
+    for (const root of getShadowRoots(ctx)) {
+      if (root?.querySelectorAll) results.push(...root.querySelectorAll(selector));
     }
     return results;
   }
@@ -94,9 +85,6 @@
     createElement: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
     delCls: (el, ...cls) => el?.classList.remove(...cls),
     addCls: (el, ...cls) => el?.classList.add(...cls),
-    sendToIFrames(data) {
-      this.getIFrames().forEach((el) => this.isVisible(el) && this.postMessage(el?.contentWindow, data));
-    },
     freqTimes: /* @__PURE__ */ new Map(),
     isThrottle(key = "throttle", gap = 300) {
       const now = Date.now();
@@ -132,12 +120,6 @@
         current && parents.unshift(current);
       }
       return parents;
-    },
-    cloneAttrs(source, target, ...attrs) {
-      attrs.flat().forEach((attr) => {
-        const value = source.getAttribute(attr);
-        if (value) target.setAttribute(attr, value);
-      });
     },
     setStyle(els, prop, val, priority) {
       if (!els || !prop) return;
@@ -179,9 +161,11 @@
   }
   VideoEnhancer.hackAttachShadow();
   const Listen = {
-    isMutedLoop: (video) => video?.muted && video?.loop,
     isNoVideo: () => !window.vMeta && !window.topWin,
+    isMutedLoop: (video) => video?.muted && video?.loop,
+    isExecuted: (key, ctx = window.e9x ??= {}) => ctx[key] || !!(ctx[key] = true, false),
     init(isNonFirst = false) {
+      this.host = location.host;
       this.setupVideoListeners();
       this.setupKeydownListener();
       this.setupMouseMoveListener();
@@ -201,9 +185,16 @@
     },
     setupFullscreenListener() {
       document.addEventListener("fullscreenchange", () => {
-        const isFullscreen = !!document.fullscreenElement;
-        !isFullscreen && this.fsWrapper && this.dispatchShortcut(Consts.P);
-        Tools.postMessage(window.top, { isFullscreen });
+        Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
+      });
+      if (this.isExecuted("isDefined")) return;
+      Object.defineProperty(this, "isFullscreen", {
+        get: () => this._isFullscreen,
+        set: (value) => {
+          this._isFullscreen = value;
+          if (!(value && this.fsWrapper)) this.toggleWebFullscreen();
+          Tools.microTask(() => this.customFullChangeHandle());
+        }
       });
     },
     setupMouseMoveListener() {
@@ -274,7 +265,7 @@
     processEvent(data) {
       if (this.vMeta?.iFrame && this.player) delete this.player;
       ({ P: this.toggleWebFullscreen, ENTER: this.toggleFullscreen })[data?.key]?.(data?.isTrusted);
-      if (!this.player) Tools.sendToIFrames(data);
+      if (!this.player) this.sendToVideoIFrame(data);
     }
   };
   const Events = {
@@ -284,7 +275,9 @@
       const ctrl = new AbortController();
       video && this.videoAborts.get(video)?.abort();
       const handle = ({ type, target }) => this[type](target);
-      this.videoEvts.forEach((t) => (video ?? document).addEventListener(t, handle, { capture: true, signal: ctrl.signal }));
+      this.videoEvts.forEach(
+        (t) => (video ?? document).addEventListener(t, handle, { capture: true, passive: true, signal: ctrl.signal })
+      );
       if (video) this.videoAborts.set(video, ctrl), this.unbindVideoEvts();
     },
     setupShadowVideoListener() {
@@ -307,7 +300,7 @@
     },
     timeupdate(video) {
       if (isNaN(video.duration)) return;
-      this.autoWebFullscreen(video);
+      Tools.microTask(() => this.autoWebFullscreen(video));
     },
     playing(video) {
       this.setCurrentVideo(video);
@@ -324,11 +317,11 @@
     },
     setPlayer(video) {
       this.player = video;
-      const vMeta = { isLive: video.duration === Infinity, timestamp: Date.now() };
+      const vMeta = this.vMeta ?? { vw: innerWidth, vh: innerHeight };
       this.syncMetaToParentWin(vMeta);
     },
     syncMetaToParentWin(vMeta) {
-      window.vMeta = this.vMeta = vMeta;
+      window.vMeta = this.vMeta = { ...vMeta, timestamp: Date.now() };
       if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { vMeta: { ...vMeta, iFrame: location.href } });
       Tools.microTask(() => this.initMenuCmds());
       this.sendTopWinInfo();
@@ -336,9 +329,13 @@
     sendTopWinInfo() {
       const { host, href: url } = location;
       const { innerWidth: vw, innerHeight: vh } = window;
-      const topWin = { url, host, vw, vh };
+      const topWin = { vw, vh, url, host };
       window.topWin = this.topWin = topWin;
-      Tools.sendToIFrames({ topWin });
+      this.sendToVideoIFrame({ topWin });
+    },
+    sendToVideoIFrame(data) {
+      const vFrame = this.getVideoIFrame();
+      Tools.postMessage(vFrame?.contentWindow, data);
     }
   };
   class BasicStorage {
@@ -362,51 +359,37 @@
     IS_AUTO: new BasicStorage("IS_AUTO_", false, Boolean),
     DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, Number),
     CUSTOM_CTN: new BasicStorage("CUSTOM_CTN_", ""),
-    ICONS_ELE: new BasicStorage("ICONS_ELE_", ""),
     IGNORE_URLS: new BasicStorage("IGNORE_URLS_", ""),
-    HIDE_ELEMENTS: new BasicStorage("HIDE_ELEMENTS_", "")
+    FS_CHANGE_CODE: new BasicStorage("FS_CHANGE_CODE_", "")
   };
   const WebFull = {
-    triggerIconElement(index) {
-      const content = Storage.ICONS_ELE.get(this.topWin.host);
-      const selector = (content.match(/[^;\n]+/g) || [])?.[index];
-      const element = this.player?.closest(selector) ?? Tools.query(selector);
-      if (element) element.click ? element.click() : element.dispatchEvent(new MouseEvent("click"));
-      return selector;
-    },
     toggleFullscreen() {
       if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
-      if (this.triggerIconElement(Consts.ICONS.full)) return;
-      this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
-      if (this.isFullscreen || !this.fsWrapper) this.dispatchShortcut(Consts.P);
+      document.exitFullscreen().catch(() => this.getVideoHostContainer()?.requestFullscreen());
     },
     toggleWebFullscreen(isTrusted) {
       if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
-      if (this.triggerIconElement(Consts.ICONS.webFull)) return;
       if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen();
       this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
-      requestAnimationFrame(() => this.hideRelatedOnFullscreen());
+      Tools.microTask(() => this.customFullChangeHandle());
     },
     enterWebFullscreen() {
       const container = this.fsWrapper = this.getVideoHostContainer();
       if (!container || container.matches(":is(html, body)")) return this.adaptToWebFullscreen();
       container.scrollY = window.scrollY;
       const parents = Tools.getParents(container);
-      container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(location.host) ? parents.forEach((el) => {
-        Tools.emitEvent("addStyle", { sroot: el.getRootNode() });
-        Tools.attr(el, Consts.webFull, true);
-      }) : this.detachForFullscreen();
+      const unDetach = container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(this.host);
+      unDetach ? parents.forEach((el) => this.setWebFullAttr(el)) : this.detachForFullscreen();
       this.adaptToWebFullscreen();
     },
     detachForFullscreen() {
       if (this.fsParent) return;
       this.fsParent = Tools.getParent(this.fsWrapper);
-      this.fsPlaceholder = document.createElement("div");
-      Tools.cloneAttrs(this.fsWrapper, this.fsPlaceholder, ["id", "class", "style"]);
+      this.fsPlaceholder = this.fsWrapper.cloneNode();
       this.fsParent.replaceChild(this.fsPlaceholder, this.fsWrapper);
       document.body.insertAdjacentElement("beforeend", this.fsWrapper);
       this.fsWrapper.querySelector("video")?.play();
-      Tools.attr(this.fsWrapper, Consts.webFull, true);
+      this.setWebFullAttr(this.fsWrapper);
     },
     exitWebFullscreen() {
       if (!this.fsWrapper) return;
@@ -415,18 +398,24 @@
       if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
       Tools.querys(`[${Consts.webFull}]`).forEach((el) => Tools.attr(el, Consts.webFull));
       requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(this.docElement, "scroll-behavior")));
-      this.videoParents.clear();
       this.fsPlaceholder = this.fsWrapper = this.fsParent = null;
+      this.videoParents.clear();
     },
     getVideoHostContainer() {
-      if (this.player) return this.getVideoContainer();
-      return this.getVideoIFrame() ?? Tools.getIFrames().find(Tools.isVisible);
+      return this.player ? this.getVideoContainer() : this.getVideoIFrame();
     },
     getVideoIFrame() {
-      if (!this.vMeta?.iFrame) return null;
-      const { pathname, search } = new URL(this.vMeta.iFrame);
-      const partial = ((s) => s.slice(0, s.length * 0.8))(decodeURIComponent(search));
-      return Tools.query(`iframe[src*="${pathname + partial}"]`);
+      if (!this.vMeta?.iFrame) return Tools.getIFrames().find(Tools.isVisible);
+      if (this.fsWrapper) return this.fsWrapper;
+      const { vw, vh, iFrame } = this.vMeta;
+      const { pathname, search } = new URL(iFrame);
+      const partial = ((s) => s.slice(0, Math.floor(s.length * 0.8)))(decodeURIComponent(search));
+      const vFrame = Tools.query(`iframe[src*="${pathname + partial}"]`);
+      if (vFrame) return vFrame;
+      const tol = 5;
+      const iFrames = Tools.getIFrames();
+      const matchSize = ({ offsetWidth: w, offsetHeight: h }) => Math.abs(w - vw) < tol && Math.abs(h - vh) < tol;
+      return iFrames.find(matchSize) ?? iFrames.find(Tools.isVisible);
     },
     getVideoContainer() {
       const selector = Storage.CUSTOM_CTN.get(this.topWin?.host)?.trim();
@@ -470,12 +459,54 @@
         if (!this.fsWrapper.contains(el)) return;
         const { offsetWidth: width, offsetHeight: height } = this.player;
         if (width === vw && height === vh && el.offsetHeight === vh) return;
-        Tools.attr(el, Consts.webFull, true);
+        this.setWebFullAttr(el);
       });
     },
-    hideRelatedOnFullscreen(cls = "_hide") {
-      const selector = Storage.HIDE_ELEMENTS.get(this.topWin?.host);
-      selector && Tools.querys(selector).forEach((el) => this.fsWrapper ? Tools.addCls(el, cls) : Tools.delCls(el, cls));
+    setWebFullAttr(el) {
+      const sroot = el.getRootNode();
+      Tools.attr(el, Consts.webFull, true);
+      if (this.isExecuted("__Added__", sroot)) return;
+      if (sroot instanceof ShadowRoot) Tools.emitEvent("addStyle", { sroot });
+    },
+    customFullChangeHandle() {
+      if (Tools.isThrottle("fsChange", Consts.HALF_SEC)) return;
+      Tools.sleep(10).then(() => {
+        const tol = 5;
+        const { width, height } = window.screen;
+        const { topWin, player, fsWrapper } = this;
+        const { offsetWidth: ew, offsetHeight: eh } = fsWrapper ?? {};
+        const isWFs = Math.abs(ew - topWin.vw) < tol && Math.abs(eh - topWin.vh) < tol;
+        const isFs = Math.abs(ew - width) < tol && Math.abs(eh - height) < tol;
+        const type = isFs ? "isFull" : isWFs ? "isWFull" : "default";
+        const jsCode = Storage.FS_CHANGE_CODE.get(topWin.host);
+        this.executeCodeSnippet(jsCode, type, player);
+      });
+    },
+    executeCodeSnippet(jsCode, type, video) {
+      try {
+        if (!jsCode) return;
+        const code = `(async () => { ${jsCode} })()`;
+        const args = ["type", "App", "video", "Tools", "unsafeWindow"];
+        const handler = this.codeSnippetCache ??= new Function(...args, code);
+        handler(type, App, video, Tools, unsafeWindow);
+      } catch (e) {
+        const unsafe = e.message.includes("unsafe-eval");
+        unsafe ? this.injectCodeSnippet(jsCode, type, video) : console.error("代码执行出错：", e);
+      }
+    },
+    injectCodeSnippet(jsCode, type, video) {
+      const evt = `gm_code_inject_${type}`;
+      const injectCode = `
+        (() => {
+          document.addEventListener('${evt}', (e) => {
+            const { type, App, video, Tools, unsafeWindow } = e.detail;
+            (async () => { try { ${jsCode} } catch (err) { console.error('代码执行出错：', err); } })();
+          }, { once: true });
+        })();
+        `;
+      Tools.query(`#${evt}`)?.remove();
+      GM_addElement("script", { id: evt, textContent: injectCode, type: "text/javascript" });
+      Tools.emitEvent(evt, { type, App, video, Tools, unsafeWindow });
     }
   };
   const Automatic = {
@@ -516,19 +547,17 @@
         enable: "启用自动网页全屏",
         disable: "禁用自动网页全屏",
         ignore: "自动时忽略的网址",
-        element: "定义全屏点击元素",
-        hidden: "全屏时隐藏元素",
         custom: "自定义视频容器",
-        detach: "脱离式全屏阈值"
+        fsChange: "扩展代码逻辑",
+        detach: "脱离阈值"
       },
       en: {
         enable: "Enable auto web fullscreen",
         disable: "Disable auto web fullscreen",
-        hidden: "Elements hidden in fullscreen",
         detach: "Detached fullscreen threshold",
-        element: "fullscreen click elements",
-        ignore: "URLs ignored in auto mode",
-        custom: "Custom video container"
+        fsChange: "Fullscreen change extend handler",
+        custom: "Custom video fullscreen container",
+        ignore: "URLs ignored in auto mode"
       }
     };
     static #getLang = () => (navigator.language || navigator.userLanguage).includes("zh") ? "zh" : "en";
@@ -538,29 +567,33 @@
     isAuto: () => Storage.IS_AUTO.get(window.topWin?.host ?? location.host),
     initMenuCmds() {
       if (this.hasMenu || !Tools.isTopWin()) return;
-      GM_addValueChangeListener(Storage.IS_AUTO.name + location.host, () => this.setupMenuCmds());
+      GM_addValueChangeListener(Storage.IS_AUTO.name + this.host, () => this.setupMenuCmds());
       this.setupMenuCmds();
       this.hasMenu = true;
     },
     setupMenuCmds() {
-      const host = location.host;
       const isAuto = I18n.t(this.isAuto() ? "disable" : "enable");
+      const fsChange = ({ title, cache, value }) => {
+        const input = prompt(title, value);
+        if (input === null) return;
+        cache.set(input, this.host);
+        this.codeSnippetCache = null;
+      };
       const configs = [
-        { title: isAuto, cache: Storage.IS_AUTO, fn: (cache, val) => cache.set(!val, host) },
+        { title: isAuto, cache: Storage.IS_AUTO, fn: ({ cache, value }) => cache.set(!value, this.host) },
         { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS },
-        { title: I18n.t("element"), cache: Storage.ICONS_ELE },
         { title: I18n.t("custom"), cache: Storage.CUSTOM_CTN },
-        { title: I18n.t("hidden"), cache: Storage.HIDE_ELEMENTS },
+        { title: I18n.t("fsChange"), cache: Storage.FS_CHANGE_CODE, fn: fsChange },
         { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD }
       ];
       configs.forEach(({ title, cache, fn }) => {
         const id = `${cache.name}_MENU_ID`;
         GM_unregisterMenuCommand(this[id]);
         this[id] = GM_registerMenuCommand(title, () => {
-          const value = cache.get(host);
-          if (fn) return fn.call(this, cache, value);
+          const value = cache.get(this.host);
+          if (fn) return fn.call(this, { title, cache, value });
           const input = prompt(title, value);
-          if (input !== null) cache.set(input, host);
+          if (input !== null) cache.set(input, this.host);
         });
       });
     }
