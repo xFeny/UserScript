@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import monkey, { util, cdn } from "vite-plugin-monkey";
+import monkey, { cdn } from "vite-plugin-monkey";
 import cleanup from "rollup-plugin-cleanup";
 
 // 使用自带图标进行网页全屏的，使用@match
@@ -61,8 +61,8 @@ export default defineConfig({
       },
       build: {
         externalGlobals: {
-          notyf: cdn.unpkg("notyf", "notyf.min.js").concat(util.dataUrl(";window.notyf={Notyf};")),
-          sweetalert2: cdn.unpkg("sweetalert2", "dist/sweetalert2.min.js").concat(util.dataUrl(";window.sweetalert2=Swal;")),
+          notyf: cdn.unpkg("Notyf", "notyf.min.js"),
+          sweetalert2: cdn.unpkg("Swal", "dist/sweetalert2.min.js"),
         },
         externalResource: {
           "sweetalert2/dist/sweetalert2.min.css": cdn.unpkg("sweetalert2"),

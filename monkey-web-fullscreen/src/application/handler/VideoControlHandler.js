@@ -198,7 +198,7 @@ export default {
 
     this.player.setAttribute("crossorigin", "anonymous");
     const { videoWidth: width, videoHeight: height } = this.player;
-    const canvas = Tools.createElement("canvas", { width, height });
+    const canvas = Tools.newEle("canvas", { width, height });
     const ctx = canvas.getContext("2d");
 
     try {
@@ -225,14 +225,14 @@ export default {
   customToast(start, text, end, dealy, isRemove) {
     // 最终呈现：<span>正在以<span class="cText">1.15x</span>倍速播放</span>
     const span = document.createElement("span");
-    const child = Tools.createElement("span", { textContent: text, className: "cText" });
+    const child = Tools.newEle("span", { textContent: text, className: "cText" });
     span.append(document.createTextNode(start), child, document.createTextNode(end));
     return this.showToast(span, dealy, isRemove);
   },
   showToast(content, dealy = Consts.THREE_SEC, isRemove = true) {
     return new Promise((resolve) => {
       if (isRemove) Tools.query(".monkey-toast")?.remove();
-      const el = Tools.createElement("div", { className: "monkey-toast" });
+      const el = Tools.newEle("div", { className: "monkey-toast" });
       content instanceof Element ? el.appendChild(content) : (el.textContent = content);
 
       (this.findVideoContainer(null, 2, false).appendChild(el), resolve(el));

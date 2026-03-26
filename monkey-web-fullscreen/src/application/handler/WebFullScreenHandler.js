@@ -2,7 +2,6 @@ import Site from "../common/Site";
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
-import Keyboard from "../common/Keyboard";
 
 /**
  * 网页全屏逻辑处理
@@ -33,8 +32,7 @@ export default {
   toggleFullscreen() {
     if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
     if (this.isGMatch()) return this.toggleFullByIcon(Site.icons.full);
-
-    this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
+    document.exitFullscreen().catch(() => this.getVideoHostContainer()?.requestFullscreen());
   },
   toggleWebFullscreen(isTrusted) {
     if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;

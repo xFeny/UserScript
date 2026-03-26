@@ -13,7 +13,7 @@ export default defineConfig({
       userscript: {
         connect: "*",
         author: "Feny",
-        version: "1.1.1",
+        version: "1.1.2",
         match: ["*://*/*"],
         name: "JSON Viewer",
         license: "GPL-3.0-only",
@@ -22,23 +22,19 @@ export default defineConfig({
         namespace: "http://tampermonkey.net/",
         description:
           "格式化显示 JSON 使数据看起来更加漂亮。支持 JSON 主题色切换。支持 JSON 脑图，清晰明了的查看 JSON 层级。支持通过 JSON Crack 查看 JSON。支持手动输入 JSON，HTTP 请求获取 JSON",
+        require: ["https://unpkg.com/@popperjs/core@2.11.8/dist/umd/popper.min.js"],
       },
       entry: "src/main.js",
       build: {
         systemjs: "inline",
         externalGlobals: {
-          jsmind: cdn.unpkg("jsmind", "es6/jsmind.js").concat(util.dataUrl(";window.jsmind=jsMind;")),
-          "dom-to-image": ["domtoimage", () => `https://unpkg.com/dom-to-image@2.6.0/src/dom-to-image.js`].concat(
-            util.dataUrl(";window.domtoimage=domtoimage;")
-          ),
+          jsmind: cdn.unpkg("jsMind", "es6/jsmind.js"),
+          "dom-to-image": cdn.unpkg("domtoimage", "src/dom-to-image.js"),
+          "tippy.js": cdn.unpkg("tippy", "dist/tippy-bundle.umd.min.js"),
           beautifier: cdn
-            .unpkg("beautifier")
-            .concat(
-              util.dataUrl(";window.beautifier=js_beautify;window.js_beautify=js_beautify;window.css_beautify=css_beautify;")
-            ),
-          "highlight.js": ["hljs", () => `https://unpkg.com/@highlightjs/cdn-assets@11.10.0/highlight.min.js`].concat(
-            util.dataUrl(";window.hljs=hljs;")
-          ),
+            .unpkg("js_beautify")
+            .concat(util.dataUrl(";window.js_beautify=js_beautify;window.css_beautify=css_beautify;")),
+          "highlight.js": ["hljs", () => `https://unpkg.com/@highlightjs/cdn-assets@11.10.0/highlight.min.js`],
         },
         cssSideEffects: () => (css) => window.addEventListener("message", ({ data }) => data?.addStyle && GM_addStyle(css)),
       },

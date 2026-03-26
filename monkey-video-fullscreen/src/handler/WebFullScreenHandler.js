@@ -10,7 +10,7 @@ import Storage from "../common/Storage";
 export default {
   toggleFullscreen() {
     if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
-    this.isFullscreen ? document.exitFullscreen() : this.getVideoHostContainer()?.requestFullscreen();
+    document.exitFullscreen().catch(() => this.getVideoHostContainer()?.requestFullscreen());
   },
   toggleWebFullscreen(isTrusted) {
     if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;

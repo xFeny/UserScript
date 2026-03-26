@@ -13,6 +13,7 @@ export default {
     video && this.videoAborts.get(video)?.abort(); // 防止重复绑定
 
     const handle = ({ type, target }) => {
+      if (this.isMutedLoop(target)) return;
       if (!target?.matches(`video, ${Consts.FAKE_VIDEO}`)) return;
       (this[type]?.(target), this.customVideoEvtHandle(type, target));
     };
@@ -75,9 +76,8 @@ export default {
     this.autoExitWebFullscreen();
     this.clearCachedTime(video);
   },
-  ratechange: () => App.playbackRateDisplay(),
+  ratechange: (video) => App.playbackRateDisplay(),
   customVideoEvtHandle(type, video) {
-    if (this.isMutedLoop(video)) return;
     if (type === "timeupdate" && Tools.isThrottle("codeSnippet", Consts.ONE_SEC)) return;
     Tools.sleep(10).then(() => this.executeCodeSnippet(Storage.VIDEO_EVT_CODE.get(this.host), type, video));
   },

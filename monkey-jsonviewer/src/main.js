@@ -8,7 +8,7 @@ const { EXAMPLE_JSON, LAYUI_JS } = URL;
 (function () {
   "use strict";
 
-  GM_registerMenuCommand("JSON示例", () => GM_openInTab(EXAMPLE_JSON));
+  if (window.top === window.self) GM_registerMenuCommand("JSON示例", () => GM_openInTab(EXAMPLE_JSON));
 
   const innerText = document.body.innerText;
   const { rawText, jsonpFun } = Utils.matchJsonp(innerText);

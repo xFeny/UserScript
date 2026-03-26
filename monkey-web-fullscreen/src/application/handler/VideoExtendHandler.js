@@ -64,7 +64,7 @@ export default {
 
     // 创建播放进度元素
     const el = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
-    el.append(document.createTextNode("00:00"), Tools.createElement("b", { textContent: "%" }));
+    el.append(document.createTextNode("00:00"), Tools.newEle("b", { textContent: "%" }));
     this.progNode = el;
 
     return el;
@@ -84,7 +84,7 @@ export default {
   // ====================⇑⇑⇑ 常显倍速相关逻辑 ⇑⇑⇑====================
 
   createDisplayElement(cls, color) {
-    const el = Tools.createElement("div", { className: cls, style: `color: ${color}` });
+    const el = Tools.newEle("div", { className: cls, style: `color: ${color}` });
     this.prependElement(el);
     return el;
   },
