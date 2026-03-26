@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>控制面板效果</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6.3.7/dist/tippy.css" />
+    <style>
+      .vc-panel-wrapper {
+        top: 28%;
+        border: none;
+        position: fixed;
+        left: calc(100vw - 50px);
+        user-select: none !important;
+        z-index: 2147483647 !important;
+        background-color: transparent !important;
+      }
+      .vc-panel-wrapper * {
+        color: #e0e0e0;
+        font-size: 12px;
+        user-select: none !important;
+        transition:
+          border 0.3s,
+          background-color 0.3s !important;
+      }
+      .vc-trigger {
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        line-height: 32px;
+        border-radius: 50%;
+        position: relative;
+        text-align: center;
+        background: #333;
+        box-shadow: 0 2px 8px #0000004d;
+      }
+      .vc-trigger:hover {
+        background: #444;
+      }
+      .vc-control-panel {
+        width: 260px;
+        overflow: hidden;
+        border-radius: 4px;
+        background: #444;
+        box-shadow: 0 2px 8px #0000004d;
+      }
+      .vc-panel-header {
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        background: #333;
+        justify-content: space-between;
+      }
+      .vc-theme-btn {
+        cursor: pointer;
+      }
+      .vc-func-group,
+      .vc-slider-control {
+        gap: 8px;
+        padding: 8px;
+        border-top: 1px solid #555555;
+      }
+      .vc-func-group {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .vc-func-group:nth-of-type(4) .vc-control-item:nth-of-type(2) b,
+      .vc-func-group:nth-of-type(4) .vc-control-item:nth-of-type(5) b {
+        display: inline-block;
+        transform: rotate(90deg);
+      }
+      .vc-control-item {
+        padding: 5px 0;
+        cursor: pointer;
+        text-align: center;
+        border-radius: 4px;
+        background: #555;
+      }
+      .vc-control-item:hover {
+        background: #666;
+      }
+      .vc-control-item b {
+        margin-right: 5px;
+      }
+      .vc-slider-control {
+        display: flex;
+        flex-direction: column;
+      }
+      .vc-slider-control button {
+        border: none;
+        cursor: pointer;
+        padding: 2px 8px;
+        font-weight: 700;
+        border-radius: 4px;
+        background: #555;
+      }
+      .vc-slider-control button:hover {
+        background: #666;
+      }
+      .vc-slider-label {
+        text-align: left;
+        transform-origin: left center;
+      }
+      .vc-slider-row {
+        gap: 8px;
+        display: flex;
+        align-items: center;
+      }
+      .vc-slider {
+        flex: 1;
+        height: 4px;
+        border: none;
+        outline: none;
+        border-radius: 3px;
+        background: #d3d3d3;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      .vc-slider::-webkit-slider-thumb {
+        width: 12px;
+        height: 12px;
+        cursor: pointer;
+        border-radius: 50%;
+        background: #9a72ff;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      .vc-slider::-webkit-slider-thumb:hover {
+        background: #a37ffe;
+      }
+      .light-mode * {
+        color: #333;
+        border-color: #e0e0e0;
+      }
+      .light-mode .vc-trigger,
+      .light-mode .vc-control-panel {
+        background-color: #fff;
+      }
+      .light-mode .vc-trigger:hover {
+        background-color: #e3e5e7;
+      }
+      .light-mode .vc-panel-header {
+        background-color: #f5f5f5;
+      }
+      .light-mode .vc-control-item,
+      .light-mode .vc-slider-control button {
+        background-color: #f0f0f0;
+      }
+      .light-mode .vc-control-item:hover,
+      .light-mode .vc-slider-control button:hover {
+        background-color: #e0e0e0;
+      }
+      .tippy-box[data-theme~="vc-panel-wrapper"] {
+        background-color: transparent !important;
+      }
+      .tippy-box[data-theme~="vc-panel-wrapper"] .tippy-content {
+        padding: 0 !important;
+      }
+      @media (min-width: 2560px) {
+        .vc-panel-wrapper * {
+          font-size: 16px;
+        }
+        .vc-control-panel {
+          width: 320px;
+        }
+        .vc-trigger {
+          width: 45px;
+          height: 45px;
+          line-height: 45px;
+        }
+      }
+      @media (min-width: 3840px) {
+        .vc-panel-wrapper * {
+          font-size: 24px;
+        }
+        .vc-control-panel {
+          width: 430px;
+        }
+        .vc-trigger {
+          width: 64px;
+          height: 64px;
+          line-height: 64px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="vc-panel-wrapper">
+      <div class="vc-trigger">⚙️</div>
+    </div>
+
+    <!-- 控制面板 -->
+    <div class="vc-control-panel">
+      <div class="vc-panel-header"><b>🎬 播放控制</b><b class="vc-theme-btn">☀️</b></div>
+      <div class="vc-func-group">
+        <div class="vc-control-item"><b>▣</b>画中画</div>
+        <div class="vc-control-item"><b>⤢</b>网页全屏</div>
+        <div class="vc-control-item"><b>⛶</b>全屏</div>
+      </div>
+      <div class="vc-func-group">
+        <div class="vc-control-item"><b>⎙</b>截图</div>
+        <div class="vc-control-item"><b>⟳</b>旋转</div>
+        <div class="vc-control-item"><b>][</b>镜像</div>
+        <div class="vc-control-item"><b>‹‹</b>上一帧</div>
+        <div class="vc-control-item"><b>▷</b>播放</div>
+        <div class="vc-control-item"><b>››</b>下一帧</div>
+      </div>
+      <div class="vc-func-group">
+        <div class="vc-control-item"><b>+</b>放大</div>
+        <div class="vc-control-item"><b>‹‹</b>上移</div>
+        <div class="vc-control-item"><b>‹‹</b>左移</div>
+        <div class="vc-control-item"><b>-</b>缩小</div>
+        <div class="vc-control-item"><b>››</b>下移</div>
+        <div class="vc-control-item"><b>››</b>右移</div>
+      </div>
+      <div class="vc-slider-control">
+        <label class="vc-slider-label">倍速: 1.45x</label>
+        <div class="vc-slider-row">
+          <button>-</button>
+          <input min="0.1" max="16" step="0.15" type="range" class="vc-slider" />
+          <button>+</button>
+          <button>↺</button>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="https://unpkg.com/draggable@4.2.0/dist/draggable.min.js"></script>
+  <script src="https://unpkg.com/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://unpkg.com/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js"></script>
+  <script>
+    window.addEventListener("load", () => {
+      document.querySelector(".vc-theme-btn").addEventListener("click", (e) => {
+        const classList = e.target.closest(".vc-panel-wrapper").classList;
+        classList.toggle("light-mode", !classList.contains("light-mode"));
+      });
+
+      const el = document.querySelector(".vc-trigger");
+
+      tippy(el, {
+        arrow: false,
+        duration: 500,
+        allowHTML: true,
+        interactive: true,
+        placement: "left",
+        appendTo: "parent",
+        theme: "vc-panel-wrapper",
+        content: document.querySelector(".vc-control-panel"),
+        offset: innerWidth >= 3840 ? [0, 100] : [0, 10],
+      });
+
+      new Draggable(el, { setPosition: false });
+    });
+  </script>
+</html>

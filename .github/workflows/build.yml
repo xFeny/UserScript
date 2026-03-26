@@ -32,6 +32,11 @@ jobs:
           cd monkey-web-fullscreen
           pnpm install
           pnpm build
+      - name: Build monkey-web-fullscreen-gui
+        run: |
+          cd monkey-web-fullscreen-gui
+          pnpm install
+          pnpm build
       - name: Build monkey-video-fullscreen
         run: |
           cd monkey-video-fullscreen

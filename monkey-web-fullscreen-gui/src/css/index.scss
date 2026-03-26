@@ -1,0 +1,226 @@
+.vc-panel-wrapper {
+  top: 28%;
+  border: none;
+  position: fixed;
+  left: calc(100vw - 50px);
+  user-select: none !important;
+  z-index: 2147483647 !important;
+  background-color: transparent !important;
+
+  * {
+    color: #e0e0e0;
+    font-size: 12px;
+    user-select: none !important;
+    transition:
+      border 0.3s,
+      background-color 0.3s !important;
+  }
+}
+
+/* 右侧居中设置按钮 */
+.vc-trigger {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  line-height: 32px;
+  border-radius: 50%;
+  position: relative;
+  text-align: center;
+  background: #333333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  &:hover {
+    background: #444444;
+  }
+}
+
+.vc-control-panel {
+  width: 260px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #444444;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* 顶部标题栏 */
+.vc-panel-header {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  background: #333333;
+  justify-content: space-between;
+}
+
+/* 主题切换按钮 */
+.vc-theme-btn {
+  cursor: pointer;
+}
+
+/* 功能区布局样式 */
+.vc-func-group,
+.vc-slider-control {
+  gap: 8px;
+  padding: 8px;
+  border-top: 1px solid #555555;
+}
+
+.vc-func-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  /*  上/下移 旋转90度 */
+  &:nth-of-type(4) {
+    .vc-control-item {
+      &:nth-of-type(2),
+      &:nth-of-type(5) {
+        b {
+          display: inline-block;
+          transform: rotate(90deg);
+        }
+      }
+    }
+  }
+}
+
+.vc-control-item {
+  padding: 5px 0;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 4px;
+  background: #555555;
+
+  &:hover {
+    background: #666666;
+  }
+
+  b {
+    margin-right: 5px;
+  }
+}
+
+/* 倍速滑块功能区 */
+.vc-slider-control {
+  display: flex;
+  flex-direction: column;
+
+  button {
+    border: none;
+    cursor: pointer;
+    padding: 2px 8px;
+    font-weight: bold;
+    border-radius: 4px;
+    background: #555555;
+
+    &:hover {
+      background: #666666;
+    }
+  }
+}
+
+.vc-slider-label {
+  text-align: left;
+  transform-origin: left center;
+}
+
+.vc-slider-row {
+  gap: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.vc-slider {
+  flex: 1;
+  height: 4px;
+  border: none;
+  outline: none;
+  border-radius: 3px;
+  background: #d3d3d3;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.vc-slider::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
+  border-radius: 50%;
+  background: #9a72ff;
+  -webkit-appearance: none;
+  appearance: none;
+
+  &:hover {
+    background: #a37ffe;
+  }
+}
+
+/* 浅色模式样式 */
+.light-mode {
+  * {
+    color: #333;
+    border-color: #e0e0e0;
+  }
+
+  .vc-trigger,
+  .vc-control-panel {
+    background-color: #ffffff;
+  }
+
+  .vc-trigger:hover {
+    background-color: #e3e5e7;
+  }
+
+  .vc-panel-header {
+    background-color: #f5f5f5;
+  }
+
+  .vc-control-item,
+  .vc-slider-control button {
+    background-color: #f0f0f0;
+
+    &:hover {
+      background-color: #e0e0e0;
+    }
+  }
+}
+
+.tippy-box[data-theme~="vc-panel-wrapper"] {
+  background-color: transparent !important;
+
+  .tippy-content {
+    padding: 0 !important;
+  }
+}
+
+/* ========== 2K/4K 屏幕（≥2560px） ========== */
+@media (min-width: 2560px) {
+  .vc-panel-wrapper * {
+    font-size: 16px;
+  }
+
+  .vc-control-panel {
+    width: 320px;
+  }
+
+  .vc-trigger {
+    width: 45px;
+    height: 45px;
+    line-height: 45px;
+  }
+}
+
+/* ========== 4K 屏幕（≥3840px） ========== */
+@media (min-width: 3840px) {
+  .vc-panel-wrapper * {
+    font-size: 24px;
+  }
+
+  .vc-control-panel {
+    width: 430px;
+  }
+
+  .vc-trigger {
+    width: 64px;
+    height: 64px;
+    line-height: 64px;
+  }
+}

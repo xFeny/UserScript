@@ -10,7 +10,7 @@ import Extend from "./handler/VideoExtendHandler";
 import Ignore from "./handler/IgnoreUrlsHandler";
 import Menu from "./handler/MenuHandler";
 
-unsafeWindow.AUTO_WEB_FULLSCREEN = window.App = {};
+unsafeWindow.GM_E9X_FS = window.App = {};
 
 // 合并处理器方法到App并绑定上下文
 const handlers = [Listen, Keydown, Events, Control, WebFull, Automatic, Episode, Picker, Extend, Ignore, Menu];
