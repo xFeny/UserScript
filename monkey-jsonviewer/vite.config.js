@@ -36,6 +36,9 @@ export default defineConfig({
             .concat(util.dataUrl(";window.js_beautify=js_beautify;window.css_beautify=css_beautify;")),
           "highlight.js": ["hljs", () => `https://unpkg.com/@highlightjs/cdn-assets@11.10.0/highlight.min.js`],
         },
+        externalResource: {
+          "jsmind/style/jsmind.css": cdn.unpkg("jsmind", "style/jsmind.css"),
+        },
         cssSideEffects: () => (css) => window.addEventListener("message", ({ data }) => data?.addStyle && GM_addStyle(css)),
       },
     }),

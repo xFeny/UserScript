@@ -1,5 +1,5 @@
 .vc-panel-wrapper {
-  top: 28%;
+  top: 30%;
   border: none;
   position: fixed;
   left: calc(100vw - 50px);
@@ -35,7 +35,7 @@
 }
 
 .vc-control-panel {
-  width: 260px;
+  width: 265px;
   overflow: hidden;
   border-radius: 4px;
   background: #444444;
@@ -192,13 +192,10 @@
 }
 
 /* ========== 2K/4K 屏幕（≥2560px） ========== */
-@media (min-width: 2560px) {
-  .vc-panel-wrapper * {
-    font-size: 16px;
-  }
 
-  .vc-control-panel {
-    width: 320px;
+@media (min-width: 2200px) {
+  .vc-panel-wrapper * {
+    font-size: 14px;
   }
 
   .vc-trigger {
@@ -206,21 +203,12 @@
     height: 45px;
     line-height: 45px;
   }
-}
-
-/* ========== 4K 屏幕（≥3840px） ========== */
-@media (min-width: 3840px) {
-  .vc-panel-wrapper * {
-    font-size: 24px;
-  }
 
   .vc-control-panel {
-    width: 430px;
+    width: 325px;
   }
 
-  .vc-trigger {
-    width: 64px;
-    height: 64px;
-    line-height: 64px;
+  .vc-control-item {
+    padding: 7px 0;
   }
 }

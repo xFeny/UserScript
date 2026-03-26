@@ -84,3 +84,20 @@
     left: auto !important;
   }
 }
+
+@media (min-width: 2200px) {
+  .__Clock {
+    font-size: 23px !important;
+    line-height: 23px !important;
+  }
+
+  .__timeupdate,
+  .__rateDisplay {
+    font-size: 16px !important;
+    line-height: 16px !important;
+  }
+
+  .__timeupdate {
+    top: 30.5px !important;
+  }
+}

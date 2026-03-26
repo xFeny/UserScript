@@ -1,10 +1,11 @@
 import Storage from "../common/Storage";
+import Utils from "../common/Utils";
 
 /**
  * 初始化控制面板元素
  */
 export default {
-  initControlPanel() {
+  createPanelWrapper() {
     if (this.wrapper) return;
     this.panelTrigger = FyTools.newEle("div", { textContent: "⚙️", className: "vc-trigger" });
     this.wrapper = FyTools.newEle("div", { className: "vc-panel-wrapper" });
@@ -15,7 +16,7 @@ export default {
   /**
    * 创建播放控制面板
    */
-  createControlPanelContent() {
+  createControlPanel() {
     if (this.panel) return this.panel;
 
     const els = ["FullScreen", "Operation", "Transform", "Rate"].map((name) => this[`create${name}Controls`]());
@@ -46,7 +47,7 @@ export default {
    * </div>
    */
   createFullScreenControls() {
-    const pip = () => document.exitPictureInPicture().catch(() => this.player?.requestPictureInPicture());
+    const pip = () => document.exitPictureInPicture().catch(() => this.FS.player?.requestPictureInPicture());
 
     const config = [
       { text: "画中画", icon: "▣", params: [], action: pip },
@@ -64,7 +65,7 @@ export default {
       { text: "旋转", icon: "⟳", params: [], action: this.FS.rotateVideo },
       { text: "镜像", icon: "][", params: [], action: this.FS.horizFlip },
       { text: "上一帧", icon: "‹‹", params: [-1], action: this.FS.freezeFrame },
-      { text: "播放", icon: "▷", params: [], action: () => this.FS.playV(this.player) },
+      { text: "播放", icon: "▷", params: [], action: () => this.FS.playV(this.FS.player) },
       { text: "下一帧", icon: "››", params: [], action: this.FS.freezeFrame },
     ];
     return this.createControlGroup(config);

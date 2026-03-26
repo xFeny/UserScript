@@ -118,15 +118,15 @@ export default {
 
     if (this.isExecuted("isDefined")) return;
     VideoEnhancer.defineProperty(this, "isFullscreen", {
-      set: (value, setter) => (setter(value), this.handleFullscreenChange(value)),
+      set: (value, setter) => (setter(value), this.onFullChange(value)),
     });
   },
-  handleFullscreenChange(isFullscreen) {
+  onFullChange(isFull) {
     // 全屏时移除输入框焦点（解决B站自动聚焦问题）
-    isFullscreen && Tools.isInputable(document.activeElement) && document.activeElement.blur();
+    isFull && Tools.isInputable(document.activeElement) && document.activeElement.blur();
 
     // 默认 <=> 全屏、 全屏 => 网页全屏
-    if (!this.isGMatch() && !(isFullscreen && this.fsWrapper)) this.toggleWebFullscreen();
+    if (!this.isGMatch() && !(isFull && this.fsWrapper)) this.toggleWebFullscreen();
 
     // 执行自定义的代码片段
     Tools.microTask(() => this.customFullChangeHandle());

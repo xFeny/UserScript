@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         GUI-视频自动网页全屏｜倍速播放
+// @name         GUI-悬浮图形控制面板
 // @namespace    http://tampermonkey.net/
 // @version      1.0.0
 // @author       Feny
-// @description  为「视频自动网页全屏｜倍速播放」提供图形界面操作，支持拖动到任意位置，深/浅皮肤切换。
+// @description  为「视频自动网页全屏｜倍速播放」脚本提供悬浮图形控制面板，支持自由拖拽定位、深色/浅色主题切换
 // @license      GPL-3.0-only
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAqdJREFUWEftl91LFFEYxp/3jB9ESZjtSl51F1RUSgRCF/kHlF1IhiFhF65dqEQkBUErdJMStBukGwQre2NZUiCRqUiURkW65mIfqGUFsW6Ii0jY7p4Tc3Rqd5zaGVldAudynve8z28e3jMzh5Dmi1R/V0vQyRRWxgWG6x22SrcnOAhQcQIbwVtXba8y1EANSpS1xzJin5c/Dz+jRDPvGWoErwRw35zuh8ChpcXXFjbwi9k/WADA9viGgovGnxtFs6EmcApMvCdBA3oIIirl4N8NNQngmRYJiwTOE7EHHLERAmXFawQ6AdCQkRbjsZIMUvIFoV0HMSsEDjCgSK8tJqAHAEDAMWLKLOexx8tiVVDEhLLVQAtzRPcwKOUANSWCw1/rsBe6PcFz8dpfAdTFgtF+EmIvBG7pID7mZNl2zkVCFQbahzqHfYerddpNhFpdsnfqauzl8ZoEuO4JXdIKOefynnZlimxXhBbqjTZL/el8pzrAVjTGmKh12Bq1ddJs974abQDXfFMuAhQ6EodwDTHWAf6/BAoK8nD0cDEKtuVhyD+OzvvLXnyWJshyApedJ1F65M9n4tlAAF5fL168fGfJWCu2DDA61GpodLvjCdp8vfjyNWQJJGUAquvMzBzafD0yEc65KZCUAmiOo4FPEqS753VSiFUB0FxbPF244en6J8SqAoTD8zhYcjZ9AP6RCVRWNacHYPD5GJqudmBi8tvaAkxNBeUuuNv5NOkAqgUpm4FIJCrfA+r0z4bnTZmvCKCv+wrsts0JBg8fvZLGY28NfoqToFhOoOJ4CS40lMu2I28mpXFP37DpJ9YXWgZQG+Tm5mBL7qakA2aGakUAZhqbrVkH0BLoB34fzcyml5K6pd/yaicRlQlgV0q6mmwitMOpyfpVKfsFya4w73cz9xQAAAAASUVORK5CYII=
 // @match        *://*/*
@@ -19,7 +19,7 @@
 // @run-at       document-body
 // ==/UserScript==
 
-(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const r=document.createElement("style");r.textContent=e,document.head.append(r)})(' @charset "UTF-8";.vc-panel-wrapper{top:28%;border:none;position:fixed;left:calc(100vw - 50px);user-select:none!important;z-index:2147483647!important;background-color:transparent!important}.vc-panel-wrapper *{color:#e0e0e0;font-size:12px;user-select:none!important;transition:border .3s,background-color .3s!important}.vc-trigger{width:32px;height:32px;cursor:pointer;line-height:32px;border-radius:50%;position:relative;text-align:center;background:#333;box-shadow:0 2px 8px #0000004d}.vc-trigger:hover{background:#444}.vc-control-panel{width:260px;overflow:hidden;border-radius:4px;background:#444;box-shadow:0 2px 8px #0000004d}.vc-panel-header{padding:8px;display:flex;align-items:center;background:#333;justify-content:space-between}.vc-theme-btn{cursor:pointer}.vc-func-group,.vc-slider-control{gap:8px;padding:8px;border-top:1px solid #555555}.vc-func-group{display:grid;grid-template-columns:repeat(3,1fr)}.vc-func-group:nth-of-type(4) .vc-control-item:nth-of-type(2) b,.vc-func-group:nth-of-type(4) .vc-control-item:nth-of-type(5) b{display:inline-block;transform:rotate(90deg)}.vc-control-item{padding:5px 0;cursor:pointer;text-align:center;border-radius:4px;background:#555}.vc-control-item:hover{background:#666}.vc-control-item b{margin-right:5px}.vc-slider-control{display:flex;flex-direction:column}.vc-slider-control button{border:none;cursor:pointer;padding:2px 8px;font-weight:700;border-radius:4px;background:#555}.vc-slider-control button:hover{background:#666}.vc-slider-label{text-align:left;transform-origin:left center}.vc-slider-row{gap:8px;display:flex;align-items:center}.vc-slider{flex:1;height:4px;border:none;outline:none;border-radius:3px;background:#d3d3d3;-webkit-appearance:none;appearance:none}.vc-slider::-webkit-slider-thumb{width:12px;height:12px;cursor:pointer;border-radius:50%;background:#9a72ff;-webkit-appearance:none;appearance:none}.vc-slider::-webkit-slider-thumb:hover{background:#a37ffe}.light-mode *{color:#333;border-color:#e0e0e0}.light-mode .vc-trigger,.light-mode .vc-control-panel{background-color:#fff}.light-mode .vc-trigger:hover{background-color:#e3e5e7}.light-mode .vc-panel-header{background-color:#f5f5f5}.light-mode .vc-control-item,.light-mode .vc-slider-control button{background-color:#f0f0f0}.light-mode .vc-control-item:hover,.light-mode .vc-slider-control button:hover{background-color:#e0e0e0}.tippy-box[data-theme~=vc-panel-wrapper]{background-color:transparent!important}.tippy-box[data-theme~=vc-panel-wrapper] .tippy-content{padding:0!important}@media (min-width: 2560px){.vc-panel-wrapper *{font-size:16px}.vc-control-panel{width:320px}.vc-trigger{width:45px;height:45px;line-height:45px}}@media (min-width: 3840px){.vc-panel-wrapper *{font-size:24px}.vc-control-panel{width:430px}.vc-trigger{width:64px;height:64px;line-height:64px}} ');
+(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const r=document.createElement("style");r.textContent=e,document.head.append(r)})(' @charset "UTF-8";.vc-panel-wrapper{top:30%;border:none;position:fixed;left:calc(100vw - 50px);user-select:none!important;z-index:2147483647!important;background-color:transparent!important}.vc-panel-wrapper *{color:#e0e0e0;font-size:12px;user-select:none!important;transition:border .3s,background-color .3s!important}.vc-trigger{width:32px;height:32px;cursor:pointer;line-height:32px;border-radius:50%;position:relative;text-align:center;background:#333;box-shadow:0 2px 8px #0000004d}.vc-trigger:hover{background:#444}.vc-control-panel{width:265px;overflow:hidden;border-radius:4px;background:#444;box-shadow:0 2px 8px #0000004d}.vc-panel-header{padding:8px;display:flex;align-items:center;background:#333;justify-content:space-between}.vc-theme-btn{cursor:pointer}.vc-func-group,.vc-slider-control{gap:8px;padding:8px;border-top:1px solid #555555}.vc-func-group{display:grid;grid-template-columns:repeat(3,1fr)}.vc-func-group:nth-of-type(4) .vc-control-item:nth-of-type(2) b,.vc-func-group:nth-of-type(4) .vc-control-item:nth-of-type(5) b{display:inline-block;transform:rotate(90deg)}.vc-control-item{padding:5px 0;cursor:pointer;text-align:center;border-radius:4px;background:#555}.vc-control-item:hover{background:#666}.vc-control-item b{margin-right:5px}.vc-slider-control{display:flex;flex-direction:column}.vc-slider-control button{border:none;cursor:pointer;padding:2px 8px;font-weight:700;border-radius:4px;background:#555}.vc-slider-control button:hover{background:#666}.vc-slider-label{text-align:left;transform-origin:left center}.vc-slider-row{gap:8px;display:flex;align-items:center}.vc-slider{flex:1;height:4px;border:none;outline:none;border-radius:3px;background:#d3d3d3;-webkit-appearance:none;appearance:none}.vc-slider::-webkit-slider-thumb{width:12px;height:12px;cursor:pointer;border-radius:50%;background:#9a72ff;-webkit-appearance:none;appearance:none}.vc-slider::-webkit-slider-thumb:hover{background:#a37ffe}.light-mode *{color:#333;border-color:#e0e0e0}.light-mode .vc-trigger,.light-mode .vc-control-panel{background-color:#fff}.light-mode .vc-trigger:hover{background-color:#e3e5e7}.light-mode .vc-panel-header{background-color:#f5f5f5}.light-mode .vc-control-item,.light-mode .vc-slider-control button{background-color:#f0f0f0}.light-mode .vc-control-item:hover,.light-mode .vc-slider-control button:hover{background-color:#e0e0e0}.tippy-box[data-theme~=vc-panel-wrapper]{background-color:transparent!important}.tippy-box[data-theme~=vc-panel-wrapper] .tippy-content{padding:0!important}@media (min-width: 2200px){.vc-panel-wrapper *{font-size:14px}.vc-trigger{width:45px;height:45px;line-height:45px}.vc-control-panel{width:325px}.vc-control-item{padding:7px 0}} ');
 
 (function (tippy, Draggable) {
   'use strict';
@@ -47,17 +47,37 @@
   }
   const Storage = {
     IS_DARK_THEME: new BasicStorage("IS_DARK_THEME", true, Boolean),
-    DRAG_POSITION: new BasicStorage("DRAG_POSITION_", { x: void 0, y: void 0 })
+    DRAG_POSITION: new BasicStorage("DRAG_POSITION_", { x: 0, y: 0 })
+  };
+  const Utils = {
+    waitFor(condition, opts = {}) {
+      const start = Date.now();
+      const { immediate = false, interval = 50, timeout = 3e3 } = opts;
+      return new Promise((resolve, reject) => {
+        const checkCondition = () => {
+          if (Date.now() - start > timeout) return reject(new Error("检测超时"));
+          condition() ? resolve() : setTimeout(checkCondition, interval);
+        };
+        immediate ? checkCondition() : setTimeout(checkCondition, interval);
+      });
+    },
+    onBefore(target, funcName, preExec) {
+      const original = target[funcName];
+      target[funcName] = function(...args) {
+        Promise.resolve().then(() => preExec.apply(this, args));
+        return original.apply(this, args);
+      };
+    }
   };
   const Layout = {
-    initControlPanel() {
+    createPanelWrapper() {
       if (this.wrapper) return;
       this.panelTrigger = FyTools.newEle("div", { textContent: "⚙️", className: "vc-trigger" });
       this.wrapper = FyTools.newEle("div", { className: "vc-panel-wrapper" });
       this.wrapper.append(this.panelTrigger);
       document.body.prepend(this.wrapper);
     },
-    createControlPanelContent() {
+    createControlPanel() {
       if (this.panel) return this.panel;
       const els = ["FullScreen", "Operation", "Transform", "Rate"].map((name) => this[`create${name}Controls`]());
       this.panel = FyTools.newEle("div", { className: "vc-control-panel" });
@@ -73,7 +93,7 @@
       return header;
     },
     createFullScreenControls() {
-      const pip = () => document.exitPictureInPicture().catch(() => this.player?.requestPictureInPicture());
+      const pip = () => document.exitPictureInPicture().catch(() => this.FS.player?.requestPictureInPicture());
       const config = [
         { text: "画中画", icon: "▣", params: [], action: pip },
         { text: "网页全屏", icon: "⤢", params: ["P", { isTrusted: true }], action: this.FS.dispatchShortcut },
@@ -87,7 +107,7 @@
         { text: "旋转", icon: "⟳", params: [], action: this.FS.rotateVideo },
         { text: "镜像", icon: "][", params: [], action: this.FS.horizFlip },
         { text: "上一帧", icon: "‹‹", params: [-1], action: this.FS.freezeFrame },
-        { text: "播放", icon: "▷", params: [], action: () => this.FS.playV(this.player) },
+        { text: "播放", icon: "▷", params: [], action: () => this.FS.playV(this.FS.player) },
         { text: "下一帧", icon: "››", params: [], action: this.FS.freezeFrame }
       ];
       return this.createControlGroup(config);
@@ -131,63 +151,42 @@
       return container;
     }
   };
-  const Utils = {
-    waitFor(condition, opts = {}) {
-      const start = Date.now();
-      const { immediate = false, interval = 50, timeout = 3e3 } = opts;
-      return new Promise((resolve, reject) => {
-        const checkCondition = () => {
-          if (Date.now() - start > timeout) return reject(new Error("检测超时"));
-          condition() ? resolve() : setTimeout(checkCondition, interval);
-        };
-        immediate ? checkCondition() : setTimeout(checkCondition, interval);
-      });
-    },
-    hookBefore(target, funcName, preExec) {
-      const original = target[funcName];
-      target[funcName] = function(...args) {
-        Promise.resolve().then(() => preExec.apply(this, args));
-        return original.apply(this, args);
-      };
-    }
-  };
   const Control = {
     FS: null,
-    player: null,
-    async init() {
-      await Utils.waitFor(() => unsafeWindow.GM_E9X_FS).catch(() => console.error("未安装关联的脚本"));
-      this.FS = unsafeWindow.GM_E9X_FS;
-      this.onPlayerInstanceChange();
-      this.onFullscreenChange();
-      this.onPlayerRateChange();
-      this.host = location.host;
+    init() {
+      Utils.waitFor(() => unsafeWindow.GM_E9X_FS).then(() => {
+        this.host = location.host;
+        this.FS = unsafeWindow.GM_E9X_FS;
+        this.setupFunctionHooks();
+        this.watchPlayerChange();
+      }).catch(() => console.error("未安装关联的脚本"));
     },
-    onPlayerInstanceChange() {
+    watchPlayerChange() {
       Object.defineProperty(this.FS, "player", {
-        configurable: true,
-        get: () => this.player,
         set: (value) => {
-          this.player = value;
-          FyTools.microTask(() => {
-            this.initControlPanel();
-            this.setControlPanelTheme();
-            this.setupPanelTrigger();
-            this.setupDraggable();
-          });
+          this.FS.__player = value;
+          this.initControlPanel(value);
+        },
+        get() {
+          return this.__player;
         }
       });
     },
-    onFullscreenChange() {
-      const preExec = () => this.wrapper && (document.fullscreenElement ?? document.body).prepend(this.wrapper);
-      Utils.hookBefore(this.FS, "handleFullscreenChange", preExec);
-    },
-    onPlayerRateChange() {
-      Utils.hookBefore(this.FS, "ratechange", () => this.renderRateToPanel());
+    setupFunctionHooks() {
+      Utils.onBefore(this.FS, "ratechange", () => this.renderRateToPanel());
+      Utils.onBefore(this.FS, "onFullChange", () => (document.fullscreenElement ?? document.body).prepend(this.wrapper ?? ""));
     },
     renderRateToPanel() {
-      if (!this.player || !this.panel) return;
-      this.label.textContent = `倍速: ${this.player.playbackRate}x`;
-      this.slider.value = this.player.playbackRate;
+      if (!this.FS.player || !this.panel) return;
+      this.slider.value = this.FS.player.playbackRate;
+      this.label.textContent = `倍速: ${this.FS.player.playbackRate}x`;
+    },
+    initControlPanel(video) {
+      if (!video || this.wrapper) return;
+      this.createPanelWrapper();
+      this.setControlPanelTheme();
+      this.setupPanelTrigger();
+      this.setupDraggable();
     },
     setControlPanelTheme(isDark = Storage.IS_DARK_THEME.get()) {
       if (this.theme) this.theme.textContent = isDark ? "🌙" : "☀️";
@@ -203,19 +202,17 @@
         placement: "left",
         appendTo: "parent",
         theme: "vc-panel-wrapper",
-        offset: innerWidth >= 3840 ? [0, 100] : [0, 10],
         onTrigger: (instance) => {
-          instance.setContent(this.createControlPanelContent());
+          instance.setContent(this.createControlPanel());
           if (this.panel) this.renderRateToPanel(), this.setControlPanelTheme();
         }
       });
     },
     setupDraggable() {
       const cache = Storage.DRAG_POSITION;
-      const onDragEnd = (_, x2, y2) => cache.set({ x: x2, y: y2 }, this.host);
-      const draggable = new Draggable(this.panelTrigger, { onDragEnd, setPosition: false, limit: this.getDragBounds() });
       const { x, y } = cache.get(this.host);
-      draggable.set(x, y);
+      const onDragEnd = (_, x2, y2) => cache.set({ x: x2, y: y2 }, this.host);
+      new Draggable(this.panelTrigger, { onDragEnd, setPosition: false, limit: this.getDragBounds() }).set(x, y);
     },
     getDragBounds() {
       const { top, left, bottom, width } = FyTools.getRect(this.wrapper);

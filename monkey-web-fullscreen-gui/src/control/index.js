@@ -5,42 +5,43 @@ import Utils from "../common/Utils";
 
 export default {
   FS: null,
-  player: null,
-  async init() {
-    await Utils.waitFor(() => unsafeWindow.GM_E9X_FS).catch(() => console.error("未安装关联的脚本"));
-
-    this.FS = unsafeWindow.GM_E9X_FS;
-    this.onPlayerInstanceChange();
-    this.onFullscreenChange();
-    this.onPlayerRateChange();
-    this.host = location.host;
+  init() {
+    Utils.waitFor(() => unsafeWindow.GM_E9X_FS)
+      .then(() => {
+        this.host = location.host;
+        this.FS = unsafeWindow.GM_E9X_FS;
+        this.setupFunctionHooks();
+        this.watchPlayerChange();
+      })
+      .catch(() => console.error("未安装关联的脚本"));
   },
-  onPlayerInstanceChange() {
+  watchPlayerChange() {
     Object.defineProperty(this.FS, "player", {
-      configurable: true,
-      get: () => this.player,
       set: (value) => {
-        this.player = value;
-        FyTools.microTask(() => {
-          this.initControlPanel();
-          this.setControlPanelTheme();
-          this.setupPanelTrigger();
-          this.setupDraggable();
-        });
+        this.FS.__player = value;
+        this.initControlPanel(value);
+      },
+      get() {
+        return this.__player;
       },
     });
   },
-  onFullscreenChange() {
-    const preExec = () => this.wrapper && (document.fullscreenElement ?? document.body).prepend(this.wrapper);
-    Utils.hookBefore(this.FS, "handleFullscreenChange", preExec);
-  },
-  onPlayerRateChange() {
-    Utils.hookBefore(this.FS, "ratechange", () => this.renderRateToPanel());
+  setupFunctionHooks() {
+    Utils.onBefore(this.FS, "ratechange", () => this.renderRateToPanel());
+    Utils.onBefore(this.FS, "onFullChange", () => (document.fullscreenElement ?? document.body).prepend(this.wrapper ?? ""));
   },
   renderRateToPanel() {
-    if (!this.player || !this.panel) return;
-    this.label.textContent = `倍速: ${this.player.playbackRate}x`;
-    this.slider.value = this.player.playbackRate;
+    if (!this.FS.player || !this.panel) return;
+    this.slider.value = this.FS.player.playbackRate;
+    this.label.textContent = `倍速: ${this.FS.player.playbackRate}x`;
+  },
+  initControlPanel(video) {
+    if (!video || this.wrapper) return;
+
+    this.createPanelWrapper();
+    this.setControlPanelTheme();
+    this.setupPanelTrigger();
+    this.setupDraggable();
   },
 
   // ====================⇓⇓⇓ 深/浅色皮肤相关逻辑 ⇓⇓⇓====================
@@ -66,9 +67,8 @@ export default {
       placement: "left",
       appendTo: "parent",
       theme: "vc-panel-wrapper",
-      offset: innerWidth >= 3840 ? [0, 100] : [0, 10],
       onTrigger: (instance) => {
-        instance.setContent(this.createControlPanelContent());
+        instance.setContent(this.createControlPanel());
         if (this.panel) (this.renderRateToPanel(), this.setControlPanelTheme());
       },
     });
@@ -80,12 +80,10 @@ export default {
    */
   setupDraggable() {
     const cache = Storage.DRAG_POSITION;
+    const { x, y } = cache.get(this.host);
 
     const onDragEnd = (_, x, y) => cache.set({ x, y }, this.host);
-    const draggable = new Draggable(this.panelTrigger, { onDragEnd, setPosition: false, limit: this.getDragBounds() });
-
-    const { x, y } = cache.get(this.host);
-    draggable.set(x, y);
+    new Draggable(this.panelTrigger, { onDragEnd, setPosition: false, limit: this.getDragBounds() }).set(x, y);
   },
   /**
    * 允许的拖拽范围

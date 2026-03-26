@@ -27,7 +27,7 @@ export default {
     return isDynamic;
   },
   initVideoProps(video) {
-    if (!Tools.isAttached(this.player)) delete this.player;
+    if (!Tools.isAttached(this.player)) this.player = undefined;
     Object.keys(video).forEach((k) => k.startsWith("_mfs_") && delete video[k]);
 
     // 设置默认一些值
