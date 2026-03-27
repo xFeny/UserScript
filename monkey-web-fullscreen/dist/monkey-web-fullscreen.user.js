@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.10.0
+// @version      3.10.1
 // @author       Feny
 // @description  支持所有H5视频的增强脚本，通用网页全屏｜倍速调节；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @license      GPL-3.0-only
@@ -366,6 +366,7 @@
     PRESET_SPEED: new BasicStorage("PRESET_SPEED", "1.15,1.45,1.75", false, (value) => value.split(",")),
     SKIP_INTERVAL: new BasicStorage("VIDEO_SKIP_INTERVAL", 5, false, Number),
     ZERO_KEY_SKIP: new BasicStorage("ZERO_KEY_SKIP_INTERVAL", 30, false, Number),
+    OVERRIDE_KEY: new BasicStorage("OVERRIDE_KEYBOARD", false, false, Boolean),
     MOVING_DISTANCE: new BasicStorage("MOVING_DISTANCE", 10, false, Number),
     ZOOM_PERCENT: new BasicStorage("ZOOM_PERCENT", 10, false, Number),
     IS_AUTO_NEXT: new BasicStorage("ENABLE_AUTO_NEXT_EPISODE", false, false, Boolean),
@@ -482,7 +483,7 @@
       new MutationObserver(
         () => this.isFullscreen ? this.toggleFullscreen() : this.fsWrapper && this.exitWebFullscreen()
       ).observe(iFrame, { attributes: true, attributeFilter: ["src"] });
-      iFrame.focus();
+      if (this.isOverrideKey()) iFrame.focus();
     },
     setupFullscreenListener() {
       document.addEventListener("fullscreenchange", () => {
@@ -634,7 +635,7 @@
     isInputFocus: (e) => Tools.isInputable(e.composedPath()[0]),
     preventKey(e, { code, altKey } = e) {
       const isNumKeys = Tools.isNumber(e.key) && !this.isDisRate();
-      const isOverrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
+      const isOverrideKey = this.isOverrideKey() && [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
       const isPreventKey = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
       const isMoveKeys = altKey && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
       if (isNumKeys || isOverrideKey || isPreventKey || isMoveKeys) Tools.preventDefault(e);
@@ -677,10 +678,10 @@
         P: () => this.toggleWebFullscreen(isTrusted),
         D: () => Site.isGmMatch() && this.triggerIconElement(Site.icons.danmaku),
         N: () => Site.isGmMatch() ? this.triggerIconElement(Site.icons.next) : this.switchEpisode(),
+        SPACE: () => this.isOverrideKey() && this.playToggle(this.player),
         0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP.get(), true) || 0,
         LEFT: () => this.skipPlayback(-Storage.SKIP_INTERVAL.get()),
         RIGHT: () => this.skipPlayback(Storage.SKIP_INTERVAL.get()),
-        SPACE: () => this.playToggle(this.player),
         SHIFT_A: () => this.autoNextEnabled(),
         CTRL_ALT_S: () => this.screenshot(),
         ALT_SUB: () => this.zoomVideo(-1),
@@ -826,7 +827,7 @@
       return isDynamic;
     },
     initVideoProps(video) {
-      if (!Tools.isAttached(this.player)) this.player = void 0;
+      if (!Tools.isAttached(this.player)) this.player = null;
       Object.keys(video).forEach((k) => k.startsWith("_mfs_") && delete video[k]);
       video.__duration = video.duration;
       video.tsr = { ...Consts.DEF_TSR };
@@ -854,7 +855,7 @@
     applyCachedRate: () => Storage.NOT_CACHE_SPEED.get() ? App.delCachedRate() : App.setPlaybackRate(Storage.CACHED_SPEED.get()),
     delCachedRate: () => Storage.CACHED_SPEED.del(),
     skipPlayback(second = 0) {
-      if (!this.player || this.isLive()) return;
+      if (!this.player || this.isLive() || !this.isOverrideKey()) return;
       this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
       this.showToast(`快${second > 0 ? "进" : "退"} ${Math.abs(second)} 秒`, Consts.ONE_SEC);
     },
@@ -1129,7 +1130,7 @@
     async autoWebFullscreen(video) {
       if (!this.topWin || !video.offsetWidth || this.player !== video) return;
       if (video._mfs_isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
-      if (Site.isGmMatch() ? this.noAutoDefault() : !this.isAutoSite()) return;
+      if (Site.isGmMatch() ? Storage.NO_AUTO_DEF.get() : !this.isAutoSite()) return;
       if (this.isIgnoreWide() || await this.isWebFull(video) || Tools.isOverLimit("autoWide")) return video._mfs_isWide = true;
       this.dispatchShortcut(Keyboard.P);
     },
@@ -1461,7 +1462,7 @@
   };
   const Menu = {
     isDisRate: () => Storage.DISABLE_SPEED.get(),
-    noAutoDefault: () => Storage.NO_AUTO_DEF.get(),
+    isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
     isAutoSite: () => Storage.IS_SITE_AUTO.get(window.topWin?.host ?? location.host),
     initMenuCmds() {
       if (this.isExecuted("hasMenu") || !Tools.isTopWin()) return;
@@ -1516,8 +1517,8 @@
         { key: "Ctrl 1️~5️", desc: "预设倍速" },
         { key: "1️~9️", desc: "1️~9️ 倍速" },
         { key: "数字 0️", desc: "快进 N 秒" },
-        { key: "◀️▶️", desc: "快退/进" },
-        { key: "空格", desc: "播放/暂停" }
+        { key: "◀️▶️", desc: "快退/进 (默禁)" },
+        { key: "空格", desc: "播放/暂停 (默禁)" }
       ];
       const rows = keys.reduce((acc, it, i) => {
         if (i % 2) return acc;
@@ -1589,7 +1590,8 @@
         { name: "try", text: "禁用 尝试自动播放", cache: Storage.DISABLE_TRY_PLAY },
         { name: "next", text: "启用 自动切换下集", cache: Storage.IS_AUTO_NEXT },
         { name: "wClock", text: "启用 非全屏显时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
-        { name: "sRate", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] }
+        { name: "sRate", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },
+        { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEY }
       ];
       const render = ({ text, name, value, dataset }) => `
         <label class="__menu">${text}
