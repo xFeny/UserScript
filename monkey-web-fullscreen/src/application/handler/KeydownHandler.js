@@ -11,7 +11,7 @@ export default {
   isInputFocus: (e) => Tools.isInputable(e.composedPath()[0]),
   preventKey(e, { code, altKey } = e) {
     const isNumKeys = Tools.isNumber(e.key) && !this.isDisRate();
-    const isOverrideKey = [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
+    const isOverrideKey = this.isOverrideKey() && [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
     const isPreventKey = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
     const isMoveKeys = altKey && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
     if (isNumKeys || isOverrideKey || isPreventKey || isMoveKeys) Tools.preventDefault(e);
@@ -60,10 +60,10 @@ export default {
       P: () => this.toggleWebFullscreen(isTrusted),
       D: () => Site.isGmMatch() && this.triggerIconElement(Site.icons.danmaku),
       N: () => (Site.isGmMatch() ? this.triggerIconElement(Site.icons.next) : this.switchEpisode()),
+      SPACE: () => this.isOverrideKey() && this.playToggle(this.player),
       0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP.get(), !0) || 0,
       LEFT: () => this.skipPlayback(-Storage.SKIP_INTERVAL.get()),
       RIGHT: () => this.skipPlayback(Storage.SKIP_INTERVAL.get()),
-      SPACE: () => this.playToggle(this.player),
       SHIFT_A: () => this.autoNextEnabled(),
       CTRL_ALT_S: () => this.screenshot(),
       ALT_SUB: () => this.zoomVideo(-1),

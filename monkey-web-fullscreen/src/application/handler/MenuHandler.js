@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
  */
 export default {
   isDisRate: () => Storage.DISABLE_SPEED.get(),
-  noAutoDefault: () => Storage.NO_AUTO_DEF.get(),
+  isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
   isAutoSite: () => Storage.IS_SITE_AUTO.get(window.topWin?.host ?? location.host),
   initMenuCmds() {
     if (this.isExecuted("hasMenu") || !Tools.isTopWin()) return;
@@ -71,8 +71,8 @@ export default {
       { key: "Ctrl 1️~5️", desc: "预设倍速" },
       { key: "1️~9️", desc: "1️~9️ 倍速" },
       { key: "数字 0️", desc: "快进 N 秒" },
-      { key: "◀️▶️", desc: "快退/进" },
-      { key: "空格", desc: "播放/暂停" },
+      { key: "◀️▶️", desc: "快退/进 (默禁)" },
+      { key: "空格", desc: "播放/暂停 (默禁)" },
     ];
 
     // 偶数索引时创建新行，奇数索引时补充到上一行
@@ -154,6 +154,7 @@ export default {
       { name: "next", text: "启用 自动切换下集", cache: Storage.IS_AUTO_NEXT },
       { name: "wClock", text: "启用 非全屏显时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
       { name: "sRate", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },
+      { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEY },
     ];
 
     const render = ({ text, name, value, dataset }) => `

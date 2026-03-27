@@ -106,7 +106,7 @@ export default {
     new MutationObserver(() =>
       this.isFullscreen ? this.toggleFullscreen() : this.fsWrapper && this.exitWebFullscreen()
     ).observe(iFrame, { attributes: true, attributeFilter: ["src"] });
-    iFrame.focus(); // 使空格能控制视频播放
+    if (this.isOverrideKey()) iFrame.focus(); // 使空格能控制视频播放
   },
   // ====================⇑⇑⇑ 设置当前视频相关逻辑 ⇑⇑⇑====================
 

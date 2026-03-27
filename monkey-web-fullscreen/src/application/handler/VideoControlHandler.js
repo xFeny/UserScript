@@ -27,7 +27,7 @@ export default {
     return isDynamic;
   },
   initVideoProps(video) {
-    if (!Tools.isAttached(this.player)) this.player = undefined;
+    if (!Tools.isAttached(this.player)) this.player = null;
     Object.keys(video).forEach((k) => k.startsWith("_mfs_") && delete video[k]);
 
     // 设置默认一些值
@@ -68,7 +68,7 @@ export default {
 
   // ====================⇓⇓⇓ 调节播放进度相关逻辑 ⇓⇓⇓====================
   skipPlayback(second = 0) {
-    if (!this.player || this.isLive()) return;
+    if (!this.player || this.isLive() || !this.isOverrideKey()) return;
     this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
     this.showToast(`快${second > 0 ? "进" : "退"} ${Math.abs(second)} 秒`, Consts.ONE_SEC);
   },
