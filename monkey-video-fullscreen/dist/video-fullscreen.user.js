@@ -76,6 +76,7 @@
     querys: (selector, ctx) => querySelectorAll(selector, ctx),
     sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
     postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
+    isExecuted: (key, ctx = window.e9x ??= {}) => ctx?.[key] || !!(ctx && (ctx[key] = true), false),
     getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
     isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
     preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),
@@ -163,7 +164,6 @@
   const Listen = {
     isNoVideo: () => !window.vMeta && !window.topWin,
     isMutedLoop: (video) => video?.muted && video?.loop,
-    isExecuted: (key, ctx = window.e9x ??= {}) => ctx[key] || !!(ctx[key] = true, false),
     init(isNonFirst = false) {
       this.host = location.host;
       this.setupVideoListeners();
@@ -187,7 +187,7 @@
       document.addEventListener("fullscreenchange", () => {
         Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
       });
-      if (this.isExecuted("isDefined")) return;
+      if (Tools.isExecuted("isDefined")) return;
       Object.defineProperty(this, "isFullscreen", {
         get: () => this._isFullscreen,
         set: (value) => {
@@ -208,7 +208,7 @@
     getVideoForCoord(x, y) {
       if (Tools.pointInElement(x, y, this.player)) return this.player;
       const getZIndex = (el) => Number(getComputedStyle(el).zIndex) || 0;
-      const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(x, y, v));
+      const videos = Tools.querys("video").filter((v) => Tools.pointInElement(x, y, v));
       return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
     },
     createEdgeElement(video) {
@@ -274,7 +274,7 @@
     setupVideoListeners(video) {
       const ctrl = new AbortController();
       video && this.videoAborts.get(video)?.abort();
-      const handle = ({ type, target }) => this[type](target);
+      const handle = ({ type, target }) => !this.isMutedLoop(target) && this[type](target);
       this.videoEvts.forEach(
         (t) => (video ?? document).addEventListener(t, handle, { capture: true, passive: true, signal: ctrl.signal })
       );
@@ -311,7 +311,7 @@
       if (!Tools.isAttached(this.player)) delete this.player;
     },
     setCurrentVideo(video) {
-      if (!video || this.player === video || video.offsetWidth < 260 || this.isMutedLoop(video)) return;
+      if (!video || this.player === video || video.offsetWidth < 260) return;
       if (this.player && !this.player.paused && !isNaN(this.player.duration)) return;
       this.setPlayer(video);
     },
@@ -465,7 +465,7 @@
     setWebFullAttr(el) {
       const sroot = el.getRootNode();
       Tools.attr(el, Consts.webFull, true);
-      if (this.isExecuted("__Added__", sroot)) return;
+      if (Tools.isExecuted("__Added__", sroot)) return;
       if (sroot instanceof ShadowRoot) Tools.emitEvent("addStyle", { sroot });
     },
     customFullChangeHandle() {
@@ -486,9 +486,9 @@
       try {
         if (!jsCode) return;
         const code = `(async () => { ${jsCode} })()`;
-        const args = ["type", "App", "video", "Tools", "unsafeWindow"];
+        const args = ["type", "video", "Tools", "unsafeWindow"];
         const handler = this.codeSnippetCache ??= new Function(...args, code);
-        handler(type, App, video, Tools, unsafeWindow);
+        handler(type, video, Tools, unsafeWindow);
       } catch (e) {
         const unsafe = e.message.includes("unsafe-eval");
         unsafe ? this.injectCodeSnippet(jsCode, type, video) : console.error("代码执行出错：", e);
@@ -499,14 +499,14 @@
       const injectCode = `
         (() => {
           document.addEventListener('${evt}', (e) => {
-            const { type, App, video, Tools, unsafeWindow } = e.detail;
+            const { type, video, Tools, unsafeWindow } = e.detail;
             (async () => { try { ${jsCode} } catch (err) { console.error('代码执行出错：', err); } })();
           }, { once: true });
         })();
         `;
       Tools.query(`#${evt}`)?.remove();
       GM_addElement("script", { id: evt, textContent: injectCode, type: "text/javascript" });
-      Tools.emitEvent(evt, { type, App, video, Tools, unsafeWindow });
+      Tools.emitEvent(evt, { type, video, Tools, unsafeWindow });
     }
   };
   const Automatic = {

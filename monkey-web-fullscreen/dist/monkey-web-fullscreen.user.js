@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.10.1
+// @version      3.10.2
 // @author       Feny
 // @description  支持所有H5视频的增强脚本，通用网页全屏｜倍速调节；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @license      GPL-3.0-only
@@ -115,10 +115,11 @@
     postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
     getNumbers: (str) => typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : [],
     log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
+    isExecuted: (key, ctx = window.e9x ??= {}) => ctx?.[key] || !!(ctx && (ctx[key] = true), false),
     getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
     isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
-    preventDefault: (e) => (e.preventDefault(), e.stopPropagation(), e.stopImmediatePropagation()),
     attr: (el, name, val) => el && name && el[val ? "setAttribute" : "removeAttribute"](name, val),
+    preventEvent: (e) => (e.preventDefault(), e.stopPropagation(), e.stopImmediatePropagation()),
     emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
     isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
     newEle: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
@@ -222,7 +223,7 @@
       const { immediate = false, interval = 50, timeout = 3e3 } = opts;
       return new Promise((resolve, reject) => {
         const checkCondition = () => {
-          if (Date.now() - start > timeout) return reject(new Error("检测超时"));
+          if (Date.now() - start > timeout) return reject(new Error("waitFor 预期条件未满足"));
           condition() ? resolve() : setTimeout(checkCondition, interval);
         };
         immediate ? checkCondition() : setTimeout(checkCondition, interval);
@@ -356,8 +357,6 @@
     IS_SITE_AUTO: new BasicStorage("ENABLE_THIS_SITE_AUTO_", false, false, Boolean, true),
     DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, false, Number, true),
     FULL_CHANGE_CODE: new BasicStorage("FULL_CHANGE_CODE_", "", false, String, true),
-    DISABLE_TRY_PLAY: new BasicStorage("DISABLE_TRY_PLAY", false, false, Boolean),
-    IS_INVISIBLE_PAUSE: new BasicStorage("DISABLE_INVISIBLE_PAUSE", false, false, Boolean),
     SPEED_STEP: new BasicStorage("PLAY_RATE_STEP", 0.25, false, parseFloat),
     DISABLE_SPEED: new BasicStorage("CLOSE_PLAY_RATE", false, false, Boolean),
     RATE_KEEP_SHOW: new BasicStorage("RATE_KEEP_SHOW", false, false, Boolean),
@@ -367,6 +366,7 @@
     SKIP_INTERVAL: new BasicStorage("VIDEO_SKIP_INTERVAL", 5, false, Number),
     ZERO_KEY_SKIP: new BasicStorage("ZERO_KEY_SKIP_INTERVAL", 30, false, Number),
     OVERRIDE_KEY: new BasicStorage("OVERRIDE_KEYBOARD", false, false, Boolean),
+    IS_INVISIBLE_PAUSE: new BasicStorage("DISABLE_INVISIBLE_PAUSE", false, false, Boolean),
     MOVING_DISTANCE: new BasicStorage("MOVING_DISTANCE", 10, false, Number),
     ZOOM_PERCENT: new BasicStorage("ZOOM_PERCENT", 10, false, Number),
     IS_AUTO_NEXT: new BasicStorage("ENABLE_AUTO_NEXT_EPISODE", false, false, Boolean),
@@ -382,7 +382,7 @@
     LOAD_EVT_CODE: new BasicStorage("LOAD_EVT_CODE_", "", false, String, true),
     VIDEO_EVT_CODE: new BasicStorage("VIDEO_EVT_CODE_", "", false, String, true)
   };
-  const Keyboard = Object.freeze({
+  const HotKey = Object.freeze({
     A: "KeyA",
     D: "KeyD",
     K: "KeyK",
@@ -393,22 +393,21 @@
     R: "KeyR",
     S: "KeyS",
     Z: "KeyZ",
+    Space: "Space",
+    Enter: "Enter",
     Up: "ArrowUp",
     Down: "ArrowDown",
     Left: "ArrowLeft",
     Right: "ArrowRight",
+    NumEnter: "NumpadEnter",
     Sub: "NumpadSubtract",
-    Add: "NumpadAdd",
-    Space: "Space",
-    Enter: "Enter",
-    NumEnter: "NumpadEnter"
+    Add: "NumpadAdd"
   });
   const Listen = {
     fsWrapper: null,
     isFullscreen: false,
     isNoVideo: () => !window.vMeta && !window.topWin,
     isMutedLoop: (video) => video?.muted && video?.loop,
-    isExecuted: (key, ctx = window.e9x ??= {}) => ctx[key] || !!(ctx[key] = true, false),
     init(isNonFirst = false) {
       this.host = location.host;
       this.setupVideoListeners();
@@ -422,7 +421,7 @@
       this.setupLoadEventListener();
       this.setupShadowVideoListener();
       this.setupIgnoreChangeListener();
-      this.observeWebFullscreenChange();
+      this.watchWebFullscreenChange();
       VideoEnhancer.hookActiveVideo();
     },
     setupVisibleListener() {
@@ -440,10 +439,10 @@
       }).observe(document, { childList: true });
     },
     setCurrentVideo(video) {
-      if (!video || this.player === video || video.offsetWidth < 260 || this.isMutedLoop(video)) return;
+      if (!video || this.player === video || video.offsetWidth < 260) return;
       if (this.player && !this.player.paused && !isNaN(this.player.duration)) return;
       this.setPlayer(video);
-      this.observeVideoSrcChange(video);
+      this.watchVideoSrc(video);
     },
     setPlayer(video) {
       this.player = video;
@@ -468,8 +467,8 @@
       Tools.postMessage(vFrame?.contentWindow, data);
       if (vFrame) this.observeIFrameChange(vFrame);
     },
-    observeVideoSrcChange(video) {
-      if (this.isExecuted("observed", video)) return;
+    watchVideoSrc(video) {
+      if (Tools.isExecuted("observed", video)) return;
       const isFake = video.matches(Consts.FAKE_VIDEO);
       const onChange = (v) => (delete this.topWin, this.setPlayer(v));
       VideoEnhancer.defineProperty(video, isFake ? "srcConfig" : "src", {
@@ -479,7 +478,7 @@
       });
     },
     observeIFrameChange(iFrame) {
-      if (!iFrame || this.isExecuted("observed", iFrame)) return;
+      if (!iFrame || Tools.isExecuted("observed", iFrame)) return;
       new MutationObserver(
         () => this.isFullscreen ? this.toggleFullscreen() : this.fsWrapper && this.exitWebFullscreen()
       ).observe(iFrame, { attributes: true, attributeFilter: ["src"] });
@@ -489,7 +488,7 @@
       document.addEventListener("fullscreenchange", () => {
         Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
       });
-      if (this.isExecuted("isDefined")) return;
+      if (Tools.isExecuted("isDefined")) return;
       VideoEnhancer.defineProperty(this, "isFullscreen", {
         set: (value, setter) => (setter(value), this.onFullChange(value))
       });
@@ -500,7 +499,7 @@
       Tools.microTask(() => this.customFullChangeHandle());
       this.changeTimeDisplay();
     },
-    observeWebFullscreenChange() {
+    watchWebFullscreenChange() {
       const handle = () => Tools.scrollTop(this.fsWrapper.scrollY);
       VideoEnhancer.defineProperty(this, "fsWrapper", {
         set: (value, setter) => {
@@ -544,7 +543,7 @@
     getVideoForCoord(x, y) {
       if (Tools.pointInElement(x, y, this.player)) return this.player;
       const getZIndex = (el) => Number(getComputedStyle(el).zIndex) || 0;
-      const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(x, y, v));
+      const videos = Tools.querys("video").filter((v) => Tools.pointInElement(x, y, v));
       return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
     },
     createEdgeElement(video) {
@@ -559,9 +558,9 @@
       const createEdge = (cls = "") => {
         const element = Tools.newEle("div", { video, className: `__edgeClick ${cls}` });
         element.onclick = (e) => {
-          Tools.preventDefault(e);
+          Tools.preventEvent(e);
           this.setPlayer(e.target.video);
-          Tools.sleep(5).then(() => this.dispatchShortcut(Keyboard.P, { isTrusted: true }));
+          Tools.sleep(5).then(() => this.dispatchShortcut(HotKey.P, true));
         };
         return element;
       };
@@ -633,16 +632,18 @@
   }
   const Keydown = {
     isInputFocus: (e) => Tools.isInputable(e.composedPath()[0]),
-    preventKey(e, { code, altKey } = e) {
-      const isNumKeys = Tools.isNumber(e.key) && !this.isDisRate();
-      const isOverrideKey = this.isOverrideKey() && [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
-      const isPreventKey = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
-      const isMoveKeys = altKey && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
-      if (isNumKeys || isOverrideKey || isPreventKey || isMoveKeys) Tools.preventDefault(e);
+    isUndefinedKey: ({ key, code }) => !Object.values(HotKey).includes(code) && !Tools.isNumber(key),
+    skipKeyEvent: (e) => App.isNoVideo() || App.isInputFocus(e) || App.isUndefinedKey(e),
+    preventEvent(e, { code, altKey } = e) {
+      const isNum = Tools.isNumber(e.key) && !this.unUsedRate();
+      const isOverride = this.isOverrideKey() && [HotKey.Space, HotKey.Left, HotKey.Right].includes(code);
+      const isBlock = [HotKey.K, HotKey.L, HotKey.M, HotKey.N, HotKey.P, HotKey.R].includes(code);
+      const isMove = altKey && [HotKey.Up, HotKey.Down, HotKey.Left, HotKey.Right].includes(code);
+      if (isNum || isOverride || isBlock || isMove) Tools.preventEvent(e);
     },
-    dispatchShortcut(code, { isTrusted = false } = {}) {
-      const key = this.processShortcutKey({ code });
-      Tools.postMessage(window.top, { key, isTrusted });
+    dispatchShortcut(code, isTrusted = false) {
+      const data = { key: this.processShortcutKey({ code }), isTrusted };
+      Tools.isTopWin() ? this.processEvent(data) : Tools.postMessage(window.top, data);
     },
     processShortcutKey({ key, code, ctrlKey, shiftKey, altKey }) {
       code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
@@ -650,18 +651,16 @@
       return keys.filter(Boolean).join("_").toUpperCase();
     },
     setupKeydownListener() {
-      unsafeWindow.addEventListener("keyup", (e) => this.preventKey(e), true);
       unsafeWindow.addEventListener("keydown", (e) => this.handleKeydown(e), true);
+      unsafeWindow.addEventListener("keyup", (e) => !this.skipKeyEvent(e) && this.preventEvent(e), true);
       unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
     },
     handleKeydown(e, { key, code, isTrusted } = e) {
-      if (this.isNoVideo() || this.isInputFocus(e)) return;
-      if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
-      this.preventKey(e);
-      key = this.processShortcutKey(e);
-      const specialKeys = [Keyboard.N, Keyboard.P, Keyboard.Enter, Keyboard.NumEnter];
-      if (specialKeys.includes(code)) return this.dispatchShortcut(key, { isTrusted });
-      this.processEvent({ key, isTrusted });
+      if (this.skipKeyEvent(e)) return;
+      this.preventEvent(e);
+      const emitKeys = [HotKey.N, HotKey.P, HotKey.Enter, HotKey.NumEnter];
+      if (emitKeys.includes(code)) return this.dispatchShortcut(key, { isTrusted });
+      this.processEvent({ key: this.processShortcutKey(e), isTrusted });
     },
     processEvent(data) {
       if (this.vMeta?.iFrame && this.player) delete this.player;
@@ -704,10 +703,10 @@
     },
     handleConfsMessage(data) {
       if (data?.sw_memory) this.delCachedRate();
-      if (data?.sw_speed) this.setPlaybackRate(1);
-      if (data?.sw_lCode) Storage.LOAD_EVT_CODE.set(data.sw_lCode, this.host);
-      if (data?.sw_vCode) Storage.VIDEO_EVT_CODE.set(data.sw_vCode, this.host);
+      if (data?.sw_speed) this.setPlaybackRate(1), delete this.player.playbackRate;
       if (data?.sw_fsCode) Storage.FULL_CHANGE_CODE.set(data.sw_fsCode, this.host);
+      if (data?.sw_vCode) Storage.VIDEO_EVT_CODE.set(data.sw_vCode, this.host);
+      if (data?.sw_lCode) Storage.LOAD_EVT_CODE.set(data.sw_lCode, this.host);
       if (data?.sw_vCode || data?.sw_fsCode) this.codeSnippetCache.clear();
       if ("sw_sRate" in data) this.playbackRateDisplay();
       if ("sw_color" in data) this.setTimeColor(data.sw_color);
@@ -766,20 +765,16 @@
         this.ensureRateDisplay();
       });
     },
-    canplay(video) {
-      if (!Tools.isVisible(video) || Tools.isMultiV() || Storage.DISABLE_TRY_PLAY.get()) return;
-      if (!this.isExecuted("_mfs_playV", video)) this.playV(video);
-    },
     playing(video) {
       this.setCurrentVideo(video);
       video.tsr ??= { ...Consts.DEF_TSR };
       Tools.waitFor(() => this.topWin).then(() => this.applySettings(video));
     },
     ended(video) {
-      this.autoExitWebFullscreen();
+      this.autoExitFull(video);
       this.clearCachedTime(video);
     },
-    ratechange: (video) => App.playbackRateDisplay(),
+    ratechange: () => App.playbackRateDisplay(),
     customVideoEvtHandle(type, video) {
       if (type === "timeupdate" && Tools.isThrottle("codeSnippet", Consts.ONE_SEC)) return;
       Tools.sleep(10).then(() => this.executeCodeSnippet(Storage.VIDEO_EVT_CODE.get(this.host), type, video));
@@ -789,9 +784,9 @@
       try {
         if (!jsCode) return;
         const code = `(async () => { ${jsCode} })()`;
-        const args = ["type", "App", "video", "Tools", "unsafeWindow"];
+        const args = ["type", "video", "Tools", "unsafeWindow"];
         const handler = this.codeSnippetCache.get(type) || this.codeSnippetCache.set(type, new Function(...args, code)).get(type);
-        handler(type, App, video, Tools, unsafeWindow);
+        handler(type, video, Tools, unsafeWindow);
       } catch (e) {
         const unsafe = e.message.includes("unsafe-eval");
         unsafe ? this.injectCodeSnippet(jsCode, type, video) : console.error("代码执行出错：", e);
@@ -802,17 +797,19 @@
       const injectCode = `
       (() => {
         document.addEventListener('${evt}', (e) => {
-          const { type, App, video, Tools, unsafeWindow } = e.detail;
+          const { type, video, Tools, unsafeWindow } = e.detail;
           (async () => { try { ${jsCode} } catch (err) { console.error('代码执行出错：', err); } })();
         }, { once: true, passive: true });
       })();
       `;
       Tools.query(`#${evt}`)?.remove();
       GM_addElement("script", { id: evt, textContent: injectCode, type: "text/javascript" });
-      Tools.emitEvent(evt, { type, App, video, Tools, unsafeWindow });
+      Tools.emitEvent(evt, { type, video, Tools, unsafeWindow });
     }
   };
   const Control = {
+    playToggle: (v) => v?.[v?.paused ? "play" : "pause"](),
+    remainTime: (v) => Math.floor(App.getRealDuration(v)) - Math.floor(v.currentTime),
     isLive() {
       if (!this.player) return false;
       return this.player.duration === Infinity || this.isDynamicDur(this.player);
@@ -835,15 +832,12 @@
     },
     applySettings(video) {
       this.setupClockForPlayer();
-      if (this.isExecuted("_mfs_apply", this.player)) return;
+      if (Tools.isExecuted("_mfs_apply", this.player)) return;
       this.applyCachedRate();
       this.applyCachedTime(video);
     },
-    remainTime: (v) => Math.floor(App.getRealDuration(v)) - Math.floor(v.currentTime),
-    playToggle: (v) => Site.isDouyu() ? v?.click() : v?.[v?.paused ? "play" : "pause"](),
-    playV: (v) => v?.paused && (Site.isDouyu() ? v?.click() : v?.play()),
     setPlaybackRate(rate) {
-      if (!rate || !this.player || this.isLive() || this.isDisRate() || +this.player.playbackRate === +rate) return;
+      if (!rate || !this.player || this.isLive() || this.unUsedRate() || +this.player.playbackRate === +rate) return;
       VideoEnhancer.setPlaybackRate(this.player, rate);
       this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
       if (!Storage.NOT_CACHE_SPEED.get()) Storage.CACHED_SPEED.set(this.player.playbackRate);
@@ -982,9 +976,8 @@
       this.showToast(`已${status ? "启" : "禁"}用 自动切换下集`);
     },
     customToast(start, text, end, dealy, isRemove) {
-      const span = document.createElement("span");
-      const child = Tools.newEle("span", { textContent: text, className: "cText" });
-      span.append(document.createTextNode(start), child, document.createTextNode(end));
+      const span = Tools.newEle("span");
+      span.append(start, Tools.newEle("span", { textContent: text, className: "cText" }), end);
       return this.showToast(span, dealy, isRemove);
     },
     showToast(content, dealy = Consts.THREE_SEC, isRemove = true) {
@@ -1115,7 +1108,7 @@
     setWebFullAttr(el) {
       const sroot = el.getRootNode();
       Tools.attr(el, Consts.webFull, true);
-      if (this.isExecuted("__Added__", sroot)) return;
+      if (Tools.isExecuted("__Added__", sroot)) return;
       if (sroot instanceof ShadowRoot) Tools.emitEvent("addStyle", { sroot });
     }
   };
@@ -1124,7 +1117,7 @@
       if (video.duration < 300 || video._mfs_hasTriedNext || this.remainTime(video) > Storage.NEXT_ADVANCE_SEC.get()) return;
       if (!Storage.IS_AUTO_NEXT.get() || Tools.isThrottle("autoNext", Consts.HALF_SEC)) return;
       if (this.isIgnoreNext()) return video._mfs_hasTriedNext = true;
-      this.dispatchShortcut(Keyboard.N);
+      this.dispatchShortcut(HotKey.N);
       video._mfs_hasTriedNext = true;
     },
     async autoWebFullscreen(video) {
@@ -1132,7 +1125,7 @@
       if (video._mfs_isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
       if (Site.isGmMatch() ? Storage.NO_AUTO_DEF.get() : !this.isAutoSite()) return;
       if (this.isIgnoreWide() || await this.isWebFull(video) || Tools.isOverLimit("autoWide")) return video._mfs_isWide = true;
-      this.dispatchShortcut(Keyboard.P);
+      this.dispatchShortcut(HotKey.P);
     },
     async isWebFull(video) {
       const { vw } = this.topWin;
@@ -1140,14 +1133,10 @@
       await Tools.sleep(Consts.HALF_SEC);
       return video.offsetWidth >= vw;
     },
-    autoExitWebFullscreen() {
+    autoExitFull(video) {
       if (!Site.isBili() && !Site.isAcFun()) return;
-      const isWide = this.player.offsetWidth === innerWidth;
-      if (isWide) this.toggleFullByIcon(this.isFullscreen ? Site.icons.full : Site.icons.webFull);
-      requestAnimationFrame(() => {
-        const isLast = Tools.query('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
-        if (!Tools.query(".video-pod") || isLast) Tools.query(".bpx-player-ending-related-item-cancel")?.click();
-      });
+      document.exitFullscreen().catch(() => video.offsetWidth >= innerWidth && this.toggleFullByIcon(Site.icons.webFull));
+      requestAnimationFrame(() => Tools.query(".bpx-player-ending-related-item-cancel")?.click());
     }
   };
   const Episode = {
@@ -1238,7 +1227,7 @@
   };
   const Picker = {
     setupPickerListener() {
-      if (Site.isGmMatch() || this.isExecuted("isBindPicker")) return;
+      if (Site.isGmMatch() || Tools.isExecuted("isBindPicker")) return;
       const handle = (event, { target, ctrlKey, altKey, isTrusted } = event) => {
         if (!ctrlKey || !altKey || !isTrusted || this.isNoVideo()) return;
         this.pickerCurrentEpisodePath(target) ?? this.pickerRelativeEpisodePath(target) ?? Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
@@ -1369,21 +1358,6 @@
       document.addEventListener("DOMContentLoaded", handle);
       window.addEventListener("load", handle);
     },
-    setFakeBiliUser() {
-      if (!Site.isBili()) return;
-      Tools.sleep(Consts.THREE_SEC * 2).then(() => {
-        if (unsafeWindow.__BiliUser__?.isLogin) return;
-        unsafeWindow.__BiliUser__.cache.data.isLogin = true;
-        unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
-      });
-    },
-    setBiliQuality() {
-      if (!Site.isBili() || !document.cookie.includes("DedeUserID") || !unsafeWindow.player) return;
-      const current = unsafeWindow.player.getQuality().realQ;
-      const list = unsafeWindow.player.getSupportedQualityList();
-      const target = list.find((quality) => quality === 80) ?? list[0];
-      if (current !== target) unsafeWindow.player.requestQuality(target);
-    },
     shouldHideTime: () => !App.isFullscreen && !Storage.PAGE_CLOCK.get(),
     setupClockForPlayer() {
       if (!this.player || this.shouldHideTime()) return this.Clock?.stop(true);
@@ -1395,9 +1369,9 @@
       return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
     },
     renderProgress(video) {
-      if (!video || this.player !== video || this.isMutedLoop(video)) return;
+      if (!video || this.player !== video) return;
       const duration = this.getRealDuration(video);
-      if (duration <= 30 || duration > 86400 || this.isLive() || this.shouldHideTime()) return this.progNode?.remove();
+      if (duration <= 30 || duration > 86400 || this.isLive() || this.shouldHideTime()) return this.timeEle?.remove();
       const percent = Tools.toFixed(video.currentTime / duration * 100, 1);
       const remain = this.formatTime(duration - video.currentTime);
       const el = this.createProgressElement();
@@ -1405,11 +1379,10 @@
       this.prependElement(el);
     },
     createProgressElement() {
-      if (this.progNode) return this.progNode;
-      const el = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
-      el.append(document.createTextNode("00:00"), Tools.newEle("b", { textContent: "%" }));
-      this.progNode = el;
-      return el;
+      if (this.timeEle) return this.timeEle;
+      this.timeEle = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
+      this.timeEle.append("00:00", Tools.newEle("b", { textContent: "%" }));
+      return this.timeEle;
     },
     playbackRateDisplay() {
       if (!this.player || this.isLive()) return;
@@ -1461,11 +1434,11 @@
     }
   };
   const Menu = {
-    isDisRate: () => Storage.DISABLE_SPEED.get(),
+    unUsedRate: () => Storage.DISABLE_SPEED.get(),
     isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
     isAutoSite: () => Storage.IS_SITE_AUTO.get(window.topWin?.host ?? location.host),
     initMenuCmds() {
-      if (this.isExecuted("hasMenu") || !Tools.isTopWin()) return;
+      if (Tools.isExecuted("hasMenu") || !Tools.isTopWin()) return;
       this.setupMenuStorageListener();
       this.setupMenuCmds();
     },
@@ -1587,7 +1560,6 @@
         { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_SPEED, attrs: ["send", "delay"] },
         { name: "memory", text: "禁用 记忆倍速", cache: Storage.NOT_CACHE_SPEED, attrs: ["send"] },
         { name: "tabs", text: "禁用 不可见暂停", cache: Storage.IS_INVISIBLE_PAUSE },
-        { name: "try", text: "禁用 尝试自动播放", cache: Storage.DISABLE_TRY_PLAY },
         { name: "next", text: "启用 自动切换下集", cache: Storage.IS_AUTO_NEXT },
         { name: "wClock", text: "启用 非全屏显时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
         { name: "sRate", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },

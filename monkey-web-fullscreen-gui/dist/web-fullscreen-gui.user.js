@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GUI-悬浮图形控制面板
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0
+// @version      1.0.1
 // @author       Feny
 // @description  为「视频自动网页全屏｜倍速播放」脚本提供悬浮图形控制面板，支持自由拖拽定位、深色/浅色主题切换
 // @license      GPL-3.0-only
@@ -49,26 +49,6 @@
     IS_DARK_THEME: new BasicStorage("IS_DARK_THEME", true, Boolean),
     DRAG_POSITION: new BasicStorage("DRAG_POSITION_", { x: 0, y: 0 })
   };
-  const Utils = {
-    waitFor(condition, opts = {}) {
-      const start = Date.now();
-      const { immediate = false, interval = 50, timeout = 3e3 } = opts;
-      return new Promise((resolve, reject) => {
-        const checkCondition = () => {
-          if (Date.now() - start > timeout) return reject(new Error("检测超时"));
-          condition() ? resolve() : setTimeout(checkCondition, interval);
-        };
-        immediate ? checkCondition() : setTimeout(checkCondition, interval);
-      });
-    },
-    onBefore(target, funcName, preExec) {
-      const original = target[funcName];
-      target[funcName] = function(...args) {
-        Promise.resolve().then(() => preExec.apply(this, args));
-        return original.apply(this, args);
-      };
-    }
-  };
   const Layout = {
     createPanelWrapper() {
       if (this.wrapper) return;
@@ -95,7 +75,7 @@
     createFullScreenControls() {
       const pip = () => document.exitPictureInPicture().catch(() => this.FS.player?.requestPictureInPicture());
       const config = [
-        { text: "画中画", icon: "▣", params: [], action: pip },
+        { text: "画中画", icon: "▣", action: pip },
         { text: "网页全屏", icon: "⤢", params: ["P", { isTrusted: true }], action: this.FS.dispatchShortcut },
         { text: "全屏", icon: "⛶", params: ["ENTER"], action: this.FS.dispatchShortcut }
       ];
@@ -103,18 +83,18 @@
     },
     createOperationControls() {
       const config = [
-        { text: "截图", icon: "⎙", params: [], action: this.FS.screenshot },
-        { text: "旋转", icon: "⟳", params: [], action: this.FS.rotateVideo },
-        { text: "镜像", icon: "][", params: [], action: this.FS.horizFlip },
+        { text: "截图", icon: "⎙", action: this.FS.screenshot },
+        { text: "旋转", icon: "⟳", action: this.FS.rotateVideo },
+        { text: "镜像", icon: "][", action: this.FS.horizFlip },
         { text: "上一帧", icon: "‹‹", params: [-1], action: this.FS.freezeFrame },
-        { text: "播放", icon: "▷", params: [], action: () => this.FS.playV(this.FS.player) },
-        { text: "下一帧", icon: "››", params: [], action: this.FS.freezeFrame }
+        { text: "播放", icon: "▷", action: () => this.FS.player?.play() },
+        { text: "下一帧", icon: "››", action: this.FS.freezeFrame }
       ];
       return this.createControlGroup(config);
     },
     createTransformControls() {
       const config = [
-        { text: "放大", icon: "+", params: [], action: this.FS.zoomVideo },
+        { text: "放大", icon: "+", action: this.FS.zoomVideo },
         { text: "上移", icon: "‹‹", params: ["ALT_UP"], action: this.FS.moveVideo },
         { text: "左移", icon: "‹‹", params: ["ALT_LEFT"], action: this.FS.moveVideo },
         { text: "缩小", icon: "-", params: [-1], action: this.FS.zoomVideo },
@@ -127,7 +107,7 @@
       const nodes = confs.map(({ text, icon, params = [], action = () => {
       } }) => {
         const el = FyTools.newEle("div", { className: "vc-control-item", onclick: () => action.apply(this.FS, params) });
-        el.append(FyTools.newEle("b", { textContent: icon }), document.createTextNode(text));
+        el.append(FyTools.newEle("b", { textContent: icon }), text);
         return el;
       });
       const container = FyTools.newEle("div", { className: "vc-func-group" });
@@ -149,6 +129,26 @@
       const container = FyTools.newEle("div", { className: "vc-slider-control" });
       container.append(this.label, row);
       return container;
+    }
+  };
+  const Utils = {
+    waitFor(condition, opts = {}) {
+      const start = Date.now();
+      const { immediate = false, interval = 50, timeout = 3e3 } = opts;
+      return new Promise((resolve, reject) => {
+        const checkCondition = () => {
+          if (Date.now() - start > timeout) return reject(new Error("waitFor 预期条件未满足"));
+          condition() ? resolve() : setTimeout(checkCondition, interval);
+        };
+        immediate ? checkCondition() : setTimeout(checkCondition, interval);
+      });
+    },
+    onBefore(target, funcName, preExec) {
+      const original = target[funcName];
+      target[funcName] = function(...args) {
+        Promise.resolve().then(() => preExec.apply(this, args));
+        return original.apply(this, args);
+      };
     }
   };
   const Control = {
