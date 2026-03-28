@@ -11,7 +11,7 @@ export default {
     const ctrl = new AbortController();
     video && this.videoAborts.get(video)?.abort(); // 防止重复绑定
 
-    const handle = ({ type, target }) => this[type](target);
+    const handle = ({ type, target }) => !this.isMutedLoop(target) && this[type](target);
     this.videoEvts.forEach((t) =>
       (video ?? document).addEventListener(t, handle, { capture: true, passive: true, signal: ctrl.signal })
     );
@@ -52,7 +52,7 @@ export default {
 
   // ====================⇓⇓⇓ 设置当前视频相关逻辑 ⇓⇓⇓====================
   setCurrentVideo(video) {
-    if (!video || this.player === video || video.offsetWidth < 260 || this.isMutedLoop(video)) return;
+    if (!video || this.player === video || video.offsetWidth < 260) return;
     if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // this.player 播放中
 
     this.setPlayer(video);

@@ -132,7 +132,7 @@ export default {
   setWebFullAttr(el) {
     const sroot = el.getRootNode();
     Tools.attr(el, Consts.webFull, true);
-    if (this.isExecuted("__Added__", sroot)) return;
+    if (Tools.isExecuted("__Added__", sroot)) return;
     if (sroot instanceof ShadowRoot) Tools.emitEvent("addStyle", { sroot });
   },
   customFullChangeHandle() {
@@ -155,9 +155,9 @@ export default {
     try {
       if (!jsCode) return;
       const code = `(async () => { ${jsCode} })()`;
-      const args = ["type", "App", "video", "Tools", "unsafeWindow"];
+      const args = ["type", "video", "Tools", "unsafeWindow"];
       const handler = (this.codeSnippetCache ??= new Function(...args, code));
-      handler(type, App, video, Tools, unsafeWindow);
+      handler(type, video, Tools, unsafeWindow);
     } catch (e) {
       const unsafe = e.message.includes("unsafe-eval");
       unsafe ? this.injectCodeSnippet(jsCode, type, video) : console.error("代码执行出错：", e);
@@ -168,7 +168,7 @@ export default {
     const injectCode = `
         (() => {
           document.addEventListener('${evt}', (e) => {
-            const { type, App, video, Tools, unsafeWindow } = e.detail;
+            const { type, video, Tools, unsafeWindow } = e.detail;
             (async () => { try { ${jsCode} } catch (err) { console.error('代码执行出错：', err); } })();
           }, { once: true });
         })();
@@ -176,6 +176,6 @@ export default {
 
     Tools.query(`#${evt}`)?.remove();
     GM_addElement("script", { id: evt, textContent: injectCode, type: "text/javascript" });
-    Tools.emitEvent(evt, { type, App, video, Tools, unsafeWindow });
+    Tools.emitEvent(evt, { type, video, Tools, unsafeWindow });
   },
 };

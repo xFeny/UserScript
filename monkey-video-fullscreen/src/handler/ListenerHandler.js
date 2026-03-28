@@ -8,7 +8,6 @@ import VideoEnhancer from "../lib/VideoEnhancer";
 export default {
   isNoVideo: () => !window.vMeta && !window.topWin,
   isMutedLoop: (video) => video?.muted && video?.loop,
-  isExecuted: (key, ctx = (window.e9x ??= {})) => ctx[key] || !!((ctx[key] = true), false),
   init(isNonFirst = false) {
     this.host = location.host;
     this.setupVideoListeners();
@@ -38,7 +37,7 @@ export default {
       Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
     });
 
-    if (this.isExecuted("isDefined")) return;
+    if (Tools.isExecuted("isDefined")) return;
     Object.defineProperty(this, "isFullscreen", {
       get: () => this._isFullscreen,
       set: (value) => {
@@ -64,7 +63,7 @@ export default {
     if (Tools.pointInElement(x, y, this.player)) return this.player;
 
     const getZIndex = (el) => Number(getComputedStyle(el).zIndex) || 0;
-    const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(x, y, v));
+    const videos = Tools.querys("video").filter((v) => Tools.pointInElement(x, y, v));
     return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
   createEdgeElement(video) {

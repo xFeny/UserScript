@@ -1,6 +1,5 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
-import Consts from "../common/Consts";
 import Clock from "../common/lib/Clock";
 import Storage from "../common/Storage";
 
@@ -12,27 +11,6 @@ export default {
     const handle = ({ type }) => this.executeCodeSnippet(Storage.LOAD_EVT_CODE.get(this.host), type, this.player);
     document.addEventListener("DOMContentLoaded", handle);
     window.addEventListener("load", handle);
-  },
-  /**
-   * 解决：B站未登录观看视频约1分钟弹出登录框问题
-   */
-  setFakeBiliUser() {
-    if (!Site.isBili()) return;
-    Tools.sleep(Consts.THREE_SEC * 2).then(() => {
-      if (unsafeWindow.__BiliUser__?.isLogin) return;
-      unsafeWindow.__BiliUser__.cache.data.isLogin = true;
-      unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
-    });
-  },
-  /**
-   * B站登录状态下画质设置为 1080P
-   */
-  setBiliQuality() {
-    if (!Site.isBili() || !document.cookie.includes("DedeUserID") || !unsafeWindow.player) return;
-    const current = unsafeWindow.player.getQuality().realQ;
-    const list = unsafeWindow.player.getSupportedQualityList();
-    const target = list.find((quality) => quality === 80) ?? list[0];
-    if (current !== target) unsafeWindow.player.requestQuality(target);
   },
   shouldHideTime: () => !App.isFullscreen && !Storage.PAGE_CLOCK.get(),
   setupClockForPlayer() {
@@ -47,10 +25,10 @@ export default {
     return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
   },
   renderProgress(video) {
-    if (!video || this.player !== video || this.isMutedLoop(video)) return;
+    if (!video || this.player !== video) return;
 
     const duration = this.getRealDuration(video);
-    if (duration <= 30 || duration > 864e2 || this.isLive() || this.shouldHideTime()) return this.progNode?.remove();
+    if (duration <= 30 || duration > 864e2 || this.isLive() || this.shouldHideTime()) return this.timeEle?.remove();
 
     const percent = Tools.toFixed((video.currentTime / duration) * 100, 1);
     const remain = this.formatTime(duration - video.currentTime);
@@ -60,14 +38,12 @@ export default {
     this.prependElement(el);
   },
   createProgressElement() {
-    if (this.progNode) return this.progNode;
+    if (this.timeEle) return this.timeEle;
 
     // 创建播放进度元素
-    const el = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
-    el.append(document.createTextNode("00:00"), Tools.newEle("b", { textContent: "%" }));
-    this.progNode = el;
-
-    return el;
+    this.timeEle = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
+    this.timeEle.append("00:00", Tools.newEle("b", { textContent: "%" }));
+    return this.timeEle;
   },
   // ====================⇑⇑⇑ 进度显示相关逻辑 ⇑⇑⇑====================
 

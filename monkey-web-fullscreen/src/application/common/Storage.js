@@ -18,11 +18,6 @@ export default unsafeWindow.FyStorage = {
   /** 网页全屏相关：全屏变换时的自定义处理逻辑 */
   FULL_CHANGE_CODE: new BasicStorage("FULL_CHANGE_CODE_", "", false, String, true),
 
-  /** 播放相关：禁用尝试自动播放 */
-  DISABLE_TRY_PLAY: new BasicStorage("DISABLE_TRY_PLAY", false, false, Boolean),
-  /** 播放相关：禁用标签页隐藏暂停 */
-  IS_INVISIBLE_PAUSE: new BasicStorage("DISABLE_INVISIBLE_PAUSE", false, false, Boolean),
-
   /** 倍速相关：倍速步进 */
   SPEED_STEP: new BasicStorage("PLAY_RATE_STEP", 0.25, false, parseFloat),
   /** 倍速相关：禁用倍速调节 */
@@ -36,12 +31,14 @@ export default unsafeWindow.FyStorage = {
   /** 倍速相关：预设的倍速数组 */
   PRESET_SPEED: new BasicStorage("PRESET_SPEED", "1.15,1.45,1.75", false, (value) => value.split(",")),
 
-  /** 快进秒数相关：快进/退秒数 */
+  /** 播放相关：快进/退秒数 */
   SKIP_INTERVAL: new BasicStorage("VIDEO_SKIP_INTERVAL", 5, false, Number),
-  /** 快进秒数相关：零键快进秒数 */
+  /** 播放相关：零键快进秒数 */
   ZERO_KEY_SKIP: new BasicStorage("ZERO_KEY_SKIP_INTERVAL", 30, false, Number),
-  /** 快进秒数相关：启用 空格 ◀▶ 键控制 */
+  /** 播放相关：启用 空格 ◀▶ 键控制 */
   OVERRIDE_KEY: new BasicStorage("OVERRIDE_KEYBOARD", false, false, Boolean),
+  /** 播放相关：禁用标签页隐藏暂停 */
+  IS_INVISIBLE_PAUSE: new BasicStorage("DISABLE_INVISIBLE_PAUSE", false, false, Boolean),
 
   /** 缩放和移动相关：移动距离 */
   MOVING_DISTANCE: new BasicStorage("MOVING_DISTANCE", 10, false, Number),

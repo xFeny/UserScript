@@ -1,8 +1,8 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
-import Keyboard from "../common/Keyboard";
 import VideoEnhancer from "../VideoEnhancer";
+import HotKey from "../common/HotKey";
 
 // 只在开发环境下执行，打包时会移除该代码
 if (import.meta.env.DEV) Tools.isTopWin() && window.addEventListener("resize", () => App.sendTopWinInfo());
@@ -15,7 +15,6 @@ export default {
   isFullscreen: false,
   isNoVideo: () => !window.vMeta && !window.topWin,
   isMutedLoop: (video) => video?.muted && video?.loop,
-  isExecuted: (key, ctx = (window.e9x ??= {})) => ctx[key] || !!((ctx[key] = true), false),
   init(isNonFirst = false) {
     this.host = location.host;
     this.setupVideoListeners();
@@ -30,7 +29,7 @@ export default {
     this.setupLoadEventListener();
     this.setupShadowVideoListener();
     this.setupIgnoreChangeListener();
-    this.observeWebFullscreenChange();
+    this.watchWebFullscreenChange();
     VideoEnhancer.hookActiveVideo();
   },
   setupVisibleListener() {
@@ -54,11 +53,11 @@ export default {
   },
   // ====================⇓⇓⇓ 设置当前视频相关逻辑 ⇓⇓⇓====================
   setCurrentVideo(video) {
-    if (!video || this.player === video || video.offsetWidth < 260 || this.isMutedLoop(video)) return;
+    if (!video || this.player === video || video.offsetWidth < 260) return;
     if (this.player && !this.player.paused && !isNaN(this.player.duration)) return; // this.player 播放中
 
     this.setPlayer(video);
-    this.observeVideoSrcChange(video);
+    this.watchVideoSrc(video);
   },
   setPlayer(video) {
     this.player = video;
@@ -84,8 +83,8 @@ export default {
     Tools.postMessage(vFrame?.contentWindow, data);
     if (vFrame) this.observeIFrameChange(vFrame);
   },
-  observeVideoSrcChange(video) {
-    if (this.isExecuted("observed", video)) return;
+  watchVideoSrc(video) {
+    if (Tools.isExecuted("observed", video)) return;
 
     const isFake = video.matches(Consts.FAKE_VIDEO);
     const onChange = (v) => (delete this.topWin, this.setPlayer(v));
@@ -101,7 +100,7 @@ export default {
    * 2. 自动聚焦iframe，使空格能控制视频播放
    */
   observeIFrameChange(iFrame) {
-    if (!iFrame || this.isExecuted("observed", iFrame)) return;
+    if (!iFrame || Tools.isExecuted("observed", iFrame)) return;
 
     new MutationObserver(() =>
       this.isFullscreen ? this.toggleFullscreen() : this.fsWrapper && this.exitWebFullscreen()
@@ -116,7 +115,7 @@ export default {
       Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
     });
 
-    if (this.isExecuted("isDefined")) return;
+    if (Tools.isExecuted("isDefined")) return;
     VideoEnhancer.defineProperty(this, "isFullscreen", {
       set: (value, setter) => (setter(value), this.onFullChange(value)),
     });
@@ -134,7 +133,7 @@ export default {
     // 播放器右上角时间的显/隐
     this.changeTimeDisplay();
   },
-  observeWebFullscreenChange() {
+  watchWebFullscreenChange() {
     const handle = () => Tools.scrollTop(this.fsWrapper.scrollY);
     VideoEnhancer.defineProperty(this, "fsWrapper", {
       set: (value, setter) => {
@@ -191,7 +190,7 @@ export default {
     if (Tools.pointInElement(x, y, this.player)) return this.player;
 
     const getZIndex = (el) => Number(getComputedStyle(el).zIndex) || 0;
-    const videos = Tools.querys("video").filter((v) => !this.isMutedLoop(v) && Tools.pointInElement(x, y, v));
+    const videos = Tools.querys("video").filter((v) => Tools.pointInElement(x, y, v));
     return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
   createEdgeElement(video) {
@@ -216,9 +215,9 @@ export default {
       const element = Tools.newEle("div", { video, className: `__edgeClick ${cls}` });
 
       element.onclick = (e) => {
-        Tools.preventDefault(e);
+        Tools.preventEvent(e);
         this.setPlayer(e.target.video);
-        Tools.sleep(5).then(() => this.dispatchShortcut(Keyboard.P, { isTrusted: true }));
+        Tools.sleep(5).then(() => this.dispatchShortcut(HotKey.P, true));
       };
 
       return element;

@@ -169,7 +169,7 @@ export default {
   setWebFullAttr(el) {
     const sroot = el.getRootNode();
     Tools.attr(el, Consts.webFull, true);
-    if (this.isExecuted("__Added__", sroot)) return;
+    if (Tools.isExecuted("__Added__", sroot)) return;
     if (sroot instanceof ShadowRoot) Tools.emitEvent("addStyle", { sroot });
   },
 };

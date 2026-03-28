@@ -8,11 +8,11 @@ import Swal from "sweetalert2";
  * 脚本菜单相关逻辑处理
  */
 export default {
-  isDisRate: () => Storage.DISABLE_SPEED.get(),
+  unUsedRate: () => Storage.DISABLE_SPEED.get(),
   isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
   isAutoSite: () => Storage.IS_SITE_AUTO.get(window.topWin?.host ?? location.host),
   initMenuCmds() {
-    if (this.isExecuted("hasMenu") || !Tools.isTopWin()) return;
+    if (Tools.isExecuted("hasMenu") || !Tools.isTopWin()) return;
     this.setupMenuStorageListener();
     this.setupMenuCmds();
   },
@@ -150,7 +150,6 @@ export default {
       { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_SPEED, attrs: ["send", "delay"] },
       { name: "memory", text: "禁用 记忆倍速", cache: Storage.NOT_CACHE_SPEED, attrs: ["send"] },
       { name: "tabs", text: "禁用 不可见暂停", cache: Storage.IS_INVISIBLE_PAUSE },
-      { name: "try", text: "禁用 尝试自动播放", cache: Storage.DISABLE_TRY_PLAY },
       { name: "next", text: "启用 自动切换下集", cache: Storage.IS_AUTO_NEXT },
       { name: "wClock", text: "启用 非全屏显时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
       { name: "sRate", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },

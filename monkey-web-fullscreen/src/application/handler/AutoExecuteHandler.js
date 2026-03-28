@@ -1,8 +1,8 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
+import HotKey from "../common/HotKey";
 import Storage from "../common/Storage";
-import Keyboard from "../common/Keyboard";
 
 /**
  * 自动网页全屏、自动切换下集逻辑处理
@@ -13,7 +13,7 @@ export default {
     if (!Storage.IS_AUTO_NEXT.get() || Tools.isThrottle("autoNext", Consts.HALF_SEC)) return;
     if (this.isIgnoreNext()) return (video._mfs_hasTriedNext = true);
 
-    this.dispatchShortcut(Keyboard.N);
+    this.dispatchShortcut(HotKey.N);
     video._mfs_hasTriedNext = true;
   },
   async autoWebFullscreen(video) {
@@ -23,7 +23,7 @@ export default {
     if (this.isIgnoreWide() || (await this.isWebFull(video)) || Tools.isOverLimit("autoWide")) return (video._mfs_isWide = true);
 
     // 发送网页全屏消息
-    this.dispatchShortcut(Keyboard.P);
+    this.dispatchShortcut(HotKey.P);
   },
   async isWebFull(video) {
     const { vw } = this.topWin;
@@ -31,18 +31,9 @@ export default {
     await Tools.sleep(Consts.HALF_SEC);
     return video.offsetWidth >= vw;
   },
-  autoExitWebFullscreen() {
+  autoExitFull(video) {
     if (!Site.isBili() && !Site.isAcFun()) return;
-    const isWide = this.player.offsetWidth === innerWidth;
-    if (isWide) this.toggleFullByIcon(this.isFullscreen ? Site.icons.full : Site.icons.webFull);
-
-    // 取消连播触发条件：
-    // - B站普通视频（非番剧）播放结束时
-    // - B站合集视频播放至最后一集时
-    // - B站合集中关闭「自动连播」选项时
-    requestAnimationFrame(() => {
-      const isLast = Tools.query('.video-pod .switch-btn:not(.on), .video-pod__item:last-of-type[data-scrolled="true"]');
-      if (!Tools.query(".video-pod") || isLast) Tools.query(".bpx-player-ending-related-item-cancel")?.click();
-    });
+    document.exitFullscreen().catch(() => video.offsetWidth >= innerWidth && this.toggleFullByIcon(Site.icons.webFull));
+    requestAnimationFrame(() => Tools.query(".bpx-player-ending-related-item-cancel")?.click()); // B站取消连播
   },
 };

@@ -1,24 +1,26 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
+import HotKey from "../common/HotKey";
 import Storage from "../common/Storage";
-import Keyboard from "../common/Keyboard";
 
 /**
  * 快捷键和消息相关逻辑处理
  */
 export default {
   isInputFocus: (e) => Tools.isInputable(e.composedPath()[0]),
-  preventKey(e, { code, altKey } = e) {
-    const isNumKeys = Tools.isNumber(e.key) && !this.isDisRate();
-    const isOverrideKey = this.isOverrideKey() && [Keyboard.Space, Keyboard.Left, Keyboard.Right].includes(code);
-    const isPreventKey = [Keyboard.K, Keyboard.L, Keyboard.M, Keyboard.N, Keyboard.P, Keyboard.R].includes(code);
-    const isMoveKeys = altKey && [Keyboard.Up, Keyboard.Down, Keyboard.Left, Keyboard.Right].includes(code);
-    if (isNumKeys || isOverrideKey || isPreventKey || isMoveKeys) Tools.preventDefault(e);
+  isUndefinedKey: ({ key, code }) => !Object.values(HotKey).includes(code) && !Tools.isNumber(key),
+  skipKeyEvent: (e) => App.isNoVideo() || App.isInputFocus(e) || App.isUndefinedKey(e),
+  preventEvent(e, { code, altKey } = e) {
+    const isNum = Tools.isNumber(e.key) && !this.unUsedRate();
+    const isOverride = this.isOverrideKey() && [HotKey.Space, HotKey.Left, HotKey.Right].includes(code);
+    const isBlock = [HotKey.K, HotKey.L, HotKey.M, HotKey.N, HotKey.P, HotKey.R].includes(code);
+    const isMove = altKey && [HotKey.Up, HotKey.Down, HotKey.Left, HotKey.Right].includes(code);
+    if (isNum || isOverride || isBlock || isMove) Tools.preventEvent(e);
   },
-  dispatchShortcut(code, { isTrusted = false } = {}) {
-    const key = this.processShortcutKey({ code });
-    Tools.postMessage(window.top, { key, isTrusted });
+  dispatchShortcut(code, isTrusted = false) {
+    const data = { key: this.processShortcutKey({ code }), isTrusted };
+    Tools.isTopWin() ? this.processEvent(data) : Tools.postMessage(window.top, data);
   },
   processShortcutKey({ key, code, ctrlKey, shiftKey, altKey }) {
     code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
@@ -26,20 +28,18 @@ export default {
     return keys.filter(Boolean).join("_").toUpperCase();
   },
   setupKeydownListener() {
-    unsafeWindow.addEventListener("keyup", (e) => this.preventKey(e), true);
     unsafeWindow.addEventListener("keydown", (e) => this.handleKeydown(e), true);
+    unsafeWindow.addEventListener("keyup", (e) => !this.skipKeyEvent(e) && this.preventEvent(e), true);
     unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
   },
   handleKeydown(e, { key, code, isTrusted } = e) {
     // Tools.log("键盘事件：", { key, code });
-    if (this.isNoVideo() || this.isInputFocus(e)) return;
-    if (!Object.values(Keyboard).includes(code) && !Tools.isNumber(key)) return;
+    if (this.skipKeyEvent(e)) return;
 
-    this.preventKey(e);
-    key = this.processShortcutKey(e);
-    const specialKeys = [Keyboard.N, Keyboard.P, Keyboard.Enter, Keyboard.NumEnter];
-    if (specialKeys.includes(code)) return this.dispatchShortcut(key, { isTrusted });
-    this.processEvent({ key, isTrusted });
+    this.preventEvent(e);
+    const emitKeys = [HotKey.N, HotKey.P, HotKey.Enter, HotKey.NumEnter];
+    if (emitKeys.includes(code)) return this.dispatchShortcut(key, { isTrusted });
+    this.processEvent({ key: this.processShortcutKey(e), isTrusted });
   },
   processEvent(data) {
     // 规避父窗口视频对 iframe 内视频网页全屏的干扰
@@ -100,10 +100,10 @@ export default {
   handleConfsMessage(data) {
     // 处理在 “更多设置” 中操作功能切换（启用/禁用）时发来的消息
     if (data?.sw_memory) this.delCachedRate(); // 禁用记忆倍速
-    if (data?.sw_speed) this.setPlaybackRate(1); // 禁用倍速调节
-    if (data?.sw_lCode) Storage.LOAD_EVT_CODE.set(data.sw_lCode, this.host);
-    if (data?.sw_vCode) Storage.VIDEO_EVT_CODE.set(data.sw_vCode, this.host);
+    if (data?.sw_speed) (this.setPlaybackRate(1), delete this.player.playbackRate); // 禁用倍速调节
     if (data?.sw_fsCode) Storage.FULL_CHANGE_CODE.set(data.sw_fsCode, this.host);
+    if (data?.sw_vCode) Storage.VIDEO_EVT_CODE.set(data.sw_vCode, this.host);
+    if (data?.sw_lCode) Storage.LOAD_EVT_CODE.set(data.sw_lCode, this.host);
     if (data?.sw_vCode || data?.sw_fsCode) this.codeSnippetCache.clear();
 
     if ("sw_sRate" in data) this.playbackRateDisplay(); // 左上角常显倍速

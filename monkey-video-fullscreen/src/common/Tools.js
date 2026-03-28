@@ -10,6 +10,7 @@ export default {
   querys: (selector, ctx) => querySelectorAll(selector, ctx),
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
   postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
+  isExecuted: (key, ctx = (window.e9x ??= {})) => ctx?.[key] || !!(ctx && (ctx[key] = true), false),
   getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
   isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
   preventDefault: (event) => event.preventDefault() & event.stopPropagation() & event.stopImmediatePropagation(),

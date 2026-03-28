@@ -15,7 +15,7 @@ import Swal from "sweetalert2";
  */
 export default {
   setupPickerListener() {
-    if (Site.isGmMatch() || this.isExecuted("isBindPicker")) return;
+    if (Site.isGmMatch() || Tools.isExecuted("isBindPicker")) return;
 
     const handle = (event, { target, ctrlKey, altKey, isTrusted } = event) => {
       if (!ctrlKey || !altKey || !isTrusted || this.isNoVideo()) return;

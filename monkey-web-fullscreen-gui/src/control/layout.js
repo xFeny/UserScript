@@ -1,5 +1,4 @@
 import Storage from "../common/Storage";
-import Utils from "../common/Utils";
 
 /**
  * 初始化控制面板元素
@@ -50,7 +49,7 @@ export default {
     const pip = () => document.exitPictureInPicture().catch(() => this.FS.player?.requestPictureInPicture());
 
     const config = [
-      { text: "画中画", icon: "▣", params: [], action: pip },
+      { text: "画中画", icon: "▣", action: pip },
       { text: "网页全屏", icon: "⤢", params: ["P", { isTrusted: true }], action: this.FS.dispatchShortcut },
       { text: "全屏", icon: "⛶", params: ["ENTER"], action: this.FS.dispatchShortcut },
     ];
@@ -61,12 +60,12 @@ export default {
    */
   createOperationControls() {
     const config = [
-      { text: "截图", icon: "⎙", params: [], action: this.FS.screenshot },
-      { text: "旋转", icon: "⟳", params: [], action: this.FS.rotateVideo },
-      { text: "镜像", icon: "][", params: [], action: this.FS.horizFlip },
+      { text: "截图", icon: "⎙", action: this.FS.screenshot },
+      { text: "旋转", icon: "⟳", action: this.FS.rotateVideo },
+      { text: "镜像", icon: "][", action: this.FS.horizFlip },
       { text: "上一帧", icon: "‹‹", params: [-1], action: this.FS.freezeFrame },
-      { text: "播放", icon: "▷", params: [], action: () => this.FS.playV(this.FS.player) },
-      { text: "下一帧", icon: "››", params: [], action: this.FS.freezeFrame },
+      { text: "播放", icon: "▷", action: () => this.FS.player?.play() },
+      { text: "下一帧", icon: "››", action: this.FS.freezeFrame },
     ];
     return this.createControlGroup(config);
   },
@@ -75,7 +74,7 @@ export default {
    */
   createTransformControls() {
     const config = [
-      { text: "放大", icon: "+", params: [], action: this.FS.zoomVideo },
+      { text: "放大", icon: "+", action: this.FS.zoomVideo },
       { text: "上移", icon: "‹‹", params: ["ALT_UP"], action: this.FS.moveVideo },
       { text: "左移", icon: "‹‹", params: ["ALT_LEFT"], action: this.FS.moveVideo },
       { text: "缩小", icon: "-", params: [-1], action: this.FS.zoomVideo },
@@ -91,7 +90,7 @@ export default {
   createControlGroup(confs) {
     const nodes = confs.map(({ text, icon, params = [], action = () => {} }) => {
       const el = FyTools.newEle("div", { className: "vc-control-item", onclick: () => action.apply(this.FS, params) });
-      el.append(FyTools.newEle("b", { textContent: icon }), document.createTextNode(text));
+      el.append(FyTools.newEle("b", { textContent: icon }), text);
       return el;
     });
 

@@ -1,4 +1,3 @@
-import Site from "../common/Site";
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
 import Storage from "../common/Storage";
@@ -9,6 +8,8 @@ import VideoEnhancer from "../VideoEnhancer";
  * 如：倍速、快进、缩放、移动等
  */
 export default {
+  playToggle: (v) => v?.[v?.paused ? "play" : "pause"](),
+  remainTime: (v) => Math.floor(App.getRealDuration(v)) - Math.floor(v.currentTime),
   isLive() {
     if (!this.player) return false;
     return this.player.duration === Infinity || this.isDynamicDur(this.player);
@@ -39,19 +40,15 @@ export default {
   },
   applySettings(video) {
     this.setupClockForPlayer();
-    if (this.isExecuted("_mfs_apply", this.player)) return;
+    if (Tools.isExecuted("_mfs_apply", this.player)) return;
 
     // ====== 应用缓存数据 ======
     this.applyCachedRate();
     this.applyCachedTime(video);
   },
-  remainTime: (v) => Math.floor(App.getRealDuration(v)) - Math.floor(v.currentTime),
-  playToggle: (v) => (Site.isDouyu() ? v?.click() : v?.[v?.paused ? "play" : "pause"]()),
-  playV: (v) => v?.paused && (Site.isDouyu() ? v?.click() : v?.play()),
-
   // ====================⇓⇓⇓ 调节播放倍速相关逻辑 ⇓⇓⇓====================
   setPlaybackRate(rate) {
-    if (!rate || !this.player || this.isLive() || this.isDisRate() || +this.player.playbackRate === +rate) return;
+    if (!rate || !this.player || this.isLive() || this.unUsedRate() || +this.player.playbackRate === +rate) return;
 
     // 设置倍速
     VideoEnhancer.setPlaybackRate(this.player, rate);
@@ -222,11 +219,12 @@ export default {
     const status = Storage.IS_AUTO_NEXT.set(!Storage.IS_AUTO_NEXT.get());
     this.showToast(`已${status ? "启" : "禁"}用 自动切换下集`);
   },
+  /**
+   * 效果：<span>正在以<span class="cText">1.15x</span>倍速播放</span>
+   */
   customToast(start, text, end, dealy, isRemove) {
-    // 最终呈现：<span>正在以<span class="cText">1.15x</span>倍速播放</span>
-    const span = document.createElement("span");
-    const child = Tools.newEle("span", { textContent: text, className: "cText" });
-    span.append(document.createTextNode(start), child, document.createTextNode(end));
+    const span = Tools.newEle("span");
+    span.append(start, Tools.newEle("span", { textContent: text, className: "cText" }), end);
     return this.showToast(span, dealy, isRemove);
   },
   showToast(content, dealy = Consts.THREE_SEC, isRemove = true) {

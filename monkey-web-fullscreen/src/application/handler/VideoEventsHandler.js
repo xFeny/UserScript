@@ -63,20 +63,16 @@ export default {
       this.ensureRateDisplay();
     });
   },
-  canplay(video) {
-    if (!Tools.isVisible(video) || Tools.isMultiV() || Storage.DISABLE_TRY_PLAY.get()) return;
-    if (!this.isExecuted("_mfs_playV", video)) this.playV(video);
-  },
   playing(video) {
     this.setCurrentVideo(video);
     video.tsr ??= { ...Consts.DEF_TSR };
     Tools.waitFor(() => this.topWin).then(() => this.applySettings(video));
   },
   ended(video) {
-    this.autoExitWebFullscreen();
+    this.autoExitFull(video);
     this.clearCachedTime(video);
   },
-  ratechange: (video) => App.playbackRateDisplay(),
+  ratechange: () => App.playbackRateDisplay(),
   customVideoEvtHandle(type, video) {
     if (type === "timeupdate" && Tools.isThrottle("codeSnippet", Consts.ONE_SEC)) return;
     Tools.sleep(10).then(() => this.executeCodeSnippet(Storage.VIDEO_EVT_CODE.get(this.host), type, video));
@@ -86,9 +82,9 @@ export default {
     try {
       if (!jsCode) return;
       const code = `(async () => { ${jsCode} })()`;
-      const args = ["type", "App", "video", "Tools", "unsafeWindow"];
+      const args = ["type", "video", "Tools", "unsafeWindow"];
       const handler = this.codeSnippetCache.get(type) || this.codeSnippetCache.set(type, new Function(...args, code)).get(type);
-      handler(type, App, video, Tools, unsafeWindow);
+      handler(type, video, Tools, unsafeWindow);
     } catch (e) {
       const unsafe = e.message.includes("unsafe-eval");
       unsafe ? this.injectCodeSnippet(jsCode, type, video) : console.error("代码执行出错：", e);
@@ -99,7 +95,7 @@ export default {
     const injectCode = `
       (() => {
         document.addEventListener('${evt}', (e) => {
-          const { type, App, video, Tools, unsafeWindow } = e.detail;
+          const { type, video, Tools, unsafeWindow } = e.detail;
           (async () => { try { ${jsCode} } catch (err) { console.error('代码执行出错：', err); } })();
         }, { once: true, passive: true });
       })();
@@ -107,6 +103,6 @@ export default {
 
     Tools.query(`#${evt}`)?.remove();
     GM_addElement("script", { id: evt, textContent: injectCode, type: "text/javascript" });
-    Tools.emitEvent(evt, { type, App, video, Tools, unsafeWindow });
+    Tools.emitEvent(evt, { type, video, Tools, unsafeWindow });
   },
 };

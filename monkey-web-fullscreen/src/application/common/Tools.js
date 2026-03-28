@@ -17,10 +17,11 @@ export default unsafeWindow.FyTools = {
   postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
   getNumbers: (str) => (typeof str === "string" ? (str.match(/\d+/g) ?? []).map(Number) : []),
   log: (...data) => console.log(...["%c===== 脚本日志 =====\n\n", "color:green;", ...data, "\n\n"]),
+  isExecuted: (key, ctx = (window.e9x ??= {})) => ctx?.[key] || !!(ctx && (ctx[key] = true), false),
   getIFrames: () => querySelectorAll("iframe:not([src=''], [src='#'], [id='buffer'], [id='install'])"),
   isVisible: (el) => !!(el && getComputedStyle(el).visibility !== "hidden" && (el.offsetWidth || el.offsetHeight)),
-  preventDefault: (e) => (e.preventDefault(), e.stopPropagation(), e.stopImmediatePropagation()),
   attr: (el, name, val) => el && name && el[val ? "setAttribute" : "removeAttribute"](name, val),
+  preventEvent: (e) => (e.preventDefault(), e.stopPropagation(), e.stopImmediatePropagation()),
   emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
   isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
   newEle: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
@@ -152,7 +153,7 @@ export default unsafeWindow.FyTools = {
 
     return new Promise((resolve, reject) => {
       const checkCondition = () => {
-        if (Date.now() - start > timeout) return reject(new Error("检测超时"));
+        if (Date.now() - start > timeout) return reject(new Error("waitFor 预期条件未满足"));
         condition() ? resolve() : setTimeout(checkCondition, interval);
       };
 

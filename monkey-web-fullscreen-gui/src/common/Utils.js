@@ -15,7 +15,7 @@ export default {
 
     return new Promise((resolve, reject) => {
       const checkCondition = () => {
-        if (Date.now() - start > timeout) return reject(new Error("检测超时"));
+        if (Date.now() - start > timeout) return reject(new Error("waitFor 预期条件未满足"));
         condition() ? resolve() : setTimeout(checkCondition, interval);
       };
 

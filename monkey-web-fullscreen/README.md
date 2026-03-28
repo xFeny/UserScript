@@ -237,12 +237,12 @@
 
 #### 2. 自动退出网页全屏
 
-脚本默认支持 B 站和 AcFun 弹幕网，在视频播放结束后自动退出全屏状态（番剧页面不支持）。对于 B 站，还会自动点击「取消连播」按钮，避免自动播放下一个视频。
+B 站视频播放结束后自动退出全屏状态且点击「取消连播」按钮，避免自动播放下一个视频。
 
 如需关闭此功能，请在脚本中注释掉以下代码：
 
 ```js
-this.autoExitWebFullscreen();
+this.autoExitFull(video);
 ```
 #### 3. 标签页不可见时自动暂停
 
@@ -293,7 +293,7 @@ this.autoExitWebFullscreen();
 
 #### 8. 执行自定义代码逻辑
 
-可访问的值：type, video, unsafeWindow, Tools, App
+可访问的值：type, video, unsafeWindow, Tools
 
 - **自定义页面加载事件处理逻辑**
 
@@ -305,9 +305,8 @@ this.autoExitWebFullscreen();
   // if(type === "DOMContentLoaded") console.log('DOM 树已构建完成，可以操作 DOM 元素了！');
   // if(type === "load") console.log('页面资源已加载完！');
   
-  Tools.sleep(3000).then(() => {
-    // 解决B站未登录时，播放一分钟左右弹出登录窗的问题
-    if (unsafeWindow.__BiliUser__?.isLogin) return;
+  // 解决B站未登录时，播放一分钟左右弹出登录窗的问题
+  Tools.waitFor(() => unsafeWindow.__BiliUser__ && !unsafeWindow.__BiliUser__.isLogin, { interval: 300 }).then(() => {
     unsafeWindow.__BiliUser__.cache.data.isLogin = true;
     unsafeWindow.__BiliUser__.cache.data.mid = Date.now();
   });
@@ -322,33 +321,32 @@ this.autoExitWebFullscreen();
   
 - **自定义视频各种事件处理逻辑**
 
-    事件类型（type）：`loadstart`、`loadedmetadata`、`loadeddata`、`timeupdate`、`ratechange`、`canplay`、`playing`、`ended`
-  
-    示例一：https://www.bilibili.com/
-  
-    ```js
-    // B站已登录时，清晰度切换为 1080P
-    if(type === "playing"){
-      if (!document.cookie.includes("DedeUserID") || !unsafeWindow.player) return;
-      const current = unsafeWindow.player.getQuality().realQ;
-      const list = unsafeWindow.player.getSupportedQualityList();
-      const target = list.find((quality) => quality === 80) ?? list[0];
-      if (current !== target) unsafeWindow.player.requestQuality(target);
-    }
-    ```
-  
-    > 也可以放到页面 `load` 事件中处理，这里只是用于举例。
-  
+  事件类型（type）：`loadstart`、`loadedmetadata`、`loadeddata`、`timeupdate`、`ratechange`、`canplay`、`playing`、`ended`
+
+  示例一：https://www.bilibili.com/
+
+  ```js
+  // B站已登录时，清晰度切换为 1080P，Tools.isExecuted() 用于标记只执行一次
+  if (type !== "playing" || Tools.isExecuted("setBiliQuality")) return;
+  Tools.waitFor(() => unsafeWindow.player && document.cookie.includes("DedeUserID"), { interval: 300 }).then(() => {
+    const current = unsafeWindow.player.getQuality().realQ;
+    const list = unsafeWindow.player.getSupportedQualityList();
+    const target = list.find((quality) => quality === 80) ?? list[0];
+    if (current !== target) unsafeWindow.player.requestQuality(target);
+  });
+  ```
+
+  > 也可以放到页面 `load` 事件中处理，这里只是用于举例。
+
   示例二：https://live.bilibili.com/
   ```js
   // B站直播切换最高清晰度
-  if (type === "playing") {
-    Tools.sleep(1500).then(() => {
-      const info = unsafeWindow.top?.livePlayer?.getPlayerInfo();
-      const qn = info?.qualityCandidates?.[0]?.qn ?? "10000";
-      if (info?.quality !== qn) unsafeWindow.top?.livePlayer?.switchQuality(qn);
-    });
-  }
+  if (type !== "playing" || Tools.isExecuted("setBiliLiveQuality")) return;
+  Tools.waitFor(() => unsafeWindow.top?.livePlayer, { interval: 500 }).then(() => {
+    const info = unsafeWindow.top?.livePlayer?.getPlayerInfo();
+    const qn = info?.qualityCandidates?.[0]?.qn ?? "10000";
+    if (info?.quality !== qn) unsafeWindow.top?.livePlayer?.switchQuality(qn);
+  });
   ```
 
 - **自定义全屏切换处理逻辑**
@@ -364,13 +362,5 @@ this.autoExitWebFullscreen();
     console.log("退出(网页)全屏模式！");
   }
   ```
-  
-    示例一：https://www.bilibili.com/
-  ```js
-  // 设置音量均衡
-  if(type === "default") return;
-  Tools.query('.bpx-player-ctrl-setting-loudness input[value="1"]')?.click();
-  ```
-  
   
 
