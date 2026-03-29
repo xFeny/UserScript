@@ -2,14 +2,11 @@ import Tools from "./common/Tools";
 
 class VideoEnhancer {
   static setPlaybackRate(video, rate) {
-    this.defineProperty(video, "playbackRate", {
-      set(value, setter) {
-        if (this.playbackRate === value) return;
-        this.__playRate === value && setter(value);
-      },
-    });
+    if (!Tools.isExecuted("__vRateHooked", video)) {
+      this.defineProperty(video, "playbackRate", { set: (val, setter) => video._vRate === val && setter(val) });
+    }
 
-    video.playbackRate = video.__playRate = Tools.toFixed(rate);
+    video.playbackRate = video._vRate = Tools.toFixed(rate);
   }
 
   /**
