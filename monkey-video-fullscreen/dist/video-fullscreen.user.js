@@ -2,7 +2,7 @@
 // @name            视频网页全屏
 // @name:en         Video Fullscreen
 // @namespace       npm/vite-plugin-monkey
-// @version         3.10.0
+// @version         3.10.1
 // @author          Feny
 // @description     让所有视频网页全屏，快捷键：P - 网页全屏，Enter - 全屏; 支持侧边点击切换网页全屏; 支持自动网页全屏
 // @description:en  Maximize all video players; Shortcut keys: P - Web Fullscreen, Enter - Fullscreen; Support side click to web fullscreen; Support auto web fullscreen
@@ -365,7 +365,7 @@
   const WebFull = {
     toggleFullscreen() {
       if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
-      document.exitFullscreen().catch(() => this.getVideoHostContainer()?.requestFullscreen());
+      document.exitFullscreen().catch(() => (this.enterWebFullscreen(), this.fsWrapper.requestFullscreen()));
     },
     toggleWebFullscreen(isTrusted) {
       if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
@@ -374,6 +374,7 @@
       Tools.microTask(() => this.customFullChangeHandle());
     },
     enterWebFullscreen() {
+      if (this.fsWrapper) return;
       const container = this.fsWrapper = this.getVideoHostContainer();
       if (!container || container.matches(":is(html, body)")) return this.adaptToWebFullscreen();
       container.scrollY = window.scrollY;
@@ -469,8 +470,8 @@
       if (sroot instanceof ShadowRoot) Tools.emitEvent("addStyle", { sroot });
     },
     customFullChangeHandle() {
-      if (Tools.isThrottle("fsChange", Consts.HALF_SEC)) return;
-      Tools.sleep(10).then(() => {
+      clearTimeout(this.e9x_fs_code);
+      this.e9x_fs_code = setTimeout(() => {
         const tol = 5;
         const { width, height } = window.screen;
         const { topWin, player, fsWrapper } = this;
@@ -480,7 +481,7 @@
         const type = isFs ? "isFull" : isWFs ? "isWFull" : "default";
         const jsCode = Storage.FS_CHANGE_CODE.get(topWin.host);
         this.executeCodeSnippet(jsCode, type, player);
-      });
+      }, 10);
     },
     executeCodeSnippet(jsCode, type, video) {
       try {
