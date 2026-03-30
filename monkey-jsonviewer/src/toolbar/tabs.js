@@ -1,5 +1,5 @@
 import jsonMind from "../mind";
-import URL from "../common/URL";
+import Urls from "../common/Urls";
 import Utils from "../common/Utils";
 
 const mindBox = Utils.query("#mindBox");
@@ -45,7 +45,7 @@ const tabs = {
       move: false,
       title: false,
       area: ["100vw", "100vh"],
-      content: `<iframe id="jsoncrackEmbed" src="${URL.JSON_CRACK_WIDGET}"></iframe>`,
+      content: `<iframe id="jsoncrackEmbed" src="${Urls.jsoncrack}"></iframe>`,
       success() {
         const jsonCrackEmbed = Utils.query("#jsoncrackEmbed");
         window?.addEventListener("message", () => {

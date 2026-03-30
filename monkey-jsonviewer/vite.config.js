@@ -13,7 +13,7 @@ export default defineConfig({
       userscript: {
         connect: "*",
         author: "Feny",
-        version: "1.1.2",
+        version: "1.1.3",
         match: ["*://*/*"],
         name: "JSON Viewer",
         license: "GPL-3.0-only",
@@ -23,6 +23,8 @@ export default defineConfig({
         description:
           "格式化显示 JSON 使数据看起来更加漂亮。支持 JSON 主题色切换。支持 JSON 脑图，清晰明了的查看 JSON 层级。支持通过 JSON Crack 查看 JSON。支持手动输入 JSON，HTTP 请求获取 JSON",
         require: ["https://unpkg.com/@popperjs/core@2.11.8/dist/umd/popper.min.js"],
+        "run-at": "document-end",
+        noframes: true,
       },
       entry: "src/main.js",
       build: {

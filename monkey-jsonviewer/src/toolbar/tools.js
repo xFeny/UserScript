@@ -1,4 +1,3 @@
-import URL from "../common/URL";
 import Utils from "../common/Utils";
 import http_form from "../layout/http_form";
 

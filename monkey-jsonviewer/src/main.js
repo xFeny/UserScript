@@ -1,14 +1,13 @@
 import Utils from "./common/Utils";
-import URL from "./common/URL";
+import Urls from "./common/Urls";
 import layout from "./layout";
 import "./layout/layout.scss";
 import "tippy.js/dist/tippy.css";
 
-const { EXAMPLE_JSON, LAYUI_JS } = URL;
 (function () {
   "use strict";
 
-  if (window.top === window.self) GM_registerMenuCommand("JSON示例", () => GM_openInTab(EXAMPLE_JSON));
+  GM_registerMenuCommand("JSON示例", () => GM_openInTab(Urls.example));
 
   const innerText = document.body.innerText;
   const { rawText, jsonpFun } = Utils.matchJsonp(innerText);
@@ -21,17 +20,13 @@ const { EXAMPLE_JSON, LAYUI_JS } = URL;
   Utils.hide(Utils.query("pre"));
   window.postMessage({ addStyle: true });
 
-  const meta = Utils.createElement("meta", { name: "viewport", content: "width=device-width, initial-scale=1.0" });
-  document.head.appendChild(meta);
+  GM_addElement("meta", { name: "viewport", content: "width=device-width, initial-scale=1.0" });
+  GM_addElement("script", { src: Urls.layui, type: "text/javascript" });
 
-  const script = Utils.createElement("script", { src: LAYUI_JS, type: "text/javascript" });
-  document.head.appendChild(script);
-
+  document.body.insertAdjacentHTML("afterbegin", layout);
   setTimeout(async () => {
-    document.body.insertAdjacentHTML("afterbegin", layout);
     const temp = Utils.query('template[data-for="viewFormater"]');
     Utils.query(".toolbar").innerHTML = temp.innerHTML;
-
     await import("./format");
     import("./scrollTop");
     import("./toolbar");
