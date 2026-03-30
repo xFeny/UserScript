@@ -47,7 +47,7 @@ export default defineConfig({
       userscript: {
         match,
         author: "Feny",
-        version: "3.10.2",
+        version: "3.10.3",
         connect: "gitee.com",
         license: "GPL-3.0-only",
         name: "视频自动网页全屏｜倍速播放",

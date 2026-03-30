@@ -32,7 +32,7 @@ export default {
   toggleFullscreen() {
     if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
     if (this.isGMatch()) return this.toggleFullByIcon(Site.icons.full);
-    document.exitFullscreen().catch(() => this.getVideoHostContainer()?.requestFullscreen());
+    document.exitFullscreen().catch(() => (this.enterWebFullscreen(), this.fsWrapper.requestFullscreen()));
   },
   toggleWebFullscreen(isTrusted) {
     if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
@@ -46,8 +46,8 @@ export default {
    * 若容器层级超过阈值，容器“脱离”原DOM结构
    */
   enterWebFullscreen() {
-    // video的宿主容器元素
-    const container = (this.fsWrapper = this.getVideoHostContainer());
+    if (this.fsWrapper) return;
+    const container = (this.fsWrapper = this.getVideoHostContainer()); // video的宿主容器元素
     if (!container || container.matches(":is(html, body)")) return this.adaptToWebFullscreen();
 
     container.scrollY = window.scrollY;

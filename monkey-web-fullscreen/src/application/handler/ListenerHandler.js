@@ -144,8 +144,9 @@ export default {
     });
   },
   customFullChangeHandle() {
-    if (Tools.isThrottle("fsChange", Consts.HALF_SEC)) return;
-    Tools.sleep(10).then(() => {
+    // 连续触发只执行最后一次
+    clearTimeout(this.e9x_fs_code);
+    this.e9x_fs_code = setTimeout(() => {
       const tol = 5; // 允许的偏差
       const { width, height } = window.screen;
       const { topWin, player, fsWrapper } = this;
@@ -158,7 +159,7 @@ export default {
 
       const jsCode = Storage.FULL_CHANGE_CODE.get(this.host);
       this.executeCodeSnippet(jsCode, type, player);
-    });
+    }, 10);
   },
   // ====================⇑⇑⇑ 全屏状态变换时处理相关逻辑 ⇑⇑⇑====================
 

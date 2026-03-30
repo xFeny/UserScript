@@ -10,7 +10,7 @@ import Storage from "../common/Storage";
 export default {
   toggleFullscreen() {
     if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
-    document.exitFullscreen().catch(() => this.getVideoHostContainer()?.requestFullscreen());
+    document.exitFullscreen().catch(() => (this.enterWebFullscreen(), this.fsWrapper.requestFullscreen()));
   },
   toggleWebFullscreen(isTrusted) {
     if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
@@ -19,8 +19,8 @@ export default {
     Tools.microTask(() => this.customFullChangeHandle());
   },
   enterWebFullscreen() {
-    // video的宿主容器元素
-    const container = (this.fsWrapper = this.getVideoHostContainer());
+    if (this.fsWrapper) return;
+    const container = (this.fsWrapper = this.getVideoHostContainer()); // video的宿主容器元素
     if (!container || container.matches(":is(html, body)")) return this.adaptToWebFullscreen();
 
     container.scrollY = window.scrollY;
@@ -136,8 +136,9 @@ export default {
     if (sroot instanceof ShadowRoot) Tools.emitEvent("addStyle", { sroot });
   },
   customFullChangeHandle() {
-    if (Tools.isThrottle("fsChange", Consts.HALF_SEC)) return;
-    Tools.sleep(10).then(() => {
+    // 连续触发只执行最后一次
+    clearTimeout(this.e9x_fs_code);
+    this.e9x_fs_code = setTimeout(() => {
       const tol = 5; // 偏差值
       const { width, height } = window.screen;
       const { topWin, player, fsWrapper } = this;
@@ -149,7 +150,7 @@ export default {
 
       const jsCode = Storage.FS_CHANGE_CODE.get(topWin.host);
       this.executeCodeSnippet(jsCode, type, player);
-    });
+    }, 10);
   },
   executeCodeSnippet(jsCode, type, video) {
     try {
