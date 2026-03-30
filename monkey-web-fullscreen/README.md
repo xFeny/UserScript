@@ -297,8 +297,10 @@ this.autoExitFull(video);
 
 - **自定义页面加载事件处理逻辑**
 
-  事件类型（type）：`DOMContentLoaded`、`load`
+  > **注意：** 自定义加载事件逻辑，需要刷新页面才能看到效果！！！
 
+  事件类型（type）：`DOMContentLoaded`、`load`
+  
   示例一：https://www.bilibili.com/
   
   ```js
@@ -318,6 +320,34 @@ this.autoExitFull(video);
   // 需要点击才会加载视频资源
   if(type === "load") Tools.query("body > #start")?.click();
   ```
+  示例三：重写获取下集跳转元素的逻辑
+  
+  ```js
+  /**
+   * 获取跳转目标集数的元素
+   * @param isPrev 是否跳转上一集；true = 上一集，false = 下一集
+   * @returns 要点击的元素
+   */
+  GM_E9X_FS.getJumpTargetEpisode(isPrev: boolean): HTMLElement;
+  ```
+  
+  1. [慕课网](https://www.imooc.com/)
+  
+     ```js
+     // 默认只能本章节内切换，重写逻辑使其不限于本章节切换
+     GM_E9X_FS.getJumpTargetEpisode = function () {
+       const all = Tools.querys(".sec-li a"); // 章节视频列表
+       const currIndex = all.findIndex((el) => el.href.includes(location.pathname)); // 当前播放的
+       return all[currIndex + 1]; // 要播放的下一个视频
+     };
+     ```
+  
+  2. [我要自学网](https://www.51zxw.net/)
+  
+     ```js
+     // 直接获取“下一节”元素
+     GM_E9X_FS.getJumpTargetEpisode = () => Tools.query(".icon-next-fill");
+     ```
   
 - **自定义视频各种事件处理逻辑**
 
