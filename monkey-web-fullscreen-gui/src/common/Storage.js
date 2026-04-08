@@ -5,7 +5,7 @@ import BasicStorage from "./lib/BasicStorage";
  */
 export default {
   /** 是否为深色主题 */
-  IS_DARK_THEME: new BasicStorage("IS_DARK_THEME", true, Boolean),
-  /** 是否为深色主题 */
+  DARK_THEME: new BasicStorage("DARK_THEME", true, Boolean),
+  /** 记录拖动的位置信息 */
   DRAG_POSITION: new BasicStorage("DRAG_POSITION_", { x: 0, y: 0 }),
 };

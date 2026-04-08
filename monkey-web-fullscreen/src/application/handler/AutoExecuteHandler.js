@@ -9,31 +9,29 @@ import Storage from "../common/Storage";
  */
 export default {
   autoNextEpisode(video) {
-    if (video.duration < 300 || video._mfs_hasTriedNext || this.remainTime(video) > Storage.NEXT_ADVANCE_SEC.get()) return;
-    if (!Storage.IS_AUTO_NEXT.get() || Tools.isThrottle("autoNext", Consts.HALF_SEC)) return;
-    if (this.isIgnoreNext()) return (video._mfs_hasTriedNext = true);
+    if (video.duration < 300 || video.vx_hasTriedNext || this.remainTime(video) > Storage.NEXT_ADVANCE.get()) return;
+    if (!Storage.NEXT_AUTO.get() || Tools.isThrottle("autoNext", Consts.HALF_SEC)) return;
+    if (this.isIgnoreNext()) return (video.vx_hasTriedNext = true);
 
     this.dispatchShortcut(HotKey.N);
-    video._mfs_hasTriedNext = true;
+    video.vx_hasTriedNext = true;
   },
   async autoWebFullscreen(video) {
     if (!this.topWin || !video.offsetWidth || this.player !== video) return;
-    if (video._mfs_isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC)) return;
+    if (video.vx_isWFs || Tools.isThrottle("autoWFs", Consts.ONE_SEC)) return;
     if (Site.isGmMatch() ? Storage.NO_AUTO_DEF.get() : !this.isAutoSite()) return;
-    if (this.isIgnoreWide() || (await this.isWebFull(video)) || Tools.isOverLimit("autoWide")) return (video._mfs_isWide = true);
+    if (this.isIgnoreWFs() || (await this.isWebFull()) || Tools.isOverLimit("autoWFs")) return (video.vx_isWFs = true);
 
     // 发送网页全屏消息
     this.dispatchShortcut(HotKey.P);
   },
-  async isWebFull(video) {
-    const { vw } = this.topWin;
-    if (video.offsetWidth < vw) return false;
-    await Tools.sleep(Consts.HALF_SEC);
-    return video.offsetWidth >= vw;
+  async isWebFull(ms = Consts.HALF_SEC) {
+    const isWFs = () => this.getFsMode() === "isWFull";
+    return isWFs() ? await Tools.sleep(ms).then(isWFs) : false;
   },
-  autoExitFull(video) {
+  autoExitFullscreen() {
     if (!Site.isBili() && !Site.isAcFun()) return;
-    document.exitFullscreen().catch(() => video.offsetWidth >= innerWidth && this.toggleFullByIcon(Site.icons.webFull));
+    document.exitFullscreen().catch(async () => (await this.isWebFull(5)) && this.iconToFull(Site.icons.webFull));
     requestAnimationFrame(() => Tools.query(".bpx-player-ending-related-item-cancel")?.click()); // B站取消连播
   },
 };

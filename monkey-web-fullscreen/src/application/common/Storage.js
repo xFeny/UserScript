@@ -4,73 +4,49 @@ import BasicStorage from "./lib/BasicStorage";
  * 脚本存储键值配置
  */
 export default unsafeWindow.FyStorage = {
-  /** 缓存远端`@match`网址的相关图标选择器 */
-  ICONS_SELECTOR: new BasicStorage("ICONS_SELECTOR", null),
+  /** 脚本菜单 */
+  SITE_AUTO: new BasicStorage("SITE_AUTO_", false, false, Boolean, true), // 此站 启/禁用自动网页全屏
+  DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, false, Number, true), // 此站脱离式全屏阈值
 
-  /** 网页全屏相关：自定义此站视频容器 */
-  CUSTOM_CTN: new BasicStorage("CUSTOM_WEB_FULL_", "", false, String, true),
-  /** 网页全屏相关：禁用`@match`网址自动网页全屏 */
-  NO_AUTO_DEF: new BasicStorage("DISABLE_DEFAULT_AUTO", false, false, Boolean),
-  /** 网页全屏相关：此站启/禁用自动网页全屏 */
-  IS_SITE_AUTO: new BasicStorage("ENABLE_THIS_SITE_AUTO_", false, false, Boolean, true),
-  /** 网页全屏相关：脱离原结构网页全屏的阈值 */
-  DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, false, Number, true),
-  /** 网页全屏相关：全屏变换时的自定义处理逻辑 */
-  FULL_CHANGE_CODE: new BasicStorage("FULL_CHANGE_CODE_", "", false, String, true),
+  /** 更多设置-控制 */
+  NO_AUTO_DEF: new BasicStorage("NO_AUTO_DEF", false, false, Boolean), // 禁用 默认自动
+  DISABLE_RATE: new BasicStorage("DISABLE_RATE", false, false, Boolean), // 禁用 倍速调节
+  FORGET_RATE: new BasicStorage("FORGET_RATE", false, false, Boolean), // 禁用 记忆倍速
+  INVIS_PAUSE: new BasicStorage("DISABLE_INVISIBLE_PAUSE", false, false, Boolean), // 禁用 不可见暂停
+  NEXT_AUTO: new BasicStorage("NEXT_AUTO", false, false, Boolean), // 启用 自动切换下集
+  CLOCK_WEB: new BasicStorage("CLOCK_WEB", false, false, Boolean), // 启用 非全屏显时间
+  RATE_SHOW: new BasicStorage("RATE_KEEP_SHOW", false, false, Boolean), // 启用 左上角常显倍速
+  OVERRIDE_KEY: new BasicStorage("OVERRIDE_KEYBOARD", false, false, Boolean), // 启用 空格 ◀▶ 键控制
 
-  /** 倍速相关：倍速步进 */
-  SPEED_STEP: new BasicStorage("PLAY_RATE_STEP", 0.25, false, parseFloat),
-  /** 倍速相关：禁用倍速调节 */
-  DISABLE_SPEED: new BasicStorage("CLOSE_PLAY_RATE", false, false, Boolean),
-  /** 倍速相关：常显倍速 */
-  RATE_KEEP_SHOW: new BasicStorage("RATE_KEEP_SHOW", false, false, Boolean),
-  /** 倍速相关：禁用记忆倍速 */
-  NOT_CACHE_SPEED: new BasicStorage("DISABLE_MEMORY_SPEED", false, false, Boolean),
-  /** 倍速相关：记忆的倍速 */
-  CACHED_SPEED: new BasicStorage("FENY_SCRIPTS_V_PLAYBACK_RATE", 1, true, parseFloat),
-  /** 倍速相关：预设的倍速数组 */
-  PRESET_SPEED: new BasicStorage("PRESET_SPEED", "1.15,1.45,1.75", false, (value) => value.split(",")),
+  /** 更多设置-参数 */
+  RATE_STEP: new BasicStorage("RATE_STEP", 0.25, false, parseFloat), // 倍速步进
+  SKIP_INTERVAL: new BasicStorage("SKIP_INTERVAL", 5, false, Number), // 快进/退秒数
+  ZERO_KEY_SKIP: new BasicStorage("ZERO_KEY_SKIP_INTERVAL", 30, false, Number), // 零键快进秒数
+  NEXT_ADVANCE: new BasicStorage("NEXT_ADVANCE", 75, false, Number), // 自动下集提前秒数
+  ZOOM_PERCENT: new BasicStorage("ZOOM_PERCENT", 10, false, Number), // 缩放百分比
+  MOVE_DIST: new BasicStorage("MOVE_DIST", 10, false, Number), // 移动距离
+  CLOCK_COLOR: new BasicStorage("CLOCK_COLOR", "#e0e0e0"), // 时间颜色
+  PRESET_RATE: new BasicStorage("PRESET_SPEED", "1.15,1.45,1.75", false, (value) => value.split(",")), // 预设的常用倍速
 
-  /** 播放相关：快进/退秒数 */
-  SKIP_INTERVAL: new BasicStorage("VIDEO_SKIP_INTERVAL", 5, false, Number),
-  /** 播放相关：零键快进秒数 */
-  ZERO_KEY_SKIP: new BasicStorage("ZERO_KEY_SKIP_INTERVAL", 30, false, Number),
-  /** 播放相关：启用 空格 ◀▶ 键控制 */
-  OVERRIDE_KEY: new BasicStorage("OVERRIDE_KEYBOARD", false, false, Boolean),
-  /** 播放相关：禁用标签页隐藏暂停 */
-  IS_INVISIBLE_PAUSE: new BasicStorage("DISABLE_INVISIBLE_PAUSE", false, false, Boolean),
+  /** 更多设置-忽略 */
+  NEXT_IGNORE_URLS: new BasicStorage("NEXT_IGNORE_URLS", ""), // 下集
+  FULL_IGNORE_URLS: new BasicStorage("FULL_IGNORE_URLS", ""), // 网页全屏
 
-  /** 缩放和移动相关：移动距离 */
-  MOVING_DISTANCE: new BasicStorage("MOVING_DISTANCE", 10, false, Number),
-  /** 缩放和移动相关：缩放百分比 */
-  ZOOM_PERCENT: new BasicStorage("ZOOM_PERCENT", 10, false, Number),
+  /** 更多设置-全屏 */
+  V_WRAPPER: new BasicStorage("V_WRAPPER_", "", false, String, true), // 视频容器
+  FS_CODE: new BasicStorage("FULL_CHANGE_CODE_", "", false, String, true), // 全屏切换执行代码
 
-  /** 下集切换相关：启用自动切换至下集 */
-  IS_AUTO_NEXT: new BasicStorage("ENABLE_AUTO_NEXT_EPISODE", false, false, Boolean),
-  /** 下集切换相关：自动下集提前秒数 */
-  NEXT_ADVANCE_SEC: new BasicStorage("AUTO_NEXT_ADVANCE_SECONDS", 75, false, Number),
-  /** 下集切换相关：自定义下集切换—当前播放集数 拾取的CSS选择器 */
-  RELATIVE_EPISODE: new BasicStorage("RELATIVE_EPISODE_SELECTOR_", "", false, String, true),
-  /** 下集切换相关：自定义下集切换—集数列表中的任意一集 拾取的CSS选择器 */
-  CURRENT_EPISODE: new BasicStorage("CURRENT_EPISODE_SELECTOR_", "", false, String, true),
+  /** 更多设置-下集 */
+  NEXT_CUR_EP: new BasicStorage("CURRENT_EPISODE_SELECTOR_", "", false, String, true), // 当前集选择器
+  NEXT_REL_EP: new BasicStorage("RELATIVE_EPISODE_SELECTOR_", "", false, String, true), // 全部集选择器
 
-  /** 时间显示相关：非全屏模式下显示时间 */
-  PAGE_CLOCK: new BasicStorage("UNFULL_CLOCK", false, false, Boolean),
-  /** 时间显示相关：时间颜色 */
-  CLOCK_COLOR: new BasicStorage("CLOCK_COLOR", "#e0e0e0"),
+  /** 更多设置-高级 */
+  LOAD_CODE: new BasicStorage("LOAD_EVT_CODE_", "", false, String, true), // load 事件执行代码
+  VIDEO_CODE: new BasicStorage("VIDEO_EVT_CODE_", "", false, String, true), // video 事件执行代码
 
-  /** 播放进度相关：播放进度保存天数 */
-  STORAGE_DAYS: new BasicStorage("STORAGE_DAYS", 8, false, parseFloat),
-  /** 播放进度相关：记录的视频播放进度 */
-  PLAY_TIME: new BasicStorage("PLAY_TIME_", 0, true, undefined, true),
-
-  /** 忽略网址相关：自动切换下集时忽略的网址列表 */
-  NEXT_IGNORE_URLS: new BasicStorage("NEXT_IGNORE_URLS", ""),
-  /** 忽略网址相关：自动网页全屏时忽略的网址列表 */
-  FULL_IGNORE_URLS: new BasicStorage("FULL_IGNORE_URLS", ""),
-
-  /** 事件：load 事件回调代码片段 */
-  LOAD_EVT_CODE: new BasicStorage("LOAD_EVT_CODE_", "", false, String, true),
-  /** 事件：video 事件回调代码片段 */
-  VIDEO_EVT_CODE: new BasicStorage("VIDEO_EVT_CODE_", "", false, String, true),
+  /** 其他缓存键名 */
+  ICONS_SELECTOR: new BasicStorage("ICONS_SELECTOR", null), // 缓存远端默认`@match`图标选择器
+  CACHED_RATE: new BasicStorage("FENY_SCRIPTS_V_PLAYBACK_RATE", 1, true, parseFloat), // 记忆的倍速
+  STORAGE_DAYS: new BasicStorage("STORAGE_DAYS", 8, false, parseFloat), // 播放进度保存天数
+  V_TIME: new BasicStorage("PLAY_TIME_", 0, true, undefined, true), // 视频播放进度
 };

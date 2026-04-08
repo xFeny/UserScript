@@ -58,8 +58,8 @@ export default {
       K: () => this.freezeFrame(-1),
       ENTER: () => this.toggleFullscreen(),
       P: () => this.toggleWebFullscreen(isTrusted),
-      D: () => Site.isGmMatch() && this.triggerIconElement(Site.icons.danmaku),
-      N: () => (Site.isGmMatch() ? this.triggerIconElement(Site.icons.next) : this.switchEpisode()),
+      D: () => Site.isGmMatch() && this.triggerIcon(Site.icons.danmaku),
+      N: () => (Site.isGmMatch() ? this.triggerIcon(Site.icons.next) : this.switchEpisode()),
       SPACE: () => this.isOverrideKey() && this.playToggle(this.player),
       0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP.get(), !0) || 0,
       LEFT: () => this.skipPlayback(-Storage.SKIP_INTERVAL.get()),
@@ -73,10 +73,10 @@ export default {
     };
 
     // 倍速加减
-    ["A", "S", "ADD", "SUB"].forEach((k, i) => (dict[k] = () => this.adjustPlayRate([1, -1][i % 2] * Storage.SPEED_STEP.get())));
+    ["A", "S", "ADD", "SUB"].forEach((k, i) => (dict[k] = () => this.adjustPlayRate([1, -1][i % 2] * Storage.RATE_STEP.get())));
 
     // 预设常用倍速值
-    for (let i = 1; i < 6; i++) dict[`CTRL_${i}`] = () => this.setPlaybackRate(Storage.PRESET_SPEED.get()[i - 1]);
+    for (let i = 1; i < 6; i++) dict[`CTRL_${i}`] = () => this.setPlaybackRate(Storage.PRESET_RATE.get()[i - 1]);
 
     // 视频移动
     ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => (dict[k] = () => this.moveVideo(k)));
@@ -100,14 +100,14 @@ export default {
   handleConfsMessage(data) {
     // 处理在 “更多设置” 中操作功能切换（启用/禁用）时发来的消息
     if (data?.sw_memory) this.delCachedRate(); // 禁用记忆倍速
-    if (data?.sw_speed) (this.setPlaybackRate(1), delete this.player.playbackRate); // 禁用倍速调节
-    if (data?.sw_fsCode) Storage.FULL_CHANGE_CODE.set(data.sw_fsCode, this.host);
-    if (data?.sw_vCode) Storage.VIDEO_EVT_CODE.set(data.sw_vCode, this.host);
-    if (data?.sw_lCode) Storage.LOAD_EVT_CODE.set(data.sw_lCode, this.host);
-    if (data?.sw_vCode || data?.sw_fsCode) this.codeSnippetCache.clear();
+    if (data?.sw_lCode) Storage.LOAD_CODE.set(data.sw_lCode, this.host);
+    if (data?.sw_fsCode) Storage.FS_CODE.set(data.sw_fsCode, this.host);
+    if (data?.sw_vCode) Storage.VIDEO_CODE.set(data.sw_vCode, this.host);
+    if (data?.sw_vCode || data?.sw_fsCode) this.codeSnippetCache.clear(); // 清除缓存的代码片段
+    if (data?.sw_speed) (this.setPlaybackRate(1), delete this.player?.playbackRate); // 禁用倍速调节
 
-    if ("sw_sRate" in data) this.playbackRateDisplay(); // 左上角常显倍速
-    if ("sw_color" in data) this.setTimeColor(data.sw_color); // 时间颜色
+    if ("sw_sRate" in data) setTimeout(() => this.playbackRateDisplay(), 30); // 左上角常显倍速
     if ("sw_wClock" in data) setTimeout(() => this.changeTimeDisplay(), 30); // 非全屏显示时间
+    if ("sw_color" in data) this.setTimeColor(data.sw_color); // 时间颜色
   },
 };

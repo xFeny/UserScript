@@ -8,30 +8,25 @@ import Swal from "sweetalert2";
  * 脚本菜单相关逻辑处理
  */
 export default {
-  unUsedRate: () => Storage.DISABLE_SPEED.get(),
+  unUsedRate: () => Storage.DISABLE_RATE.get(),
   isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
-  isAutoSite: () => Storage.IS_SITE_AUTO.get(window.topWin?.host ?? location.host),
+  isAutoSite: () => Storage.SITE_AUTO.get(window.topWin?.host ?? location.host),
   initMenuCmds() {
     if (Tools.isExecuted("hasMenu") || !Tools.isTopWin()) return;
-    this.setupMenuStorageListener();
+    this.setupMenuChangeListener();
     this.setupMenuCmds();
   },
-  setupMenuStorageListener() {
-    [Storage.IS_SITE_AUTO, Storage.CURRENT_EPISODE].forEach((it) =>
-      GM_addValueChangeListener(`${it.name}${this.host}`, () => this.setupMenuCmds())
-    );
+  setupMenuChangeListener() {
+    [Storage.SITE_AUTO].forEach((t) => GM_addValueChangeListener(t.name + this.host, () => this.setupMenuCmds()));
   },
   setupMenuCmds() {
-    const epHide = !Storage.CURRENT_EPISODE.get(this.host);
     const tle = `此站${this.isAutoSite() ? "禁" : "启"}用自动网页全屏`;
-    const sFn = ({ host, cache }) => cache.set(!cache.get(host), host);
-    const delFn = ({ host }) => Storage.CURRENT_EPISODE.del(host) & Storage.RELATIVE_EPISODE.del(host);
+    const sFn = ({ host, cache }) => cache.toggle(host);
 
     // 菜单配置项
     const configs = [
-      { title: tle, cache: Storage.IS_SITE_AUTO, useHost: true, isHide: Site.isGmMatch(), fn: sFn },
+      { title: tle, cache: Storage.SITE_AUTO, useHost: true, isHide: Site.isGmMatch(), fn: sFn },
       { title: "此站脱离式全屏阈值", cache: Storage.DETACH_THRESHOLD, useHost: true, isHide: Site.isGmMatch() },
-      { title: "删除此站剧集选择器", cache: Storage.CURRENT_EPISODE, useHost: true, isHide: epHide, fn: delFn },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, fn: this.shortcutKeysPopup },
       { title: "更多设置", cache: { name: "SETTING" }, fn: this.settingPopup },
     ];
@@ -89,47 +84,51 @@ export default {
       showCancelButton: true,
       cancelButtonText: "关闭",
       showConfirmButton: false,
-      customClass: { container: "monkey-web-fullscreen" },
+      customClass: { container: "vpx-popup" },
       html: Tools.safeHTML(`<table><tr><th>快捷键</th><th>说明</th><th>快捷键</th><th>说明</th></tr>${rows}</table>`),
     });
   },
   settingPopup() {
-    const [a, b, c, d, e] = [this.genBasics(), this.genParams(), this.genIgnore(), this.genFull(), this.genCode()];
-    const cacheMap = Object.assign({}, ...[a, b, c, d, e].map((it) => it.eCache));
+    const cacheMap = {};
+    const tabConfs = ["控制:Basics", "参数:Params", "忽略:Ignore", "全屏:Full", "下集:Next", "高级:Extend"];
 
-    const html = `
-        <div class="swal2-tabs">
-          <div class="swal2-tabs-header">
-              <div class="swal2-tab active" data-id="tab1">控制</div>
-              <div class="swal2-tab" data-id="tab2">参数</div>
-              <div class="swal2-tab" data-id="tab3">忽略</div>
-              <div class="swal2-tab" data-id="tab4">全屏</div>
-              <div class="swal2-tab" data-id="tab5">增强</div>
-          </div>
-          <div class="swal2-tabs-content">
-            <div class="swal2-tab-panel active" id="tab1">${a.html}</div>
-            <div class="swal2-tab-panel" id="tab2">${b.html}</div>
-            <div class="swal2-tab-panel" id="tab3">${c.html}</div>
-            <div class="swal2-tab-panel" id="tab4">${d.html}</div>
-            <div class="swal2-tab-panel" id="tab5">${e.html}</div>
-          </div>
-        </div>`;
+    // 创建容器
+    const header = Tools.newEle("div", { className: "vpx-tabs-header" });
+    const content = Tools.newEle("div", { className: "vpx-tabs-content" });
 
+    tabConfs.forEach((conf, i) => {
+      const tabId = `tab_${i}`;
+      const cur = i ? "" : "active";
+      const [textContent, method] = conf.split(":");
+      const { html, eCache } = this[`render${method}`]();
+
+      // 插入元素
+      header.append(Tools.newEle("div", { tabId, className: `vpx-tab ${cur}`, textContent }));
+      content.append(Tools.newEle("div", { className: `vpx-tab-panel ${tabId} ${cur}`, innerHTML: html }));
+
+      // 合并缓存映射到总cacheMap
+      Object.assign(cacheMap, eCache);
+    });
+
+    const tabs = Tools.newEle("div", { className: "vpx-tabs" });
+    tabs.append(header, content);
+
+    // 显示弹窗
     Swal.fire({
       width: 400,
+      html: tabs,
       title: "设置",
       showCancelButton: true,
       cancelButtonText: "关闭",
       showConfirmButton: false,
-      html: Tools.safeHTML(html),
-      customClass: { container: "monkey-web-fullscreen" },
+      customClass: { container: "vpx-popup" },
       didOpen(popup) {
         // 处理Tabs切换
-        popup.onclick = ({ target: tab }) => {
-          if (!tab.matches(".swal2-tab")) return;
+        popup.onclick = ({ target: t }) => {
+          if (!t.matches(".vpx-tab")) return;
           Tools.querys(".active", popup).forEach((el) => Tools.delCls(el, "active"));
-          Tools.query(`#${tab.dataset.id}`, popup).classList.add("active");
-          tab.classList.add("active");
+          Tools.query(`.${t.tabId}`, popup).classList.add("active");
+          t.classList.add("active");
         };
 
         // 输入事件监听
@@ -144,93 +143,95 @@ export default {
       },
     });
   },
-  genBasics() {
+  renderBasics() {
     const confs = [
       { name: "autoDef", text: "禁用 默认自动", cache: Storage.NO_AUTO_DEF },
-      { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_SPEED, attrs: ["send", "delay"] },
-      { name: "memory", text: "禁用 记忆倍速", cache: Storage.NOT_CACHE_SPEED, attrs: ["send"] },
-      { name: "tabs", text: "禁用 不可见暂停", cache: Storage.IS_INVISIBLE_PAUSE },
-      { name: "next", text: "启用 自动切换下集", cache: Storage.IS_AUTO_NEXT },
-      { name: "wClock", text: "启用 非全屏显时间", cache: Storage.PAGE_CLOCK, attrs: ["send"] },
-      { name: "sRate", text: "启用 左上角常显倍速", cache: Storage.RATE_KEEP_SHOW, attrs: ["send"] },
+      { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_RATE, attrs: ["send", "delay"] },
+      { name: "memory", text: "禁用 记忆倍速", cache: Storage.FORGET_RATE, attrs: ["send"] },
+      { name: "tabs", text: "禁用 不可见暂停", cache: Storage.INVIS_PAUSE },
+      { name: "next", text: "启用 自动切换下集", cache: Storage.NEXT_AUTO },
+      { name: "wClock", text: "启用 非全屏显时间", cache: Storage.CLOCK_WEB, attrs: ["send"] },
+      { name: "sRate", text: "启用 左上角常显倍速", cache: Storage.RATE_SHOW, attrs: ["send"] },
       { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEY },
     ];
 
     const render = ({ text, name, value, dataset }) => `
-        <label class="__menu">${text}
+        <label class="vpx-input">${text}
           <input name="${name}" ${value ? "checked" : ""} ${dataset} type="checkbox"/>
           <span class="toggle-track"></span>
         </label>`;
 
     return this.generate(confs, render);
   },
-  genParams() {
+  renderParams() {
     const confs = [
-      { name: "step", text: "倍速步进", cache: Storage.SPEED_STEP },
+      { name: "step", text: "倍速步进", cache: Storage.RATE_STEP },
       { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
       { name: "zero", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP },
-      { name: "advance", text: "下集提前秒数", cache: Storage.NEXT_ADVANCE_SEC },
+      { name: "advance", text: "下集提前秒数", cache: Storage.NEXT_ADVANCE },
       { name: "percent", text: "缩放百分比", cache: Storage.ZOOM_PERCENT },
-      { name: "move", text: "移动距离", cache: Storage.MOVING_DISTANCE },
+      { name: "move", text: "移动距离", cache: Storage.MOVE_DIST },
       { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR, attrs: ["send"] },
-      { name: "preset", text: "常用倍速", cache: Storage.PRESET_SPEED },
+      { name: "preset", text: "常用倍速", cache: Storage.PRESET_RATE },
     ];
 
     const render = ({ text, name, value, dataset }) => `
-        <label class="__menu">${text}
+        <label class="vpx-input">${text}
           <input name="${name}" value="${value}" ${dataset} type="text" autocomplete="off"/>
         </label>`;
 
     return this.generate(confs, render);
   },
-  genIgnore() {
+  renderIgnore() {
     const confs = [
-      { name: "ignoreNext", text: "自动切换下集时忽略的网址（用 ; 隔开）", cache: Storage.NEXT_IGNORE_URLS },
-      { name: "ignoreFs", text: "自动网页全屏时忽略的网址（用 ; 隔开）", cache: Storage.FULL_IGNORE_URLS },
+      { name: "nextUrls", text: "自动切换下集时 忽略的网址（用 ; 隔开）", cache: Storage.NEXT_IGNORE_URLS },
+      { name: "wFsUrls", text: "自动网页全屏时 忽略的网址（用 ; 隔开）", cache: Storage.FULL_IGNORE_URLS },
     ];
 
-    const render = ({ text, name, value, dataset, disable }) => `
-        <div class="text-group"><p>${text}</p>
-          <textarea name="${name}" ${dataset} ${disable ? "disabled" : ""} spellcheck="false" autocomplete="off">${value}</textarea>
-        </div>`;
-
-    return this.generate(confs, render);
+    return this.renderConfs(confs);
   },
-  genFull() {
+  renderFull() {
     const confs = [
-      { name: "custCtn", text: "此站(网页)全屏视频容器", cache: Storage.CUSTOM_CTN, disable: this.isGMatch(), useHost: true },
-      { name: "fsCode", text: "此站(网页)全屏切换扩展代码", cache: Storage.FULL_CHANGE_CODE, useHost: true, attrs: ["send"] },
+      { name: "vWrap", text: "此站 (网页)全屏视频容器", cache: Storage.V_WRAPPER, disable: this.isGMatch(), useHost: true },
+      { name: "fsCode", text: "此站 (网页)全屏切换 事件代码", cache: Storage.FS_CODE, useHost: true, attrs: ["send"] },
     ];
 
-    const render = ({ text, name, value, dataset, disable }) => `
-        <div class="text-group"><p>${text}</p>
-          <textarea name="${name}" ${dataset} ${disable ? "disabled" : ""} spellcheck="false" autocomplete="off">${value}</textarea>
-        </div>`;
-
-    return this.generate(confs, render);
+    return this.renderConfs(confs);
   },
-  genCode() {
+  renderNext() {
     const confs = [
-      { name: "lCode", text: "此站 load 事件扩展代码", cache: Storage.LOAD_EVT_CODE, useHost: true, attrs: ["send"] },
-      { name: "vCode", text: "此站视频事件扩展代码", cache: Storage.VIDEO_EVT_CODE, useHost: true, attrs: ["send"] },
+      { name: "curEp", text: "此站 当前播放集选择器", cache: Storage.NEXT_CUR_EP, useHost: true, disable: Site.isGmMatch() },
+      { name: "allEp", text: "此站 定位全部集选择器", cache: Storage.NEXT_REL_EP, useHost: true, disable: Site.isGmMatch() },
     ];
 
-    const render = ({ text, name, value, dataset, disable }) => `
-        <div class="text-group"><p>${text}</p>
-          <textarea name="${name}" ${dataset} ${disable ? "disabled" : ""} spellcheck="false" autocomplete="off">${value}</textarea>
+    return this.renderConfs(confs);
+  },
+  renderExtend() {
+    const confs = [
+      { name: "lCode", text: "此站 load 事件代码", cache: Storage.LOAD_CODE, useHost: true, attrs: ["send"] },
+      { name: "vCode", text: "此站 video 事件代码", cache: Storage.VIDEO_CODE, useHost: true, attrs: ["send"] },
+    ];
+
+    return this.renderConfs(confs);
+  },
+  renderConfs(confs) {
+    const render = ({ text, name, value, dataset }) => `
+        <div class="vpx-textarea"><p>${text}</p>
+          <textarea name="${name}" ${dataset} spellcheck="false" autocomplete="off">${value}</textarea>
         </div>`;
 
     return this.generate(confs, render);
   },
   generate(confs, render) {
     const finalConfs = confs.map((conf) => {
-      const { cache, attrs = [], useHost } = conf;
+      const { cache, attrs = [], useHost, disable } = conf;
       const host = useHost ? this.host : Consts.EMPTY;
 
-      let dataset = attrs.map((key) => `data-${key}="true"`).join(" ");
-      if (host) dataset = `${dataset} data-host="${host}"`.trim();
+      const props = attrs.map((key) => `data-${key}="true"`);
+      if (host) props.push(`data-host="${host}"`);
+      if (disable) props.push(`disabled`);
 
-      return { ...conf, dataset, value: cache.get(host) };
+      return { ...conf, dataset: props.join(Consts.EMPTY), value: cache.get(host) };
     });
 
     // 生成HTML字符串

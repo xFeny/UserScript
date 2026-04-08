@@ -9,7 +9,6 @@ export default unsafeWindow.FyTools = {
   getRect: (el) => el?.getBoundingClientRect(),
   microTask: (fn) => Promise.resolve().then(fn),
   alert: (...data) => window.alert(data.join(" ")),
-  isMultiV: () => querySelectorAll("video").length > 1,
   query: (selector, ctx) => querySelector(selector, ctx),
   querys: (selector, ctx) => querySelectorAll(selector, ctx),
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),

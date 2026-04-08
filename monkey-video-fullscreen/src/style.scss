@@ -1,6 +1,6 @@
 /** 视频网页全屏相关样式 START **/
-[gm_webfullscreen],
-body[gm_webfullscreen] [gm_webfullscreen] {
+[web-fullscr],
+body[web-fullscr] [web-fullscr] {
   top: 0 !important;
   left: 0 !important;
   margin: 0 !important;
@@ -22,8 +22,8 @@ body[gm_webfullscreen] [gm_webfullscreen] {
   display: flex !important;
 }
 
-[gm_webfullscreen] video,
-body[gm_webfullscreen] [gm_webfullscreen] video {
+[web-fullscr] video,
+body[web-fullscr] [web-fullscr] video {
   top: 0 !important;
   left: 0 !important;
   width: 100vw !important;
@@ -34,14 +34,14 @@ body[gm_webfullscreen] [gm_webfullscreen] video {
 }
 
 /** 隐藏后面的兄弟元素 */
-[gm_webfullscreen] ~ *:not(.monkey-web-fullscreen) {
+[web-fullscr] ~ * {
   display: none !important;
 }
 
 /** 视频网页全屏相关样式 END **/
 
 /** 视频侧边双击元素样式 */
-.__edgeClick {
+.__v_edge {
   left: 0 !important;
   top: 6% !important;
   opacity: 0 !important;

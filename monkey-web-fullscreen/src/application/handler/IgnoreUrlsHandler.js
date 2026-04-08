@@ -24,7 +24,7 @@ export default {
     if (!this.nextFilter) this.initIgnoreUrls();
     return this.isBlocked(this.nextFilter);
   },
-  isIgnoreWide() {
+  isIgnoreWFs() {
     if (!this.wideFilter) this.initIgnoreUrls();
     return this.isBlocked(this.wideFilter);
   },

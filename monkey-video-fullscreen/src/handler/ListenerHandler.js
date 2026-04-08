@@ -14,7 +14,7 @@ export default {
     this.setupKeydownListener();
     this.setupMouseMoveListener();
     this.setupFullscreenListener();
-    this.docElement = document.documentElement;
+    this.docEle = document.documentElement;
 
     if (isNonFirst) return;
     this.setupDocumentObserver();
@@ -28,7 +28,7 @@ export default {
    */
   setupDocumentObserver() {
     new MutationObserver(() => {
-      if (this.docElement === document.documentElement) return;
+      if (this.docEle === document.documentElement) return;
       (this.init(true), document.head.append(gmStyle.cloneNode(true)));
     }).observe(document, { childList: true });
   },
@@ -37,7 +37,7 @@ export default {
       Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
     });
 
-    if (Tools.isExecuted("isDefined")) return;
+    if (Tools.isExecuted("fsDoneHook")) return;
     Object.defineProperty(this, "isFullscreen", {
       get: () => this._isFullscreen,
       set: (value) => {
@@ -45,7 +45,7 @@ export default {
 
         // 默认 <=> 全屏、 全屏 => 网页全屏
         if (!(value && this.fsWrapper)) this.toggleWebFullscreen();
-        Tools.microTask(() => this.customFullChangeHandle());
+        Tools.microTask(() => this.runFsChangeCode());
       },
     });
   },
@@ -78,12 +78,12 @@ export default {
     }
 
     // 已创建过侧边元素，重新插入到父容器中
-    Tools.querys(".__edgeClick", container).forEach((el) => el.remove());
+    Tools.querys(".__v_edge", container).forEach((el) => el.remove());
     if (video.lArea) return container.prepend(video.lArea, video.rArea);
 
     // 复用元素创建逻辑
     const createEdge = (cls = "") => {
-      const element = Tools.createElement("div", { video, className: `__edgeClick ${cls}` });
+      const element = Tools.createElement("div", { video, className: `__v_edge ${cls}` });
 
       element.onclick = (e) => {
         Tools.preventDefault(e);

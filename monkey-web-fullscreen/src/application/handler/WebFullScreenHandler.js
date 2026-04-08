@@ -16,29 +16,29 @@ export default {
    */
   getLiveIcons: () => (Tools.emitMousemove(App.player), Tools.querys(".right-area .icon")),
   isGMatch: () => Site.isGmMatch() && !Site.isBiliLive(),
-  triggerIconElement(name) {
+  triggerIcon(name) {
     const index = Object.values(Site.icons).indexOf(name);
     const element = Site.isBiliLive() ? this.getLiveIcons()?.[index] : Tools.query(Site.getIcons()?.[name]);
     return Tools.fireMouseEvt(element, "click");
   },
-  toggleFullByIcon(name) {
+  iconToFull(name) {
     const el = this.player ?? this.getVideoIFrame();
     const { height } = Tools.getRect(el) ?? { height: 0 };
-    if (!this.triggerIconElement(name) || !el) return;
+    if (!this.triggerIcon(name) || !el) return;
 
     const condition = () => Boolean(Tools.getRect(el).height - height);
-    Tools.waitFor(condition).then(() => this.customFullChangeHandle());
+    Tools.waitFor(condition).then(() => this.runFsChangeCode());
   },
   toggleFullscreen() {
-    if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
-    if (this.isGMatch()) return this.toggleFullByIcon(Site.icons.full);
+    if (!Tools.isTopWin() || Tools.isThrottle("_Full_")) return;
+    if (this.isGMatch()) return this.iconToFull(Site.icons.full);
     document.exitFullscreen().catch(() => (this.enterWebFullscreen(), this.fsWrapper.requestFullscreen()));
   },
   toggleWebFullscreen(isTrusted) {
-    if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
-    if (this.isGMatch()) return this.toggleFullByIcon(Site.icons.webFull);
+    if (this.isNoVideo() || Tools.isThrottle("_WebFull_")) return;
+    if (this.isGMatch()) return this.iconToFull(Site.icons.webFull);
 
-    if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
+    if (this.isFullscreen && isTrusted) return document.exitFullscreen().catch(() => {}); // 由全屏切换到网页全屏
     this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
   },
   /**
@@ -75,14 +75,14 @@ export default {
     const { scrollY } = this.fsWrapper;
 
     // 临时禁用平滑滚动：为了确保接下来的滚动操作是瞬间完成的（无动画）
-    Tools.setStyle(this.docElement, "scroll-behavior", "auto", "important");
+    Tools.setStyle(this.docEle, "scroll-behavior", "auto", "important");
 
     // 是脱离原结构式网页全屏时，将视频容器还原到它原来的DOM位置
     if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
     Tools.querys(`[${Consts.webFull}]`).forEach((el) => Tools.attr(el, Consts.webFull));
 
     // 滚动到全屏前位置、恢复默认滚动效果
-    requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(this.docElement, "scroll-behavior")));
+    requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(this.docEle, "scroll-behavior")));
 
     this.fsPlaceholder = this.fsWrapper = this.fsParent = null;
     this.videoParents.clear();
@@ -93,8 +93,7 @@ export default {
     return this.player ? this.getVideoContainer() : this.getVideoIFrame();
   },
   getVideoIFrame() {
-    // 脚本猫 v0.16.11：多层嵌套 iframe 存在 this.vMeta 无值的问题（如 www.ttdm6.me）
-    if (!this.vMeta?.iFrame) return Tools.getIFrames().find(Tools.isVisible);
+    if (!this.vMeta?.iFrame) return null;
     if (this.fsWrapper) return this.fsWrapper;
 
     const { vw, vh, iFrame } = this.vMeta;
@@ -110,7 +109,7 @@ export default {
   },
   getVideoContainer() {
     // 自定义网页全屏元素，支持多个选择器，返回第一个找到的元素
-    const selector = Storage.CUSTOM_CTN.get(this.topWin?.host)?.trim();
+    const selector = Storage.V_WRAPPER.get(this.topWin?.host)?.trim();
     const ctn = selector ? (this.player.closest(selector) ?? Tools.query(selector)) : null;
     return ctn ?? this.findVideoContainer(this.findCtrlContainer());
   },

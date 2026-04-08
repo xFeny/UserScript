@@ -18,7 +18,7 @@ export default {
     this.jumpToTargetEpisode(target);
   },
   getJumpTargetEpisode(isPrev) {
-    const current = Storage.RELATIVE_EPISODE.get(this.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
+    const current = Storage.NEXT_REL_EP.get(this.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
     return this.getTargetEpisode(current, isPrev);
   },
   getCurrentEpisodeByLink() {

@@ -14,8 +14,13 @@ export default {
     if (!this.player) return false;
     return this.player.duration === Infinity || this.isDynamicDur(this.player);
   },
+  isMultiVideo() {
+    if (this._multiV || Tools.isThrottle("isMulti", Consts.TWO_SEC * 5)) return this._multiV;
+    const validVideo = (v) => !this.isMutedLoop(v) && v.offsetWidth > 300 && !isNaN(v.duration);
+    return (this._multiV = Tools.querys("video").filter(validVideo).length > 1);
+  },
   isDynamicDur(video) {
-    if (video._mfs_isDynamic || video.currentTime > video.__duration) return true;
+    if (video.vx_isDynamic || video.currentTime > video.__duration) return true;
 
     // 记录默认时长，用于判断是否为动态时长
     const { duration, __duration } = video;
@@ -23,24 +28,24 @@ export default {
     if (__duration > 120 && __duration < 432e2) return false; // 时长在2分钟~12小时之间，判定为固定时长（非动态）
 
     const isDynamic = Math.floor(duration) > Math.floor(__duration);
-    if (isDynamic) video._mfs_isDynamic = true; // 为true，后续不再重新计算
+    if (isDynamic) video.vx_isDynamic = true; // 为true，后续不再重新计算
 
     return isDynamic;
   },
   initVideoProps(video) {
     if (!Tools.isAttached(this.player)) this.player = null;
-    Object.keys(video).forEach((k) => k.startsWith("_mfs_") && delete video[k]);
+    Object.keys(video).forEach((k) => k.startsWith("vx_") && delete video[k]);
 
     // 设置默认一些值
     video.__duration = video.duration;
     video.tsr = { ...Consts.DEF_TSR };
 
     // 重置次数限制
-    Tools.resetLimit("autoWide");
+    Tools.resetLimit("autoWFs");
   },
   applySettings(video) {
     this.setupClockForPlayer();
-    if (Tools.isExecuted("_mfs_apply", this.player)) return;
+    if (Tools.isExecuted("vx_apply", this.player)) return;
 
     // ====== 应用缓存数据 ======
     this.applyCachedRate();
@@ -53,14 +58,15 @@ export default {
     // 设置倍速
     VideoEnhancer.setPlaybackRate(this.player, rate);
     this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
-    if (!Storage.NOT_CACHE_SPEED.get()) Storage.CACHED_SPEED.set(this.player.playbackRate);
+    if (!Storage.FORGET_RATE.get()) Storage.CACHED_RATE.set(this.player.playbackRate);
   },
   adjustPlayRate(step = 0.25) {
+    if (!this.player) return;
     const rate = Math.max(0.1, +this.player.playbackRate + step);
     this.setPlaybackRate(Math.min(16, rate));
   },
-  applyCachedRate: () => (Storage.NOT_CACHE_SPEED.get() ? App.delCachedRate() : App.setPlaybackRate(Storage.CACHED_SPEED.get())),
-  delCachedRate: () => Storage.CACHED_SPEED.del(),
+  applyCachedRate: () => (Storage.FORGET_RATE.get() ? App.delCachedRate() : App.setPlaybackRate(Storage.CACHED_RATE.get())),
+  delCachedRate: () => Storage.CACHED_RATE.del(),
   // ====================⇑⇑⇑ 调节播放倍速相关逻辑 ⇑⇑⇑====================
 
   // ====================⇓⇓⇓ 调节播放进度相关逻辑 ⇓⇓⇓====================
@@ -70,43 +76,33 @@ export default {
     this.showToast(`快${second > 0 ? "进" : "退"} ${Math.abs(second)} 秒`, Consts.ONE_SEC);
   },
   cachePlayTime(video) {
-    if (video !== this.player || !this.topWin || video.duration < 120 || this.isLive()) return;
+    if (video !== this.player || !this.topWin || video.duration < 150 || this.isLive() || this.isMultiVideo()) return;
     if (Tools.isThrottle("cacheTime", Consts.ONE_SEC) || +video.currentTime < Storage.SKIP_INTERVAL.get()) return;
 
     // 距离结束10秒，清除记忆缓存
     if (this.remainTime(video) <= 10) return this.clearCachedTime(video);
 
-    Storage.PLAY_TIME.set(+video.currentTime - 1, this.getUniqueKey(video), Storage.STORAGE_DAYS.get());
-    if (Tools.isMultiV()) this.ensureUniqueCacheTime(); // 清除页面内多视频的播放进度存储，如：抖音网页版
+    Storage.V_TIME.set(+video.currentTime - 1, this.getUniqueKey(video), Storage.STORAGE_DAYS.get());
   },
   applyCachedTime(video) {
-    if (!this.topWin || this.isLive() || Tools.querys("video").length > 2) return;
+    if (!this.topWin || this.isLive() || this.isMultiVideo()) return;
 
     // 缓存的播放时间
-    const time = Storage.PLAY_TIME.get(this.getUniqueKey(video));
+    const time = Storage.V_TIME.get(this.getUniqueKey(video));
     if (time <= +video.currentTime) return;
 
     this.setCurrentTime(time);
-    this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.ONE_SEC * 3.5, false).then((el) => {
-      if (Tools.query(".monkey-toast")) Tools.setStyle(el, "transform", `translateY(${-5 - el.offsetHeight}px)`);
-    });
+    this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.TWO_SEC * 2, false);
   },
   setCurrentTime: (ct) => ct && (App.player.currentTime = Math.max(0, ct)),
-  clearCachedTime: (v) => App.topWin && Storage.PLAY_TIME.del(App.getUniqueKey(v)),
+  clearCachedTime: (v) => App.topWin && Storage.V_TIME.del(App.getUniqueKey(v)),
   getUniqueKey(video, { duration, __duration } = video) {
-    if (video._mfs_cacheTKey) return video._mfs_cacheTKey;
+    if (video.vx_tkey) return video.vx_tkey;
 
     const currNumber = this.getCurrentEpisodeNumber();
     const baseKey = `${this.topWin.urlHash}_${Math.floor(__duration || duration)}`;
-    const cacheKey = currNumber ? `${baseKey}_${currNumber}` : baseKey;
-    video._mfs_cacheTKey = cacheKey;
 
-    return cacheKey;
-  },
-  ensureUniqueCacheTime() {
-    const pattern = `${Storage.PLAY_TIME.name}${this.topWin.urlHash}`;
-    const keys = Object.keys(Storage.PLAY_TIME.fuzzyGet(pattern));
-    if (keys.length > 1) Storage.PLAY_TIME.fuzzyDel(pattern);
+    return (video.vx_tkey = currNumber ? `${baseKey}_${currNumber}` : baseKey);
   },
   formatTime(sec) {
     if (isNaN(sec)) return "00:00";
@@ -147,7 +143,7 @@ export default {
     if (!this.player) return;
 
     const { tsr } = this.player;
-    const s = Storage.MOVING_DISTANCE.get();
+    const s = Storage.MOVE_DIST.get();
     const dMap = { ALT_UP: [0, -s, "上"], ALT_DOWN: [0, s, "下"], ALT_LEFT: [-s, 0, "左"], ALT_RIGHT: [s, 0, "右"] };
     let [x, y, desc] = dMap[key];
     x *= tsr.mirror; // 镜像后的移动方向
@@ -167,13 +163,13 @@ export default {
     styles.forEach((n) => Tools.setStyle(this.player, n));
     this.player.tsr = { ...Consts.DEF_TSR };
     Tools.delCls(this.player, "__tsr");
-    delete this.player._mfs_tsr;
+    delete this.player.vx_tsr;
   },
   setTsr(name, value) {
     try {
       Tools.addCls(this.player, "__tsr");
-      this.player._mfs_tsr ??= getComputedStyle(this.player).transform;
-      Tools.setStyle(this.player, "--deftsr", this.player._mfs_tsr);
+      this.player.vx_tsr ??= getComputedStyle(this.player).transform;
+      Tools.setStyle(this.player, "--deftsr", this.player.vx_tsr);
       Tools.setStyle(this.player, name, value);
     } catch (e) {
       console.error(e);
@@ -215,26 +211,21 @@ export default {
     !this.player.paused && this.player.pause();
     this.player.currentTime += dir / 24;
   },
-  autoNextEnabled() {
-    const status = Storage.IS_AUTO_NEXT.set(!Storage.IS_AUTO_NEXT.get());
-    this.showToast(`已${status ? "启" : "禁"}用 自动切换下集`);
-  },
+  autoNextEnabled: () => App.showToast(`已${Storage.NEXT_AUTO.toggle() ? "启" : "禁"}用 自动切换下集`),
   /**
    * 效果：<span>正在以<span class="cText">1.15x</span>倍速播放</span>
    */
   customToast(start, text, end, dealy, isRemove) {
     const span = Tools.newEle("span");
     span.append(start, Tools.newEle("span", { textContent: text, className: "cText" }), end);
-    return this.showToast(span, dealy, isRemove);
+    this.showToast(span, dealy, isRemove);
   },
   showToast(content, dealy = Consts.THREE_SEC, isRemove = true) {
-    return new Promise((resolve) => {
-      if (isRemove) Tools.query(".monkey-toast")?.remove();
-      const el = Tools.newEle("div", { className: "monkey-toast" });
-      content instanceof Element ? el.appendChild(content) : (el.textContent = content);
+    if (isRemove) Tools.query(".monkey-toast")?.remove();
+    const el = Tools.newEle("div", { className: "monkey-toast" });
+    content instanceof Element ? el.appendChild(content) : (el.textContent = content);
 
-      (this.findVideoContainer(null, 2, false).appendChild(el), resolve(el));
-      setTimeout(() => ((el.style.opacity = 0), setTimeout(() => el.remove(), Consts.HALF_SEC)), dealy);
-    });
+    setTimeout(() => (Tools.addCls(el, "out"), setTimeout(() => el.remove(), 250)), dealy);
+    this.findVideoContainer(null, 2, false).appendChild(el);
   },
 };

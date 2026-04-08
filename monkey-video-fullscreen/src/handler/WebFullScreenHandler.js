@@ -9,14 +9,14 @@ import Storage from "../common/Storage";
  */
 export default {
   toggleFullscreen() {
-    if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
+    if (!Tools.isTopWin() || Tools.isThrottle("_Full_")) return;
     document.exitFullscreen().catch(() => (this.enterWebFullscreen(), this.fsWrapper.requestFullscreen()));
   },
   toggleWebFullscreen(isTrusted) {
-    if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
-    if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen(); // 由全屏切换到网页全屏
+    if (this.isNoVideo() || Tools.isThrottle("_WebFull_")) return;
+    if (this.isFullscreen && isTrusted) return document.exitFullscreen().catch(() => {}); // 由全屏切换到网页全屏
     this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
-    Tools.microTask(() => this.customFullChangeHandle());
+    Tools.microTask(() => this.runFsChangeCode());
   },
   enterWebFullscreen() {
     if (this.fsWrapper) return;
@@ -48,14 +48,14 @@ export default {
     const { scrollY } = this.fsWrapper;
 
     // 临时禁用平滑滚动：为了确保接下来的滚动操作是瞬间完成的（无动画）
-    Tools.setStyle(this.docElement, "scroll-behavior", "auto", "important");
+    Tools.setStyle(this.docEle, "scroll-behavior", "auto", "important");
 
     // 是脱离原结构式网页全屏时，将视频容器还原到它原来的DOM位置
     if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
     Tools.querys(`[${Consts.webFull}]`).forEach((el) => Tools.attr(el, Consts.webFull));
 
     // 滚动到全屏前位置、恢复默认滚动效果
-    requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(this.docElement, "scroll-behavior")));
+    requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(this.docEle, "scroll-behavior")));
 
     this.fsPlaceholder = this.fsWrapper = this.fsParent = null;
     this.videoParents.clear();
@@ -64,7 +64,7 @@ export default {
     return this.player ? this.getVideoContainer() : this.getVideoIFrame();
   },
   getVideoIFrame() {
-    if (!this.vMeta?.iFrame) return Tools.getIFrames().find(Tools.isVisible);
+    if (!this.vMeta?.iFrame) return null;
     if (this.fsWrapper) return this.fsWrapper;
 
     const { vw, vh, iFrame } = this.vMeta;
@@ -80,7 +80,7 @@ export default {
   },
   getVideoContainer() {
     // 自定义网页全屏元素，支持多个选择器，返回第一个找到的元素
-    const selector = Storage.CUSTOM_CTN.get(this.topWin?.host)?.trim();
+    const selector = Storage.V_WRAPPER.get(this.topWin?.host)?.trim();
     const ctn = selector ? (this.player.closest(selector) ?? Tools.query(selector)) : null;
     return ctn ?? this.findVideoContainer(this.findCtrlContainer());
   },
@@ -135,22 +135,22 @@ export default {
     if (Tools.isExecuted("__Added__", sroot)) return;
     if (sroot instanceof ShadowRoot) Tools.emitEvent("addStyle", { sroot });
   },
-  customFullChangeHandle() {
+  runFsChangeCode() {
     // 连续触发只执行最后一次
-    clearTimeout(this.e9x_fs_code);
-    this.e9x_fs_code = setTimeout(() => {
-      const tol = 5; // 偏差值
-      const { width, height } = window.screen;
-      const { topWin, player, fsWrapper } = this;
-      const { offsetWidth: ew, offsetHeight: eh } = fsWrapper ?? {};
-
-      const isWFs = Math.abs(ew - topWin.vw) < tol && Math.abs(eh - topWin.vh) < tol;
-      const isFs = Math.abs(ew - width) < tol && Math.abs(eh - height) < tol;
-      const type = isFs ? "isFull" : isWFs ? "isWFull" : "default";
-
-      const jsCode = Storage.FS_CHANGE_CODE.get(topWin.host);
-      this.executeCodeSnippet(jsCode, type, player);
+    clearTimeout(this.e9x_fsCode);
+    this.e9x_fsCode = setTimeout(() => {
+      const jsCode = Storage.FS_CODE.get(this.topWin.host);
+      this.executeCodeSnippet(jsCode, this.getFsMode(), this.player);
     }, 10);
+  },
+  getFsMode(tol = 5) {
+    const { topWin, fsWrapper } = this;
+    const { width, height } = window.screen;
+    const { offsetWidth: ew = 0, offsetHeight: eh = 0 } = fsWrapper ?? {};
+
+    const isWFs = Math.abs(ew - topWin.vw) < tol && Math.abs(eh - topWin.vh) < tol;
+    const isFs = Math.abs(ew - width) < tol && Math.abs(eh - height) < tol;
+    return isFs ? "isFull" : isWFs ? "isWFull" : "default";
   },
   executeCodeSnippet(jsCode, type, video) {
     try {

@@ -1,6 +1,6 @@
 .__Clock,
 .__timeupdate,
-.__rateDisplay {
+.__v_rate {
   color: #e0e0e0;
   opacity: 1 !important;
   z-index: 100 !important;
@@ -36,7 +36,7 @@
 }
 
 .__timeupdate,
-.__rateDisplay {
+.__v_rate {
   font-size: 12px !important;
   line-height: 12px !important;
 }
@@ -57,7 +57,7 @@
 }
 
 /** 视频左上角此终显示倍速 **/
-.__rateDisplay {
+.__v_rate {
   color: #d9d9d9;
   top: 5px !important;
   left: 5px !important;
@@ -67,7 +67,7 @@
 }
 
 /** 视频侧边双击元素样式 */
-.__edgeClick {
+.__v_edge {
   left: 0 !important;
   top: 6% !important;
   opacity: 0 !important;
@@ -92,7 +92,7 @@
   }
 
   .__timeupdate,
-  .__rateDisplay {
+  .__v_rate {
     font-size: 16px !important;
     line-height: 16px !important;
   }

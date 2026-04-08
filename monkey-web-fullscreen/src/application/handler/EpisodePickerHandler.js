@@ -24,13 +24,13 @@ export default {
         this.pickerRelativeEpisodePath(target) ??
         Tools.notyf("已拾取过剧集元素 (￣ー￣)", true);
 
-      Tools.preventDefault(event);
+      Tools.preventEvent(event);
     };
 
     document.addEventListener("click", handle, true);
   },
   pickerCurrentEpisodePath(el) {
-    if (Storage.CURRENT_EPISODE.get(this.host)) return;
+    if (Storage.NEXT_CUR_EP.get(this.host)) return;
     return this.pickerEpisodePopup(el, {
       onVerify(value) {
         try {
@@ -42,13 +42,13 @@ export default {
         }
       },
       onSave(value) {
-        Storage.CURRENT_EPISODE.set(value, this.host);
+        Storage.NEXT_CUR_EP.set(value, this.host);
         Tools.notyf("继续拾取元素 ＼(＞０＜)／");
       },
     });
   },
   pickerRelativeEpisodePath(el) {
-    if (Storage.RELATIVE_EPISODE.get(this.host)) return;
+    if (Storage.NEXT_REL_EP.get(this.host)) return;
     return this.pickerEpisodePopup(el, {
       onVerify(value) {
         try {
@@ -61,38 +61,38 @@ export default {
         }
       },
       onSave(value) {
-        Storage.RELATIVE_EPISODE.set(value, this.host);
+        Storage.NEXT_REL_EP.set(value, this.host);
         Tools.notyf("操作完成 []~(￣▽￣)~* 干杯");
       },
     });
   },
   getCurrentEpisodeNumber() {
-    const selector = Storage.CURRENT_EPISODE.get(this.topWin.host);
+    const selector = Storage.NEXT_CUR_EP.get(this.topWin.host);
     return selector ? this.getEpisodeNumber(Tools.query(selector)) : null;
   },
   getCurrentEpisodeBySelector() {
     const num = this.getCurrentEpisodeNumber();
-    const current = this.getEpisodeWrapper(Tools.query(Storage.CURRENT_EPISODE.get(this.host)));
-    const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(Storage.RELATIVE_EPISODE.get(this.host))));
+    const current = this.getEpisodeWrapper(Tools.query(Storage.NEXT_CUR_EP.get(this.host)));
+    const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(Storage.NEXT_REL_EP.get(this.host))));
     return episodes.includes(current) ? current : episodes.find((el) => this.getEpisodeNumber(el) === num);
   },
   async pickerEpisodePopup(el, { onVerify, onSave }) {
     const res = await Swal.fire({
-      html: Tools.safeHTML(`<h4>验证能正确取到集数，再确定保存</h4>
-      <textarea id="picker" class="swal2-textarea" spellcheck="false"></textarea>
+      html: Tools.safeHTML(`<h3>验证能正确取到集数，再确定保存</h3>
+      <textarea class="swal2-textarea vpx-picker" spellcheck="false"></textarea>
       <p>编辑元素选择器，确保能正确获取到集数</p>`),
-      customClass: { container: "monkey-web-fullscreen" },
+      customClass: { container: "vpx-popup" },
       confirmButtonText: "保存",
       denyButtonText: "验证",
       showDenyButton: true,
       reverseButtons: true,
       focusDeny: true,
       preDeny: () => {
-        const value = Tools.query("#picker").value.trim();
+        const value = Tools.query(".vpx-picker").value.trim();
         return value ? (onVerify.call(this, value) ?? false) : Tools.notyf("选择器不能为空！", true);
       },
-      preConfirm: () => Tools.query("#picker").value.trim() || Tools.notyf("选择器不能为空！", true),
-      didOpen: () => (Tools.query("#picker").value = Tools.getElementPath(el)),
+      preConfirm: () => Tools.query(".vpx-picker").value.trim() || Tools.notyf("选择器不能为空！", true),
+      didOpen: () => (Tools.query(".vpx-picker").value = Tools.getElementPath(el)),
     });
 
     return res.isConfirmed && onSave.call(this, res.value);

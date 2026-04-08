@@ -9,9 +9,9 @@ export default {
   /** 脱离原结构网页全屏的阈值 */
   DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, Number),
   /** 自定义此站视频容器 */
-  CUSTOM_CTN: new BasicStorage("CUSTOM_CTN_", ""),
+  V_WRAPPER: new BasicStorage("V_WRAPPER_", ""),
   /** 自动网页全屏忽略的网址 */
   IGNORE_URLS: new BasicStorage("IGNORE_URLS_", ""),
   /** 全屏切换时的执行的代码逻辑 */
-  FS_CHANGE_CODE: new BasicStorage("FS_CHANGE_CODE_", ""),
+  FS_CODE: new BasicStorage("FS_CHANGE_CODE_", ""),
 };

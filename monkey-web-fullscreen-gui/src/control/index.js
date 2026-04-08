@@ -48,10 +48,9 @@ export default {
   /**
    * 设置并缓存主题
    */
-  setControlPanelTheme(isDark = Storage.IS_DARK_THEME.get()) {
-    if (this.theme) this.theme.textContent = isDark ? "🌙" : "☀️";
-    this.wrapper?.classList.toggle("light-mode", !isDark);
-    Storage.IS_DARK_THEME.set(isDark);
+  setControlPanelTheme(isDark = Storage.DARK_THEME.get()) {
+    this.wrapper.classList.toggle("light-mode", !isDark);
+    Storage.DARK_THEME.set(isDark);
   },
   // ====================⇑⇑⇑ 深/浅色皮肤相关逻辑 ⇑⇑⇑====================
 
@@ -69,7 +68,7 @@ export default {
       theme: "vc-panel-wrapper",
       onTrigger: (instance) => {
         instance.setContent(this.createControlPanel());
-        if (this.panel) (this.renderRateToPanel(), this.setControlPanelTheme());
+        if (this.panel) this.renderRateToPanel();
       },
     });
   },

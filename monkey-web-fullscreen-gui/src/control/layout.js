@@ -18,7 +18,7 @@ export default {
   createControlPanel() {
     if (this.panel) return this.panel;
 
-    const els = ["FullScreen", "Operation", "Transform", "Rate"].map((name) => this[`create${name}Controls`]());
+    const els = ["Fullscreen", "Operation", "Transform", "Rate"].map((name) => this[`create${name}Controls`]());
     this.panel = FyTools.newEle("div", { className: "vc-control-panel" });
     this.panel.append(this.createPanelHeader(), ...els);
 
@@ -29,11 +29,11 @@ export default {
    */
   createPanelHeader() {
     const title = FyTools.newEle("b", { textContent: "🎬 播放控制" });
-    const onclick = () => this.setControlPanelTheme(!Storage.IS_DARK_THEME.get());
-    this.theme = FyTools.newEle("b", { className: "vc-theme-btn", textContent: "🌙", onclick });
+    const onclick = () => this.setControlPanelTheme(!Storage.DARK_THEME.get());
+    const theme = FyTools.newEle("b", { className: "vc-theme-btn", onclick });
 
     const header = FyTools.newEle("div", { className: "vc-panel-header" });
-    header.append(title, this.theme);
+    header.append(title, theme);
     return header;
   },
   /**
@@ -45,7 +45,7 @@ export default {
    *   <div class="vc-control-item"><b>⛶</b>全屏</div>
    * </div>
    */
-  createFullScreenControls() {
+  createFullscreenControls() {
     const pip = () => document.exitPictureInPicture().catch(() => this.FS.player?.requestPictureInPicture());
 
     const config = [
@@ -112,7 +112,7 @@ export default {
    * </div>
    */
   createRateControls() {
-    const step = FyStorage.SPEED_STEP.get();
+    const step = FyStorage?.RATE_STEP?.get() ?? 0.25;
     const setRate = (value) => this.FS.setPlaybackRate(value);
     const adjustRate = (plus = 1) => this.FS.adjustPlayRate(plus * step);
 

@@ -44,8 +44,8 @@ export default {
     this.setCurrentVideo(video);
   },
   initVideoProps(video) {
-    delete video.__isWide;
-    Tools.resetLimit("autoWide");
+    delete video.__isWFs;
+    Tools.resetLimit("autoWFs");
     if (!Tools.isAttached(this.player)) delete this.player;
   },
   // ====================⇑⇑⇑ 视频监听事件相关逻辑 ⇑⇑⇑====================
@@ -64,7 +64,7 @@ export default {
   },
   syncMetaToParentWin(vMeta) {
     window.vMeta = this.vMeta = { ...vMeta, timestamp: Date.now() };
-    if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { vMeta: { ...vMeta, iFrame: location.href } });
+    if (!Tools.isTopWin()) return Tools.postMessage(unsafeWindow.parent, { vMeta: { ...vMeta, iFrame: location.href } });
     Tools.microTask(() => this.initMenuCmds());
     this.sendTopWinInfo();
   },

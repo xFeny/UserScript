@@ -25,8 +25,8 @@ export default {
     const configs = [
       { title: isAuto, cache: Storage.IS_AUTO, fn: ({ cache, value }) => cache.set(!value, this.host) },
       { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS },
-      { title: I18n.t("custom"), cache: Storage.CUSTOM_CTN },
-      { title: I18n.t("fsChange"), cache: Storage.FS_CHANGE_CODE, fn: fsChange },
+      { title: I18n.t("custom"), cache: Storage.V_WRAPPER },
+      { title: I18n.t("fsChange"), cache: Storage.FS_CODE, fn: fsChange },
       { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD },
     ];
 

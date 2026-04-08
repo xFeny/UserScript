@@ -22,7 +22,7 @@ export default {
     this.setupVisibleListener();
     this.setupMouseMoveListener();
     this.setupFullscreenListener();
-    this.docElement = document.documentElement;
+    this.docEle = document.documentElement;
 
     if (isNonFirst) return;
     this.setupDocumentObserver();
@@ -34,10 +34,8 @@ export default {
   },
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
-      if (this.isNoVideo() || Storage.IS_INVISIBLE_PAUSE.get()) return;
-
       const video = this.player;
-      if (!video || video.ended || !Tools.isVisible(video)) return;
+      if (!video || video.ended || Storage.INVIS_PAUSE.get()) return;
       document.hidden ? video.pause() : video.play();
     });
   },
@@ -47,7 +45,7 @@ export default {
    */
   setupDocumentObserver() {
     new MutationObserver(() => {
-      if (this.docElement === document.documentElement) return;
+      if (this.docEle === document.documentElement) return;
       (this.init(true), document.head.append(gmStyle.cloneNode(true)));
     }).observe(document, { childList: true });
   },
@@ -66,7 +64,7 @@ export default {
   },
   syncMetaToParentWin(vMeta) {
     window.vMeta = this.vMeta = { ...vMeta, timestamp: Date.now() };
-    if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { vMeta: { ...vMeta, iFrame: location.href } });
+    if (!Tools.isTopWin()) return Tools.postMessage(unsafeWindow.parent, { vMeta: { ...vMeta, iFrame: location.href } });
     Tools.microTask(() => (this.initMenuCmds(), this.setupPickerListener()));
     this.sendTopWinInfo();
   },
@@ -102,9 +100,9 @@ export default {
   observeIFrameChange(iFrame) {
     if (!iFrame || Tools.isExecuted("observed", iFrame)) return;
 
-    new MutationObserver(() =>
-      this.isFullscreen ? this.toggleFullscreen() : this.fsWrapper && this.exitWebFullscreen()
-    ).observe(iFrame, { attributes: true, attributeFilter: ["src"] });
+    // src属性发生变化，自动退出(网页)全屏
+    const observer = new MutationObserver(() => document.exitFullscreen().catch(() => this.exitWebFullscreen()));
+    observer.observe(iFrame, { attributes: true, attributeFilter: ["src"] });
     if (this.isOverrideKey()) iFrame.focus(); // 使空格能控制视频播放
   },
   // ====================⇑⇑⇑ 设置当前视频相关逻辑 ⇑⇑⇑====================
@@ -115,7 +113,7 @@ export default {
       Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
     });
 
-    if (Tools.isExecuted("isDefined")) return;
+    if (Tools.isExecuted("fsDoneHook")) return;
     VideoEnhancer.defineProperty(this, "isFullscreen", {
       set: (value, setter) => (setter(value), this.onFullChange(value)),
     });
@@ -128,7 +126,7 @@ export default {
     if (!this.isGMatch() && !(isFull && this.fsWrapper)) this.toggleWebFullscreen();
 
     // 执行自定义的代码片段
-    Tools.microTask(() => this.customFullChangeHandle());
+    Tools.microTask(() => this.runFsChangeCode());
 
     // 播放器右上角时间的显/隐
     this.changeTimeDisplay();
@@ -138,53 +136,53 @@ export default {
     VideoEnhancer.defineProperty(this, "fsWrapper", {
       set: (value, setter) => {
         const method = setter(value) ? "addEventListener" : "removeEventListener";
-        Tools.microTask(() => this.customFullChangeHandle());
+        Tools.microTask(() => this.runFsChangeCode());
         unsafeWindow[method]("scroll", handle, true);
       },
     });
   },
-  customFullChangeHandle() {
+  runFsChangeCode() {
     // 连续触发只执行最后一次
-    clearTimeout(this.e9x_fs_code);
-    this.e9x_fs_code = setTimeout(() => {
-      const tol = 5; // 允许的偏差
-      const { width, height } = window.screen;
-      const { topWin, player, fsWrapper } = this;
-      const element = player ?? this.getVideoIFrame();
-      const { offsetWidth: ew, offsetHeight: eh } = this.isGMatch() ? element : fsWrapper || {};
-
-      const isWFs = Math.abs(ew - topWin.vw) < tol && Math.abs(eh - topWin.vh) < tol;
-      const isFs = Math.abs(ew - width) < tol && Math.abs(eh - height) < tol;
-      const type = isFs ? "isFull" : isWFs ? "isWFull" : "default";
-
-      const jsCode = Storage.FULL_CHANGE_CODE.get(this.host);
-      this.executeCodeSnippet(jsCode, type, player);
+    clearTimeout(this.e9x_fsCode);
+    this.e9x_fsCode = setTimeout(() => {
+      const jsCode = Storage.FS_CODE.get(this.host);
+      this.executeCodeSnippet(jsCode, this.getFsMode(), this.player);
     }, 10);
+  },
+  /**
+   * 获取页面模式
+   * @param {Number} tol 误差值
+   * @returns isFull-全屏、isWFull-网页全屏、default-默认
+   */
+  getFsMode(tol = 5) {
+    const { width, height } = window.screen;
+    const { topWin, player, fsWrapper } = this;
+    const { offsetWidth: ew = 0, offsetHeight: eh = 0 } = this.isGMatch() ? player : fsWrapper || {};
+
+    const isWFs = Math.abs(ew - topWin.vw) < tol && Math.abs(eh - topWin.vh) < tol;
+    const isFs = Math.abs(ew - width) < tol && Math.abs(eh - height) < tol;
+    return isFs ? "isFull" : isWFs ? "isWFull" : "default";
   },
   // ====================⇑⇑⇑ 全屏状态变换时处理相关逻辑 ⇑⇑⇑====================
 
   // ====================⇓⇓⇓ 鼠标移动监听相关逻辑 ⇓⇓⇓====================
   setupMouseMoveListener() {
-    let timer = null;
-    const handle = ({ type, clientX, clientY }) => {
+    const handle = ({ type, target, clientX, clientY }) => {
       if (Tools.isThrottle(type)) return;
-
-      // 根据坐标获取视频元素，并创建侧边元素
-      this.createEdgeElement(this.getVideoForCoord(clientX, clientY));
-
-      // 有视频信息时才切换鼠标光标的显隐
-      if (this.isNoVideo()) return;
-      (clearTimeout(timer), this.toggleCursor());
-      timer = setTimeout(() => this.toggleCursor(true), Consts.TWO_SEC);
+      const video = this.getVideoForCoord(clientX, clientY);
+      if (video) (this.createEdgeElement(video), this.toggleCursor(target));
     };
 
     document.addEventListener("mousemove", handle, { passive: true });
   },
-  toggleCursor(hide = false, cls = "__hc") {
-    if (!hide) return Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
+  toggleCursor(target, cls = "__hc") {
+    clearTimeout(this._cursorTid);
+    Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
 
-    const eles = [...Tools.getParents(this.player, 3), this.getVideoIFrame()];
-    eles.forEach((el) => (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
+    this._cursorTid = setTimeout(() => {
+      const eles = [target, ...Tools.getParents(this.player, 2), ...Tools.querys(".__v_edge")];
+      eles.forEach((el) => (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
+    }, Consts.TWO_SEC);
   },
   // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
   getVideoForCoord(x, y) {
@@ -195,8 +193,6 @@ export default {
     return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
   createEdgeElement(video) {
-    if (!video) return;
-
     const container = this.getEdgeContainer(video);
 
     // 父容器未发生变化，不更新位置
@@ -208,12 +204,12 @@ export default {
     }
 
     // 已创建过侧边元素，重新插入到父容器中
-    Tools.querys(".__edgeClick", container).forEach((el) => el.remove());
+    Tools.querys(".__v_edge", container).forEach((el) => el.remove());
     if (video.lArea) return container.prepend(video.lArea, video.rArea);
 
     // 复用元素创建逻辑
     const createEdge = (cls = "") => {
-      const element = Tools.newEle("div", { video, className: `__edgeClick ${cls}` });
+      const element = Tools.newEle("div", { video, className: `__v_edge ${cls}` });
 
       element.onclick = (e) => {
         Tools.preventEvent(e);

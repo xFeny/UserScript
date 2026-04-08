@@ -22,7 +22,7 @@ export default defineConfig({
       entry: "src/main.js",
       userscript: {
         author: "Feny",
-        version: "3.10.1",
+        version: "3.10.2",
         match: ["*://*/*"],
         license: "GPL-3.0-only",
         "run-at": "document-start",

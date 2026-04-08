@@ -21,12 +21,12 @@ declare global {
     /**
      * 显示进度的元素
      */
-    progNode: HTMLDivElement;
+    timeNode: HTMLDivElement;
 
     /**
      * 倍速常显元素
      */
-    rateDisplay: HTMLDivElement;
+    rateNode: HTMLDivElement;
 
     /**
      * 时钟类
@@ -53,7 +53,7 @@ declare global {
 
     /**
      * 调整播放倍速（递增/递减）
-     * @param {number} [step=Storage.SPEED_STEP.get()] - 步长
+     * @param {number} [step=Storage.RATE_STEP.get()] - 步长
      */
     adjustPlayRate(step?: number): void;
 
@@ -63,6 +63,14 @@ declare global {
      * @returns {string} 缓存key
      */
     getUniqueKey(video: HTMLVideoElement): string;
+
+    /**
+     * 显示提示信息
+     * @param content 提示内容
+     * @param dealy 显示时长
+     * @param isRemove 是否一次旧元素
+     */
+    showToast(content: HTMLVideoElement | String, dealy: Number, isRemove: Boolean): void;
 
     /**
      * 设置播放器时钟

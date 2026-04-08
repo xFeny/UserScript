@@ -5,7 +5,7 @@ export default Object.freeze({
   P: "P",
   HALF_SEC: 500,
   ONE_SEC: 1000,
-  webFull: "gm_webfullscreen",
+  webFull: "web-fullscr",
   MSG_SOURCE: "SCRIPTS_VIDEO_FULLSCREEN",
   ICONS: { full: 0, webFull: 1 },
 });

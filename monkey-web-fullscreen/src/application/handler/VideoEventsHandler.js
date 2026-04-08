@@ -15,7 +15,7 @@ export default {
     const handle = ({ type, target }) => {
       if (this.isMutedLoop(target)) return;
       if (!target?.matches(`video, ${Consts.FAKE_VIDEO}`)) return;
-      (this[type]?.(target), this.customVideoEvtHandle(type, target));
+      (this[type]?.(target), this.runVideoEvtCode(type, target));
     };
 
     this.videoEvts.forEach((t) =>
@@ -58,8 +58,8 @@ export default {
       this.autoWebFullscreen(video);
       this.autoNextEpisode(video);
 
-      this.cachePlayTime(video);
       this.renderProgress(video);
+      this.cachePlayTime(video);
       this.ensureRateDisplay();
     });
   },
@@ -69,13 +69,13 @@ export default {
     Tools.waitFor(() => this.topWin).then(() => this.applySettings(video));
   },
   ended(video) {
-    this.autoExitFull(video);
+    this.autoExitFullscreen();
     this.clearCachedTime(video);
   },
   ratechange: () => App.playbackRateDisplay(),
-  customVideoEvtHandle(type, video) {
+  runVideoEvtCode(type, video) {
     if (type === "timeupdate" && Tools.isThrottle("codeSnippet", Consts.ONE_SEC)) return;
-    Tools.sleep(10).then(() => this.executeCodeSnippet(Storage.VIDEO_EVT_CODE.get(this.host), type, video));
+    Tools.sleep(10).then(() => this.executeCodeSnippet(Storage.VIDEO_CODE.get(this.host), type, video));
   },
   codeSnippetCache: new Map(),
   executeCodeSnippet(jsCode, type, video) {

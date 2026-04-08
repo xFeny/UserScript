@@ -11,8 +11,8 @@
   @include __tsr("var(--deftsr, matrix(1, 0, 0, 1, 0, 0))");
 }
 
-[gm_webfullscreen] video,
-body[gm_webfullscreen] [gm_webfullscreen] video {
+[web-fullscr] video,
+body[web-fullscr] [web-fullscr] video {
   &.__tsr {
     @include __tsr();
   }

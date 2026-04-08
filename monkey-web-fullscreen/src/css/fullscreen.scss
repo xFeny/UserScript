@@ -1,5 +1,5 @@
-[gm_webfullscreen],
-body[gm_webfullscreen] [gm_webfullscreen] {
+[web-fullscr],
+body[web-fullscr] [web-fullscr] {
   top: 0 !important;
   left: 0 !important;
   margin: 0 !important;
@@ -21,8 +21,8 @@ body[gm_webfullscreen] [gm_webfullscreen] {
   display: flex !important;
 }
 
-[gm_webfullscreen] video,
-body[gm_webfullscreen] [gm_webfullscreen] video {
+[web-fullscr] video,
+body[web-fullscr] [web-fullscr] video {
   top: 0 !important;
   left: 0 !important;
   width: 100vw !important;
@@ -33,6 +33,6 @@ body[gm_webfullscreen] [gm_webfullscreen] video {
 }
 
 /** 隐藏后面的兄弟元素 */
-[gm_webfullscreen] ~ *:not(.monkey-web-fullscreen) {
+[web-fullscr] ~ *:not(.vpx-popup) {
   display: none !important;
 }

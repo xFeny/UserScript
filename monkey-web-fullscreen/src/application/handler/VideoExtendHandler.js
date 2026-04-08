@@ -8,11 +8,11 @@ import Storage from "../common/Storage";
  */
 export default {
   setupLoadEventListener() {
-    const handle = ({ type }) => this.executeCodeSnippet(Storage.LOAD_EVT_CODE.get(this.host), type, this.player);
+    const handle = ({ type }) => this.executeCodeSnippet(Storage.LOAD_CODE.get(this.host), type, this.player);
     document.addEventListener("DOMContentLoaded", handle);
     window.addEventListener("load", handle);
   },
-  shouldHideTime: () => !App.isFullscreen && !Storage.PAGE_CLOCK.get(),
+  shouldHideTime: () => !App.isFullscreen && !Storage.CLOCK_WEB.get(),
   setupClockForPlayer() {
     if (!this.player || this.shouldHideTime()) return this.Clock?.stop(true);
     if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(this.player.parentNode).start();
@@ -28,7 +28,7 @@ export default {
     if (!video || this.player !== video) return;
 
     const duration = this.getRealDuration(video);
-    if (duration <= 30 || duration > 864e2 || this.isLive() || this.shouldHideTime()) return this.timeEle?.remove();
+    if (duration <= 30 || duration > 864e2 || this.isLive() || this.shouldHideTime()) return this.timeNode?.remove();
 
     const percent = Tools.toFixed((video.currentTime / duration) * 100, 1);
     const remain = this.formatTime(duration - video.currentTime);
@@ -38,25 +38,25 @@ export default {
     this.prependElement(el);
   },
   createProgressElement() {
-    if (this.timeEle) return this.timeEle;
+    if (this.timeNode) return this.timeNode;
 
     // 创建播放进度元素
-    this.timeEle = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
-    this.timeEle.append("00:00", Tools.newEle("b", { textContent: "%" }));
-    return this.timeEle;
+    this.timeNode = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
+    this.timeNode.append("00:00", Tools.newEle("b", { textContent: "%" }));
+    return this.timeNode;
   },
   // ====================⇑⇑⇑ 进度显示相关逻辑 ⇑⇑⇑====================
 
   // ====================⇓⇓⇓ 常显倍速相关逻辑 ⇓⇓⇓====================
   playbackRateDisplay() {
     if (!this.player || this.isLive()) return;
-    if (!Storage.RATE_KEEP_SHOW.get()) return this.rateDisplay?.remove();
+    if (!Storage.RATE_SHOW.get()) return this.rateNode?.remove();
 
-    this.rateDisplay ??= this.createDisplayElement("__rateDisplay");
-    this.rateDisplay.textContent = `倍速: ${this.player.playbackRate}`;
-    this.prependElement(this.rateDisplay);
+    this.rateNode ??= this.createDisplayElement("__v_rate");
+    this.rateNode.textContent = `倍速: ${this.player.playbackRate}`;
+    this.prependElement(this.rateNode);
   },
-  ensureRateDisplay: () => !Tools.isAttached(App.rateDisplay) && App.playbackRateDisplay(),
+  ensureRateDisplay: () => !Tools.isAttached(App.rateNode) && App.playbackRateDisplay(),
   // ====================⇑⇑⇑ 常显倍速相关逻辑 ⇑⇑⇑====================
 
   createDisplayElement(cls, color) {
@@ -69,5 +69,5 @@ export default {
     if (el && !container?.contains(el)) container?.prepend(el);
   },
   changeTimeDisplay: () => (App.setupClockForPlayer(), App.renderProgress(App.player)),
-  setTimeColor: (color) => Tools.setStyle([App.progNode, App.Clock?.element], "color", color),
+  setTimeColor: (color) => Tools.setStyle([App.timeNode, App.Clock?.element], "color", color),
 };

@@ -27,7 +27,7 @@ export default class BasicStorage {
    * @returns {string} 最终拼接后的键名
    * @throws {Error} 当requireKey为true且suffix为空时抛出错误
    */
-  #getFinalKey(suffix) {
+  #getKey(suffix) {
     if (this.splice && !suffix) throw new Error(`${this.name} 后缀不能为空！`);
     return this.name + (this.splice ? suffix : "");
   }
@@ -40,7 +40,7 @@ export default class BasicStorage {
    */
   set(value, key, expires) {
     const val = expires ? JSON.stringify({ value, expires: Date.now() + expires * 864e5 }) : value;
-    this.storage.setItem(this.#getFinalKey(key), val);
+    this.storage.setItem(this.#getKey(key), val);
     return value;
   }
 
@@ -50,7 +50,7 @@ export default class BasicStorage {
    * @returns {any} 解析后的有效数据 | 默认值
    */
   get(key) {
-    const data = this.#get(this.#getFinalKey(key));
+    const data = this.#get(this.#getKey(key));
     return !data?.value ? data : data.expires > Date.now() ? data.value : this.defVal;
   }
 
@@ -69,10 +69,17 @@ export default class BasicStorage {
   }
 
   /**
+   * 布尔值切换：取反当前值并保存，返回新值
+   * @param {string} [key] 键名后缀
+   * @returns {boolean} 切换后的新值
+   */
+  toggle = (key) => this.set(!this.get(key), key);
+
+  /**
    * 删除指定键名的数据
    * @param {string} [key] 键名后缀（可选，不传则删除基础名对应数据）
    */
-  del = (key) => this.storage.removeItem(this.#getFinalKey(key));
+  del = (key) => this.storage.removeItem(this.#getKey(key));
   fuzzyDel = (pattern) => this.fuzzyHandle(pattern, (key) => this.storage.removeItem(key));
 
   fuzzyGet(pattern) {

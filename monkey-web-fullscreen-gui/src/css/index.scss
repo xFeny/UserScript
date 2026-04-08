@@ -54,6 +54,10 @@
 /* 主题切换按钮 */
 .vc-theme-btn {
   cursor: pointer;
+
+  &::after {
+    content: "🌙";
+  }
 }
 
 /* 功能区布局样式 */
@@ -171,6 +175,10 @@
 
   .vc-panel-header {
     background-color: #f5f5f5;
+  }
+
+  .vc-theme-btn::after {
+    content: "☀️";
   }
 
   .vc-control-item,

@@ -7,8 +7,8 @@ export default Object.freeze({
   ONE_SEC: 1000,
   TWO_SEC: 2000,
   THREE_SEC: 3000,
+  webFull: "web-fullscr",
   FAKE_VIDEO: "fake-video",
-  webFull: "gm_webfullscreen",
   MSG_SOURCE: "SCRIPTS_AUTO_WEB_FULLSCREEN",
   DEF_TSR: { zoom: 100, mvX: 0, mvY: 0, rotate: 0, mirror: 1 },
 });
