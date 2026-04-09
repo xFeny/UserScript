@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GUI-悬浮图形控制面板
 // @namespace    http://tampermonkey.net/
-// @version      1.0.1
+// @version      1.0.2
 // @author       Feny
 // @description  为「视频自动网页全屏｜倍速播放」脚本提供悬浮图形控制面板，支持自由拖拽定位、深色/浅色主题切换
 // @license      GPL-3.0-only
@@ -19,7 +19,7 @@
 // @run-at       document-body
 // ==/UserScript==
 
-(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const r=document.createElement("style");r.textContent=e,document.head.append(r)})(' @charset "UTF-8";.vc-panel-wrapper{top:30%;border:none;position:fixed;left:calc(100vw - 50px);user-select:none!important;z-index:2147483647!important;background-color:transparent!important}.vc-panel-wrapper *{color:#e0e0e0;font-size:12px;user-select:none!important;transition:border .3s,background-color .3s!important}.vc-trigger{width:32px;height:32px;cursor:pointer;line-height:32px;border-radius:50%;position:relative;text-align:center;background:#333;box-shadow:0 2px 8px #0000004d}.vc-trigger:hover{background:#444}.vc-control-panel{width:265px;overflow:hidden;border-radius:4px;background:#444;box-shadow:0 2px 8px #0000004d}.vc-panel-header{padding:8px;display:flex;align-items:center;background:#333;justify-content:space-between}.vc-theme-btn{cursor:pointer}.vc-func-group,.vc-slider-control{gap:8px;padding:8px;border-top:1px solid #555555}.vc-func-group{display:grid;grid-template-columns:repeat(3,1fr)}.vc-func-group:nth-of-type(4) .vc-control-item:nth-of-type(2) b,.vc-func-group:nth-of-type(4) .vc-control-item:nth-of-type(5) b{display:inline-block;transform:rotate(90deg)}.vc-control-item{padding:5px 0;cursor:pointer;text-align:center;border-radius:4px;background:#555}.vc-control-item:hover{background:#666}.vc-control-item b{margin-right:5px}.vc-slider-control{display:flex;flex-direction:column}.vc-slider-control button{border:none;cursor:pointer;padding:2px 8px;font-weight:700;border-radius:4px;background:#555}.vc-slider-control button:hover{background:#666}.vc-slider-label{text-align:left;transform-origin:left center}.vc-slider-row{gap:8px;display:flex;align-items:center}.vc-slider{flex:1;height:4px;border:none;outline:none;border-radius:3px;background:#d3d3d3;-webkit-appearance:none;appearance:none}.vc-slider::-webkit-slider-thumb{width:12px;height:12px;cursor:pointer;border-radius:50%;background:#9a72ff;-webkit-appearance:none;appearance:none}.vc-slider::-webkit-slider-thumb:hover{background:#a37ffe}.light-mode *{color:#333;border-color:#e0e0e0}.light-mode .vc-trigger,.light-mode .vc-control-panel{background-color:#fff}.light-mode .vc-trigger:hover{background-color:#e3e5e7}.light-mode .vc-panel-header{background-color:#f5f5f5}.light-mode .vc-control-item,.light-mode .vc-slider-control button{background-color:#f0f0f0}.light-mode .vc-control-item:hover,.light-mode .vc-slider-control button:hover{background-color:#e0e0e0}.tippy-box[data-theme~=vc-panel-wrapper]{background-color:transparent!important}.tippy-box[data-theme~=vc-panel-wrapper] .tippy-content{padding:0!important}@media (min-width: 2200px){.vc-panel-wrapper *{font-size:14px}.vc-trigger{width:45px;height:45px;line-height:45px}.vc-control-panel{width:325px}.vc-control-item{padding:7px 0}} ');
+(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const o=document.createElement("style");o.textContent=e,document.head.append(o)})(' @charset "UTF-8";.vc-panel-wrapper{top:30%;border:none;position:fixed;left:calc(100vw - 50px);user-select:none!important;z-index:2147483647!important;background-color:transparent!important}.vc-panel-wrapper *{color:#e0e0e0;font-size:12px;user-select:none!important;transition:border .3s,background-color .3s!important}.vc-trigger{width:32px;height:32px;cursor:pointer;line-height:32px;border-radius:50%;position:relative;text-align:center;background:#333;box-shadow:0 2px 8px #0000004d}.vc-trigger:hover{background:#444}.vc-control-panel{width:265px;overflow:hidden;border-radius:4px;background:#444;box-shadow:0 2px 8px #0000004d}.vc-panel-header{padding:8px;display:flex;align-items:center;background:#333;justify-content:space-between}.vc-theme-btn{cursor:pointer}.vc-theme-btn:after{content:"\u{1F319}"}.vc-func-group,.vc-slider-control{gap:8px;padding:8px;border-top:1px solid #555555}.vc-func-group{display:grid;grid-template-columns:repeat(3,1fr)}.vc-func-group:nth-of-type(4) .vc-control-item:nth-of-type(2) b,.vc-func-group:nth-of-type(4) .vc-control-item:nth-of-type(5) b{display:inline-block;transform:rotate(90deg)}.vc-control-item{padding:5px 0;cursor:pointer;text-align:center;border-radius:4px;background:#555}.vc-control-item:hover{background:#666}.vc-control-item b{margin-right:5px}.vc-slider-control{display:flex;flex-direction:column}.vc-slider-control button{border:none;cursor:pointer;padding:2px 8px;font-weight:700;border-radius:4px;background:#555}.vc-slider-control button:hover{background:#666}.vc-slider-label{text-align:left;transform-origin:left center}.vc-slider-row{gap:8px;display:flex;align-items:center}.vc-slider{flex:1;height:4px;border:none;outline:none;border-radius:3px;background:#d3d3d3;-webkit-appearance:none;appearance:none}.vc-slider::-webkit-slider-thumb{width:12px;height:12px;cursor:pointer;border-radius:50%;background:#9a72ff;-webkit-appearance:none;appearance:none}.vc-slider::-webkit-slider-thumb:hover{background:#a37ffe}.light-mode *{color:#333;border-color:#e0e0e0}.light-mode .vc-trigger,.light-mode .vc-control-panel{background-color:#fff}.light-mode .vc-trigger:hover{background-color:#e3e5e7}.light-mode .vc-panel-header{background-color:#f5f5f5}.light-mode .vc-theme-btn:after{content:"\u2600\uFE0F"}.light-mode .vc-control-item,.light-mode .vc-slider-control button{background-color:#f0f0f0}.light-mode .vc-control-item:hover,.light-mode .vc-slider-control button:hover{background-color:#e0e0e0}.tippy-box[data-theme~=vc-panel-wrapper]{background-color:transparent!important}.tippy-box[data-theme~=vc-panel-wrapper] .tippy-content{padding:0!important}@media (min-width: 2200px){.vc-panel-wrapper *{font-size:14px}.vc-trigger{width:45px;height:45px;line-height:45px}.vc-control-panel{width:325px}.vc-control-item{padding:7px 0}} ');
 
 (function (tippy, Draggable) {
   'use strict';
@@ -32,21 +32,20 @@
   class BasicStorage {
     constructor(name, defVal, parser = (v) => v) {
       Object.assign(this, { name, defVal, parser });
-      this.storage = { getItem: GM_getValue, setItem: GM_setValue };
     }
-    #getFinalKey(suffix) {
-      return this.name + (suffix ? suffix : "");
+    #getKey(suffix = "") {
+      return this.name + suffix;
     }
-    set(value, key) {
-      this.storage.setItem(this.#getFinalKey(key), value);
+    set(value, suffix) {
+      GM_setValue(this.#getKey(suffix), value);
     }
-    get(key) {
-      const value = this.storage.getItem(this.#getFinalKey(key));
-      return this.parser(value ?? this.defVal);
+    get(suffix) {
+      const val = GM_getValue(this.#getKey(suffix));
+      return this.parser(val ?? this.defVal);
     }
   }
   const Storage = {
-    IS_DARK_THEME: new BasicStorage("IS_DARK_THEME", true, Boolean),
+    DARK_THEME: new BasicStorage("DARK_THEME", true, Boolean),
     DRAG_POSITION: new BasicStorage("DRAG_POSITION_", { x: 0, y: 0 })
   };
   const Layout = {
@@ -59,20 +58,20 @@
     },
     createControlPanel() {
       if (this.panel) return this.panel;
-      const els = ["FullScreen", "Operation", "Transform", "Rate"].map((name) => this[`create${name}Controls`]());
+      const els = ["Fullscreen", "Operation", "Transform", "Rate"].map((name) => this[`create${name}Controls`]());
       this.panel = FyTools.newEle("div", { className: "vc-control-panel" });
       this.panel.append(this.createPanelHeader(), ...els);
       return this.panel;
     },
     createPanelHeader() {
       const title = FyTools.newEle("b", { textContent: "🎬 播放控制" });
-      const onclick = () => this.setControlPanelTheme(!Storage.IS_DARK_THEME.get());
-      this.theme = FyTools.newEle("b", { className: "vc-theme-btn", textContent: "🌙", onclick });
+      const onclick = () => this.setControlPanelTheme(!Storage.DARK_THEME.get());
+      const theme = FyTools.newEle("b", { className: "vc-theme-btn", onclick });
       const header = FyTools.newEle("div", { className: "vc-panel-header" });
-      header.append(title, this.theme);
+      header.append(title, theme);
       return header;
     },
-    createFullScreenControls() {
+    createFullscreenControls() {
       const pip = () => document.exitPictureInPicture().catch(() => this.FS.player?.requestPictureInPicture());
       const config = [
         { text: "画中画", icon: "▣", action: pip },
@@ -115,7 +114,7 @@
       return container;
     },
     createRateControls() {
-      const step = FyStorage.SPEED_STEP.get();
+      const step = FyStorage?.RATE_STEP?.get() ?? 0.25;
       const setRate = (value) => this.FS.setPlaybackRate(value);
       const adjustRate = (plus2 = 1) => this.FS.adjustPlayRate(plus2 * step);
       const reset = FyTools.newEle("button", { textContent: "↺", onclick: () => setRate(1) });
@@ -188,10 +187,9 @@
       this.setupPanelTrigger();
       this.setupDraggable();
     },
-    setControlPanelTheme(isDark = Storage.IS_DARK_THEME.get()) {
-      if (this.theme) this.theme.textContent = isDark ? "🌙" : "☀️";
-      this.wrapper?.classList.toggle("light-mode", !isDark);
-      Storage.IS_DARK_THEME.set(isDark);
+    setControlPanelTheme(isDark = Storage.DARK_THEME.get()) {
+      this.wrapper.classList.toggle("light-mode", !isDark);
+      Storage.DARK_THEME.set(isDark);
     },
     setupPanelTrigger() {
       tippy(this.panelTrigger, {
@@ -204,7 +202,7 @@
         theme: "vc-panel-wrapper",
         onTrigger: (instance) => {
           instance.setContent(this.createControlPanel());
-          if (this.panel) this.renderRateToPanel(), this.setControlPanelTheme();
+          if (this.panel) this.renderRateToPanel();
         }
       });
     },

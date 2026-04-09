@@ -2,7 +2,7 @@
 // @name            视频网页全屏
 // @name:en         Video Fullscreen
 // @namespace       npm/vite-plugin-monkey
-// @version         3.10.1
+// @version         3.10.2
 // @author          Feny
 // @description     让所有视频网页全屏，快捷键：P - 网页全屏，Enter - 全屏; 支持侧边点击切换网页全屏; 支持自动网页全屏
 // @description:en  Maximize all video players; Shortcut keys: P - Web Fullscreen, Enter - Fullscreen; Support side click to web fullscreen; Support auto web fullscreen
@@ -20,7 +20,7 @@
 // @run-at          document-start
 // ==/UserScript==
 
-(e=>{const o=Symbol("added"),t=document.createElement("style");t.textContent=e,window.gmStyle=t,document.addEventListener("addStyle",({detail:{sroot:n}})=>{n[o]||n instanceof Document||(n.prepend(t.cloneNode(!0)),n[o]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(e)})(' @charset "UTF-8";[gm_webfullscreen],body[gm_webfullscreen] [gm_webfullscreen]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[gm_webfullscreen] video,body[gm_webfullscreen] [gm_webfullscreen] video{top:0!important;left:0!important;width:100vw!important;border:none!important;transform:none!important;object-fit:contain!important;height:clamp(100vh - 100%,100vh,100%)!important}[gm_webfullscreen]~*:not(.monkey-web-fullscreen){display:none!important}.__edgeClick{left:0!important;top:6%!important;opacity:0!important;width:25px!important;height:70%!important;position:absolute!important;z-index:2147483647!important;cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC),pointer!important}.__edgeClick.right{right:0!important;left:auto!important} ');
+(o=>{const e=Symbol("added"),t=document.createElement("style");t.textContent=o,window.gmStyle=t,document.addEventListener("addStyle",({detail:{sroot:n}})=>{n[e]||n instanceof Document||(n.prepend(t.cloneNode(!0)),n[e]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(o)})(' @charset "UTF-8";[web-fullscr],body[web-fullscr] [web-fullscr]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[web-fullscr] video,body[web-fullscr] [web-fullscr] video{top:0!important;left:0!important;width:100vw!important;border:none!important;transform:none!important;object-fit:contain!important;height:clamp(100vh - 100%,100vh,100%)!important}[web-fullscr]~*{display:none!important}.__v_edge{left:0!important;top:6%!important;opacity:0!important;width:25px!important;height:70%!important;position:absolute!important;z-index:2147483647!important;cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC),pointer!important}.__v_edge.right{right:0!important;left:auto!important} ');
 
 (function () {
   'use strict';
@@ -63,7 +63,7 @@
     P: "P",
     HALF_SEC: 500,
     ONE_SEC: 1e3,
-    webFull: "gm_webfullscreen",
+    webFull: "web-fullscr",
     MSG_SOURCE: "SCRIPTS_VIDEO_FULLSCREEN",
     ICONS: { full: 0, webFull: 1 }
   });
@@ -170,7 +170,7 @@
       this.setupKeydownListener();
       this.setupMouseMoveListener();
       this.setupFullscreenListener();
-      this.docElement = document.documentElement;
+      this.docEle = document.documentElement;
       if (isNonFirst) return;
       this.setupDocumentObserver();
       this.setupShadowVideoListener();
@@ -179,7 +179,7 @@
     },
     setupDocumentObserver() {
       new MutationObserver(() => {
-        if (this.docElement === document.documentElement) return;
+        if (this.docEle === document.documentElement) return;
         this.init(true), document.head.append(gmStyle.cloneNode(true));
       }).observe(document, { childList: true });
     },
@@ -187,13 +187,13 @@
       document.addEventListener("fullscreenchange", () => {
         Tools.postMessage(window.top, { isFullscreen: !!document.fullscreenElement });
       });
-      if (Tools.isExecuted("isDefined")) return;
+      if (Tools.isExecuted("fsDoneHook")) return;
       Object.defineProperty(this, "isFullscreen", {
         get: () => this._isFullscreen,
         set: (value) => {
           this._isFullscreen = value;
           if (!(value && this.fsWrapper)) this.toggleWebFullscreen();
-          Tools.microTask(() => this.customFullChangeHandle());
+          Tools.microTask(() => this.runFsChangeCode());
         }
       });
     },
@@ -217,10 +217,10 @@
       if (container instanceof Element && this.lacksRelativePosition(container)) {
         Tools.setStyle(container, "position", "relative");
       }
-      Tools.querys(".__edgeClick", container).forEach((el) => el.remove());
+      Tools.querys(".__v_edge", container).forEach((el) => el.remove());
       if (video.lArea) return container.prepend(video.lArea, video.rArea);
       const createEdge = (cls = "") => {
-        const element = Tools.createElement("div", { video, className: `__edgeClick ${cls}` });
+        const element = Tools.createElement("div", { video, className: `__v_edge ${cls}` });
         element.onclick = (e) => {
           Tools.preventDefault(e);
           this.setPlayer(e.target.video);
@@ -306,8 +306,8 @@
       this.setCurrentVideo(video);
     },
     initVideoProps(video) {
-      delete video.__isWide;
-      Tools.resetLimit("autoWide");
+      delete video.__isWFs;
+      Tools.resetLimit("autoWFs");
       if (!Tools.isAttached(this.player)) delete this.player;
     },
     setCurrentVideo(video) {
@@ -322,7 +322,7 @@
     },
     syncMetaToParentWin(vMeta) {
       window.vMeta = this.vMeta = { ...vMeta, timestamp: Date.now() };
-      if (!Tools.isTopWin()) return Tools.postMessage(window.parent, { vMeta: { ...vMeta, iFrame: location.href } });
+      if (!Tools.isTopWin()) return Tools.postMessage(unsafeWindow.parent, { vMeta: { ...vMeta, iFrame: location.href } });
       Tools.microTask(() => this.initMenuCmds());
       this.sendTopWinInfo();
     },
@@ -358,20 +358,21 @@
   const Storage = {
     IS_AUTO: new BasicStorage("IS_AUTO_", false, Boolean),
     DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, Number),
-    CUSTOM_CTN: new BasicStorage("CUSTOM_CTN_", ""),
+    V_WRAPPER: new BasicStorage("V_WRAPPER_", ""),
     IGNORE_URLS: new BasicStorage("IGNORE_URLS_", ""),
-    FS_CHANGE_CODE: new BasicStorage("FS_CHANGE_CODE_", "")
+    FS_CODE: new BasicStorage("FS_CHANGE_CODE_", "")
   };
   const WebFull = {
     toggleFullscreen() {
-      if (!Tools.isTopWin() || Tools.isThrottle("toggleFull")) return;
+      if (!Tools.isTopWin() || Tools.isThrottle("_Full_")) return;
       document.exitFullscreen().catch(() => (this.enterWebFullscreen(), this.fsWrapper.requestFullscreen()));
     },
     toggleWebFullscreen(isTrusted) {
-      if (this.isNoVideo() || Tools.isThrottle("toggleWeb")) return;
-      if (this.isFullscreen && isTrusted) return document.fullscreenElement && document.exitFullscreen();
+      if (this.isNoVideo() || Tools.isThrottle("_WebFull_")) return;
+      if (this.isFullscreen && isTrusted) return document.exitFullscreen().catch(() => {
+      });
       this.fsWrapper ? this.exitWebFullscreen() : this.enterWebFullscreen();
-      Tools.microTask(() => this.customFullChangeHandle());
+      Tools.microTask(() => this.runFsChangeCode());
     },
     enterWebFullscreen() {
       if (this.fsWrapper) return;
@@ -395,10 +396,10 @@
     exitWebFullscreen() {
       if (!this.fsWrapper) return;
       const { scrollY } = this.fsWrapper;
-      Tools.setStyle(this.docElement, "scroll-behavior", "auto", "important");
+      Tools.setStyle(this.docEle, "scroll-behavior", "auto", "important");
       if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
       Tools.querys(`[${Consts.webFull}]`).forEach((el) => Tools.attr(el, Consts.webFull));
-      requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(this.docElement, "scroll-behavior")));
+      requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(this.docEle, "scroll-behavior")));
       this.fsPlaceholder = this.fsWrapper = this.fsParent = null;
       this.videoParents.clear();
     },
@@ -406,7 +407,7 @@
       return this.player ? this.getVideoContainer() : this.getVideoIFrame();
     },
     getVideoIFrame() {
-      if (!this.vMeta?.iFrame) return Tools.getIFrames().find(Tools.isVisible);
+      if (!this.vMeta?.iFrame) return null;
       if (this.fsWrapper) return this.fsWrapper;
       const { vw, vh, iFrame } = this.vMeta;
       const { pathname, search } = new URL(iFrame);
@@ -419,7 +420,7 @@
       return iFrames.find(matchSize) ?? iFrames.find(Tools.isVisible);
     },
     getVideoContainer() {
-      const selector = Storage.CUSTOM_CTN.get(this.topWin?.host)?.trim();
+      const selector = Storage.V_WRAPPER.get(this.topWin?.host)?.trim();
       const ctn = selector ? this.player.closest(selector) ?? Tools.query(selector) : null;
       return ctn ?? this.findVideoContainer(this.findCtrlContainer());
     },
@@ -469,19 +470,20 @@
       if (Tools.isExecuted("__Added__", sroot)) return;
       if (sroot instanceof ShadowRoot) Tools.emitEvent("addStyle", { sroot });
     },
-    customFullChangeHandle() {
-      clearTimeout(this.e9x_fs_code);
-      this.e9x_fs_code = setTimeout(() => {
-        const tol = 5;
-        const { width, height } = window.screen;
-        const { topWin, player, fsWrapper } = this;
-        const { offsetWidth: ew, offsetHeight: eh } = fsWrapper ?? {};
-        const isWFs = Math.abs(ew - topWin.vw) < tol && Math.abs(eh - topWin.vh) < tol;
-        const isFs = Math.abs(ew - width) < tol && Math.abs(eh - height) < tol;
-        const type = isFs ? "isFull" : isWFs ? "isWFull" : "default";
-        const jsCode = Storage.FS_CHANGE_CODE.get(topWin.host);
-        this.executeCodeSnippet(jsCode, type, player);
+    runFsChangeCode() {
+      clearTimeout(this.e9x_fsCode);
+      this.e9x_fsCode = setTimeout(() => {
+        const jsCode = Storage.FS_CODE.get(this.topWin.host);
+        this.executeCodeSnippet(jsCode, this.getFsMode(), this.player);
       }, 10);
+    },
+    getFsMode(tol = 5) {
+      const { topWin, fsWrapper } = this;
+      const { width, height } = window.screen;
+      const { offsetWidth: ew = 0, offsetHeight: eh = 0 } = fsWrapper ?? {};
+      const isWFs = Math.abs(ew - topWin.vw) < tol && Math.abs(eh - topWin.vh) < tol;
+      const isFs = Math.abs(ew - width) < tol && Math.abs(eh - height) < tol;
+      return isFs ? "isFull" : isWFs ? "isWFull" : "default";
     },
     executeCodeSnippet(jsCode, type, video) {
       try {
@@ -513,15 +515,13 @@
   const Automatic = {
     async autoWebFullscreen(video) {
       if (!this.topWin || !video.offsetWidth || this.player !== video) return;
-      if (video.__isWide || Tools.isThrottle("autoWide", Consts.ONE_SEC) || !this.isAuto()) return;
-      if (this.isIgnoreUrl() || await this.isWebFull(video) || Tools.isOverLimit("autoWide")) return video.__isWide = true;
+      if (video.__isWFs || Tools.isThrottle("autoWFs", Consts.ONE_SEC) || !this.isAuto()) return;
+      if (this.isIgnoreUrl() || await this.isWebFull() || Tools.isOverLimit("autoWFs")) return video.__isWFs = true;
       this.dispatchShortcut(Consts.P);
     },
-    async isWebFull(video) {
-      const { vw } = this.topWin;
-      if (video.offsetWidth < vw) return false;
-      await Tools.sleep(Consts.HALF_SEC);
-      return video.offsetWidth >= vw;
+    async isWebFull(ms = Consts.HALF_SEC) {
+      const isWFs = () => this.getFsMode() === "isWFull";
+      return isWFs() ? await Tools.sleep(ms).then(isWFs) : false;
     }
   };
   const Ignore = {
@@ -583,8 +583,8 @@
       const configs = [
         { title: isAuto, cache: Storage.IS_AUTO, fn: ({ cache, value }) => cache.set(!value, this.host) },
         { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS },
-        { title: I18n.t("custom"), cache: Storage.CUSTOM_CTN },
-        { title: I18n.t("fsChange"), cache: Storage.FS_CHANGE_CODE, fn: fsChange },
+        { title: I18n.t("custom"), cache: Storage.V_WRAPPER },
+        { title: I18n.t("fsChange"), cache: Storage.FS_CODE, fn: fsChange },
         { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD }
       ];
       configs.forEach(({ title, cache, fn }) => {
