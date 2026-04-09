@@ -2,13 +2,6 @@
 
 参考设置：<a href="https://pic1.imgdb.cn/item/696662c00e6bc0c5db9822b5.png" target="_blank">https://pic1.imgdb.cn/item/696662c00e6bc0c5db9822b5.png</a>
 
-### 脚本菜单
-
-1. 此站启/禁用自动网页全屏（非 `@match` 网站时显示）
-2. 此站脱离式全屏阈值
-3. 快捷键说明
-4. 更多设置
-
 ### 快捷键大全
 
 | 快捷键      | 说明                     | 快捷键                  | 说明                 |
@@ -24,17 +17,51 @@
 | 数字 0️⃣                                                       | 快进 30 秒       | ◀️▶️                                                           | 快退/进 (默禁) |
 | 空格                                                         | 播放/暂停 (默禁) |                                                              |                |
 
-### 网页全屏 | 倍速
+## (网页)全屏相关
 
-<b style="color:red;">理论上</b>**支持所有含 HTML5 `<video> ` 的视频网页**，覆盖绝大多数视频播放场景。
+### 1. 自定义视频容器
 
-支持微博、推特等多视频平台 —— 哪个视频处于播放状态，即可直接对其进行网页全屏、播放倍速调节等操作。
+**设置路径：**「更多设置」→「全屏」→「此站 (网页)全屏视频容器」
 
-### 自动网页全屏
+该功能允许您为当前网站设置自定义 (网页)全屏视频容器，解决 (网页)全屏时可能出现的各种适配问题，例如：
 
-脚本默认只对 `@match` 配置的网站自动网页全屏，若需对其他的网站启用**自动网页全屏**，按以下配置即可快速生效。
+- 保留特定区域（如弹幕、控制栏按钮）在 (网页)全屏模式中始终可见。
+- 解决部分网页全屏后内容被截断、缩放异常等问题。
 
-**1. 对所有网站生效**
+#### 示例  
+
+| 网站                               | CSS 选择器         | 效果说明         |
+| ---------------------------------- | ------------------ | ---------------- |
+| [抖音](https://www.douyin.com/)    | `#slidelist > div` | 全屏后能切换视频 |
+| [吐槽弹幕网](https://www.tucao.my) | `#m_dplayer`       | 显示底部控制栏   |
+| [虎牙直播](https://www.huya.com)   | `#videoContainer`  | 显示底部控制栏   |
+
+### 2. 脱离式全屏阈值
+
+**解决的问题：** 
+
+- 在单页面（SPA）多视频应用中，如果通过「自定义此站视频容器」仍无法解决全屏异常，可尝试调整此阈值。
+
+  **示例：** 在 [YouTube Shorts](https://www.youtube.com/shorts)、[新版贴吧](https://tieba.baidu.com) 未修改阈值时切换网页全屏异常，修改阈值为 `10` 后可正常切换。
+
+- 缓解(网页)全屏切换卡顿、不流畅问题。
+
+  **示例：** 在 www.reddit.com 滚动加载内容后，DOM 元素过多，导致切换(网页)全屏存在明显延迟（`iframe` 无法解决）
+
+### 3. 侧边单击网页全屏
+
+将鼠标移至视频左右两侧边缘区域，当鼠标光标发生变化时 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAipJREFUSEutlTFoFEEUhr+3nKhFwMouKIqNFhYixC6m0E5UMFhI0F4UBY1GbzPZQyVJF7BSUBCNuZBLaWVMp6LYaaWiSBAtFLSKhH2yc3thd2/nbk6cbtl//n/+ef97I/SwNOJZApeQg77bxBeY4DRCUwHvfd7A/yKgExiEbWzghlzlfdFdJwd6k92scQnls4xjWntzDjTiHnAaeEnMETF8z4q4BFLyOrAHuC8hZ8oFmqdoAZ+whWNyjtUWOD1AUuR1ggL5WyoMyxjvSgXsPWdFhHmpMtwpCBrxGtgHtJHbQJRtXhcR3kiVkS4CSXT7qDCSPbnTQS+x9cF6xVQNm4DtbGZFRvntQ9yTAzUMEjS7GHiMcEeqLPkISdr+gwVwLmo6SR+r/CpgPgB3iamL4aNLrFxAmZZxLhd6YBY46SBqAHPENMSwlsV41cDGt8YQytMu1/IFmCVmUQwvnDF1kWhkx8dOn7sHloipeTuwLiKuALc8BRLYcnmjzbCRn0wDP7KDSw07CEiK23kJ34BHwO02ATVsJeABcCgZehIyUCj2AnDcofAKqKfFtsnKT9Mau1AeAvutvZKXSyM7m+baBISzBDTkGl+dKdKIReCoi9zWwVAhsLnvzxAtE3NYDH+KwnkHzQdnLzEXxPCpQ5omIdcnoxIyVYbvKUUtAjUMEPA8/V4h4IBcJ+mBkpvrlgjHf41s0w0BMxJy3kXzTw5sLSY4gXAK4aJU3dH9C5MTtb2fy3n/AAAAAElFTkSuQmCC" style="width:21px; vertical-align: text-top" /> ，点击即可切换网页全屏状态。
+
+**解决的问题：** 
+
+- 在微博、X、Instagram 等多视频页，无需按键盘快捷键，即可便捷切换网页全屏。
+- 避免父窗口视频对 `iframe` 视频网页全屏的干扰（www.reddit.com）
+
+### 4. 自动网页全屏
+
+脚本默认只对 `@match` 配置的网站自动网页全屏，若需对其他的网站启用**自动网页全屏**，可按以下方式配置：
+
+**（1）. 对所有网站生效**
 
 将脚本中的：
 
@@ -48,11 +75,11 @@
 // @match        *://*/*
 ```
 
-推荐在插件的脚本设置面板中完成用户匹配规则的配置；后续脚本更新时，即可避免重复修改。
+**推荐在浏览器插件的脚本设置面板中完成用户匹配规则的配置；后续脚本更新时，可避免重复修改**。
 
 参考设置：<a href="https://pic1.imgdb.cn/item/696662c00e6bc0c5db9822b5.png" target="_blank">https://pic1.imgdb.cn/item/696662c00e6bc0c5db9822b5.png</a>
 
-**2. 对特定网站生效（以咕咕番为例）**
+**（2）. 只针对单个网站生效（以咕咕番为例）**
 
 使用 `@include` 指定单个网站：
 
@@ -60,7 +87,7 @@
 // @include      *://www.gugu3.com/*
 ```
 
-**3. 对嵌套框架页生效（如 E 站弹幕网）**
+**（3）. 对嵌套框架页生效（如 E 站弹幕网）**
 
 若视频在 `iframe` 框架中播放，需同时匹配主页面和框架页的域名：
 
@@ -69,9 +96,9 @@
 // @include      *://player.ezdmw.com/danmuku/*
 ```
 
-修改完成后，刷新视频页面并等待视频完全加载，再在脚本菜单中点击「此站启用自动网页全屏」。设置成功后，<b style="color:#e5b01e">视频开始播放</b>时将自动进入网页全屏。
+配置完成后，刷新视频页面并等待视频完全加载，再在脚本菜单中点击「此站启用自动网页全屏」。设置成功后，<b style="color:#e5b01e">视频开始播放</b>时将自动进入网页全屏。
 
-> ⚠️ 注意：配置特定网站时须用 `@include`，而非 `@match`（`@match` 触发的是网站自带的图标，如果配置成 `@match` ，还需要在 `class Site` 中定义相关图标的 `CSS` 选择器）。
+> ⚠️ 注意：配置只针对单个网站时须用 `@include`，而非 `@match`（`@match` 触发的是网站自带的图标，如果配置成 `@match` ，还需要在 `class Site` 中定义相关图标的 `CSS` 选择器）。
 >
 > 如要对 `PPTV聚力视频` 自动网页全屏，配置成：
 >
@@ -90,48 +117,53 @@
 >
 > **反之亦然！！！**
 
-#### 忽略特定页面
+### 5. 忽略特定页面
 
 「此站启用自动网页全屏」后，将对目标域名下的所有页面生效（例如 YouTube 的搜索结果、短视频等场景）。若需排除不需要自动的页面，可按以下步骤操作：
 
-1. 进入「更多设置」→「忽略设置」→「自动网页全屏时忽略的网址」
+1. 进入「更多设置」→「忽略」→「自动网页全屏时忽略的网址」
 2. 添加目标页面的网址（如输入：`https://www.youtube.com/shorts` 即可排除短视频页）
 
 > ⚠️ 注意：该功能不支持模糊匹配，仅采用「前缀匹配」逻辑（即仅匹配以输入网址开头的页面）
 >
-> - 若输入带路径的网址（如 `https://www.youtube.com/shorts`），则匹配所有以该路径开头的子页面；
-> - 若仅输入域名网址（如 `https://www.youtube.com`），仅匹配该网站首页，不会作用于任何子页面。
 
-### 通用下集切换
+### 6.  (网页)全屏切换 扩展逻辑
 
-脚本默认 `@match` 配置的网站，使用站点自带的下集图标，点击对应元素完成下集切换。
+可在切换全屏、网页全屏、退出全屏时，执行对应的自定义代码逻辑，比如调整页面布局、显示 / 隐藏控件等。
 
-对于其他第三方视频网站，脚本提供了通用性较强的下集切换方案，让你在全网不同站点都能享受一致、顺畅的下一集体验。
+**代码存放路径**：「更多设置」→「全屏」→「此站 (网页)全屏切换 事件代码」
 
-**1. 对所有网站生效**
-
-将脚本中的：
+事件类型（type）：isFull、isWFull、default
 
 ```js
-// @note        *://*/*
+if (type === "isFull") {
+  console.log("进入全屏模式！");
+} else if (type === "isWFull") {
+  console.log("进入网页全屏模式！");
+} else {
+  console.log("退出(网页)全屏模式！");
+}
 ```
-修改为：
+
+### 7. 自动退出网页全屏
+
+B 站视频播放结束后自动退出全屏状态且点击「取消连播」按钮，避免自动播放下一个视频。
+
+如不需此功能，请在脚本中注释或删除掉以下代码：
 
 ```js
-// @match        *://*/*
+this.autoExitFullscreen();
 ```
 
-**2. 对特定网站生效（以咕咕番为例）**
 
-使用 `@include` 指定单个网站：
 
-```js
-// @include      *://www.gugu3.com/*
-```
+## 下集切换相关
 
-配置完成后，测试网站是否能成功切换下集。
+对默认 `@match` 匹配网站，脚本直接使用站点自带的下一集按钮进行切换。
 
-#### 自动切换下集
+同时为其他第三方视频站点提供了通用性较强的下集切换功能实现，让你在全网不同站点都能享受一致、顺畅的下一集体验。
+
+### 1. 自动切换下集
 
 功能默认处于禁用状态，需手动在脚本菜单中开启以激活使用。
 
@@ -144,7 +176,7 @@
 
 > 限制：时长小于 5 分钟的视频不会触发自动切换下集
 
-#### 手动拾取元素适配（解决切换失败问题）
+### 2. 手动拾取元素适配（解决切换失败问题）
 
 若遇到网站无法成功切换下集，或跳转至错误地址的情况，可通过手动适配的方式，**尝试解决**切换失败问题。
 
@@ -200,26 +232,45 @@
 - 聚神铺导航（[https://www.jspoo.com/](https://www.jspoo.com/)）
 - 硬核指南（[https://yinghezhinan.com/](https://yinghezhinan.com/)）
 
-### 自定义此站视频容器
+### 3. 重写获取下集跳转元素的逻辑
 
-设置路径：「更多设置」→「全屏设置」→「自定义此站视频容器」
+  ```js
+  /**
+   * 获取跳转目标集数的元素
+   * @param isPrev 是否跳转上一集；true = 上一集，false = 下一集
+   * @returns 要点击的元素
+   */
+  GM_E9X_FS.getJumpTargetEpisode(isPrev: boolean): HTMLElement;
+  ```
 
-该功能允许您为当前网站设置个性化的视频容器，解决网页全屏时可能出现的各种适配问题，例如：
+若手动适配仍无法正常切换下一集，可通过重写获取下集跳转元素的逻辑，自定义匹配规则，解决脚本默认代码逻辑的切换限制，实现精准、稳定的下一集跳转。
 
-- 保留特定区域（如弹幕、控制按钮）在网页全屏模式中始终可见
-- 解决部分网页全屏后内容被截断、缩放异常等问题
+**代码存放路径**：「更多设置」→「高级」→「此站 load 事件代码」
 
-#### 示例  
+  1. [慕课网](https://www.imooc.com/)
 
-| 网站                               | CSS 选择器         | 效果说明         |
-| ---------------------------------- | ------------------ | ---------------- |
-| [抖音](https://www.douyin.com/)    | `#slidelist > div` | 全屏后能切换视频 |
-| [吐槽弹幕网](https://www.tucao.my) | `#m_dplayer`       | 显示底部控制栏   |
-| [虎牙直播](https://www.huya.com)   | `#videoContainer`  | 显示底部控制栏   |
+     默认只能本章节内切换，重写逻辑使其不限于本章节切换
 
-### 其他功能
+     ```js
+     GM_E9X_FS.getJumpTargetEpisode = function (isPrev) {
+       const all = Tools.querys(".sec-li a"); // 章节视频列表
+       const currIndex = all.findIndex((el) => el.href.includes(location.pathname)); // 当前播放的
+       return isPrev ? all[currIndex - 1] : all[currIndex + 1]; // 要播放的下一个视频
+     };
+     ```
 
-#### 1. 空格◀️▶️ 控制
+  2. [我要自学网](https://www.51zxw.net/)
+
+     ```js
+     // 直接获取“下一节”元素
+     GM_E9X_FS.getJumpTargetEpisode = () => Tools.query(".icon-next-fill");
+     ```
+
+
+
+## 其他功能
+
+### 1. 空格◀️▶️ 控制
 
 默认处于禁用状态，需手动开启后使用。
 
@@ -232,22 +283,13 @@
 - 调整播放器默认快退/进秒数
 - 视频在 `iframe` 中无需手动聚焦也能操控视频
 
-#### 2. 自动退出网页全屏
-
-B 站视频播放结束后自动退出全屏状态且点击「取消连播」按钮，避免自动播放下一个视频。
-
-如需关闭此功能，请在脚本中注释掉以下代码：
-
-```js
-this.autoExitFullscreen();
-```
-#### 3. 标签页不可见时自动暂停
+### 2. 标签页不可见时自动暂停
 
 默认启用：视频标签页切换到后台（不可见）时自动暂停，切回时自动播放。
 
 - 关闭路径：「更多设置」→「控制」→「禁用 不可见暂停」
 
-#### 4. 预设常用倍速
+### 3. 预设常用倍速
 
 支持自定义常用的播放倍速，通过 `Ctrl + 数字键【1~5】` 一键设置，提升效率。
 
@@ -256,7 +298,7 @@ this.autoExitFullscreen();
 - 映射规则：`Ctrl + 1` 至 `Ctrl + 5` 分别对应预设倍速列表的第 1 至第 5 项
   - 示例：预设值为 `1.15,1.45,1.75` 时，`Ctrl + 1` 对应 1.15 倍、`Ctrl + 2` 对应 1.45 倍、`Ctrl + 3` 对应 1.75 倍
 
-#### 5. 全屏模式下显示时间
+### 4. 全屏模式下显示时间
 
 默认在全屏模式右上角显示：系统时间、视频剩余时长、进度百分比。
 
@@ -267,34 +309,13 @@ this.autoExitFullscreen();
 
 > 限制：≤30秒视频不显示剩余时长和进度百分比
 
-#### 6. 侧边单击网页全屏
+### 5. 执行自定义代码逻辑
 
-将鼠标移至视频左右两侧边缘区域，当鼠标光标发生变化时 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAipJREFUSEutlTFoFEEUhr+3nKhFwMouKIqNFhYixC6m0E5UMFhI0F4UBY1GbzPZQyVJF7BSUBCNuZBLaWVMp6LYaaWiSBAtFLSKhH2yc3thd2/nbk6cbtl//n/+ef97I/SwNOJZApeQg77bxBeY4DRCUwHvfd7A/yKgExiEbWzghlzlfdFdJwd6k92scQnls4xjWntzDjTiHnAaeEnMETF8z4q4BFLyOrAHuC8hZ8oFmqdoAZ+whWNyjtUWOD1AUuR1ggL5WyoMyxjvSgXsPWdFhHmpMtwpCBrxGtgHtJHbQJRtXhcR3kiVkS4CSXT7qDCSPbnTQS+x9cF6xVQNm4DtbGZFRvntQ9yTAzUMEjS7GHiMcEeqLPkISdr+gwVwLmo6SR+r/CpgPgB3iamL4aNLrFxAmZZxLhd6YBY46SBqAHPENMSwlsV41cDGt8YQytMu1/IFmCVmUQwvnDF1kWhkx8dOn7sHloipeTuwLiKuALc8BRLYcnmjzbCRn0wDP7KDSw07CEiK23kJ34BHwO02ATVsJeABcCgZehIyUCj2AnDcofAKqKfFtsnKT9Mau1AeAvutvZKXSyM7m+baBISzBDTkGl+dKdKIReCoi9zWwVAhsLnvzxAtE3NYDH+KwnkHzQdnLzEXxPCpQ5omIdcnoxIyVYbvKUUtAjUMEPA8/V4h4IBcJ+mBkpvrlgjHf41s0w0BMxJy3kXzTw5sLSY4gXAK4aJU3dH9C5MTtb2fy3n/AAAAAElFTkSuQmCC" style="width:21px; vertical-align: text-top" /> ，点击即可切换网页全屏状态。
-
-**解决的问题：** 
-
-- 在微博、X、Instagram 等平台浏览视频时，无需抬手按键盘快捷键，即可便捷切换网页全屏。
-- 避免外层父窗口视频影响内嵌 iframe 视频的网页全屏（www.reddit.com）
-
-#### 7. 脱离式全屏阈值
-
-**解决的问题：** 
-
-- 在单页应用（SPA）或多视频列表页中，如果通过「自定义此站视频容器」仍无法解决全屏异常，可尝试调整此阈值。
-
-  **示例：** 在 [YouTube Shorts](https://www.youtube.com/shorts)、[新版贴吧](https://tieba.baidu.com) 未修改阈值时切换网页全屏异常，修改阈值为 `10` 后可正常切换。
-
-- 缓解(网页)全屏切换卡顿、不流畅问题。
-
-  **示例：** 在 www.reddit.com 无限滚动加载内容，切换(网页)全屏存在明显延迟（iframe无法解决o(╥﹏╥)o）
-
-#### 8. 执行自定义代码逻辑
-
-可访问的值：type, video, unsafeWindow, Tools
+可访问的值：type, video, unsafeWindow, Tools, GM_E9X_FS
 
 - **自定义页面加载事件处理逻辑**
 
-  **设置路径**：「更多设置」→「高级」→「此站 load 事件代码」
+  **代码存放路径**：「更多设置」→「高级」→「此站 load 事件代码」
 
   > **注意：** 自定义加载事件逻辑，需要刷新页面才能看到效果！！！
   
@@ -319,38 +340,10 @@ this.autoExitFullscreen();
   // 需要点击才会加载视频资源
   if(type === "load") Tools.query("body > #start")?.click();
   ```
-  示例三：重写获取下集跳转元素的逻辑
-  
-  ```js
-  /**
-   * 获取跳转目标集数的元素
-   * @param isPrev 是否跳转上一集；true = 上一集，false = 下一集
-   * @returns 要点击的元素
-   */
-  GM_E9X_FS.getJumpTargetEpisode(isPrev: boolean): HTMLElement;
-  ```
-  
-  1. [慕课网](https://www.imooc.com/)
-  
-     ```js
-     // 默认只能本章节内切换，重写逻辑使其不限于本章节切换
-     GM_E9X_FS.getJumpTargetEpisode = function () {
-       const all = Tools.querys(".sec-li a"); // 章节视频列表
-       const currIndex = all.findIndex((el) => el.href.includes(location.pathname)); // 当前播放的
-       return all[currIndex + 1]; // 要播放的下一个视频
-     };
-     ```
-  
-  2. [我要自学网](https://www.51zxw.net/)
-  
-     ```js
-     // 直接获取“下一节”元素
-     GM_E9X_FS.getJumpTargetEpisode = () => Tools.query(".icon-next-fill");
-     ```
-  
+
 - **自定义视频各种事件处理逻辑**
 
-  **设置路径**：「更多设置」→「高级」→「此站 video 事件代码」
+  **代码存放路径**：「更多设置」→「高级」→「此站 video 事件代码」
 
   事件类型（type）：`loadstart`、`loadedmetadata`、`loadeddata`、`timeupdate`、`ratechange`、`canplay`、`playing`、`ended`
 
@@ -380,20 +373,5 @@ this.autoExitFullscreen();
   });
   ```
 
-- **自定义全屏切换处理逻辑**
-
-  **设置路径**：「更多设置」→「全屏」→「此站 (网页)全屏切换 事件代码」
-  
-  事件类型（type）：isFull、isWFull、default
-  
-  ```js
-  if (type === "isFull") {
-    console.log("进入全屏模式！");
-  } else if (type === "isWFull") {
-    console.log("进入网页全屏模式！");
-  } else {
-    console.log("退出(网页)全屏模式！");
-  }
-  ```
   
 
