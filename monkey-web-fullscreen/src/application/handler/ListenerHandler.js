@@ -11,6 +11,7 @@ if (import.meta.env.DEV) Tools.isTopWin() && window.addEventListener("resize", (
  * 应用程序初始化
  */
 export default {
+  player: null,
   fsWrapper: null,
   isFullscreen: false,
   isNoVideo: () => !window.vMeta && !window.topWin,

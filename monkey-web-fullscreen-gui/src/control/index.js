@@ -16,15 +16,7 @@ export default {
       .catch(() => console.error("未安装关联的脚本"));
   },
   watchPlayerChange() {
-    Object.defineProperty(this.FS, "player", {
-      set: (value) => {
-        this.FS.__player = value;
-        this.initControlPanel(value);
-      },
-      get() {
-        return this.__player;
-      },
-    });
+    GM_FVEnh.defineProperty(this.FS, "player", { set: (value, setter) => (setter(value), this.initControlPanel(value)) });
   },
   setupFunctionHooks() {
     Utils.onBefore(this.FS, "ratechange", () => this.renderRateToPanel());
