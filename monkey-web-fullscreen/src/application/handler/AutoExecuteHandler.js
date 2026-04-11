@@ -1,8 +1,8 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
+import Store from "../common/Store";
 import Consts from "../common/Consts";
 import HotKey from "../common/HotKey";
-import Store from "../common/Store";
 
 /**
  * 自动网页全屏、自动切换下集逻辑处理

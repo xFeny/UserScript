@@ -1,6 +1,6 @@
 import Tools from "../common/Tools";
-import Consts from "../common/Consts";
 import Store from "../common/Store";
+import Consts from "../common/Consts";
 import VideoEnhancer from "../VideoEnhancer";
 import HotKey from "../common/HotKey";
 

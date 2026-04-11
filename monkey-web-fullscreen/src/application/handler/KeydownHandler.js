@@ -1,8 +1,8 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
+import Store from "../common/Store";
 import Consts from "../common/Consts";
 import HotKey from "../common/HotKey";
-import Store from "../common/Store";
 
 /**
  * 快捷键和消息相关逻辑处理

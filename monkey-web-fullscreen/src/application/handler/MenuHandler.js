@@ -1,8 +1,8 @@
-import Store from "../common/Store";
-import Consts from "../common/Consts";
-import Tools from "../common/Tools";
-import Site from "../common/Site";
 import Swal from "sweetalert2";
+import Site from "../common/Site";
+import Store from "../common/Store";
+import Tools from "../common/Tools";
+import Consts from "../common/Consts";
 
 /**
  * 脚本菜单相关逻辑处理

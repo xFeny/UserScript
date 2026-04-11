@@ -1,7 +1,7 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
-import Consts from "../common/Consts";
 import Store from "../common/Store";
+import Consts from "../common/Consts";
 
 /**
  * 网页全屏逻辑处理

@@ -1,7 +1,7 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
-import Clock from "../common/lib/Clock";
 import Store from "../common/Store";
+import Clock from "../common/lib/Clock";
 
 /**
  * 视频一些额外处理

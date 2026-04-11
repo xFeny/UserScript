@@ -1,6 +1,6 @@
 import Tools from "../common/Tools";
-import Consts from "../common/Consts";
 import Store from "../common/Store";
+import Consts from "../common/Consts";
 
 /**
  * 视频监听事件逻辑处理
