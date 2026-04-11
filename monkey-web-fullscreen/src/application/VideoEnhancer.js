@@ -1,6 +1,11 @@
 import Tools from "./common/Tools";
 
-class VideoEnhancer {
+export default class VideoEnhancer {
+  static {
+    this.hackAttachShadow();
+    unsafeWindow.GM_FVEnh ??= this; // 防重复挂载
+  }
+
   static setPlaybackRate(video, rate) {
     if (!Tools.isExecuted("__vRateHooked", video)) {
       this.defineProperty(video, "playbackRate", { set: (val, setter) => video._vRate === val && setter(val) });
@@ -93,6 +98,3 @@ class VideoEnhancer {
     };
   }
 }
-
-VideoEnhancer.hackAttachShadow();
-export default VideoEnhancer;
