@@ -1,4 +1,4 @@
-import Storage from "../common/Storage";
+import Store from "../common/Store";
 
 /**
  * 处理：自动网页全屏时忽略的网址
@@ -6,14 +6,14 @@ import Storage from "../common/Storage";
 export default {
   initIgnoreUrls: () => (App.urlFilter = App.getIgnoreUrls()),
   setupIgnoreChangeListener() {
-    GM_addValueChangeListener(Storage.IGNORE_URLS.name, () => this.initIgnoreUrls());
+    GM_addValueChangeListener(Store.IGNORE_URLS.name, () => this.initIgnoreUrls());
   },
   isIgnoreUrl() {
     if (!this.urlFilter) this.initIgnoreUrls();
     return this.isBlocked(this.urlFilter);
   },
   getIgnoreUrls() {
-    const urlsStr = Storage.IGNORE_URLS.get(this.topWin.host);
+    const urlsStr = Store.IGNORE_URLS.get(this.topWin.host);
     return (urlsStr.match(/[^\s;]+/g) || []).filter((url) => new URL(url).pathname !== "/");
   },
   isBlocked(urls = []) {

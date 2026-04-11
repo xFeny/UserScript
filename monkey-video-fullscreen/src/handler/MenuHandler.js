@@ -1,15 +1,15 @@
 import Tools from "../common/Tools";
-import Storage from "../common/Storage";
+import Store from "../common/Store";
 import I18n from "../common/I18n";
 
 /**
  * 脚本菜单相关逻辑处理
  */
 export default {
-  isAuto: () => Storage.IS_AUTO.get(window.topWin?.host ?? location.host),
+  isAuto: () => Store.IS_AUTO.get(window.topWin?.host ?? location.host),
   initMenuCmds() {
     if (this.hasMenu || !Tools.isTopWin()) return;
-    GM_addValueChangeListener(Storage.IS_AUTO.name + this.host, () => this.setupMenuCmds());
+    GM_addValueChangeListener(Store.IS_AUTO.name + this.host, () => this.setupMenuCmds());
     this.setupMenuCmds();
     this.hasMenu = true;
   },
@@ -23,11 +23,11 @@ export default {
     };
 
     const configs = [
-      { title: isAuto, cache: Storage.IS_AUTO, fn: ({ cache, value }) => cache.set(!value, this.host) },
-      { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS },
-      { title: I18n.t("custom"), cache: Storage.V_WRAPPER },
-      { title: I18n.t("fsChange"), cache: Storage.FS_CODE, fn: fsChange },
-      { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD },
+      { title: isAuto, cache: Store.IS_AUTO, fn: ({ cache, value }) => cache.set(!value, this.host) },
+      { title: I18n.t("ignore"), cache: Store.IGNORE_URLS },
+      { title: I18n.t("custom"), cache: Store.V_WRAPPER },
+      { title: I18n.t("fsChange"), cache: Store.FS_CODE, fn: fsChange },
+      { title: I18n.t("detach"), cache: Store.DETACH_THRESHOLD },
     ];
 
     // 注册菜单项

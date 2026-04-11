@@ -1,4 +1,4 @@
-import Storage from "../common/Storage";
+import Store from "../common/Store";
 import Consts from "../common/Consts";
 import Tools from "../common/Tools";
 import Site from "../common/Site";
@@ -8,16 +8,16 @@ import Swal from "sweetalert2";
  * 脚本菜单相关逻辑处理
  */
 export default {
-  unUsedRate: () => Storage.DISABLE_RATE.get(),
-  isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
-  isAutoSite: () => Storage.SITE_AUTO.get(window.topWin?.host ?? location.host),
+  unUsedRate: () => Store.DISABLE_RATE.get(),
+  isOverrideKey: () => Store.OVERRIDE_KEY.get(),
+  isAutoSite: () => Store.SITE_AUTO.get(window.topWin?.host ?? location.host),
   initMenuCmds() {
     if (Tools.isExecuted("hasMenu") || !Tools.isTopWin()) return;
     this.setupMenuChangeListener();
     this.setupMenuCmds();
   },
   setupMenuChangeListener() {
-    [Storage.SITE_AUTO].forEach((t) => GM_addValueChangeListener(t.name + this.host, () => this.setupMenuCmds()));
+    [Store.SITE_AUTO].forEach((t) => GM_addValueChangeListener(t.name + this.host, () => this.setupMenuCmds()));
   },
   setupMenuCmds() {
     const tle = `此站${this.isAutoSite() ? "禁" : "启"}用自动网页全屏`;
@@ -25,8 +25,8 @@ export default {
 
     // 菜单配置项
     const configs = [
-      { title: tle, cache: Storage.SITE_AUTO, useHost: true, isHide: Site.isGmMatch(), fn: sFn },
-      { title: "此站脱离式全屏阈值", cache: Storage.DETACH_THRESHOLD, useHost: true, isHide: Site.isGmMatch() },
+      { title: tle, cache: Store.SITE_AUTO, useHost: true, isHide: Site.isGmMatch(), fn: sFn },
+      { title: "此站脱离式全屏阈值", cache: Store.DETACH_THRESHOLD, useHost: true, isHide: Site.isGmMatch() },
       { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, fn: this.shortcutKeysPopup },
       { title: "更多设置", cache: { name: "SETTING" }, fn: this.settingPopup },
     ];
@@ -145,14 +145,14 @@ export default {
   },
   renderBasics() {
     const confs = [
-      { name: "autoDef", text: "禁用 默认自动", cache: Storage.NO_AUTO_DEF },
-      { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_RATE, attrs: ["send", "delay"] },
-      { name: "memory", text: "禁用 记忆倍速", cache: Storage.FORGET_RATE, attrs: ["send"] },
-      { name: "tabs", text: "禁用 不可见暂停", cache: Storage.INVIS_PAUSE },
-      { name: "next", text: "启用 自动切换下集", cache: Storage.NEXT_AUTO },
-      { name: "wClock", text: "启用 非全屏显时间", cache: Storage.CLOCK_WEB, attrs: ["send"] },
-      { name: "sRate", text: "启用 左上角常显倍速", cache: Storage.RATE_SHOW, attrs: ["send"] },
-      { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEY },
+      { name: "autoDef", text: "禁用 默认自动", cache: Store.NO_AUTO_DEF },
+      { name: "speed", text: "禁用 倍速调节", cache: Store.DISABLE_RATE, attrs: ["send", "delay"] },
+      { name: "memory", text: "禁用 记忆倍速", cache: Store.FORGET_RATE, attrs: ["send"] },
+      { name: "tabs", text: "禁用 不可见暂停", cache: Store.INVIS_PAUSE },
+      { name: "next", text: "启用 自动切换下集", cache: Store.NEXT_AUTO },
+      { name: "wClock", text: "启用 非全屏显时间", cache: Store.CLOCK_WEB, attrs: ["send"] },
+      { name: "sRate", text: "启用 左上角常显倍速", cache: Store.RATE_SHOW, attrs: ["send"] },
+      { name: "override", text: "启用 空格◀️▶️ 控制", cache: Store.OVERRIDE_KEY },
     ];
 
     const render = ({ text, name, value, dataset }) => `
@@ -165,14 +165,14 @@ export default {
   },
   renderParams() {
     const confs = [
-      { name: "step", text: "倍速步进", cache: Storage.RATE_STEP },
-      { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
-      { name: "zero", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP },
-      { name: "advance", text: "下集提前秒数", cache: Storage.NEXT_ADVANCE },
-      { name: "percent", text: "缩放百分比", cache: Storage.ZOOM_PERCENT },
-      { name: "move", text: "移动距离", cache: Storage.MOVE_DIST },
-      { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR, attrs: ["send"] },
-      { name: "preset", text: "常用倍速", cache: Storage.PRESET_RATE },
+      { name: "step", text: "倍速步进", cache: Store.RATE_STEP },
+      { name: "skip", text: "快进/退秒数", cache: Store.SKIP_INTERVAL },
+      { name: "zero", text: "零键快进秒数", cache: Store.ZERO_KEY_SKIP },
+      { name: "advance", text: "下集提前秒数", cache: Store.NEXT_ADVANCE },
+      { name: "percent", text: "缩放百分比", cache: Store.ZOOM_PERCENT },
+      { name: "move", text: "移动距离", cache: Store.MOVE_DIST },
+      { name: "color", text: "时间颜色", cache: Store.CLOCK_COLOR, attrs: ["send"] },
+      { name: "preset", text: "常用倍速", cache: Store.PRESET_RATE },
     ];
 
     const render = ({ text, name, value, dataset }) => `
@@ -184,32 +184,32 @@ export default {
   },
   renderIgnore() {
     const confs = [
-      { name: "nextUrls", text: "自动切换下集时 忽略的网址（用 ; 隔开）", cache: Storage.NEXT_IGNORE_URLS },
-      { name: "wFsUrls", text: "自动网页全屏时 忽略的网址（用 ; 隔开）", cache: Storage.FULL_IGNORE_URLS },
+      { name: "nextUrls", text: "自动切换下集时 忽略的网址（用 ; 隔开）", cache: Store.NEXT_IGNORE_URLS },
+      { name: "wFsUrls", text: "自动网页全屏时 忽略的网址（用 ; 隔开）", cache: Store.FULL_IGNORE_URLS },
     ];
 
     return this.renderConfs(confs);
   },
   renderFull() {
     const confs = [
-      { name: "vWrap", text: "此站 (网页)全屏视频容器", cache: Storage.V_WRAPPER, disable: this.isGMatch(), useHost: true },
-      { name: "fsCode", text: "此站 (网页)全屏切换 事件代码", cache: Storage.FS_CODE, useHost: true, attrs: ["send"] },
+      { name: "vWrap", text: "此站 (网页)全屏视频容器", cache: Store.V_WRAPPER, disable: this.isGMatch(), useHost: true },
+      { name: "fsCode", text: "此站 (网页)全屏切换 事件代码", cache: Store.FS_CODE, useHost: true, attrs: ["send"] },
     ];
 
     return this.renderConfs(confs);
   },
   renderNext() {
     const confs = [
-      { name: "curEp", text: "此站 当前播放集选择器", cache: Storage.NEXT_CUR_EP, useHost: true, disable: Site.isGmMatch() },
-      { name: "allEp", text: "此站 定位全部集选择器", cache: Storage.NEXT_REL_EP, useHost: true, disable: Site.isGmMatch() },
+      { name: "curEp", text: "此站 当前播放集选择器", cache: Store.NEXT_CUR_EP, useHost: true, disable: Site.isGmMatch() },
+      { name: "allEp", text: "此站 定位全部集选择器", cache: Store.NEXT_REL_EP, useHost: true, disable: Site.isGmMatch() },
     ];
 
     return this.renderConfs(confs);
   },
   renderExtend() {
     const confs = [
-      { name: "lCode", text: "此站 load 事件代码", cache: Storage.LOAD_CODE, useHost: true, attrs: ["send"] },
-      { name: "vCode", text: "此站 video 事件代码", cache: Storage.VIDEO_CODE, useHost: true, attrs: ["send"] },
+      { name: "lCode", text: "此站 load 事件代码", cache: Store.LOAD_CODE, useHost: true, attrs: ["send"] },
+      { name: "vCode", text: "此站 video 事件代码", cache: Store.VIDEO_CODE, useHost: true, attrs: ["send"] },
     ];
 
     return this.renderConfs(confs);

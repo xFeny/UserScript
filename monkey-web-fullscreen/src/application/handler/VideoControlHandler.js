@@ -1,6 +1,6 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
-import Storage from "../common/Storage";
+import Store from "../common/Store";
 import VideoEnhancer from "../VideoEnhancer";
 
 /**
@@ -58,15 +58,15 @@ export default {
     // 设置倍速
     VideoEnhancer.setPlaybackRate(this.player, rate);
     this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
-    if (!Storage.FORGET_RATE.get()) Storage.CACHED_RATE.set(this.player.playbackRate);
+    if (!Store.FORGET_RATE.get()) Store.CACHED_RATE.set(this.player.playbackRate);
   },
   adjustPlayRate(step = 0.25) {
     if (!this.player) return;
     const rate = Math.max(0.1, +this.player.playbackRate + step);
     this.setPlaybackRate(Math.min(16, rate));
   },
-  applyCachedRate: () => (Storage.FORGET_RATE.get() ? App.delCachedRate() : App.setPlaybackRate(Storage.CACHED_RATE.get())),
-  delCachedRate: () => Storage.CACHED_RATE.del(),
+  applyCachedRate: () => (Store.FORGET_RATE.get() ? App.delCachedRate() : App.setPlaybackRate(Store.CACHED_RATE.get())),
+  delCachedRate: () => Store.CACHED_RATE.del(),
   // ====================⇑⇑⇑ 调节播放倍速相关逻辑 ⇑⇑⇑====================
 
   // ====================⇓⇓⇓ 调节播放进度相关逻辑 ⇓⇓⇓====================
@@ -77,25 +77,25 @@ export default {
   },
   cachePlayTime(video) {
     if (video !== this.player || !this.topWin || video.duration < 150 || this.isLive() || this.isMultiVideo()) return;
-    if (Tools.isThrottle("cacheTime", Consts.ONE_SEC) || +video.currentTime < Storage.SKIP_INTERVAL.get()) return;
+    if (Tools.isThrottle("cacheTime", Consts.ONE_SEC) || +video.currentTime < Store.SKIP_INTERVAL.get()) return;
 
     // 距离结束10秒，清除记忆缓存
     if (this.remainTime(video) <= 10) return this.clearCachedTime(video);
 
-    Storage.V_TIME.set(+video.currentTime - 1, this.getUniqueKey(video), Storage.STORAGE_DAYS.get());
+    Store.V_TIME.set(+video.currentTime - 1, this.getUniqueKey(video), Store.STORAGE_DAYS.get());
   },
   applyCachedTime(video) {
     if (!this.topWin || this.isLive() || this.isMultiVideo()) return;
 
     // 缓存的播放时间
-    const time = Storage.V_TIME.get(this.getUniqueKey(video));
+    const time = Store.V_TIME.get(this.getUniqueKey(video));
     if (time <= +video.currentTime) return;
 
     this.setCurrentTime(time);
     this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.TWO_SEC * 2, false);
   },
   setCurrentTime: (ct) => ct && (App.player.currentTime = Math.max(0, ct)),
-  clearCachedTime: (v) => App.topWin && Storage.V_TIME.del(App.getUniqueKey(v)),
+  clearCachedTime: (v) => App.topWin && Store.V_TIME.del(App.getUniqueKey(v)),
   getUniqueKey(video, { duration, __duration } = video) {
     if (video.vx_tkey) return video.vx_tkey;
 
@@ -132,7 +132,7 @@ export default {
     if (!this.player) return;
 
     const { tsr } = this.player;
-    const step = Storage.ZOOM_PERCENT.get();
+    const step = Store.ZOOM_PERCENT.get();
     const zoom = Math.max(25, Math.min(500, tsr.zoom + dir * step));
 
     tsr.zoom = zoom;
@@ -143,7 +143,7 @@ export default {
     if (!this.player) return;
 
     const { tsr } = this.player;
-    const s = Storage.MOVE_DIST.get();
+    const s = Store.MOVE_DIST.get();
     const dMap = { ALT_UP: [0, -s, "上"], ALT_DOWN: [0, s, "下"], ALT_LEFT: [-s, 0, "左"], ALT_RIGHT: [s, 0, "右"] };
     let [x, y, desc] = dMap[key];
     x *= tsr.mirror; // 镜像后的移动方向
@@ -211,7 +211,7 @@ export default {
     !this.player.paused && this.player.pause();
     this.player.currentTime += dir / 24;
   },
-  autoNextEnabled: () => App.showToast(`已${Storage.NEXT_AUTO.toggle() ? "启" : "禁"}用 自动切换下集`),
+  autoNextEnabled: () => App.showToast(`已${Store.NEXT_AUTO.toggle() ? "启" : "禁"}用 自动切换下集`),
   /**
    * 效果：<span>正在以<span class="cText">1.15x</span>倍速播放</span>
    */

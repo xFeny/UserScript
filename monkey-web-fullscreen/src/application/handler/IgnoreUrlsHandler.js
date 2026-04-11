@@ -1,4 +1,4 @@
-import Storage from "../common/Storage";
+import Store from "../common/Store";
 
 /**
  * 处理：
@@ -7,18 +7,18 @@ import Storage from "../common/Storage";
  */
 export default {
   setupIgnoreChangeListener() {
-    [Storage.FULL_IGNORE_URLS, Storage.NEXT_IGNORE_URLS].forEach((it) =>
+    [Store.FULL_IGNORE_URLS, Store.NEXT_IGNORE_URLS].forEach((it) =>
       GM_addValueChangeListener(it.name, () => this.initIgnoreUrls())
     );
   },
   initIgnoreUrls() {
     // 「自动下集」忽略URL处理
     const nextIgnore = ["https://www.youtube.com/watch", "https://www.bilibili.com/video", "https://www.bilibili.com/list"];
-    this.nextFilter = this.processIgnoreUrls(Storage.NEXT_IGNORE_URLS, nextIgnore);
+    this.nextFilter = this.processIgnoreUrls(Store.NEXT_IGNORE_URLS, nextIgnore);
 
     // 「自动网页全屏」忽略URL处理
     const wideIgnore = ["https://www.youtube.com/results", "https://www.youtube.com/shorts"];
-    this.wideFilter = this.processIgnoreUrls(Storage.FULL_IGNORE_URLS, wideIgnore);
+    this.wideFilter = this.processIgnoreUrls(Store.FULL_IGNORE_URLS, wideIgnore);
   },
   isIgnoreNext() {
     if (!this.nextFilter) this.initIgnoreUrls();

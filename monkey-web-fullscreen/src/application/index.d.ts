@@ -53,7 +53,7 @@ declare global {
 
     /**
      * 调整播放倍速（递增/递减）
-     * @param {number} [step=Storage.RATE_STEP.get()] - 步长
+     * @param {number} [step=Store.RATE_STEP.get()] - 步长
      */
     adjustPlayRate(step?: number): void;
 

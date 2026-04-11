@@ -1,4 +1,4 @@
-import Storage from "../common/Storage";
+import Store from "../common/Store";
 import Tools from "../common/Tools";
 import Site from "../common/Site";
 import Swal from "sweetalert2";
@@ -30,7 +30,7 @@ export default {
     document.addEventListener("click", handle, true);
   },
   pickerCurrentEpisodePath(el) {
-    if (Storage.NEXT_CUR_EP.get(this.host)) return;
+    if (Store.NEXT_CUR_EP.get(this.host)) return;
     return this.pickerEpisodePopup(el, {
       onVerify(value) {
         try {
@@ -42,13 +42,13 @@ export default {
         }
       },
       onSave(value) {
-        Storage.NEXT_CUR_EP.set(value, this.host);
+        Store.NEXT_CUR_EP.set(value, this.host);
         Tools.notyf("继续拾取元素 ＼(＞０＜)／");
       },
     });
   },
   pickerRelativeEpisodePath(el) {
-    if (Storage.NEXT_REL_EP.get(this.host)) return;
+    if (Store.NEXT_REL_EP.get(this.host)) return;
     return this.pickerEpisodePopup(el, {
       onVerify(value) {
         try {
@@ -61,19 +61,19 @@ export default {
         }
       },
       onSave(value) {
-        Storage.NEXT_REL_EP.set(value, this.host);
+        Store.NEXT_REL_EP.set(value, this.host);
         Tools.notyf("操作完成 []~(￣▽￣)~* 干杯");
       },
     });
   },
   getCurrentEpisodeNumber() {
-    const selector = Storage.NEXT_CUR_EP.get(this.topWin.host);
+    const selector = Store.NEXT_CUR_EP.get(this.topWin.host);
     return selector ? this.getEpisodeNumber(Tools.query(selector)) : null;
   },
   getCurrentEpisodeBySelector() {
     const num = this.getCurrentEpisodeNumber();
-    const current = this.getEpisodeWrapper(Tools.query(Storage.NEXT_CUR_EP.get(this.host)));
-    const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(Storage.NEXT_REL_EP.get(this.host))));
+    const current = this.getEpisodeWrapper(Tools.query(Store.NEXT_CUR_EP.get(this.host)));
+    const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(Store.NEXT_REL_EP.get(this.host))));
     return episodes.includes(current) ? current : episodes.find((el) => this.getEpisodeNumber(el) === num);
   },
   async pickerEpisodePopup(el, { onVerify, onSave }) {

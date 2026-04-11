@@ -1,4 +1,4 @@
-import Storage from "../common/Storage";
+import Store from "../common/Store";
 
 /**
  * 初始化控制面板元素
@@ -29,7 +29,7 @@ export default {
    */
   createPanelHeader() {
     const title = FyTools.newEle("b", { textContent: "🎬 播放控制" });
-    const onclick = () => this.setControlPanelTheme(!Storage.DARK_THEME.get());
+    const onclick = () => this.setControlPanelTheme(!Store.DARK_THEME.get());
     const theme = FyTools.newEle("b", { className: "vc-theme-btn", onclick });
 
     const header = FyTools.newEle("div", { className: "vc-panel-header" });

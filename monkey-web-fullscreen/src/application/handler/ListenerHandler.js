@@ -1,6 +1,6 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
-import Storage from "../common/Storage";
+import Store from "../common/Store";
 import VideoEnhancer from "../VideoEnhancer";
 import HotKey from "../common/HotKey";
 
@@ -36,7 +36,7 @@ export default {
   setupVisibleListener() {
     window.addEventListener("visibilitychange", () => {
       const video = this.player;
-      if (!video || video.ended || Storage.INVIS_PAUSE.get()) return;
+      if (!video || video.ended || Store.INVIS_PAUSE.get()) return;
       document.hidden ? video.pause() : video.play();
     });
   },
@@ -146,7 +146,7 @@ export default {
     // 连续触发只执行最后一次
     clearTimeout(this.e9x_fsCode);
     this.e9x_fsCode = setTimeout(() => {
-      const jsCode = Storage.FS_CODE.get(this.host);
+      const jsCode = Store.FS_CODE.get(this.host);
       this.executeCodeSnippet(jsCode, this.getFsMode(), this.player);
     }, 10);
   },

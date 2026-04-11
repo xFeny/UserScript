@@ -1,6 +1,6 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
-import Storage from "../common/Storage";
+import Store from "../common/Store";
 
 /**
  * 网页全屏逻辑处理
@@ -25,7 +25,7 @@ export default {
 
     container.scrollY = window.scrollY;
     const parents = Tools.getParents(container);
-    const unDetach = container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(this.host);
+    const unDetach = container instanceof HTMLIFrameElement || parents.length < Store.DETACH_THRESHOLD.get(this.host);
     unDetach ? parents.forEach((el) => this.setWebFullAttr(el)) : this.detachForFullscreen();
 
     // 视频容器宽高适应网页全屏变化
@@ -80,7 +80,7 @@ export default {
   },
   getVideoContainer() {
     // 自定义网页全屏元素，支持多个选择器，返回第一个找到的元素
-    const selector = Storage.V_WRAPPER.get(this.topWin?.host)?.trim();
+    const selector = Store.V_WRAPPER.get(this.topWin?.host)?.trim();
     const ctn = selector ? (this.player.closest(selector) ?? Tools.query(selector)) : null;
     return ctn ?? this.findVideoContainer(this.findCtrlContainer());
   },
@@ -139,7 +139,7 @@ export default {
     // 连续触发只执行最后一次
     clearTimeout(this.e9x_fsCode);
     this.e9x_fsCode = setTimeout(() => {
-      const jsCode = Storage.FS_CODE.get(this.topWin.host);
+      const jsCode = Store.FS_CODE.get(this.topWin.host);
       this.executeCodeSnippet(jsCode, this.getFsMode(), this.player);
     }, 10);
   },

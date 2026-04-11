@@ -1,6 +1,6 @@
 import tippy from "tippy.js";
 import Draggable from "draggable/dist/draggable.min.js";
-import Storage from "../common/Storage";
+import Store from "../common/Store";
 import Utils from "../common/Utils";
 
 export default {
@@ -40,9 +40,9 @@ export default {
   /**
    * 设置并缓存主题
    */
-  setControlPanelTheme(isDark = Storage.DARK_THEME.get()) {
+  setControlPanelTheme(isDark = Store.DARK_THEME.get()) {
     this.wrapper.classList.toggle("light-mode", !isDark);
-    Storage.DARK_THEME.set(isDark);
+    Store.DARK_THEME.set(isDark);
   },
   // ====================⇑⇑⇑ 深/浅色皮肤相关逻辑 ⇑⇑⇑====================
 
@@ -70,7 +70,7 @@ export default {
    * 设置元素可拖拽功能
    */
   setupDraggable() {
-    const cache = Storage.DRAG_POSITION;
+    const cache = Store.DRAG_POSITION;
     const { x, y } = cache.get(this.host);
 
     const onDragEnd = (_, x, y) => cache.set({ x, y }, this.host);

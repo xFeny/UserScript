@@ -1,6 +1,6 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
-import Storage from "../common/Storage";
+import Store from "../common/Store";
 
 /**
  * 通用性切换视频下集
@@ -18,7 +18,7 @@ export default {
     this.jumpToTargetEpisode(target);
   },
   getJumpTargetEpisode(isPrev) {
-    const current = Storage.NEXT_REL_EP.get(this.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
+    const current = Store.NEXT_REL_EP.get(this.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
     return this.getTargetEpisode(current, isPrev);
   },
   getCurrentEpisodeByLink() {

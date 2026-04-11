@@ -1,6 +1,6 @@
 import Tools from "./Tools";
 import Consts from "./Consts";
-import Storage from "./Storage";
+import Store from "./Store";
 
 export default class Site {
   static icons = { full: "full", webFull: "webFull", next: "next", danmaku: "danmaku" };
@@ -26,13 +26,13 @@ export default class Site {
   };
 
   static {
-    const selectors = Storage.ICONS_SELECTOR.get();
+    const selectors = Store.ICONS_SELECTOR.get();
     selectors ? (this.selectors = selectors) : this.#loadRemote();
     Tools.microTask(() => (this.#createSiteTests(), this.#convertGmMatch()));
   }
 
   static getIcons(domain = location.host) {
-    if (!Storage.ICONS_SELECTOR.get()) this.#loadRemote();
+    if (!Store.ICONS_SELECTOR.get()) this.#loadRemote();
     return this.selectors[domain];
   }
 
@@ -46,7 +46,7 @@ export default class Site {
       .then((res) => {
         const remoteConf = JSON.parse(res.responseText ?? "{}");
         this.selectors = { ...this.selectors, ...remoteConf };
-        Storage.ICONS_SELECTOR.set(this.selectors, Consts.EMPTY, 1 / 3); // 缓存8小时
+        Store.ICONS_SELECTOR.set(this.selectors, Consts.EMPTY, 1 / 3); // 缓存8小时
       })
       .catch((e) => console.error("加载远程配置失败", e));
   }

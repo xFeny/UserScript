@@ -1,6 +1,6 @@
 import Tools from "../common/Tools";
 import Consts from "../common/Consts";
-import Storage from "../common/Storage";
+import Store from "../common/Store";
 
 /**
  * 视频监听事件逻辑处理
@@ -75,7 +75,7 @@ export default {
   ratechange: () => App.playbackRateDisplay(),
   runVideoEvtCode(type, video) {
     if (type === "timeupdate" && Tools.isThrottle("codeSnippet", Consts.ONE_SEC)) return;
-    Tools.sleep(10).then(() => this.executeCodeSnippet(Storage.VIDEO_CODE.get(this.host), type, video));
+    Tools.sleep(10).then(() => this.executeCodeSnippet(Store.VIDEO_CODE.get(this.host), type, video));
   },
   codeSnippetCache: new Map(),
   executeCodeSnippet(jsCode, type, video) {

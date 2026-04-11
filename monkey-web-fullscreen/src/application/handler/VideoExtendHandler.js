@@ -1,23 +1,23 @@
 import Site from "../common/Site";
 import Tools from "../common/Tools";
 import Clock from "../common/lib/Clock";
-import Storage from "../common/Storage";
+import Store from "../common/Store";
 
 /**
  * 视频一些额外处理
  */
 export default {
   setupLoadEventListener() {
-    const handle = ({ type }) => this.executeCodeSnippet(Storage.LOAD_CODE.get(this.host), type, this.player);
+    const handle = ({ type }) => this.executeCodeSnippet(Store.LOAD_CODE.get(this.host), type, this.player);
     document.addEventListener("DOMContentLoaded", handle);
     window.addEventListener("load", handle);
   },
-  shouldHideTime: () => !App.isFullscreen && !Storage.CLOCK_WEB.get(),
+  shouldHideTime: () => !App.isFullscreen && !Store.CLOCK_WEB.get(),
   setupClockForPlayer() {
     if (!this.player || this.shouldHideTime()) return this.Clock?.stop(true);
     if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(this.player.parentNode).start();
 
-    this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
+    this.Clock = new Clock(this.player.parentNode, { color: Store.CLOCK_COLOR.get() });
   },
   // ====================⇓⇓⇓ 进度显示相关逻辑 ⇓⇓⇓====================
   getRealDuration(video) {
@@ -41,7 +41,7 @@ export default {
     if (this.timeNode) return this.timeNode;
 
     // 创建播放进度元素
-    this.timeNode = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
+    this.timeNode = this.createDisplayElement("__timeupdate", Store.CLOCK_COLOR.get());
     this.timeNode.append("00:00", Tools.newEle("b", { textContent: "%" }));
     return this.timeNode;
   },
@@ -50,7 +50,7 @@ export default {
   // ====================⇓⇓⇓ 常显倍速相关逻辑 ⇓⇓⇓====================
   playbackRateDisplay() {
     if (!this.player || this.isLive()) return;
-    if (!Storage.RATE_SHOW.get()) return this.rateNode?.remove();
+    if (!Store.RATE_SHOW.get()) return this.rateNode?.remove();
 
     this.rateNode ??= this.createDisplayElement("__v_rate");
     this.rateNode.textContent = `倍速: ${this.player.playbackRate}`;
