@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GUI-悬浮图形控制面板
 // @namespace    http://tampermonkey.net/
-// @version      1.0.2
+// @version      1.0.3
 // @author       Feny
 // @description  为「视频自动网页全屏｜倍速播放」脚本提供悬浮图形控制面板，支持自由拖拽定位、深色/浅色主题切换
 // @license      GPL-3.0-only
@@ -161,15 +161,7 @@
       }).catch(() => console.error("未安装关联的脚本"));
     },
     watchPlayerChange() {
-      Object.defineProperty(this.FS, "player", {
-        set: (value) => {
-          this.FS.__player = value;
-          this.initControlPanel(value);
-        },
-        get() {
-          return this.__player;
-        }
-      });
+      GM_FVEnh.defineProperty(this.FS, "player", { set: (value, setter) => (setter(value), this.initControlPanel(value)) });
     },
     setupFunctionHooks() {
       Utils.onBefore(this.FS, "ratechange", () => this.renderRateToPanel());
