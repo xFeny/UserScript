@@ -355,7 +355,7 @@
       return this.parser(value ?? this.defVal);
     }
   }
-  const Storage = {
+  const Store = {
     IS_AUTO: new BasicStorage("IS_AUTO_", false, Boolean),
     DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, Number),
     V_WRAPPER: new BasicStorage("V_WRAPPER_", ""),
@@ -380,7 +380,7 @@
       if (!container || container.matches(":is(html, body)")) return this.adaptToWebFullscreen();
       container.scrollY = window.scrollY;
       const parents = Tools.getParents(container);
-      const unDetach = container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(this.host);
+      const unDetach = container instanceof HTMLIFrameElement || parents.length < Store.DETACH_THRESHOLD.get(this.host);
       unDetach ? parents.forEach((el) => this.setWebFullAttr(el)) : this.detachForFullscreen();
       this.adaptToWebFullscreen();
     },
@@ -420,7 +420,7 @@
       return iFrames.find(matchSize) ?? iFrames.find(Tools.isVisible);
     },
     getVideoContainer() {
-      const selector = Storage.V_WRAPPER.get(this.topWin?.host)?.trim();
+      const selector = Store.V_WRAPPER.get(this.topWin?.host)?.trim();
       const ctn = selector ? this.player.closest(selector) ?? Tools.query(selector) : null;
       return ctn ?? this.findVideoContainer(this.findCtrlContainer());
     },
@@ -473,7 +473,7 @@
     runFsChangeCode() {
       clearTimeout(this.e9x_fsCode);
       this.e9x_fsCode = setTimeout(() => {
-        const jsCode = Storage.FS_CODE.get(this.topWin.host);
+        const jsCode = Store.FS_CODE.get(this.topWin.host);
         this.executeCodeSnippet(jsCode, this.getFsMode(), this.player);
       }, 10);
     },
@@ -527,14 +527,14 @@
   const Ignore = {
     initIgnoreUrls: () => App.urlFilter = App.getIgnoreUrls(),
     setupIgnoreChangeListener() {
-      GM_addValueChangeListener(Storage.IGNORE_URLS.name, () => this.initIgnoreUrls());
+      GM_addValueChangeListener(Store.IGNORE_URLS.name, () => this.initIgnoreUrls());
     },
     isIgnoreUrl() {
       if (!this.urlFilter) this.initIgnoreUrls();
       return this.isBlocked(this.urlFilter);
     },
     getIgnoreUrls() {
-      const urlsStr = Storage.IGNORE_URLS.get(this.topWin.host);
+      const urlsStr = Store.IGNORE_URLS.get(this.topWin.host);
       return (urlsStr.match(/[^\s;]+/g) || []).filter((url) => new URL(url).pathname !== "/");
     },
     isBlocked(urls = []) {
@@ -565,10 +565,10 @@
     static t = (key) => this.#langPacks[this.#getLang()][key];
   }
   const Menu = {
-    isAuto: () => Storage.IS_AUTO.get(window.topWin?.host ?? location.host),
+    isAuto: () => Store.IS_AUTO.get(window.topWin?.host ?? location.host),
     initMenuCmds() {
       if (this.hasMenu || !Tools.isTopWin()) return;
-      GM_addValueChangeListener(Storage.IS_AUTO.name + this.host, () => this.setupMenuCmds());
+      GM_addValueChangeListener(Store.IS_AUTO.name + this.host, () => this.setupMenuCmds());
       this.setupMenuCmds();
       this.hasMenu = true;
     },
@@ -581,11 +581,11 @@
         this.codeSnippetCache = null;
       };
       const configs = [
-        { title: isAuto, cache: Storage.IS_AUTO, fn: ({ cache, value }) => cache.set(!value, this.host) },
-        { title: I18n.t("ignore"), cache: Storage.IGNORE_URLS },
-        { title: I18n.t("custom"), cache: Storage.V_WRAPPER },
-        { title: I18n.t("fsChange"), cache: Storage.FS_CODE, fn: fsChange },
-        { title: I18n.t("detach"), cache: Storage.DETACH_THRESHOLD }
+        { title: isAuto, cache: Store.IS_AUTO, fn: ({ cache, value }) => cache.set(!value, this.host) },
+        { title: I18n.t("ignore"), cache: Store.IGNORE_URLS },
+        { title: I18n.t("custom"), cache: Store.V_WRAPPER },
+        { title: I18n.t("fsChange"), cache: Store.FS_CODE, fn: fsChange },
+        { title: I18n.t("detach"), cache: Store.DETACH_THRESHOLD }
       ];
       configs.forEach(({ title, cache, fn }) => {
         const id = `${cache.name}_MENU_ID`;

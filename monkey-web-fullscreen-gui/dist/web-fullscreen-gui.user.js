@@ -44,7 +44,7 @@
       return this.parser(val ?? this.defVal);
     }
   }
-  const Storage = {
+  const Store = {
     DARK_THEME: new BasicStorage("DARK_THEME", true, Boolean),
     DRAG_POSITION: new BasicStorage("DRAG_POSITION_", { x: 0, y: 0 })
   };
@@ -65,7 +65,7 @@
     },
     createPanelHeader() {
       const title = FyTools.newEle("b", { textContent: "🎬 播放控制" });
-      const onclick = () => this.setControlPanelTheme(!Storage.DARK_THEME.get());
+      const onclick = () => this.setControlPanelTheme(!Store.DARK_THEME.get());
       const theme = FyTools.newEle("b", { className: "vc-theme-btn", onclick });
       const header = FyTools.newEle("div", { className: "vc-panel-header" });
       header.append(title, theme);
@@ -179,9 +179,9 @@
       this.setupPanelTrigger();
       this.setupDraggable();
     },
-    setControlPanelTheme(isDark = Storage.DARK_THEME.get()) {
+    setControlPanelTheme(isDark = Store.DARK_THEME.get()) {
       this.wrapper.classList.toggle("light-mode", !isDark);
-      Storage.DARK_THEME.set(isDark);
+      Store.DARK_THEME.set(isDark);
     },
     setupPanelTrigger() {
       tippy(this.panelTrigger, {
@@ -199,7 +199,7 @@
       });
     },
     setupDraggable() {
-      const cache = Storage.DRAG_POSITION;
+      const cache = Store.DRAG_POSITION;
       const { x, y } = cache.get(this.host);
       const onDragEnd = (_, x2, y2) => cache.set({ x: x2, y: y2 }, this.host);
       new Draggable(this.panelTrigger, { onDragEnd, setPosition: false, limit: this.getDragBounds() }).set(x, y);

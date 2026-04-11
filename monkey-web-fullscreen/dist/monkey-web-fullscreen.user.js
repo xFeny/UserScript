@@ -350,7 +350,7 @@
       });
     }
   }
-  const Storage = unsafeWindow.FyStorage = {
+  const Store = unsafeWindow.FyStorage = {
     SITE_AUTO: new BasicStorage("SITE_AUTO_", false, false, Boolean, true),
     DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, false, Number, true),
     NO_AUTO_DEF: new BasicStorage("NO_AUTO_DEF", false, false, Boolean),
@@ -428,7 +428,7 @@
     setupVisibleListener() {
       window.addEventListener("visibilitychange", () => {
         const video = this.player;
-        if (!video || video.ended || Storage.INVIS_PAUSE.get()) return;
+        if (!video || video.ended || Store.INVIS_PAUSE.get()) return;
         document.hidden ? video.pause() : video.play();
       });
     },
@@ -511,7 +511,7 @@
     runFsChangeCode() {
       clearTimeout(this.e9x_fsCode);
       this.e9x_fsCode = setTimeout(() => {
-        const jsCode = Storage.FS_CODE.get(this.host);
+        const jsCode = Store.FS_CODE.get(this.host);
         this.executeCodeSnippet(jsCode, this.getFsMode(), this.player);
       }, 10);
     },
@@ -597,12 +597,12 @@
       biliLive: /live.bilibili.com\/*/
     };
     static {
-      const selectors = Storage.ICONS_SELECTOR.get();
+      const selectors = Store.ICONS_SELECTOR.get();
       selectors ? this.selectors = selectors : this.#loadRemote();
       Tools.microTask(() => (this.#createSiteTests(), this.#convertGmMatch()));
     }
     static getIcons(domain = location.host) {
-      if (!Storage.ICONS_SELECTOR.get()) this.#loadRemote();
+      if (!Store.ICONS_SELECTOR.get()) this.#loadRemote();
       return this.selectors[domain];
     }
     static isGmMatch() {
@@ -613,7 +613,7 @@
       GM.xmlHttpRequest({ url, timeout: 3e3 }).then((res) => {
         const remoteConf = JSON.parse(res.responseText ?? "{}");
         this.selectors = { ...this.selectors, ...remoteConf };
-        Storage.ICONS_SELECTOR.set(this.selectors, Consts.EMPTY, 1 / 3);
+        Store.ICONS_SELECTOR.set(this.selectors, Consts.EMPTY, 1 / 3);
       }).catch((e) => console.error("加载远程配置失败", e));
     }
     static #convertGmMatch() {
@@ -676,9 +676,9 @@
         D: () => Site.isGmMatch() && this.triggerIcon(Site.icons.danmaku),
         N: () => Site.isGmMatch() ? this.triggerIcon(Site.icons.next) : this.switchEpisode(),
         SPACE: () => this.isOverrideKey() && this.playToggle(this.player),
-        0: () => this.skipPlayback(Storage.ZERO_KEY_SKIP.get(), true) || 0,
-        LEFT: () => this.skipPlayback(-Storage.SKIP_INTERVAL.get()),
-        RIGHT: () => this.skipPlayback(Storage.SKIP_INTERVAL.get()),
+        0: () => this.skipPlayback(Store.ZERO_KEY_SKIP.get(), true) || 0,
+        LEFT: () => this.skipPlayback(-Store.SKIP_INTERVAL.get()),
+        RIGHT: () => this.skipPlayback(Store.SKIP_INTERVAL.get()),
         SHIFT_A: () => this.autoNextEnabled(),
         CTRL_ALT_S: () => this.screenshot(),
         ALT_SUB: () => this.zoomVideo(-1),
@@ -686,8 +686,8 @@
         SHIFT_R: () => this.horizFlip(),
         CTRL_Z: () => this.resetTsr()
       };
-      ["A", "S", "ADD", "SUB"].forEach((k, i) => dict[k] = () => this.adjustPlayRate([1, -1][i % 2] * Storage.RATE_STEP.get()));
-      for (let i = 1; i < 6; i++) dict[`CTRL_${i}`] = () => this.setPlaybackRate(Storage.PRESET_RATE.get()[i - 1]);
+      ["A", "S", "ADD", "SUB"].forEach((k, i) => dict[k] = () => this.adjustPlayRate([1, -1][i % 2] * Store.RATE_STEP.get()));
+      for (let i = 1; i < 6; i++) dict[`CTRL_${i}`] = () => this.setPlaybackRate(Store.PRESET_RATE.get()[i - 1]);
       ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => dict[k] = () => this.moveVideo(k));
       dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
     },
@@ -701,9 +701,9 @@
     },
     handleConfsMessage(data) {
       if (data?.sw_memory) this.delCachedRate();
-      if (data?.sw_lCode) Storage.LOAD_CODE.set(data.sw_lCode, this.host);
-      if (data?.sw_fsCode) Storage.FS_CODE.set(data.sw_fsCode, this.host);
-      if (data?.sw_vCode) Storage.VIDEO_CODE.set(data.sw_vCode, this.host);
+      if (data?.sw_lCode) Store.LOAD_CODE.set(data.sw_lCode, this.host);
+      if (data?.sw_fsCode) Store.FS_CODE.set(data.sw_fsCode, this.host);
+      if (data?.sw_vCode) Store.VIDEO_CODE.set(data.sw_vCode, this.host);
       if (data?.sw_vCode || data?.sw_fsCode) this.codeSnippetCache.clear();
       if (data?.sw_speed) this.setPlaybackRate(1), delete this.player?.playbackRate;
       if ("sw_sRate" in data) setTimeout(() => this.playbackRateDisplay(), 30);
@@ -775,7 +775,7 @@
     ratechange: () => App.playbackRateDisplay(),
     runVideoEvtCode(type, video) {
       if (type === "timeupdate" && Tools.isThrottle("codeSnippet", Consts.ONE_SEC)) return;
-      Tools.sleep(10).then(() => this.executeCodeSnippet(Storage.VIDEO_CODE.get(this.host), type, video));
+      Tools.sleep(10).then(() => this.executeCodeSnippet(Store.VIDEO_CODE.get(this.host), type, video));
     },
     codeSnippetCache: /* @__PURE__ */ new Map(),
     executeCodeSnippet(jsCode, type, video) {
@@ -843,15 +843,15 @@
       if (!rate || !this.player || this.isLive() || this.unUsedRate() || +this.player.playbackRate === +rate) return;
       VideoEnhancer.setPlaybackRate(this.player, rate);
       this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
-      if (!Storage.FORGET_RATE.get()) Storage.CACHED_RATE.set(this.player.playbackRate);
+      if (!Store.FORGET_RATE.get()) Store.CACHED_RATE.set(this.player.playbackRate);
     },
     adjustPlayRate(step = 0.25) {
       if (!this.player) return;
       const rate = Math.max(0.1, +this.player.playbackRate + step);
       this.setPlaybackRate(Math.min(16, rate));
     },
-    applyCachedRate: () => Storage.FORGET_RATE.get() ? App.delCachedRate() : App.setPlaybackRate(Storage.CACHED_RATE.get()),
-    delCachedRate: () => Storage.CACHED_RATE.del(),
+    applyCachedRate: () => Store.FORGET_RATE.get() ? App.delCachedRate() : App.setPlaybackRate(Store.CACHED_RATE.get()),
+    delCachedRate: () => Store.CACHED_RATE.del(),
     skipPlayback(second = 0) {
       if (!this.player || this.isLive() || !this.isOverrideKey()) return;
       this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
@@ -859,19 +859,19 @@
     },
     cachePlayTime(video) {
       if (video !== this.player || !this.topWin || video.duration < 150 || this.isLive() || this.isMultiVideo()) return;
-      if (Tools.isThrottle("cacheTime", Consts.ONE_SEC) || +video.currentTime < Storage.SKIP_INTERVAL.get()) return;
+      if (Tools.isThrottle("cacheTime", Consts.ONE_SEC) || +video.currentTime < Store.SKIP_INTERVAL.get()) return;
       if (this.remainTime(video) <= 10) return this.clearCachedTime(video);
-      Storage.V_TIME.set(+video.currentTime - 1, this.getUniqueKey(video), Storage.STORAGE_DAYS.get());
+      Store.V_TIME.set(+video.currentTime - 1, this.getUniqueKey(video), Store.STORAGE_DAYS.get());
     },
     applyCachedTime(video) {
       if (!this.topWin || this.isLive() || this.isMultiVideo()) return;
-      const time = Storage.V_TIME.get(this.getUniqueKey(video));
+      const time = Store.V_TIME.get(this.getUniqueKey(video));
       if (time <= +video.currentTime) return;
       this.setCurrentTime(time);
       this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.TWO_SEC * 2, false);
     },
     setCurrentTime: (ct) => ct && (App.player.currentTime = Math.max(0, ct)),
-    clearCachedTime: (v) => App.topWin && Storage.V_TIME.del(App.getUniqueKey(v)),
+    clearCachedTime: (v) => App.topWin && Store.V_TIME.del(App.getUniqueKey(v)),
     getUniqueKey(video, { duration, __duration } = video) {
       if (video.vx_tkey) return video.vx_tkey;
       const currNumber = this.getCurrentEpisodeNumber();
@@ -899,7 +899,7 @@
     zoomVideo(dir = 1) {
       if (!this.player) return;
       const { tsr } = this.player;
-      const step = Storage.ZOOM_PERCENT.get();
+      const step = Store.ZOOM_PERCENT.get();
       const zoom = Math.max(25, Math.min(500, tsr.zoom + dir * step));
       tsr.zoom = zoom;
       this.setTsr("--zoom", zoom / 100);
@@ -908,7 +908,7 @@
     moveVideo(key) {
       if (!this.player) return;
       const { tsr } = this.player;
-      const s = Storage.MOVE_DIST.get();
+      const s = Store.MOVE_DIST.get();
       const dMap = { ALT_UP: [0, -s, "上"], ALT_DOWN: [0, s, "下"], ALT_LEFT: [-s, 0, "左"], ALT_RIGHT: [s, 0, "右"] };
       let [x, y, desc] = dMap[key];
       x *= tsr.mirror;
@@ -965,7 +965,7 @@
       !this.player.paused && this.player.pause();
       this.player.currentTime += dir / 24;
     },
-    autoNextEnabled: () => App.showToast(`已${Storage.NEXT_AUTO.toggle() ? "启" : "禁"}用 自动切换下集`),
+    autoNextEnabled: () => App.showToast(`已${Store.NEXT_AUTO.toggle() ? "启" : "禁"}用 自动切换下集`),
     customToast(start, text, end, dealy, isRemove) {
       const span = Tools.newEle("span");
       span.append(start, Tools.newEle("span", { textContent: text, className: "cText" }), end);
@@ -1012,7 +1012,7 @@
       if (!container || container.matches(":is(html, body)")) return this.adaptToWebFullscreen();
       container.scrollY = window.scrollY;
       const parents = Tools.getParents(container);
-      const unDetach = container instanceof HTMLIFrameElement || parents.length < Storage.DETACH_THRESHOLD.get(this.host);
+      const unDetach = container instanceof HTMLIFrameElement || parents.length < Store.DETACH_THRESHOLD.get(this.host);
       unDetach ? parents.forEach((el) => this.setWebFullAttr(el)) : this.detachForFullscreen();
       this.adaptToWebFullscreen();
     },
@@ -1052,7 +1052,7 @@
       return iFrames.find(matchSize) ?? iFrames.find(Tools.isVisible);
     },
     getVideoContainer() {
-      const selector = Storage.V_WRAPPER.get(this.topWin?.host)?.trim();
+      const selector = Store.V_WRAPPER.get(this.topWin?.host)?.trim();
       const ctn = selector ? this.player.closest(selector) ?? Tools.query(selector) : null;
       return ctn ?? this.findVideoContainer(this.findCtrlContainer());
     },
@@ -1105,8 +1105,8 @@
   };
   const Automatic = {
     autoNextEpisode(video) {
-      if (video.duration < 300 || video.vx_hasTriedNext || this.remainTime(video) > Storage.NEXT_ADVANCE.get()) return;
-      if (!Storage.NEXT_AUTO.get() || Tools.isThrottle("autoNext", Consts.HALF_SEC)) return;
+      if (video.duration < 300 || video.vx_hasTriedNext || this.remainTime(video) > Store.NEXT_ADVANCE.get()) return;
+      if (!Store.NEXT_AUTO.get() || Tools.isThrottle("autoNext", Consts.HALF_SEC)) return;
       if (this.isIgnoreNext()) return video.vx_hasTriedNext = true;
       this.dispatchShortcut(HotKey.N);
       video.vx_hasTriedNext = true;
@@ -1114,7 +1114,7 @@
     async autoWebFullscreen(video) {
       if (!this.topWin || !video.offsetWidth || this.player !== video) return;
       if (video.vx_isWFs || Tools.isThrottle("autoWFs", Consts.ONE_SEC)) return;
-      if (Site.isGmMatch() ? Storage.NO_AUTO_DEF.get() : !this.isAutoSite()) return;
+      if (Site.isGmMatch() ? Store.NO_AUTO_DEF.get() : !this.isAutoSite()) return;
       if (this.isIgnoreWFs() || await this.isWebFull() || Tools.isOverLimit("autoWFs")) return video.vx_isWFs = true;
       this.dispatchShortcut(HotKey.P);
     },
@@ -1135,7 +1135,7 @@
       this.jumpToTargetEpisode(target);
     },
     getJumpTargetEpisode(isPrev) {
-      const current = Storage.NEXT_REL_EP.get(this.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
+      const current = Store.NEXT_REL_EP.get(this.host) ? this.getCurrentEpisodeBySelector() : this.getCurrentEpisodeByLink();
       return this.getTargetEpisode(current, isPrev);
     },
     getCurrentEpisodeByLink() {
@@ -1225,7 +1225,7 @@
       document.addEventListener("click", handle, true);
     },
     pickerCurrentEpisodePath(el) {
-      if (Storage.NEXT_CUR_EP.get(this.host)) return;
+      if (Store.NEXT_CUR_EP.get(this.host)) return;
       return this.pickerEpisodePopup(el, {
         onVerify(value) {
           try {
@@ -1237,13 +1237,13 @@
           }
         },
         onSave(value) {
-          Storage.NEXT_CUR_EP.set(value, this.host);
+          Store.NEXT_CUR_EP.set(value, this.host);
           Tools.notyf("继续拾取元素 ＼(＞０＜)／");
         }
       });
     },
     pickerRelativeEpisodePath(el) {
-      if (Storage.NEXT_REL_EP.get(this.host)) return;
+      if (Store.NEXT_REL_EP.get(this.host)) return;
       return this.pickerEpisodePopup(el, {
         onVerify(value) {
           try {
@@ -1256,19 +1256,19 @@
           }
         },
         onSave(value) {
-          Storage.NEXT_REL_EP.set(value, this.host);
+          Store.NEXT_REL_EP.set(value, this.host);
           Tools.notyf("操作完成 []~(￣▽￣)~* 干杯");
         }
       });
     },
     getCurrentEpisodeNumber() {
-      const selector = Storage.NEXT_CUR_EP.get(this.topWin.host);
+      const selector = Store.NEXT_CUR_EP.get(this.topWin.host);
       return selector ? this.getEpisodeNumber(Tools.query(selector)) : null;
     },
     getCurrentEpisodeBySelector() {
       const num = this.getCurrentEpisodeNumber();
-      const current = this.getEpisodeWrapper(Tools.query(Storage.NEXT_CUR_EP.get(this.host)));
-      const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(Storage.NEXT_REL_EP.get(this.host))));
+      const current = this.getEpisodeWrapper(Tools.query(Store.NEXT_CUR_EP.get(this.host)));
+      const episodes = this.getAllEpisodes(this.getEpisodeWrapper(Tools.query(Store.NEXT_REL_EP.get(this.host))));
       return episodes.includes(current) ? current : episodes.find((el) => this.getEpisodeNumber(el) === num);
     },
     async pickerEpisodePopup(el, { onVerify, onSave }) {
@@ -1343,15 +1343,15 @@
   }
   const Extend = {
     setupLoadEventListener() {
-      const handle = ({ type }) => this.executeCodeSnippet(Storage.LOAD_CODE.get(this.host), type, this.player);
+      const handle = ({ type }) => this.executeCodeSnippet(Store.LOAD_CODE.get(this.host), type, this.player);
       document.addEventListener("DOMContentLoaded", handle);
       window.addEventListener("load", handle);
     },
-    shouldHideTime: () => !App.isFullscreen && !Storage.CLOCK_WEB.get(),
+    shouldHideTime: () => !App.isFullscreen && !Store.CLOCK_WEB.get(),
     setupClockForPlayer() {
       if (!this.player || this.shouldHideTime()) return this.Clock?.stop(true);
       if (this.Clock && !this.shouldHideTime()) return this.Clock.setContainer(this.player.parentNode).start();
-      this.Clock = new Clock(this.player.parentNode, { color: Storage.CLOCK_COLOR.get() });
+      this.Clock = new Clock(this.player.parentNode, { color: Store.CLOCK_COLOR.get() });
     },
     getRealDuration(video) {
       if (!Site.isQiyi()) return video.duration;
@@ -1369,13 +1369,13 @@
     },
     createProgressElement() {
       if (this.timeNode) return this.timeNode;
-      this.timeNode = this.createDisplayElement("__timeupdate", Storage.CLOCK_COLOR.get());
+      this.timeNode = this.createDisplayElement("__timeupdate", Store.CLOCK_COLOR.get());
       this.timeNode.append("00:00", Tools.newEle("b", { textContent: "%" }));
       return this.timeNode;
     },
     playbackRateDisplay() {
       if (!this.player || this.isLive()) return;
-      if (!Storage.RATE_SHOW.get()) return this.rateNode?.remove();
+      if (!Store.RATE_SHOW.get()) return this.rateNode?.remove();
       this.rateNode ??= this.createDisplayElement("__v_rate");
       this.rateNode.textContent = `倍速: ${this.player.playbackRate}`;
       this.prependElement(this.rateNode);
@@ -1395,15 +1395,15 @@
   };
   const Ignore = {
     setupIgnoreChangeListener() {
-      [Storage.FULL_IGNORE_URLS, Storage.NEXT_IGNORE_URLS].forEach(
+      [Store.FULL_IGNORE_URLS, Store.NEXT_IGNORE_URLS].forEach(
         (it) => GM_addValueChangeListener(it.name, () => this.initIgnoreUrls())
       );
     },
     initIgnoreUrls() {
       const nextIgnore = ["https://www.youtube.com/watch", "https://www.bilibili.com/video", "https://www.bilibili.com/list"];
-      this.nextFilter = this.processIgnoreUrls(Storage.NEXT_IGNORE_URLS, nextIgnore);
+      this.nextFilter = this.processIgnoreUrls(Store.NEXT_IGNORE_URLS, nextIgnore);
       const wideIgnore = ["https://www.youtube.com/results", "https://www.youtube.com/shorts"];
-      this.wideFilter = this.processIgnoreUrls(Storage.FULL_IGNORE_URLS, wideIgnore);
+      this.wideFilter = this.processIgnoreUrls(Store.FULL_IGNORE_URLS, wideIgnore);
     },
     isIgnoreNext() {
       if (!this.nextFilter) this.initIgnoreUrls();
@@ -1423,23 +1423,23 @@
     }
   };
   const Menu = {
-    unUsedRate: () => Storage.DISABLE_RATE.get(),
-    isOverrideKey: () => Storage.OVERRIDE_KEY.get(),
-    isAutoSite: () => Storage.SITE_AUTO.get(window.topWin?.host ?? location.host),
+    unUsedRate: () => Store.DISABLE_RATE.get(),
+    isOverrideKey: () => Store.OVERRIDE_KEY.get(),
+    isAutoSite: () => Store.SITE_AUTO.get(window.topWin?.host ?? location.host),
     initMenuCmds() {
       if (Tools.isExecuted("hasMenu") || !Tools.isTopWin()) return;
       this.setupMenuChangeListener();
       this.setupMenuCmds();
     },
     setupMenuChangeListener() {
-      [Storage.SITE_AUTO].forEach((t) => GM_addValueChangeListener(t.name + this.host, () => this.setupMenuCmds()));
+      [Store.SITE_AUTO].forEach((t) => GM_addValueChangeListener(t.name + this.host, () => this.setupMenuCmds()));
     },
     setupMenuCmds() {
       const tle = `此站${this.isAutoSite() ? "禁" : "启"}用自动网页全屏`;
       const sFn = ({ host, cache }) => cache.toggle(host);
       const configs = [
-        { title: tle, cache: Storage.SITE_AUTO, useHost: true, isHide: Site.isGmMatch(), fn: sFn },
-        { title: "此站脱离式全屏阈值", cache: Storage.DETACH_THRESHOLD, useHost: true, isHide: Site.isGmMatch() },
+        { title: tle, cache: Store.SITE_AUTO, useHost: true, isHide: Site.isGmMatch(), fn: sFn },
+        { title: "此站脱离式全屏阈值", cache: Store.DETACH_THRESHOLD, useHost: true, isHide: Site.isGmMatch() },
         { title: "快捷键说明", cache: { name: "SHORTCUTKEY" }, fn: this.shortcutKeysPopup },
         { title: "更多设置", cache: { name: "SETTING" }, fn: this.settingPopup }
       ];
@@ -1536,14 +1536,14 @@
     },
     renderBasics() {
       const confs = [
-        { name: "autoDef", text: "禁用 默认自动", cache: Storage.NO_AUTO_DEF },
-        { name: "speed", text: "禁用 倍速调节", cache: Storage.DISABLE_RATE, attrs: ["send", "delay"] },
-        { name: "memory", text: "禁用 记忆倍速", cache: Storage.FORGET_RATE, attrs: ["send"] },
-        { name: "tabs", text: "禁用 不可见暂停", cache: Storage.INVIS_PAUSE },
-        { name: "next", text: "启用 自动切换下集", cache: Storage.NEXT_AUTO },
-        { name: "wClock", text: "启用 非全屏显时间", cache: Storage.CLOCK_WEB, attrs: ["send"] },
-        { name: "sRate", text: "启用 左上角常显倍速", cache: Storage.RATE_SHOW, attrs: ["send"] },
-        { name: "override", text: "启用 空格◀️▶️ 控制", cache: Storage.OVERRIDE_KEY }
+        { name: "autoDef", text: "禁用 默认自动", cache: Store.NO_AUTO_DEF },
+        { name: "speed", text: "禁用 倍速调节", cache: Store.DISABLE_RATE, attrs: ["send", "delay"] },
+        { name: "memory", text: "禁用 记忆倍速", cache: Store.FORGET_RATE, attrs: ["send"] },
+        { name: "tabs", text: "禁用 不可见暂停", cache: Store.INVIS_PAUSE },
+        { name: "next", text: "启用 自动切换下集", cache: Store.NEXT_AUTO },
+        { name: "wClock", text: "启用 非全屏显时间", cache: Store.CLOCK_WEB, attrs: ["send"] },
+        { name: "sRate", text: "启用 左上角常显倍速", cache: Store.RATE_SHOW, attrs: ["send"] },
+        { name: "override", text: "启用 空格◀️▶️ 控制", cache: Store.OVERRIDE_KEY }
       ];
       const render = ({ text, name, value, dataset }) => `
         <label class="vpx-input">${text}
@@ -1554,14 +1554,14 @@
     },
     renderParams() {
       const confs = [
-        { name: "step", text: "倍速步进", cache: Storage.RATE_STEP },
-        { name: "skip", text: "快进/退秒数", cache: Storage.SKIP_INTERVAL },
-        { name: "zero", text: "零键快进秒数", cache: Storage.ZERO_KEY_SKIP },
-        { name: "advance", text: "下集提前秒数", cache: Storage.NEXT_ADVANCE },
-        { name: "percent", text: "缩放百分比", cache: Storage.ZOOM_PERCENT },
-        { name: "move", text: "移动距离", cache: Storage.MOVE_DIST },
-        { name: "color", text: "时间颜色", cache: Storage.CLOCK_COLOR, attrs: ["send"] },
-        { name: "preset", text: "常用倍速", cache: Storage.PRESET_RATE }
+        { name: "step", text: "倍速步进", cache: Store.RATE_STEP },
+        { name: "skip", text: "快进/退秒数", cache: Store.SKIP_INTERVAL },
+        { name: "zero", text: "零键快进秒数", cache: Store.ZERO_KEY_SKIP },
+        { name: "advance", text: "下集提前秒数", cache: Store.NEXT_ADVANCE },
+        { name: "percent", text: "缩放百分比", cache: Store.ZOOM_PERCENT },
+        { name: "move", text: "移动距离", cache: Store.MOVE_DIST },
+        { name: "color", text: "时间颜色", cache: Store.CLOCK_COLOR, attrs: ["send"] },
+        { name: "preset", text: "常用倍速", cache: Store.PRESET_RATE }
       ];
       const render = ({ text, name, value, dataset }) => `
         <label class="vpx-input">${text}
@@ -1571,29 +1571,29 @@
     },
     renderIgnore() {
       const confs = [
-        { name: "nextUrls", text: "自动切换下集时 忽略的网址（用 ; 隔开）", cache: Storage.NEXT_IGNORE_URLS },
-        { name: "wFsUrls", text: "自动网页全屏时 忽略的网址（用 ; 隔开）", cache: Storage.FULL_IGNORE_URLS }
+        { name: "nextUrls", text: "自动切换下集时 忽略的网址（用 ; 隔开）", cache: Store.NEXT_IGNORE_URLS },
+        { name: "wFsUrls", text: "自动网页全屏时 忽略的网址（用 ; 隔开）", cache: Store.FULL_IGNORE_URLS }
       ];
       return this.renderConfs(confs);
     },
     renderFull() {
       const confs = [
-        { name: "vWrap", text: "此站 (网页)全屏视频容器", cache: Storage.V_WRAPPER, disable: this.isGMatch(), useHost: true },
-        { name: "fsCode", text: "此站 (网页)全屏切换 事件代码", cache: Storage.FS_CODE, useHost: true, attrs: ["send"] }
+        { name: "vWrap", text: "此站 (网页)全屏视频容器", cache: Store.V_WRAPPER, disable: this.isGMatch(), useHost: true },
+        { name: "fsCode", text: "此站 (网页)全屏切换 事件代码", cache: Store.FS_CODE, useHost: true, attrs: ["send"] }
       ];
       return this.renderConfs(confs);
     },
     renderNext() {
       const confs = [
-        { name: "curEp", text: "此站 当前播放集选择器", cache: Storage.NEXT_CUR_EP, useHost: true, disable: Site.isGmMatch() },
-        { name: "allEp", text: "此站 定位全部集选择器", cache: Storage.NEXT_REL_EP, useHost: true, disable: Site.isGmMatch() }
+        { name: "curEp", text: "此站 当前播放集选择器", cache: Store.NEXT_CUR_EP, useHost: true, disable: Site.isGmMatch() },
+        { name: "allEp", text: "此站 定位全部集选择器", cache: Store.NEXT_REL_EP, useHost: true, disable: Site.isGmMatch() }
       ];
       return this.renderConfs(confs);
     },
     renderExtend() {
       const confs = [
-        { name: "lCode", text: "此站 load 事件代码", cache: Storage.LOAD_CODE, useHost: true, attrs: ["send"] },
-        { name: "vCode", text: "此站 video 事件代码", cache: Storage.VIDEO_CODE, useHost: true, attrs: ["send"] }
+        { name: "lCode", text: "此站 load 事件代码", cache: Store.LOAD_CODE, useHost: true, attrs: ["send"] },
+        { name: "vCode", text: "此站 video 事件代码", cache: Store.VIDEO_CODE, useHost: true, attrs: ["send"] }
       ];
       return this.renderConfs(confs);
     },
