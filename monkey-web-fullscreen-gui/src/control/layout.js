@@ -102,12 +102,17 @@ export default {
    * 创建倍速滑块功能组
    * @example
    * <div class="vc-slider-control">
-   *   <label class="vc-slider-label">倍速: 1.45x</label>
-   *     <div class="vc-slider-row">
-   *       <button>-</button>
-   *       <input min="0.1" max="16" step="0.15" type="range" class="vc-slider" />
-   *       <button>+</button>
-   *       <button>↺</button>
+   *   <div class="vc-slider-label">
+   *     <span class="vc-slider-rate">倍速: 1.45x</span>
+   *     <div class="vc-preset-rate">
+   *       <span>1.15</span><span>1.45</span><span>1.75</span>
+   *     </div>
+   *   </div>
+   *   <div class="vc-slider-row">
+   *     <button>-</button>
+   *     <input min="0.1" max="16" step="0.25" type="range" class="vc-slider">
+   *     <button>+</button>
+   *     <button>↺</button>
    *   </div>
    * </div>
    */
@@ -128,10 +133,22 @@ export default {
     const row = FyTools.newEle("div", { className: "vc-slider-row" });
     row.append(minus, this.slider, plus, reset);
 
+    // 当前倍速
+    this.rate = FyTools.newEle("span", { className: "vc-slider-rate", textContent: "倍速: 1x" });
+
+    // 预设的常用倍速
+    const preset = FyTools.newEle("div", { className: "vc-preset-rate" });
+    FyStorage.PRESET_RATE.get().map((rate) => {
+      preset.append(FyTools.newEle("span", { textContent: rate.trim(), onclick: () => setRate(rate) }));
+    });
+
+    // 当前倍速、常用倍速 容器
+    const label = FyTools.newEle("div", { className: "vc-slider-label" });
+    label.append(this.rate, preset);
+
     // 创建容器
-    this.label = FyTools.newEle("label", { className: "vc-slider-label", textContent: "倍速: 1x" });
     const container = FyTools.newEle("div", { className: "vc-slider-control" });
-    container.append(this.label, row);
+    container.append(label, row);
 
     return container;
   },

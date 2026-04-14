@@ -122,8 +122,30 @@
 }
 
 .vc-slider-label {
-  text-align: left;
-  transform-origin: left center;
+  display: flex;
+  justify-content: space-between;
+
+  * {
+    transform: scale(0.95);
+  }
+}
+
+.vc-slider-rate {
+  padding: 3px 0;
+}
+
+.vc-preset-rate {
+  gap: 3px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: repeat(auto-fit, 1fr);
+
+  span {
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 4px;
+    background: #555555;
+  }
 }
 
 .vc-slider-row {
@@ -218,5 +240,13 @@
 
   .vc-control-item {
     padding: 7px 0;
+  }
+
+  .vc-slider-label * {
+    transform: none;
+  }
+
+  .vc-preset-rate {
+    gap: 5px;
   }
 }
