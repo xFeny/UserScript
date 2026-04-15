@@ -70,8 +70,8 @@ export default {
   // ====================⇑⇑⇑ 调节播放倍速相关逻辑 ⇑⇑⇑====================
 
   // ====================⇓⇓⇓ 调节播放进度相关逻辑 ⇓⇓⇓====================
-  skipPlayback(second = 0) {
-    if (!this.player || this.isLive() || !this.isOverrideKey()) return;
+  skipPlayback(second = 0, bypass = false) {
+    if (!this.player || this.isLive() || (!bypass && !this.isOverrideKey())) return;
     this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
     this.showToast(`快${second > 0 ? "进" : "退"} ${Math.abs(second)} 秒`, Consts.ONE_SEC);
   },

@@ -30,11 +30,11 @@ export default {
     const duration = this.getRealDuration(video);
     if (duration <= 30 || duration > 864e2 || this.isLive() || this.shouldHideTime()) return this.timeNode?.remove();
 
-    const percent = Tools.toFixed((video.currentTime / duration) * 100, 1);
+    const percent = ((video.currentTime / duration) * 100).toFixed(1);
     const remain = this.formatTime(duration - video.currentTime);
 
     const el = this.createProgressElement(); // 创建相关元素
-    el.firstChild.textContent = `${remain} / ${percent}`;
+    el.firstChild.textContent = `${remain}\u2005/\u2005${percent}`;
     this.prependElement(el);
   },
   createProgressElement() {

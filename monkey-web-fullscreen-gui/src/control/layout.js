@@ -1,4 +1,5 @@
 import Store from "../common/Store";
+import Utils from "../common/Utils";
 
 /**
  * 初始化控制面板元素
@@ -122,9 +123,9 @@ export default {
     const adjustRate = (plus = 1) => this.FS.adjustPlayRate(plus * step);
 
     // =================⇓⇓⇓ 当前倍速、常用倍速相关 ⇓⇓⇓=================
-    // 当前倍速，可修改值
-    const editRate = (e) => setRate(e.target.textContent);
-    this.rate = FyTools.newEle("span", { contentEditable: true, textContent: "1", oninput: editRate });
+    // 当前倍速，支持输入值
+    const inputRate = Utils.debounce((e) => setRate(e.target.textContent));
+    this.rate = FyTools.newEle("span", { contentEditable: true, textContent: "1", oninput: inputRate });
 
     const rateWrap = FyTools.newEle("span", { className: "vc-slider-rate" });
     rateWrap.append("倍速: ", this.rate, "x");

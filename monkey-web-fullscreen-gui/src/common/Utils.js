@@ -37,4 +37,17 @@ export default {
       return original.apply(this, args);
     };
   },
+  /**
+   * 防抖函数
+   * @param {Function} func - 要防抖的函数
+   * @param {number} delay - 延迟时间（毫秒）
+   * @returns 防抖后的新函数
+   */
+  debounce(func, delay = 350) {
+    let timer;
+    return function (...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => func(...args), delay);
+    };
+  },
 };
