@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GUI-悬浮图形控制面板
 // @namespace    http://tampermonkey.net/
-// @version      1.0.6
+// @version      1.0.7
 // @author       Feny
 // @description  为「视频自动网页全屏｜倍速播放」脚本提供悬浮图形控制面板，支持自由拖拽定位、深色/浅色主题切换
 // @license      GPL-3.0-only
@@ -47,6 +47,33 @@
   const Store = {
     DARK_THEME: new BasicStorage("DARK_THEME", true, Boolean),
     DRAG_POSITION: new BasicStorage("DRAG_POSITION_", { x: 0, y: 0 })
+  };
+  const Utils = {
+    waitFor(condition, opts = {}) {
+      const start = Date.now();
+      const { immediate = false, interval = 50, timeout = 3e3 } = opts;
+      return new Promise((resolve, reject) => {
+        const checkCondition = () => {
+          if (Date.now() - start > timeout) return reject(new Error("waitFor 预期条件未满足"));
+          condition() ? resolve() : setTimeout(checkCondition, interval);
+        };
+        immediate ? checkCondition() : setTimeout(checkCondition, interval);
+      });
+    },
+    onBefore(target, funcName, preExec) {
+      const original = target[funcName];
+      target[funcName] = function(...args) {
+        Promise.resolve().then(() => preExec.apply(this, args));
+        return original.apply(this, args);
+      };
+    },
+    debounce(func, delay = 350) {
+      let timer;
+      return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => func(...args), delay);
+      };
+    }
   };
   const Layout = {
     createPanelWrapper() {
@@ -117,8 +144,8 @@
       const step = FyStorage?.RATE_STEP?.get() ?? 0.25;
       const setRate = (value) => this.FS.setPlaybackRate(value);
       const adjustRate = (plus2 = 1) => this.FS.adjustPlayRate(plus2 * step);
-      const editRate = (e) => setRate(e.target.textContent);
-      this.rate = FyTools.newEle("span", { contentEditable: true, textContent: "1", oninput: editRate });
+      const inputRate = Utils.debounce((e) => setRate(e.target.textContent));
+      this.rate = FyTools.newEle("span", { contentEditable: true, textContent: "1", oninput: inputRate });
       const rateWrap = FyTools.newEle("span", { className: "vc-slider-rate" });
       rateWrap.append("倍速: ", this.rate, "x");
       const preset = FyTools.newEle("div", { className: "vc-preset-rate" });
@@ -137,26 +164,6 @@
       const container = FyTools.newEle("div", { className: "vc-slider-control" });
       container.append(label, row);
       return container;
-    }
-  };
-  const Utils = {
-    waitFor(condition, opts = {}) {
-      const start = Date.now();
-      const { immediate = false, interval = 50, timeout = 3e3 } = opts;
-      return new Promise((resolve, reject) => {
-        const checkCondition = () => {
-          if (Date.now() - start > timeout) return reject(new Error("waitFor 预期条件未满足"));
-          condition() ? resolve() : setTimeout(checkCondition, interval);
-        };
-        immediate ? checkCondition() : setTimeout(checkCondition, interval);
-      });
-    },
-    onBefore(target, funcName, preExec) {
-      const original = target[funcName];
-      target[funcName] = function(...args) {
-        Promise.resolve().then(() => preExec.apply(this, args));
-        return original.apply(this, args);
-      };
     }
   };
   const Control = {
