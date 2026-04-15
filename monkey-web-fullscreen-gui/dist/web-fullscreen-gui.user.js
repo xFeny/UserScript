@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GUI-悬浮图形控制面板
 // @namespace    http://tampermonkey.net/
-// @version      1.0.5
+// @version      1.0.6
 // @author       Feny
 // @description  为「视频自动网页全屏｜倍速播放」脚本提供悬浮图形控制面板，支持自由拖拽定位、深色/浅色主题切换
 // @license      GPL-3.0-only
@@ -19,7 +19,7 @@
 // @run-at       document-body
 // ==/UserScript==
 
-(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const r=document.createElement("style");r.textContent=e,document.head.append(r)})(' @charset "UTF-8";.vc-panel-wrapper{top:30%;border:none;position:fixed;left:calc(100vw - 50px);user-select:none!important;z-index:2147483647!important;background-color:transparent!important}.vc-panel-wrapper *{color:#e0e0e0;font-size:12px;user-select:none!important;transition:border .3s,background-color .3s!important}.vc-trigger{width:32px;height:32px;cursor:pointer;line-height:32px;border-radius:50%;position:relative;text-align:center;background:#333;box-shadow:0 2px 8px #0000004d}.vc-trigger:hover{background:#444}.vc-control-panel{width:265px;overflow:hidden;border-radius:4px;background:#444;box-shadow:0 2px 8px #0000004d}.vc-panel-header{padding:8px;display:flex;align-items:center;background:#333;justify-content:space-between}.vc-theme-btn{cursor:pointer}.vc-theme-btn:after{content:"\u{1F319}"}.vc-func-group,.vc-slider-control{gap:8px;padding:8px;border-top:1px solid #555555}.vc-func-group{display:grid;grid-template-columns:repeat(3,1fr)}.vc-func-group:nth-of-type(4) .vc-control-item:nth-of-type(2) b,.vc-func-group:nth-of-type(4) .vc-control-item:nth-of-type(5) b{display:inline-block;transform:rotate(90deg)}.vc-control-item{padding:5px 0;cursor:pointer;text-align:center;border-radius:4px;background:#555}.vc-control-item:hover{background:#666}.vc-control-item b{margin-right:5px}.vc-slider-control{display:flex;flex-direction:column}.vc-slider-control button{border:none;cursor:pointer;padding:2px 8px;font-weight:700;border-radius:4px;background:#555}.vc-slider-control button:hover{background:#666}.vc-slider-label{display:flex;justify-content:space-between}.vc-slider-label *{transform:scale(.95)}.vc-slider-rate{padding:3px 0}.vc-preset-rate{gap:3px;display:grid;grid-auto-flow:column;grid-template-columns:repeat(auto-fit,1fr)}.vc-preset-rate span{cursor:pointer;padding:3px 6px;border-radius:4px;background:#555}.vc-preset-rate span:hover{background:#666}.vc-slider-row{gap:8px;display:flex;align-items:center}.vc-slider{flex:1;height:4px;border:none;outline:none;border-radius:3px;background:#d3d3d3;-webkit-appearance:none;appearance:none}.vc-slider::-webkit-slider-thumb{width:12px;height:12px;cursor:pointer;border-radius:50%;background:#9a72ff;-webkit-appearance:none;appearance:none}.vc-slider::-webkit-slider-thumb:hover{background:#a37ffe}.light-mode *{color:#333;border-color:#e0e0e0}.light-mode .vc-trigger,.light-mode .vc-control-panel{background-color:#fff}.light-mode .vc-trigger:hover{background-color:#e3e5e7}.light-mode .vc-panel-header{background-color:#f5f5f5}.light-mode .vc-theme-btn:after{content:"\u2600\uFE0F"}.light-mode .vc-control-item,.light-mode .vc-preset-rate span,.light-mode .vc-slider-control button{background-color:#f0f0f0}.light-mode .vc-control-item:hover,.light-mode .vc-preset-rate span:hover,.light-mode .vc-slider-control button:hover{background-color:#e0e0e0}.tippy-box[data-theme~=vc-panel-wrapper]{background-color:transparent!important}.tippy-box[data-theme~=vc-panel-wrapper] .tippy-content{padding:0!important}@media (min-width: 2200px){.vc-panel-wrapper *{font-size:14px}.vc-trigger{width:45px;height:45px;line-height:45px}.vc-control-panel{width:325px}.vc-control-item{padding:7px 0}.vc-slider-label *{transform:none}.vc-preset-rate{gap:5px}} ');
+(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const r=document.createElement("style");r.textContent=e,document.head.append(r)})(' @charset "UTF-8";.vc-panel-wrapper{top:30%;border:none;position:fixed;left:calc(100vw - 50px);user-select:none!important;z-index:2147483647!important;background-color:transparent!important}.vc-panel-wrapper *{color:#e0e0e0;font-size:12px;user-select:none!important;transition:border .3s,background-color .3s!important}.vc-trigger{width:32px;height:32px;cursor:pointer;line-height:32px;border-radius:50%;position:relative;text-align:center;background:#333;box-shadow:0 2px 8px #0000004d}.vc-trigger:hover{background:#444}.vc-control-panel{width:280px;overflow:hidden;border-radius:4px;background:#444;box-shadow:0 2px 8px #0000004d}.vc-panel-header{padding:8px;display:flex;align-items:center;background:#333;justify-content:space-between}.vc-theme-btn{cursor:pointer}.vc-theme-btn:after{content:"\u{1F319}"}.vc-func-group,.vc-slider-control{gap:8px;padding:8px;border-top:1px solid #555555}.vc-func-group{display:grid;grid-template-columns:repeat(3,1fr)}.vc-func-group:nth-of-type(4) .vc-control-item:nth-of-type(2) b,.vc-func-group:nth-of-type(4) .vc-control-item:nth-of-type(5) b{display:inline-block;transform:rotate(90deg)}.vc-control-item{padding:5px 0;cursor:pointer;text-align:center;border-radius:4px;background:#555}.vc-control-item:hover{background:#666}.vc-control-item b{margin-right:5px}.vc-slider-control{display:flex;flex-direction:column}.vc-slider-control button{border:none;cursor:pointer;padding:2px 8px;font-weight:700;border-radius:4px;background:#555}.vc-slider-control button:hover{background:#666}.vc-slider-label{display:flex;justify-content:space-between}.vc-slider-label *{transform:scale(.95)}.vc-slider-rate{padding:3px 0;cursor:default!important}.vc-slider-rate span{cursor:auto!important}.vc-slider-rate span:focus{padding:3px 6px;border-radius:4px;background-color:#666}.vc-preset-rate{gap:3px;display:grid;grid-auto-flow:column;grid-template-columns:repeat(auto-fit,1fr)}.vc-preset-rate span{cursor:pointer;padding:3px 6px;border-radius:4px;background:#555}.vc-preset-rate span:hover{background:#666}.vc-slider-row{gap:8px;display:flex;align-items:center}.vc-slider{flex:1;height:4px;border:none;outline:none;border-radius:3px;background:#d3d3d3;-webkit-appearance:none;appearance:none}.vc-slider::-webkit-slider-thumb{width:12px;height:12px;cursor:pointer;border-radius:50%;background:#9a72ff;-webkit-appearance:none;appearance:none}.vc-slider::-webkit-slider-thumb:hover{background:#a37ffe}.light-mode *{color:#333;border-color:#e0e0e0}.light-mode .vc-trigger,.light-mode .vc-control-panel{background-color:#fff}.light-mode .vc-trigger:hover{background-color:#e3e5e7}.light-mode .vc-panel-header{background-color:#f5f5f5}.light-mode .vc-theme-btn:after{content:"\u2600\uFE0F"}.light-mode .vc-control-item,.light-mode .vc-preset-rate span,.light-mode .vc-slider-control button{background-color:#f0f0f0}.light-mode .vc-control-item:hover,.light-mode .vc-preset-rate span:hover,.light-mode .vc-slider-control button:hover{background-color:#e0e0e0}.light-mode .vc-slider-rate span:focus{background-color:#f0f0f0}.tippy-box[data-theme~=vc-panel-wrapper]{background-color:transparent!important}.tippy-box[data-theme~=vc-panel-wrapper] .tippy-content{padding:0!important}@media (min-width: 2200px){.vc-panel-wrapper *{font-size:14px}.vc-trigger{width:45px;height:45px;line-height:45px}.vc-control-panel{width:340px}.vc-control-item{padding:7px 0}.vc-slider-label *{transform:none}.vc-preset-rate{gap:5px}} ');
 
 (function (tippy, Draggable) {
   'use strict';
@@ -117,6 +117,16 @@
       const step = FyStorage?.RATE_STEP?.get() ?? 0.25;
       const setRate = (value) => this.FS.setPlaybackRate(value);
       const adjustRate = (plus2 = 1) => this.FS.adjustPlayRate(plus2 * step);
+      const editRate = (e) => setRate(e.target.textContent);
+      this.rate = FyTools.newEle("span", { contentEditable: true, textContent: "1", oninput: editRate });
+      const rateWrap = FyTools.newEle("span", { className: "vc-slider-rate" });
+      rateWrap.append("倍速: ", this.rate, "x");
+      const preset = FyTools.newEle("div", { className: "vc-preset-rate" });
+      FyStorage.PRESET_RATE.get().map((rate) => {
+        preset.append(FyTools.newEle("span", { textContent: rate.trim(), onclick: () => setRate(rate) }));
+      });
+      const label = FyTools.newEle("div", { className: "vc-slider-label" });
+      label.append(rateWrap, preset);
       const reset = FyTools.newEle("button", { textContent: "↺", onclick: () => setRate(1) });
       const plus = FyTools.newEle("button", { textContent: "+", onclick: () => adjustRate() });
       const minus = FyTools.newEle("button", { textContent: "-", onclick: () => adjustRate(-1) });
@@ -124,13 +134,6 @@
       this.slider = FyTools.newEle("input", { ...attrs, oninput: (e) => setRate(e.target.value) });
       const row = FyTools.newEle("div", { className: "vc-slider-row" });
       row.append(minus, this.slider, plus, reset);
-      this.rate = FyTools.newEle("span", { className: "vc-slider-rate", textContent: "倍速: 1x" });
-      const preset = FyTools.newEle("div", { className: "vc-preset-rate" });
-      FyStorage.PRESET_RATE.get().map((rate) => {
-        preset.append(FyTools.newEle("span", { textContent: rate.trim(), onclick: () => setRate(rate) }));
-      });
-      const label = FyTools.newEle("div", { className: "vc-slider-label" });
-      label.append(this.rate, preset);
       const container = FyTools.newEle("div", { className: "vc-slider-control" });
       container.append(label, row);
       return container;
@@ -178,8 +181,7 @@
     },
     renderRateToPanel() {
       if (!this.FS.player || !this.panel) return;
-      this.slider.value = this.FS.player.playbackRate;
-      this.rate.textContent = `倍速: ${this.FS.player.playbackRate}x`;
+      this.rate.textContent = this.slider.value = this.FS.player.playbackRate;
     },
     initControlPanel(video) {
       if (!video || this.wrapper) return;
