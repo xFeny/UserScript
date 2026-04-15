@@ -121,6 +121,26 @@ export default {
     const setRate = (value) => this.FS.setPlaybackRate(value);
     const adjustRate = (plus = 1) => this.FS.adjustPlayRate(plus * step);
 
+    // =================⇓⇓⇓ 当前倍速、常用倍速相关 ⇓⇓⇓=================
+    // 当前倍速，可修改值
+    const editRate = (e) => setRate(e.target.textContent);
+    this.rate = FyTools.newEle("span", { contentEditable: true, textContent: "1", oninput: editRate });
+
+    const rateWrap = FyTools.newEle("span", { className: "vc-slider-rate" });
+    rateWrap.append("倍速: ", this.rate, "x");
+
+    // 预设的常用倍速
+    const preset = FyTools.newEle("div", { className: "vc-preset-rate" });
+    FyStorage.PRESET_RATE.get().map((rate) => {
+      preset.append(FyTools.newEle("span", { textContent: rate.trim(), onclick: () => setRate(rate) }));
+    });
+
+    // 当前倍速、常用倍速 容器
+    const label = FyTools.newEle("div", { className: "vc-slider-label" });
+    label.append(rateWrap, preset);
+    // =================⇑⇑⇑ 当前倍速、常用倍速相关 ⇑⇑⇑=================
+
+    // =================⇓⇓⇓ 倍速滑块相关 ⇓⇓⇓=================
     const reset = FyTools.newEle("button", { textContent: "↺", onclick: () => setRate(1) });
     const plus = FyTools.newEle("button", { textContent: "+", onclick: () => adjustRate() });
     const minus = FyTools.newEle("button", { textContent: "-", onclick: () => adjustRate(-1) });
@@ -132,19 +152,7 @@ export default {
     // 倍速滑块滑块组
     const row = FyTools.newEle("div", { className: "vc-slider-row" });
     row.append(minus, this.slider, plus, reset);
-
-    // 当前倍速
-    this.rate = FyTools.newEle("span", { className: "vc-slider-rate", textContent: "倍速: 1x" });
-
-    // 预设的常用倍速
-    const preset = FyTools.newEle("div", { className: "vc-preset-rate" });
-    FyStorage.PRESET_RATE.get().map((rate) => {
-      preset.append(FyTools.newEle("span", { textContent: rate.trim(), onclick: () => setRate(rate) }));
-    });
-
-    // 当前倍速、常用倍速 容器
-    const label = FyTools.newEle("div", { className: "vc-slider-label" });
-    label.append(this.rate, preset);
+    // =================⇑⇑⇑ 倍速滑块相关 ⇑⇑⇑=================
 
     // 创建容器
     const container = FyTools.newEle("div", { className: "vc-slider-control" });

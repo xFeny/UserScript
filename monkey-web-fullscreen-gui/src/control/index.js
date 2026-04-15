@@ -27,8 +27,7 @@ export default {
   },
   renderRateToPanel() {
     if (!this.FS.player || !this.panel) return;
-    this.slider.value = this.FS.player.playbackRate;
-    this.rate.textContent = `倍速: ${this.FS.player.playbackRate}x`;
+    this.rate.textContent = this.slider.value = this.FS.player.playbackRate;
   },
   initControlPanel(video) {
     if (!video || this.wrapper) return;

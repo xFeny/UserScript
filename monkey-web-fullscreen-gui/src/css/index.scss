@@ -35,7 +35,7 @@
 }
 
 .vc-control-panel {
-  width: 265px;
+  width: 280px;
   overflow: hidden;
   border-radius: 4px;
   background: #444444;
@@ -132,6 +132,17 @@
 
 .vc-slider-rate {
   padding: 3px 0;
+  cursor: default !important;
+
+  span {
+    cursor: auto !important;
+
+    &:focus {
+      padding: 3px 6px;
+      border-radius: 4px;
+      background-color: #666666;
+    }
+  }
 }
 
 .vc-preset-rate {
@@ -216,6 +227,10 @@
       background-color: #e0e0e0;
     }
   }
+
+  .vc-slider-rate span:focus {
+    background-color: #f0f0f0;
+  }
 }
 
 .tippy-box[data-theme~="vc-panel-wrapper"] {
@@ -240,7 +255,7 @@
   }
 
   .vc-control-panel {
-    width: 325px;
+    width: 340px;
   }
 
   .vc-control-item {

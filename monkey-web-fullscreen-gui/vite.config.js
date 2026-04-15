@@ -14,7 +14,7 @@ export default defineConfig({
       entry: "src/main.js",
       userscript: {
         author: "Feny",
-        version: "1.0.5",
+        version: "1.0.6",
         license: "GPL-3.0-only",
         name: "GUI-悬浮图形控制面板",
         namespace: "http://tampermonkey.net/",
