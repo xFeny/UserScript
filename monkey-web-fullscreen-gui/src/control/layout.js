@@ -124,7 +124,7 @@ export default {
 
     // =================⇓⇓⇓ 当前倍速、常用倍速相关 ⇓⇓⇓=================
     // 当前倍速，支持输入值
-    const inputRate = Utils.debounce((e) => setRate(e.target.textContent));
+    const inputRate = Utils.debounce((e) => setRate(e.target.textContent), 500);
     this.rate = FyTools.newEle("span", { contentEditable: true, textContent: "1", oninput: inputRate });
 
     const rateWrap = FyTools.newEle("span", { className: "vc-slider-rate" });
@@ -132,8 +132,8 @@ export default {
 
     // 预设的常用倍速
     const preset = FyTools.newEle("div", { className: "vc-preset-rate" });
-    FyStorage.PRESET_RATE.get().map((rate) => {
-      preset.append(FyTools.newEle("span", { textContent: rate.trim(), onclick: () => setRate(rate) }));
+    FyStorage?.PRESET_RATE?.get()?.map((rate) => {
+      if (rate) preset.append(FyTools.newEle("span", { textContent: rate.trim(), onclick: () => setRate(rate) }));
     });
 
     // 当前倍速、常用倍速 容器

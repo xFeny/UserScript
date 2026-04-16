@@ -43,7 +43,7 @@ export default {
    * @param {number} delay - 延迟时间（毫秒）
    * @returns 防抖后的新函数
    */
-  debounce(func, delay = 350) {
+  debounce(func, delay) {
     let timer;
     return function (...args) {
       clearTimeout(timer);

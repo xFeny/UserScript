@@ -8,6 +8,8 @@
   background-color: transparent !important;
 
   * {
+    border: none;
+    outline: none;
     color: #e0e0e0;
     font-size: 12px;
     user-select: none !important;
@@ -88,14 +90,7 @@
 
 .vc-control-item {
   padding: 5px 0;
-  cursor: pointer;
   text-align: center;
-  border-radius: 4px;
-  background: #555555;
-
-  &:hover {
-    background: #666666;
-  }
 
   b {
     margin-right: 5px;
@@ -108,16 +103,7 @@
   flex-direction: column;
 
   button {
-    border: none;
-    cursor: pointer;
     padding: 2px 8px;
-    font-weight: bold;
-    border-radius: 4px;
-    background: #555555;
-
-    &:hover {
-      background: #666666;
-    }
   }
 }
 
@@ -152,14 +138,7 @@
   grid-template-columns: repeat(auto-fit, 1fr);
 
   span {
-    cursor: pointer;
     padding: 3px 6px;
-    border-radius: 4px;
-    background: #555555;
-
-    &:hover {
-      background: #666666;
-    }
   }
 }
 
@@ -172,8 +151,6 @@
 .vc-slider {
   flex: 1;
   height: 4px;
-  border: none;
-  outline: none;
   border-radius: 3px;
   background: #d3d3d3;
   -webkit-appearance: none;
@@ -191,6 +168,18 @@
 
   &:hover {
     background: #a37ffe;
+  }
+}
+
+.vc-control-item,
+.vc-preset-rate span,
+.vc-slider-control button {
+  border-radius: 4px;
+  cursor: pointer !important;
+  background-color: #555555;
+
+  &:hover {
+    background-color: #666666;
   }
 }
 
