@@ -73,19 +73,6 @@
 .vc-func-group {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-
-  /*  上/下移 旋转90度 */
-  &:nth-of-type(4) {
-    .vc-control-item {
-      &:nth-of-type(2),
-      &:nth-of-type(5) {
-        b {
-          display: inline-block;
-          transform: rotate(90deg);
-        }
-      }
-    }
-  }
 }
 
 .vc-control-item {
@@ -94,6 +81,13 @@
 
   b {
     margin-right: 5px;
+
+    &[title="上移"],
+    &[title="下移"] {
+      margin-right: 2px;
+      display: inline-block;
+      transform: rotate(90deg);
+    }
   }
 }
 
@@ -104,6 +98,7 @@
 
   button {
     padding: 2px 8px;
+    font-weight: bold;
   }
 }
 

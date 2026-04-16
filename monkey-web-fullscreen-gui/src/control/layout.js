@@ -91,7 +91,7 @@ export default {
   createControlGroup(confs) {
     const nodes = confs.map(({ text, icon, params = [], action = () => {} }) => {
       const el = FyTools.newEle("div", { className: "vc-control-item", onclick: () => action.apply(this.FS, params) });
-      el.append(FyTools.newEle("b", { textContent: icon }), text);
+      el.append(FyTools.newEle("b", { title: text, textContent: icon }), text);
       return el;
     });
 
