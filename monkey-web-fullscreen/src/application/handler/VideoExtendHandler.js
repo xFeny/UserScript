@@ -25,16 +25,18 @@ export default {
     return unsafeWindow.webPlay?.wonder?._player?._playProxy?._info?.duration ?? video.duration;
   },
   renderProgress(video) {
-    if (!video || this.player !== video) return;
+    if (!video || !this.Clock || this.player !== video) return;
 
     const duration = this.getRealDuration(video);
     if (duration <= 30 || duration > 864e2 || this.isLive() || this.shouldHideTime()) return this.timeNode?.remove();
 
-    const percent = ((video.currentTime / duration) * 100).toFixed(1);
-    const remain = this.formatTime(duration - video.currentTime);
+    const percent = Tools.toFixed((video.currentTime / duration) * 100, 1);
+    const remain = this.secToTime(duration - video.currentTime);
 
     const el = this.createProgressElement(); // 创建相关元素
     el.firstChild.textContent = `${remain}\u2005/\u2005${percent}`;
+
+    Tools.setStyle(el, "--time-sx", (this.Clock.ele.clientWidth + (screen.width > 2200 ? 2.1 : 1.5)) / el.scrollWidth);
     this.prependElement(el);
   },
   createProgressElement() {

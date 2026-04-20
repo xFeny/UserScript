@@ -26,19 +26,19 @@ export default class Clock {
   }
 
   initClock() {
-    if (this.element) return;
+    if (this.ele) return;
 
     const { color, clss } = this.opts;
-    this.element = document.createElement("div");
-    if (color) this.element.style.setProperty("color", color);
-    this.element.classList.add(clss);
+    this.ele = document.createElement("div");
+    if (color) this.ele.style.setProperty("color", color);
+    this.ele.classList.add(clss);
 
-    this.container.prepend(this.element);
+    this.container.prepend(this.ele);
   }
 
   setContainer(container) {
     if (!container || this.container === container) return this;
-    if (this.element && !container.contains(this.element)) container.prepend(this.element);
+    if (this.ele && !container.contains(this.ele)) container.prepend(this.ele);
     this.container = container;
 
     return this;
@@ -51,15 +51,15 @@ export default class Clock {
   update() {
     if (!this.isRun) return; // 防止停止后仍执行
 
-    this.element.textContent = this.formatTime(new Date());
-    if (!this.container.contains(this.element)) this.container.prepend(this.element);
+    this.ele.textContent = this.formatTime(new Date());
+    if (!this.container.contains(this.ele)) this.container.prepend(this.ele);
   }
 
   start() {
     if (this.isRun) return;
 
     this.isRun = true; // 先标记运行状态，避免重复执行
-    this.element.style.removeProperty("display");
+    this.ele.style.removeProperty("display");
     this.timerId = setInterval(() => this.update(), 500);
     this.update();
   }
@@ -67,12 +67,12 @@ export default class Clock {
   stop(hide = false) {
     this.isRun = false; // 优先标记停止，阻断update循环
     if (this.timerId) (clearInterval(this.timerId), delete this.timerId);
-    if (hide) this.element?.style.setProperty("display", "none");
+    if (hide) this.ele?.style.setProperty("display", "none");
   }
 
   destroy() {
     this.stop();
-    this.element?.remove();
-    this.container = this.element = null;
+    this.ele?.remove();
+    this.container = this.ele = null;
   }
 }

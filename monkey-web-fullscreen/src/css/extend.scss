@@ -16,7 +16,6 @@
 /** 全屏时钟样式 **/
 .__Clock {
   top: 8px !important;
-  letter-spacing: 0.35px;
   right: 15px !important;
   width: auto !important;
   height: auto !important;
@@ -25,7 +24,7 @@
   text-align: right !important;
   line-height: 17.5px !important;
   background-color: transparent !important;
-  transform: scaleY(1.05) !important;
+  transform: scaleY(1.0857) !important;
 }
 
 .__timeupdate,
@@ -38,8 +37,8 @@
 .__timeupdate {
   top: 25px !important;
   right: 15px !important;
-  transform: translateX(3px) !important;
   transform-origin: top right !important;
+  transform: translateX(3px) scaleX(var(--time-sx, 1)) !important;
 
   & b {
     font: inherit !important;
@@ -94,6 +93,6 @@
 
   .__timeupdate {
     top: 28px !important;
-    transform: translateX(4.5px) !important;
+    transform: translateX(4.2px) scaleX(var(--time-sx, 1)) !important;
   }
 }

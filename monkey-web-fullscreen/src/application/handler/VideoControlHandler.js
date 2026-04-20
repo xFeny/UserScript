@@ -60,11 +60,7 @@ export default {
     this.customToast("正在以", `${this.player.playbackRate}x`, "倍速播放");
     if (!Store.FORGET_RATE.get()) Store.CACHED_RATE.set(this.player.playbackRate);
   },
-  adjustPlayRate(step = 0.25) {
-    if (!this.player) return;
-    const rate = Math.max(0.1, +this.player.playbackRate + step);
-    this.setPlaybackRate(Math.min(16, rate));
-  },
+  adjustPlayRate: (step = 0.25) => App.player && App.setPlaybackRate(Tools.clamp(+App.player.playbackRate + step, 0.1, 16)),
   applyCachedRate: () => (Store.FORGET_RATE.get() ? App.delCachedRate() : App.setPlaybackRate(Store.CACHED_RATE.get())),
   delCachedRate: () => Store.CACHED_RATE.del(),
   // ====================⇑⇑⇑ 调节播放倍速相关逻辑 ⇑⇑⇑====================
@@ -72,27 +68,18 @@ export default {
   // ====================⇓⇓⇓ 调节播放进度相关逻辑 ⇓⇓⇓====================
   skipPlayback(second = 0, bypass = false) {
     if (!this.player || this.isLive() || (!bypass && !this.isOverrideKey())) return;
-    this.setCurrentTime(Math.min(+this.player.currentTime + second, this.player.duration));
+    this.setCurrentTime(Tools.clamp(+this.player.currentTime + second, 0, this.player.duration));
     this.showToast(`快${second > 0 ? "进" : "退"} ${Math.abs(second)} 秒`, Consts.ONE_SEC);
   },
   cachePlayTime(video) {
     if (video !== this.player || !this.topWin || video.duration < 150 || this.isLive() || this.isMultiVideo()) return;
     if (Tools.isThrottle("cacheTime", Consts.ONE_SEC) || +video.currentTime < Store.SKIP_INTERVAL.get()) return;
-
-    // 距离结束10秒，清除记忆缓存
-    if (this.remainTime(video) <= 10) return this.clearCachedTime(video);
-
     Store.V_TIME.set(+video.currentTime - 1, this.getUniqueKey(video), Store.STORAGE_DAYS.get());
   },
   applyCachedTime(video) {
-    if (!this.topWin || this.isLive() || this.isMultiVideo()) return;
-
-    // 缓存的播放时间
-    const time = Store.V_TIME.get(this.getUniqueKey(video));
-    if (time <= +video.currentTime) return;
-
-    this.setCurrentTime(time);
-    this.customToast("上次观看至", this.formatTime(time), "处，已为您续播", Consts.TWO_SEC * 2, false);
+    const time = Store.V_TIME.get(this.getUniqueKey(video)); // 缓存的播放时间
+    if (!this.topWin || this.isLive() || this.isMultiVideo() || time <= +video.currentTime) return;
+    this.customToast("上次观看至", this.secToTime(this.setCurrentTime(time)), "处，已为您续播", Consts.TWO_SEC * 2, false);
   },
   setCurrentTime: (ct) => ct && (App.player.currentTime = Math.max(0, ct)),
   clearCachedTime: (v) => App.topWin && Store.V_TIME.del(App.getUniqueKey(v)),
@@ -104,9 +91,7 @@ export default {
 
     return (video.vx_tkey = currNumber ? `${baseKey}_${currNumber}` : baseKey);
   },
-  formatTime(sec) {
-    if (isNaN(sec)) return "00:00";
-
+  secToTime(sec) {
     const [h, m, s] = [~~(sec / 3600), ~~((sec % 3600) / 60), ~~(sec % 60)];
     return (h ? [h, m, s] : [m, s]).map((v) => String(v).padStart(2, "0")).join(":");
   },
@@ -133,19 +118,19 @@ export default {
 
     const { tsr } = this.player;
     const step = Store.ZOOM_PERCENT.get();
-    const zoom = Math.max(25, Math.min(500, tsr.zoom + dir * step));
+    const zoom = Tools.clamp(tsr.zoom + dir * step, 30, 300);
 
     tsr.zoom = zoom;
     this.setTsr("--zoom", zoom / 100);
     this.showToast(`缩放: ${zoom}%`, Consts.ONE_SEC);
   },
-  moveVideo(key) {
+  moveVideo(dir) {
     if (!this.player) return;
 
     const { tsr } = this.player;
     const s = Store.MOVE_DIST.get();
-    const dMap = { ALT_UP: [0, -s, "上"], ALT_DOWN: [0, s, "下"], ALT_LEFT: [-s, 0, "左"], ALT_RIGHT: [s, 0, "右"] };
-    let [x, y, desc] = dMap[key];
+    const dMap = { UP: [0, -s, "上"], DOWN: [0, s, "下"], LEFT: [-s, 0, "左"], RIGHT: [s, 0, "右"] };
+    let [x, y, desc] = dMap[dir];
     x *= tsr.mirror; // 镜像后的移动方向
 
     // 旋转后的移动方向

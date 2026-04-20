@@ -76,11 +76,11 @@ export default {
   createTransformControls() {
     const config = [
       { text: "放大", icon: "+", action: this.FS.zoomVideo },
-      { text: "上移", icon: "‹‹", params: ["ALT_UP"], action: this.FS.moveVideo },
-      { text: "左移", icon: "‹‹", params: ["ALT_LEFT"], action: this.FS.moveVideo },
+      { text: "上移", icon: "‹‹", params: ["UP"], action: this.FS.moveVideo },
+      { text: "左移", icon: "‹‹", params: ["LEFT"], action: this.FS.moveVideo },
       { text: "缩小", icon: "-", params: [-1], action: this.FS.zoomVideo },
-      { text: "下移", icon: "››", params: ["ALT_DOWN"], action: this.FS.moveVideo },
-      { text: "右移", icon: "››", params: ["ALT_RIGHT"], action: this.FS.moveVideo },
+      { text: "下移", icon: "››", params: ["DOWN"], action: this.FS.moveVideo },
+      { text: "右移", icon: "››", params: ["RIGHT"], action: this.FS.moveVideo },
     ];
     return this.createControlGroup(config);
   },

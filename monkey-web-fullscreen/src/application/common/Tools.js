@@ -11,6 +11,7 @@ export default unsafeWindow.FyTools = {
   alert: (...data) => window.alert(data.join(" ")),
   query: (selector, ctx) => querySelector(selector, ctx),
   querys: (selector, ctx) => querySelectorAll(selector, ctx),
+  clamp: (value, min, max) => Math.min(Math.max(value, min), max),
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
   toFixed: (value, digits = 2) => (+value).toFixed(digits).replace(/\.?0+$/, Consts.EMPTY),
   postMessage: (win, data) => win?.postMessage({ source: Consts.MSG_SOURCE, ...data }, "*"),
@@ -55,6 +56,21 @@ export default unsafeWindow.FyTools = {
     if (!el) return false;
     const { top, left, right, bottom } = this.getRect(el);
     return x >= left && x <= right && y >= top && y <= bottom;
+  },
+  getCenterPoint(el) {
+    const { top, left, width, height } = this.getRect(el);
+    return { cx: left + width / 2, cy: top + height / 2 }; // 元素中心点
+  },
+  /**
+   * 判断是否在目标元素视觉上方
+   * @param {HTMLElement} target 目标元素（被遮盖的）
+   * @param {HTMLElement} cover 待检查元素（要判断在上的）
+   * @returns {boolean}
+   */
+  isAboveElement(target, cover) {
+    if (!target || !cover) return false;
+    const { cx, cy } = this.getCenterPoint(target);
+    return cover.contains(document.elementFromPoint(cx, cy));
   },
   emitMousemove(el) {
     const { top: y, left, right } = this.getRect(el);

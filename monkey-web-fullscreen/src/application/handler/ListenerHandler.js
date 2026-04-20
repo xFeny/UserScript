@@ -28,9 +28,10 @@ export default {
     if (isNonFirst) return;
     this.setupDocumentObserver();
     this.setupLoadEventListener();
+    this.setupShortcutKeyMapping();
     this.setupShadowVideoListener();
-    this.setupIgnoreChangeListener();
     this.watchWebFullscreenChange();
+    this.setupIgnoreChangeListener();
     VideoEnhancer.hookActiveVideo();
   },
   setupVisibleListener() {
@@ -181,7 +182,7 @@ export default {
     Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
 
     this._cursorTid = setTimeout(() => {
-      const eles = [target, ...Tools.getParents(this.player, 2), ...Tools.querys(".__v_edge")];
+      const eles = [Tools.isAboveElement(this.player, target) && target, this.player, ...Tools.querys(".__v_edge")];
       eles.forEach((el) => (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
     }, Consts.TWO_SEC);
   },

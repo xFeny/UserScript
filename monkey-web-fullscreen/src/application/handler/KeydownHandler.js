@@ -51,13 +51,16 @@ export default {
   },
   execKeyActions({ key, isTrusted }) {
     // Tools.log("按下的键：", { key, isTrusted });
-    const dict = {
+    this.keyMapp[key]?.(isTrusted) ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
+  },
+  setupShortcutKeyMapping() {
+    const dict = (this.keyMapp = {
       M: () => this.muteVideo(),
       R: () => this.rotateVideo(),
       L: () => this.freezeFrame(),
       K: () => this.freezeFrame(-1),
       ENTER: () => this.toggleFullscreen(),
-      P: () => this.toggleWebFullscreen(isTrusted),
+      P: (isTrusted) => this.toggleWebFullscreen(isTrusted),
       D: () => Site.isGmMatch() && this.triggerIcon(Site.icons.danmaku),
       N: () => (Site.isGmMatch() ? this.triggerIcon(Site.icons.next) : this.switchEpisode()),
       SPACE: () => this.isOverrideKey() && this.playToggle(this.player),
@@ -70,7 +73,7 @@ export default {
       ALT_ADD: () => this.zoomVideo(),
       SHIFT_R: () => this.horizFlip(),
       CTRL_Z: () => this.resetTsr(),
-    };
+    });
 
     // 倍速加减
     ["A", "S", "ADD", "SUB"].forEach((k, i) => (dict[k] = () => this.adjustPlayRate([1, -1][i % 2] * Store.RATE_STEP.get())));
@@ -79,10 +82,7 @@ export default {
     for (let i = 1; i < 6; i++) dict[`CTRL_${i}`] = () => this.setPlaybackRate(Store.PRESET_RATE.get()[i - 1]);
 
     // 视频移动
-    ["ALT_UP", "ALT_DOWN", "ALT_LEFT", "ALT_RIGHT"].forEach((k) => (dict[k] = () => this.moveVideo(k)));
-
-    // 执行函数
-    dict[key]?.() ?? (Tools.isNumber(key) && this.setPlaybackRate(key));
+    ["UP", "DOWN", "LEFT", "RIGHT"].forEach((k) => (dict[`ALT_${k}`] = () => this.moveVideo(k)));
   },
   handleMessage(data) {
     // Tools.log(location.href, "接收到消息：", data, Date.now());

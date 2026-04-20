@@ -48,5 +48,5 @@ export default unsafeWindow.FyStorage = {
   ICONS_SELECTOR: new BasicStorage("ICONS_SELECTOR", null), // 缓存远端默认`@match`图标选择器
   CACHED_RATE: new BasicStorage("FENY_SCRIPTS_V_PLAYBACK_RATE", 1, true, parseFloat), // 记忆的倍速
   STORAGE_DAYS: new BasicStorage("STORAGE_DAYS", 8, false, parseFloat), // 播放进度保存天数
-  V_TIME: new BasicStorage("PLAY_TIME_", 0, true, undefined, true), // 视频播放进度
+  V_TIME: new BasicStorage("PLAY_TIME_", 0, true, Number, true), // 视频播放进度
 };
