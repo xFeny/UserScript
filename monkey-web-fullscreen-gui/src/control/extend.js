@@ -5,7 +5,7 @@ export default {
   // ==================== 画中画相关 ====================
   picInPic() {
     // 文档画中画
-    if (FyTools.isTopWin() && "documentPictureInPicture" in window) {
+    if (!this.notSupported && FyTools.isTopWin() && "documentPictureInPicture" in window) {
       return this.pipWin ? this.pipWin.close() : this.enterDocumentPictureInPicture();
     }
 
@@ -13,37 +13,38 @@ export default {
     document.exitPictureInPicture().catch(() => this.FS.player?.requestPictureInPicture());
   },
   enterDocumentPictureInPicture() {
-    try {
-      const isFs = this.FS.fsWrapper;
-      this.setPageVisibilityForced();
-      this.enableVideoWebFullscreen();
+    const isFs = this.FS.fsWrapper;
+    this.enableVideoWebFullscreen();
 
-      this.openDocumentPictureInPicture(this.FS.fsWrapper, {
-        didOpen: (pipWin) => {
-          (pipWin.GM_E9X_FS = this.FS).init();
-          this.handlePipEvents(pipWin);
-          this.pipWin = pipWin;
-        },
-        unload: (e) => {
-          this.handlePipEvents(e.target.defaultView, false);
-          document.body.appendChild(this.FS.fsWrapper);
-          if (!isFs) this.FS.exitWebFullscreen();
-          this.setPageVisibilityForced(true);
-          delete this.pipWin;
-        },
-      });
-    } catch (err) {
-      console.error("文档画中画启动失败：", err);
-    }
+    this.openDocumentPictureInPicture(this.FS.fsWrapper, {
+      didOpen: (pipWin) => {
+        this.setPageVisibilityForced();
+        (pipWin.GM_E9X_FS = this.FS).init();
+        this.handlePipEvents(pipWin);
+        this.pipWin = pipWin;
+      },
+      unload: (e) => {
+        this.handlePipEvents(e.target.defaultView, false);
+        document.body.appendChild(this.FS.fsWrapper);
+        if (!isFs) this.FS.exitWebFullscreen();
+        this.setPageVisibilityForced(true);
+        delete this.pipWin;
+      },
+    }).catch((e) => (this.notSupported = true));
   },
   async openDocumentPictureInPicture(target, { didOpen, unload }) {
-    const pipWin = await documentPictureInPicture.requestWindow({ width: 580, height: 326 });
-    document.querySelectorAll("style, link, script").forEach((el) => pipWin.document.head.append(el.cloneNode(true)));
-    pipWin.document.body.appendChild(pipWin.document.adoptNode(target));
-    if (didOpen && didOpen instanceof Function) didOpen(pipWin);
-    if (unload) pipWin.addEventListener("unload", unload);
+    try {
+      const pipWin = await documentPictureInPicture.requestWindow({ width: 500, height: 320 });
+      document.querySelectorAll("style, link, script").forEach((el) => pipWin.document.head.append(el.cloneNode(true)));
+      pipWin.document.body.appendChild(pipWin.document.adoptNode(target));
+      if (didOpen && didOpen instanceof Function) didOpen(pipWin);
+      if (unload) pipWin.addEventListener("unload", unload);
 
-    return pipWin;
+      return pipWin;
+    } catch (error) {
+      console.error("文档画中画启动失败：", error.message);
+      throw error;
+    }
   },
   enableVideoWebFullscreen() {
     this.FS.fsWrapper ??= this.FS.getVideoContainer();
