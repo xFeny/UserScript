@@ -51,6 +51,7 @@ export default {
   enableVideoWebFullscreen() {
     this.FS.fsWrapper ??= this.FS.getVideoContainer();
     this.FS.detachForFullscreen();
+    this.FS.adaptToWebFullscreen();
   },
   /**
    * 保持页面的可见性状态
