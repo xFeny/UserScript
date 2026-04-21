@@ -10,6 +10,7 @@ export default {
       .then(() => {
         this.host = location.host;
         this.FS = unsafeWindow.GM_E9X_FS;
+        this.hookAddEventListener();
         this.setupFunctionHooks();
         this.watchPlayerChange();
       })
@@ -87,4 +88,14 @@ export default {
     return { x: [-left, width / 2], y: [-top, top + bottom] };
   },
   // ====================⇑⇑⇑ 拖拽相关逻辑 ⇑⇑⇑====================
+  hookAddEventListener() {
+    window.evts = new Map();
+    const addEvent = EventTarget.prototype.addEventListener;
+    const removeEvent = EventTarget.prototype.removeEventListener;
+
+    EventTarget.prototype.addEventListener = function (...args) {
+      if ([document, unsafeWindow].includes(this)) window.evts.get(this)?.push(args) || window.evts.set(this, [args]);
+      return addEvent.call(this, ...args);
+    };
+  },
 };

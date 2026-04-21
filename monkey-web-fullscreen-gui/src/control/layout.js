@@ -50,7 +50,7 @@ export default {
     const pip = () => document.exitPictureInPicture().catch(() => this.FS.player?.requestPictureInPicture());
 
     const config = [
-      { text: "画中画", icon: "▣", action: pip },
+      { text: "画中画", icon: "▣", action: () => this.picInPic() },
       { text: "网页全屏", icon: "⤢", params: ["P", { isTrusted: true }], action: this.FS.dispatchShortcut },
       { text: "全屏", icon: "⛶", params: ["ENTER"], action: this.FS.dispatchShortcut },
     ];

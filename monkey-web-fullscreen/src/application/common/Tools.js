@@ -26,8 +26,8 @@ export default unsafeWindow.FyTools = {
   isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
   newEle: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
   hasCls: (el, ...cls) => cls.flat().some((c) => el?.classList.contains(c)),
-  delCls: (el, ...cls) => el?.classList.remove(...cls),
-  addCls: (el, ...cls) => el?.classList.add(...cls),
+  delCls: (el, ...cls) => el?.classList?.remove(...cls),
+  addCls: (el, ...cls) => el?.classList?.add(...cls),
   notyf(msg, isError = false) {
     const notyf = new Notyf({ duration: Consts.THREE_SEC, position: { x: "center", y: "top" } });
     isError ? notyf.error(msg) : notyf.success(msg);
