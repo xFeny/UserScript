@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GUI-悬浮图形控制面板
 // @namespace    http://tampermonkey.net/
-// @version      1.1.0
+// @version      1.1.2
 // @author       Feny
 // @description  为「视频自动网页全屏｜倍速播放」脚本提供悬浮图形控制面板，支持自由拖拽定位、深色/浅色主题切换
 // @license      GPL-3.0-only
@@ -46,7 +46,8 @@
   }
   const Store = {
     DARK_THEME: new BasicStorage("DARK_THEME", true, Boolean),
-    DRAG_POSITION: new BasicStorage("DRAG_POSITION_", { x: 0, y: 0 })
+    DRAG_POSITION: new BasicStorage("DRAG_POSITION_", { x: 0, y: 0 }),
+    NOT_SUPPORTED: new BasicStorage("NOT_SUPPORTED", false)
   };
   const Utils = {
     waitFor(condition, opts = {}) {
@@ -167,7 +168,7 @@
   };
   const Extend = {
     picInPic() {
-      if (!this.notSupported && FyTools.isTopWin() && "documentPictureInPicture" in window) {
+      if (!Store.NOT_SUPPORTED.get() && FyTools.isTopWin() && "documentPictureInPicture" in window) {
         return this.pipWin ? this.pipWin.close() : this.enterDocumentPictureInPicture();
       }
       document.exitPictureInPicture().catch(() => this.FS.player?.requestPictureInPicture());
@@ -189,7 +190,7 @@
           this.setPageVisibilityForced(true);
           delete this.pipWin;
         }
-      }).catch((e) => this.notSupported = true);
+      }).catch((e) => Store.NOT_SUPPORTED.set(true));
     },
     async openDocumentPictureInPicture(target, { didOpen, unload }) {
       try {
