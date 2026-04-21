@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GUI-悬浮图形控制面板
 // @namespace    http://tampermonkey.net/
-// @version      1.0.7
+// @version      1.1.0
 // @author       Feny
 // @description  为「视频自动网页全屏｜倍速播放」脚本提供悬浮图形控制面板，支持自由拖拽定位、深色/浅色主题切换
 // @license      GPL-3.0-only
@@ -99,9 +99,8 @@
       return header;
     },
     createFullscreenControls() {
-      const pip = () => document.exitPictureInPicture().catch(() => this.FS.player?.requestPictureInPicture());
       const config = [
-        { text: "画中画", icon: "▣", action: pip },
+        { text: "画中画", icon: "▣", action: () => this.picInPic() },
         { text: "网页全屏", icon: "⤢", params: ["P", { isTrusted: true }], action: this.FS.dispatchShortcut },
         { text: "全屏", icon: "⛶", params: ["ENTER"], action: this.FS.dispatchShortcut }
       ];
@@ -121,11 +120,11 @@
     createTransformControls() {
       const config = [
         { text: "放大", icon: "+", action: this.FS.zoomVideo },
-        { text: "上移", icon: "‹‹", params: ["ALT_UP"], action: this.FS.moveVideo },
-        { text: "左移", icon: "‹‹", params: ["ALT_LEFT"], action: this.FS.moveVideo },
+        { text: "上移", icon: "‹‹", params: ["UP"], action: this.FS.moveVideo },
+        { text: "左移", icon: "‹‹", params: ["LEFT"], action: this.FS.moveVideo },
         { text: "缩小", icon: "-", params: [-1], action: this.FS.zoomVideo },
-        { text: "下移", icon: "››", params: ["ALT_DOWN"], action: this.FS.moveVideo },
-        { text: "右移", icon: "››", params: ["ALT_RIGHT"], action: this.FS.moveVideo }
+        { text: "下移", icon: "››", params: ["DOWN"], action: this.FS.moveVideo },
+        { text: "右移", icon: "››", params: ["RIGHT"], action: this.FS.moveVideo }
       ];
       return this.createControlGroup(config);
     },
@@ -166,12 +165,62 @@
       return container;
     }
   };
+  const Extend = {
+    picInPic() {
+      FyTools.isTopWin() && "documentPictureInPicture" in window ? this.documentPicInPic() : this.pictureInPicture();
+    },
+    pictureInPicture() {
+      document.exitPictureInPicture().catch(() => this.FS.player?.requestPictureInPicture());
+    },
+    documentPicInPic() {
+      try {
+        if (this.pipWin) return this.pipWin.close();
+        this.setPageVisibilityForced();
+        const isFs2 = this.FS.fsWrapper;
+        this.enableVideoWebFullscreen();
+        this.openDocumentPictureInPicture().then((pipWin) => {
+          (pipWin.GM_E9X_FS = this.FS).init();
+          this.cloneEventsToPipWindow(pipWin);
+        });
+      } catch (err) {
+        console.error("文档画中画启动失败：", err);
+      }
+    },
+    async openDocumentPictureInPicture() {
+      const pipWin = await documentPictureInPicture.requestWindow({ width: 580, height: 326 });
+      document.querySelectorAll("style, link, script").forEach((el) => pipWin.document.head.append(el.cloneNode(true)));
+      pipWin.document.body.appendChild(pipWin.document.adoptNode(this.FS.fsWrapper));
+      pipWin.addEventListener("unload", () => {
+        document.body.appendChild(this.FS.fsWrapper);
+        if (!isFs) this.FS.exitWebFullscreen();
+        this.setPageVisibilityForced(true);
+        delete this.pipWin;
+      });
+      return this.pipWin = pipWin;
+    },
+    enableVideoWebFullscreen() {
+      this.FS.fsWrapper ??= this.FS.getVideoContainer();
+      this.FS.detachForFullscreen();
+    },
+    setPageVisibilityForced(restore = false) {
+      if (restore) return delete document.hidden, delete document.visibilityState;
+      GM_FVEnh.defineProperty(document, "hidden", { get: () => false });
+      GM_FVEnh.defineProperty(document, "visibilityState", { get: () => "visible" });
+    },
+    cloneEventsToPipWindow(pipWin) {
+      for (const [target, list] of window.evts) {
+        const pip = target === unsafeWindow ? pipWin : pipWin.document;
+        list.forEach((args) => pip.addEventListener(...args));
+      }
+    }
+  };
   const Control = {
     FS: null,
     init() {
       Utils.waitFor(() => unsafeWindow.GM_E9X_FS).then(() => {
         this.host = location.host;
         this.FS = unsafeWindow.GM_E9X_FS;
+        this.hookAddEventListener();
         this.setupFunctionHooks();
         this.watchPlayerChange();
       }).catch(() => console.error("未安装关联的脚本"));
@@ -225,9 +274,17 @@
     getDragBounds() {
       const { top, left, bottom, width } = FyTools.getRect(this.wrapper);
       return { x: [-left, width / 2], y: [-top, top + bottom] };
+    },
+    hookAddEventListener() {
+      window.evts = /* @__PURE__ */ new Map();
+      const addEvent = EventTarget.prototype.addEventListener;
+      EventTarget.prototype.addEventListener = function(...args) {
+        if ([document, unsafeWindow].includes(this)) window.evts.get(this)?.push(args) || window.evts.set(this, [args]);
+        return addEvent.call(this, ...args);
+      };
     }
   };
-  const App = { ...Control, ...Layout };
+  const App = { ...Control, ...Layout, ...Extend };
   App.init();
 
 })(tippy, Draggable);
