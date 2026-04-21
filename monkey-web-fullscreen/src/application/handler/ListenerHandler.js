@@ -183,7 +183,7 @@ export default {
 
     this._cursorTid = setTimeout(() => {
       const eles = [Tools.isAboveElement(this.player, target) && target, this.player, ...Tools.querys(".__v_edge")];
-      eles.forEach((el) => (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
+      eles.forEach((el) => el && (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
     }, Consts.TWO_SEC);
   },
   // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
