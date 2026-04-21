@@ -208,6 +208,7 @@
     enableVideoWebFullscreen() {
       this.FS.fsWrapper ??= this.FS.getVideoContainer();
       this.FS.detachForFullscreen();
+      this.FS.adaptToWebFullscreen();
     },
     setPageVisibilityForced(restore = false) {
       if (restore) return delete document.hidden, delete document.visibilityState;
