@@ -20,6 +20,14 @@ export default {
       this.openDocumentPictureInPicture().then((pipWin) => {
         (pipWin.GM_E9X_FS = this.FS).init();
         this.cloneEventsToPipWindow(pipWin);
+
+        // ==================== 监听画中画关闭事件 ====================
+        pipWin.addEventListener("unload", () => {
+          document.body.appendChild(this.FS.fsWrapper);
+          if (!isFs) this.FS.exitWebFullscreen();
+          this.setPageVisibilityForced(true);
+          delete this.pipWin;
+        });
       });
     } catch (err) {
       console.error("文档画中画启动失败：", err);
@@ -29,14 +37,6 @@ export default {
     const pipWin = await documentPictureInPicture.requestWindow({ width: 580, height: 326 });
     document.querySelectorAll("style, link, script").forEach((el) => pipWin.document.head.append(el.cloneNode(true)));
     pipWin.document.body.appendChild(pipWin.document.adoptNode(this.FS.fsWrapper));
-
-    // ==================== 监听画中画关闭事件 ====================
-    pipWin.addEventListener("unload", () => {
-      document.body.appendChild(this.FS.fsWrapper);
-      if (!isFs) this.FS.exitWebFullscreen();
-      this.setPageVisibilityForced(true);
-      delete this.pipWin;
-    });
 
     return (this.pipWin = pipWin);
   },
