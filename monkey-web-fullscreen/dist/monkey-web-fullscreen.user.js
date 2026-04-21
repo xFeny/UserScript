@@ -124,8 +124,8 @@
     isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
     newEle: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
     hasCls: (el, ...cls) => cls.flat().some((c) => el?.classList.contains(c)),
-    delCls: (el, ...cls) => el?.classList?.remove(...cls),
-    addCls: (el, ...cls) => el?.classList?.add(...cls),
+    delCls: (el, ...cls) => el?.classList.remove(...cls),
+    addCls: (el, ...cls) => el?.classList.add(...cls),
     notyf(msg, isError = false) {
       const notyf$1 = new notyf.Notyf({ duration: Consts.THREE_SEC, position: { x: "center", y: "top" } });
       isError ? notyf$1.error(msg) : notyf$1.success(msg);
@@ -547,7 +547,7 @@
       Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
       this._cursorTid = setTimeout(() => {
         const eles = [Tools.isAboveElement(this.player, target) && target, this.player, ...Tools.querys(".__v_edge")];
-        eles.forEach((el) => (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
+        eles.forEach((el) => el && (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
       }, Consts.TWO_SEC);
     },
     getVideoForCoord(x, y) {
