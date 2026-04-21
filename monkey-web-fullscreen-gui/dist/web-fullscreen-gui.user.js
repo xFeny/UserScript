@@ -176,11 +176,17 @@
       try {
         if (this.pipWin) return this.pipWin.close();
         this.setPageVisibilityForced();
-        const isFs2 = this.FS.fsWrapper;
+        const isFs = this.FS.fsWrapper;
         this.enableVideoWebFullscreen();
         this.openDocumentPictureInPicture().then((pipWin) => {
           (pipWin.GM_E9X_FS = this.FS).init();
           this.cloneEventsToPipWindow(pipWin);
+          pipWin.addEventListener("unload", () => {
+            document.body.appendChild(this.FS.fsWrapper);
+            if (!isFs) this.FS.exitWebFullscreen();
+            this.setPageVisibilityForced(true);
+            delete this.pipWin;
+          });
         });
       } catch (err) {
         console.error("文档画中画启动失败：", err);
@@ -190,12 +196,6 @@
       const pipWin = await documentPictureInPicture.requestWindow({ width: 580, height: 326 });
       document.querySelectorAll("style, link, script").forEach((el) => pipWin.document.head.append(el.cloneNode(true)));
       pipWin.document.body.appendChild(pipWin.document.adoptNode(this.FS.fsWrapper));
-      pipWin.addEventListener("unload", () => {
-        document.body.appendChild(this.FS.fsWrapper);
-        if (!isFs) this.FS.exitWebFullscreen();
-        this.setPageVisibilityForced(true);
-        delete this.pipWin;
-      });
       return this.pipWin = pipWin;
     },
     enableVideoWebFullscreen() {
