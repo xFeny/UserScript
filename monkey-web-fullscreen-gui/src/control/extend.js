@@ -4,41 +4,46 @@
 export default {
   // ==================== 画中画相关 ====================
   picInPic() {
-    FyTools.isTopWin() && "documentPictureInPicture" in window ? this.documentPicInPic() : this.pictureInPicture();
-  },
-  pictureInPicture() {
+    // 文档画中画
+    if (FyTools.isTopWin() && "documentPictureInPicture" in window) {
+      return this.pipWin ? this.pipWin.close() : this.enterDocumentPictureInPicture();
+    }
+
+    // 视频画中画
     document.exitPictureInPicture().catch(() => this.FS.player?.requestPictureInPicture());
   },
-  documentPicInPic() {
+  enterDocumentPictureInPicture() {
     try {
-      if (this.pipWin) return this.pipWin.close();
-
-      this.setPageVisibilityForced();
       const isFs = this.FS.fsWrapper;
+      this.setPageVisibilityForced();
       this.enableVideoWebFullscreen();
 
-      this.openDocumentPictureInPicture().then((pipWin) => {
-        (pipWin.GM_E9X_FS = this.FS).init();
-        this.cloneEventsToPipWindow(pipWin);
-
-        // ==================== 监听画中画关闭事件 ====================
-        pipWin.addEventListener("unload", () => {
+      this.openDocumentPictureInPicture(this.FS.fsWrapper, {
+        didOpen: (pipWin) => {
+          (pipWin.GM_E9X_FS = this.FS).init();
+          this.handlePipEvents(pipWin);
+          this.pipWin = pipWin;
+        },
+        unload: (e) => {
+          this.handlePipEvents(e.target.defaultView, false);
           document.body.appendChild(this.FS.fsWrapper);
           if (!isFs) this.FS.exitWebFullscreen();
           this.setPageVisibilityForced(true);
           delete this.pipWin;
-        });
+        },
       });
     } catch (err) {
       console.error("文档画中画启动失败：", err);
     }
   },
-  async openDocumentPictureInPicture() {
+  async openDocumentPictureInPicture(target, { didOpen, unload }) {
     const pipWin = await documentPictureInPicture.requestWindow({ width: 580, height: 326 });
     document.querySelectorAll("style, link, script").forEach((el) => pipWin.document.head.append(el.cloneNode(true)));
-    pipWin.document.body.appendChild(pipWin.document.adoptNode(this.FS.fsWrapper));
+    pipWin.document.body.appendChild(pipWin.document.adoptNode(target));
+    if (didOpen && didOpen instanceof Function) didOpen(pipWin);
+    if (unload) pipWin.addEventListener("unload", unload);
 
-    return (this.pipWin = pipWin);
+    return pipWin;
   },
   enableVideoWebFullscreen() {
     this.FS.fsWrapper ??= this.FS.getVideoContainer();
@@ -55,13 +60,13 @@ export default {
     GM_FVEnh.defineProperty(document, "hidden", { get: () => false });
     GM_FVEnh.defineProperty(document, "visibilityState", { get: () => "visible" });
   },
-  /**
-   * 把所有记录的事件，批量绑到 PiP 窗口
-   */
-  cloneEventsToPipWindow(pipWin) {
+  // 绑定/移除 PiP 事件（二合一）
+  handlePipEvents(pipWin, add = true) {
+    if (!window.evts) return;
+    const method = add ? "addEventListener" : "removeEventListener";
     for (const [target, list] of window.evts) {
-      const pip = target === unsafeWindow ? pipWin : pipWin.document;
-      list.forEach((args) => pip.addEventListener(...args));
+      const el = target === unsafeWindow ? pipWin : pipWin.document;
+      list.forEach((args) => el[method](...args));
     }
   },
 };
