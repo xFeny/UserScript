@@ -18,15 +18,15 @@
   
 - [x] 支持(网页)全屏切换时执行额外的代码逻辑
 
-  ```js
-  if (type === "isFull") {
-    console.log("进入全屏模式！");
-  } else if (type === "isWFull") {
-    console.log("进入网页全屏模式！");
-  } else {
-    console.log("退出(网页)全屏模式！");
-  }
-  ```
+    ```js
+    if (type === "isFull") {
+      console.log("进入全屏模式！");
+    } else if (type === "isWFull") {
+      console.log("进入网页全屏模式！");
+    } else {
+      console.log("退出(网页)全屏模式！");
+    }
+    ```
 
 ## Features
 
@@ -45,16 +45,14 @@
   
 - [x] Supports additional processing when full-screen changes
 
-  - example `https://www.youtube.com`：
-
-  ```js
-  if (type === "isFull") {
-  console.log("Enter full-screen mode!");
-  } else if (type === "isWFull") {
-  console.log("Enter full-screen web mode!");
-  } else {
-  console.log("Exit (Web) full-screen Mode!");
-  }
-  ```
-
+    ```js
+    if (type === "isFull") {
+      console.log("Enter full-screen mode!");
+    } else if (type === "isWFull") {
+      console.log("Enter full-screen web mode!");
+    } else {
+      console.log("Exit (Web) full-screen Mode!");
+    }
+    ```
+  
   
