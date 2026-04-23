@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.10.7
+// @version      3.10.8
 // @author       Feny
 // @description  支持所有H5视频的增强脚本，通用网页全屏｜倍速调节；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @license      GPL-3.0-only
@@ -329,33 +329,29 @@
     }
     get(key) {
       const data = this.#get(this.#getKey(key));
-      return !data?.value ? data : data.expires > Date.now() ? data.value : this.defVal;
+      if (!data?.value) return this.parser(data);
+      return this.parser(data.expires > Date.now() ? data.value : this.defVal);
     }
     #get(key) {
-      const value = this.storage.getItem(key);
+      const raw = this.storage.getItem(key);
+      if (raw === null) return this.defVal;
       try {
-        return JSON.parse(value) ?? this.defVal;
+        return JSON.parse(raw) ?? raw;
       } catch {
-        return this.parser(value ?? this.defVal);
+        return raw;
       }
     }
     toggle = (key) => this.set(!this.get(key), key);
     del = (key) => this.storage.removeItem(this.#getKey(key));
-    fuzzyDel = (pattern) => this.fuzzyHandle(pattern, (key) => this.storage.removeItem(key));
-    fuzzyGet(pattern) {
-      const result = {};
-      this.fuzzyHandle(pattern, (key) => result[key] = this.storage.getItem(key));
-      return result;
-    }
     fuzzyHandle(pattern, callback) {
       const keys = Object.is(this.storage, localStorage) ? Object.keys(localStorage) : GM_listValues();
-      const keyMatcher = pattern instanceof RegExp ? (key) => pattern.test(key) : (key) => key.includes(pattern);
-      keys.filter(keyMatcher).forEach(callback);
+      const matcher = pattern instanceof RegExp ? (key) => pattern.test(key) : (key) => key.includes(pattern);
+      keys.filter(matcher).forEach(callback);
     }
     static cleanExpired() {
-      this.#instances.forEach((instance) => {
-        instance.fuzzyHandle(instance.name, (key) => {
-          if (instance.#get(key)?.expires < Date.now()) instance.del(key);
+      this.#instances.forEach((ins) => {
+        ins.fuzzyHandle(ins.name, (key) => {
+          if (ins.#get(key)?.expires < Date.now()) ins.storage.removeItem(key);
         });
       });
     }
@@ -437,7 +433,7 @@
       VideoEnhancer.hookActiveVideo();
     },
     setupVisibleListener() {
-      window.addEventListener("visibilitychange", () => {
+      unsafeWindow.addEventListener("visibilitychange", () => {
         const video = this.player;
         if (!video || video.ended || Store.INVIS_PAUSE.get()) return;
         document.hidden ? video.pause() : video.play();
@@ -1043,7 +1039,7 @@
     getVideoHostContainer() {
       return this.player ? this.getVideoContainer() : this.getVideoIFrame();
     },
-    getVideoIFrame() {
+    getVideoIFrame(tol = 5) {
       if (!this.vMeta?.iFrame) return null;
       if (this.fsWrapper) return this.fsWrapper;
       const { vw, vh, iFrame } = this.vMeta;
@@ -1051,7 +1047,6 @@
       const partial = ((s) => s.slice(0, Math.floor(s.length * 0.8)))(decodeURIComponent(search));
       const vFrame = Tools.query(`iframe[src*="${pathname + partial}"]`);
       if (vFrame) return vFrame;
-      const tol = 5;
       const iFrames = Tools.getIFrames();
       const matchSize = ({ offsetWidth: w, offsetHeight: h }) => Math.abs(w - vw) < tol && Math.abs(h - vh) < tol;
       return iFrames.find(matchSize) ?? iFrames.find(Tools.isVisible);
@@ -1350,7 +1345,7 @@
     setupLoadEventListener() {
       const handle = ({ type }) => this.executeCodeSnippet(Store.LOAD_CODE.get(this.host), type, this.player);
       document.addEventListener("DOMContentLoaded", handle);
-      window.addEventListener("load", handle);
+      unsafeWindow.addEventListener("load", handle);
     },
     shouldHideTime: () => !App.isFullscreen && !Store.CLOCK_WEB.get(),
     setupClockForPlayer() {

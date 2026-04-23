@@ -2,16 +2,19 @@
 // @name            视频网页全屏
 // @name:en         Video Fullscreen
 // @namespace       npm/vite-plugin-monkey
-// @version         3.10.2
+// @version         3.10.3
 // @author          Feny
 // @description     让所有视频网页全屏，快捷键：P - 网页全屏，Enter - 全屏; 支持侧边点击切换网页全屏; 支持自动网页全屏
 // @description:en  Maximize all video players; Shortcut keys: P - Web Fullscreen, Enter - Fullscreen; Support side click to web fullscreen; Support auto web fullscreen
 // @license         GPL-3.0-only
 // @icon            data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAABNNJREFUeF7tm09oHFUcx79vNtkElgQDwYMgaUJulVhIwXoIFAvtQRAPXnopQXZfchD00ksPKoh4KUQJksx7C4UUihREcvFQhB70UMmuYhXBGMRDmrAJ+Wf+2MSwP/kNb5fNZrPzkt3ZzCT7IIfszve93+/z+/NmZmcEzvkQ59x/HAIgpXwI4AoRrRHR9XQ6nWNIUsonAF6zAHZfKXWLj0smk72O4/xloQER3dZa3zW6m47jPLDRAbihlHrEx46MjHxORO9b6DYB/EJE6gAAKSWViR8ppW7wZ8PDwy/E4/E/ALzot4AQ4q7rureNUdeI6Ds/DX9PRLe01vcN8DsAPrXQ5WKx2PWJiYmnRjcN4C0LnXdIEYCU8ihhMaKpVOqSEOJnm8lLIyqlTALQNrrSiEopWcPaqoOInra3tw+Nj4//YyD8CuAVP105gGcAXqokKo2olPJtAN/YTF4WUY4mR9Vv5IQQQ67r/mmc4ey55icCUMzW0dHRC/l8/jcACT9daQaUp/8BbVlEPwAw5je5+X5IKfWDKYcHRHTTT8cRFUJcVkr9Z0rvJwC9fjoApf3nquM4j/001gBMjb6jtf7aOGPbcHL5fP5yOp2eNxG1babFiB6n9EqzNZVKDQsh7lWDcCwAPJFxJmucsWo4HFGt9ausMen5o00zLY3ocUoPwHtKqS+NjR8D+OgoCMcGACD3/Pnzi1NTUysmPb+3bDjFiCaTSav0NEZ/opT60DhjXXpCiDdd1/3WZOs9Ihqu2N8KH1bYAo/MnNKImvTkGvdtOACUUmqEJ7ZJz4IBQoh3Xdf1UllKyb2HQfgOIcRF13V/N+s9FkJcLRedJAO8OYhoWmvNOwIbdZyd4Y7W+jOb9Cwz9g2llNfUpJS8C3lr+4xcIpHoHRsb+9eUHusvlGpODMBA+EJr7UVDSmmdnrwTaK2/8kvPcuccx+mdnJz825QeO3PJj4AQ4onruq/zcZVKr3kt4EfwrH9fzICZmZlDDeKsO8/+FQFkMpmqZ4JnFUYTQCGyzQxolkCzBzSb4Fnt9NX8au4CjdoFOjo6EI/HEYvFsLW1hZ2dnVAkXOAZ0NLSgv7+fiQSB6+Wt7e3kcvlsLa2dqogAgfQ19eHrq6uI51kAAyCgZzGCBzAwMAAWltbfX1jCEtLS9jb2/M9tp4HBA5gcHDQ2l52niEwjEaNUAEoON3I/hBKAAUQjegPoQZQABFkf4gEAAYRVH+IDICg+kPkABRALC4uYmFhoebNIrIA2PN6QIg0gM3NTczOztaUBZEGwJ5ns97vtCcekQawsbGBubm5EzvPwkgDOLc9YH9/H/Pz81hZWakp+pHMgOXlZe9iaXd3t2bnIwVgfX3du1Lkzl/PEfoewLfOOOKrq6v19Ls4V2gBcJ2z4/xHFNwd+1ACqHedV0udUAEIqs5PFYDNPcGg6/xUAVS7K9yoOj9VALx4T08Puru7i3bk83nvJKae+/lJt4jAe0DBsM7OTrS1tXn/8r0+jn4YRsMAhMHZSjY0ARSoNB+RaT4i03xEJrgT7rB2wEbcEQqx755pxV0gm80+I6KKL02F3Yla7Ct9VnhaCGH9vl0ti4ZJe+Bx+fO4FR56XyCTyTwkoitCiJfDFKk621L51dk6LxKJ6c79GyP/A7T+4JsF5qmXAAAAAElFTkSuQmCC
 // @match           *://*/*
+// @require         https://unpkg.com/sweetalert2@11.26.24/dist/sweetalert2.min.js
+// @resource        Swal  https://unpkg.com/sweetalert2@11.26.24/dist/sweetalert2.min.css
 // @grant           GM_addElement
 // @grant           GM_addStyle
 // @grant           GM_addValueChangeListener
+// @grant           GM_getResourceText
 // @grant           GM_getValue
 // @grant           GM_registerMenuCommand
 // @grant           GM_setValue
@@ -20,11 +23,16 @@
 // @run-at          document-start
 // ==/UserScript==
 
-(o=>{const r=Symbol("added"),t=document.createElement("style");t.textContent=o,window.gmStyle=t,document.addEventListener("addStyle",({detail:{sroot:n}})=>{n[r]||n instanceof Document||(n.prepend(t.cloneNode(!0)),n[r]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(o)})(' @charset "UTF-8";[web-fullscr],body[web-fullscr] [web-fullscr]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[web-fullscr] video,body[web-fullscr] [web-fullscr] video{top:0!important;left:0!important;width:100vw!important;border:none!important;transform:none!important;object-fit:contain!important;height:clamp(100vh - 100%,100vh,100%)!important}[web-fullscr]~*{display:none!important}.__v_edge{left:0!important;top:50%!important;opacity:0!important;width:20px!important;height:50%!important;position:absolute!important;z-index:2147483647!important;transform:translateY(-50%)!important;cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC),pointer!important}.__v_edge.right{right:0!important;left:auto!important} ');
+(n=>{const r=Symbol("added"),t=document.createElement("style");t.textContent=n,window.gmStyle=t,document.addEventListener("addStyle",({detail:{sroot:o}})=>{o[r]||o instanceof Document||(o.prepend(t.cloneNode(!0)),o[r]=!0)}),(GM_addStyle??(()=>document.head.append(t.cloneNode(!0))))(n)})(' @charset "UTF-8";[web-fullscr],body[web-fullscr] [web-fullscr]{top:0!important;left:0!important;margin:0!important;padding:0!important;zoom:normal!important;border:none!important;width:100vw!important;height:100vh!important;position:fixed!important;transform:none!important;max-width:none!important;max-height:none!important;border-radius:0!important;transition:none!important;z-index:2147483646!important;background-color:#000!important;flex-direction:column!important;overflow:hidden!important;display:flex!important}[web-fullscr] video,body[web-fullscr] [web-fullscr] video{top:0!important;left:0!important;width:100vw!important;border:none!important;transform:none!important;object-fit:contain!important;height:clamp(100vh - 100%,100vh,100%)!important}[web-fullscr]~*:not(.vpx-popup){display:none!important}.__v_edge{left:0!important;top:50%!important;opacity:0!important;width:20px!important;height:50%!important;position:absolute!important;z-index:2147483647!important;transform:translateY(-50%)!important;cursor:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAAXNSR0IArs4c6QAAAaBJREFUSEutlL8vBEEcxT9fpxSdVtQkGqqrHP8CoqDXSZTC7VpcRa3SCBJEclcgEQmNShDFKVRXKSj8atmv7Gbvsrd2Zydhus2+75v33rwZwXKpx0UAlTIlmxGxAQUY9dCI2GrGCvRn4tCu8CJLTCadmBTrCgcoPfGY2hRHgAmEwyR5FnHWzK8osoDq0hdm7NJoujEJSc24NdDJgCzwkHbAWqGfL+pp7kIBWa1QjyEpc2NqjQlj3QrbWjZxucQty3CHsMU3u+LylreRRDdqJAa8xmdaXB7D/rp00cFngmgPZUccTrM2SCNu4FNKnP42ykwKSdCQbaAqZe7i/3OjCFWvUsTnKsf+GUKVb2ri8mRFHJIvc48wmJct8AHMZdetQn+8w+oxC2xaEAeQdfMFgeFml7VCD188G4hfgRpKVRxq1lc6euECxYHy+LpEOKHAcdyh9SMU5TyGcN5GqyyKw1rSSTux4dlsPTzLXCEUo+93fEbF5dZIbHMw6jEPbIRY5UgcxtPmrOvWUuzQS4E60IUyJQ77/0IcZe0C3eKE6lPXDznkqgSwYj+tAAAAAElFTkSuQmCC),pointer!important}.__v_edge.right{right:0!important;left:auto!important}.vpx-popup{z-index:2147483647!important}.vpx-popup *{color:#555!important;box-sizing:border-box!important;font-family:Verdana,Geneva,Tahoma,sans-serif}.vpx-popup .swal2-popup{font-size:14px!important}.vpx-popup button:where(.swal2-styled){line-height:normal;color:#fff!important}.vpx-popup button:where(.swal2-styled):focus{box-shadow:none!important}.vpx-popup .swal2-cancel{background-color:#757575!important}.vpx-popup textarea:focus{outline:none!important;box-shadow:none!important;border-color:#3b82f6!important}.vpx-popup textarea{resize:none!important;font-size:12px!important;padding:2px 5px!important;line-height:normal!important;border:1px solid #cbd5e1!important}.vpx-popup p{margin:2px 0!important;font-size:12px!important}.vpx-textarea{margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid #f5f5f5}.vpx-textarea:last-of-type{margin-bottom:0!important;padding-bottom:0!important;border-bottom:none!important}.vpx-textarea p{text-align:left!important}.vpx-textarea textarea{border-radius:3px;width:100%!important;height:130px!important}.vpx-textarea textarea::-webkit-scrollbar{width:4px}.vpx-textarea textarea::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px} ');
 
-(function () {
+(function (Swal) {
   'use strict';
 
+  const cssLoader = (e) => {
+    const t = GM_getResourceText(e);
+    return GM_addStyle(t), t;
+  };
+  cssLoader("Swal");
   const isElement = (node) => node instanceof Element;
   const getSRoot = (node) => node?._shadowRoot ?? node?.shadowRoot ?? null;
   function* getShadowRoots(root) {
@@ -83,7 +91,7 @@
     attr: (el, name, val) => el && name && el[val ? "setAttribute" : "removeAttribute"](name, val),
     emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
     isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
-    createElement: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
+    newEle: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
     delCls: (el, ...cls) => el?.classList.remove(...cls),
     addCls: (el, ...cls) => el?.classList.add(...cls),
     freqTimes: /* @__PURE__ */ new Map(),
@@ -220,7 +228,7 @@
       Tools.querys(".__v_edge", container).forEach((el) => el.remove());
       if (video.lArea) return container.prepend(video.lArea, video.rArea);
       const createEdge = (cls = "") => {
-        const element = Tools.createElement("div", { video, className: `__v_edge ${cls}` });
+        const element = Tools.newEle("div", { video, className: `__v_edge ${cls}` });
         element.onclick = (e) => {
           Tools.preventDefault(e);
           this.setPlayer(e.target.video);
@@ -241,6 +249,30 @@
       return Tools.getParents(el, 2).every((e) => e && getComputedStyle(e).position === "static");
     }
   };
+  class BasicStorage {
+    constructor(name, defVal, parser = (v) => v) {
+      Object.assign(this, { name, defVal, parser });
+      this.storage = { getItem: GM_getValue, setItem: GM_setValue };
+    }
+    #getFinalKey(suffix) {
+      if (!suffix) throw new Error(`${this.name} 后缀不能为空！`);
+      return this.name + suffix;
+    }
+    set(value, key) {
+      this.storage.setItem(this.#getFinalKey(key), value);
+    }
+    get(key) {
+      const value = this.storage.getItem(this.#getFinalKey(key));
+      return this.parser(value ?? this.defVal);
+    }
+  }
+  const Store = {
+    IS_AUTO: new BasicStorage("IS_AUTO_", false, Boolean),
+    DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, Number),
+    V_WRAPPER: new BasicStorage("V_WRAPPER_", ""),
+    IGNORE_URLS: new BasicStorage("IGNORE_URLS_", ""),
+    FS_CODE: new BasicStorage("FS_CHANGE_CODE_", "")
+  };
   const Keydown = {
     dispatchShortcut: (key, isTrusted = false) => Tools.postMessage(window.top, { key: key.toUpperCase(), isTrusted }),
     setupKeydownListener() {
@@ -257,9 +289,10 @@
     },
     handleMessage(data) {
       if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
+      if (data?.topWin) window.topWin = this.topWin = data.topWin;
       if (data?.vMeta) return this.syncMetaToParentWin(data.vMeta);
       if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
-      if (data?.topWin) window.topWin = this.topWin = data.topWin;
+      if (data?.sw_fsCode) this.codeSnippetCache = null;
       this.processEvent(data);
     },
     processEvent(data) {
@@ -337,30 +370,6 @@
       const vFrame = this.getVideoIFrame();
       Tools.postMessage(vFrame?.contentWindow, data);
     }
-  };
-  class BasicStorage {
-    constructor(name, defVal, parser = (v) => v) {
-      Object.assign(this, { name, defVal, parser });
-      this.storage = { getItem: GM_getValue, setItem: GM_setValue };
-    }
-    #getFinalKey(suffix) {
-      if (!suffix) throw new Error(`${this.name} 后缀不能为空！`);
-      return this.name + suffix;
-    }
-    set(value, key) {
-      this.storage.setItem(this.#getFinalKey(key), value);
-    }
-    get(key) {
-      const value = this.storage.getItem(this.#getFinalKey(key));
-      return this.parser(value ?? this.defVal);
-    }
-  }
-  const Store = {
-    IS_AUTO: new BasicStorage("IS_AUTO_", false, Boolean),
-    DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, Number),
-    V_WRAPPER: new BasicStorage("V_WRAPPER_", ""),
-    IGNORE_URLS: new BasicStorage("IGNORE_URLS_", ""),
-    FS_CODE: new BasicStorage("FS_CHANGE_CODE_", "")
   };
   const WebFull = {
     toggleFullscreen() {
@@ -545,20 +554,24 @@
   class I18n {
     static #langPacks = {
       zh: {
-        enable: "启用自动网页全屏",
+        custom: "自定义此站视频容器",
         disable: "禁用自动网页全屏",
+        enable: "启用自动网页全屏",
         ignore: "自动时忽略的网址",
-        custom: "自定义视频容器",
-        fsChange: "扩展代码逻辑",
-        detach: "脱离阈值"
+        detach: "脱离原 DOM 阈值",
+        fsCode: "扩展代码逻辑",
+        setting: "更多设置",
+        close: "关闭"
       },
       en: {
+        custom: "Custom video container",
         enable: "Enable auto web fullscreen",
         disable: "Disable auto web fullscreen",
-        detach: "Detached fullscreen threshold",
-        fsChange: "Fullscreen change extend handler",
-        custom: "Custom video fullscreen container",
-        ignore: "URLs ignored in auto mode"
+        detach: "Detach original DOM threshold",
+        ignore: "URLs ignored in auto web fullscreen",
+        fsCode: "Fullscreen change extend handler",
+        setting: "More settings",
+        close: "close"
       }
     };
     static #getLang = () => (navigator.language || navigator.userLanguage).includes("zh") ? "zh" : "en";
@@ -574,29 +587,66 @@
     },
     setupMenuCmds() {
       const isAuto = I18n.t(this.isAuto() ? "disable" : "enable");
-      const fsChange = ({ title, cache, value }) => {
-        const input = prompt(title, value);
-        if (input === null) return;
-        cache.set(input, this.host);
-        this.codeSnippetCache = null;
-      };
       const configs = [
         { title: isAuto, cache: Store.IS_AUTO, fn: ({ cache, value }) => cache.set(!value, this.host) },
-        { title: I18n.t("ignore"), cache: Store.IGNORE_URLS },
         { title: I18n.t("custom"), cache: Store.V_WRAPPER },
-        { title: I18n.t("fsChange"), cache: Store.FS_CODE, fn: fsChange },
-        { title: I18n.t("detach"), cache: Store.DETACH_THRESHOLD }
+        { title: I18n.t("detach"), cache: Store.DETACH_THRESHOLD },
+        { title: I18n.t("setting"), cache: { name: "SETTING" }, fn: this.settingPopup }
       ];
       configs.forEach(({ title, cache, fn }) => {
         const id = `${cache.name}_MENU_ID`;
         GM_unregisterMenuCommand(this[id]);
         this[id] = GM_registerMenuCommand(title, () => {
-          const value = cache.get(this.host);
+          const value = cache.get?.(this.host);
           if (fn) return fn.call(this, { title, cache, value });
           const input = prompt(title, value);
           if (input !== null) cache.set(input, this.host);
         });
       });
+    },
+    settingPopup() {
+      const { html, eCache } = this.renderExtend();
+      Swal.fire({
+        html,
+        width: 400,
+        showCancelButton: true,
+        showConfirmButton: false,
+        cancelButtonText: I18n.t("close"),
+        customClass: { container: "vpx-popup" },
+        didOpen(popup) {
+          popup.oninput = ({ target: t }) => {
+            const value = t.value;
+            const { host, send } = t.dataset;
+            if (send) Tools.postMessage(window, { [`sw_${t.name}`]: value });
+            eCache[t.name].set(t.value, host);
+          };
+        }
+      });
+    },
+    renderExtend() {
+      const confs = [
+        { name: "fsCode", text: I18n.t("fsCode"), cache: Store.FS_CODE, useHost: true, attrs: ["send"] },
+        { name: "ignore", text: I18n.t("ignore"), cache: Store.IGNORE_URLS, useHost: true }
+      ];
+      return this.renderConfs(confs);
+    },
+    renderConfs(confs) {
+      const render = ({ text, name, value, dataset }) => `
+        <div class="vpx-textarea"><p>${text}</p>
+          <textarea name="${name}" ${dataset} spellcheck="false" autocomplete="off">${value}</textarea>
+        </div>`;
+      return this.generate(confs, render);
+    },
+    generate(confs, render) {
+      const finalConfs = confs.map((conf) => {
+        const { cache, attrs = [], useHost } = conf;
+        const props = attrs.map((key) => `data-${key}="true"`);
+        if (useHost) props.push(`data-host="${this.host}"`);
+        return { ...conf, dataset: props.join(""), value: cache.get(this.host) };
+      });
+      const html = finalConfs.map((conf) => render(conf)).join("");
+      const eCache = Object.fromEntries(finalConfs.map((e) => [e.name, e.cache]));
+      return { html, eCache };
     }
   };
   window.App = {};
@@ -609,4 +659,4 @@
   });
   App.init();
 
-})();
+})(Swal);
