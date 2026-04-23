@@ -62,7 +62,7 @@ export default class BasicStorage {
    */
   #get(key) {
     const raw = this.storage.getItem(key);
-    if (raw === null) return this.defVal;
+    if ([null, undefined].includes(raw)) return this.defVal;
 
     try {
       return JSON.parse(raw) ?? raw;
