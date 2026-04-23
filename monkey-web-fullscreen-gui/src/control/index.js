@@ -56,11 +56,15 @@ export default {
     tippy(this.panelTrigger, {
       arrow: false,
       duration: 500,
-      allowHTML: true,
       interactive: true,
       placement: "left",
       appendTo: "parent",
       theme: "vc-panel-wrapper",
+      onBeforeUpdate: (instance) => {
+        const content = FyTools.query(".tippy-content", instance.popper);
+        if (!content || FyTools.isExecuted("tippy-content", content)) return;
+        GM_FVEnh.defineProperty(content, "innerHTML", { set: (html, setter) => setter(FyTools.safeHTML(html)) });
+      },
       onTrigger: (instance) => {
         instance.setContent(this.createControlPanel());
         if (this.panel) this.renderRateToPanel();

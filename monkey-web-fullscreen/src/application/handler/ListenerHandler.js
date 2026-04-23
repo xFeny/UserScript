@@ -35,7 +35,7 @@ export default {
     VideoEnhancer.hookActiveVideo();
   },
   setupVisibleListener() {
-    window.addEventListener("visibilitychange", () => {
+    unsafeWindow.addEventListener("visibilitychange", () => {
       const video = this.player;
       if (!video || video.ended || Store.INVIS_PAUSE.get()) return;
       document.hidden ? video.pause() : video.play();

@@ -45,26 +45,29 @@ export default class BasicStorage {
   }
 
   /**
-   * 获取数据（自动校验过期时间）
+   * 获取并解析数据（自动校验过期时间）
    * @param {string} [key] 键名后缀（可选，不传则使用基础名）
    * @returns {any} 解析后的有效数据 | 默认值
    */
   get(key) {
     const data = this.#get(this.#getKey(key));
-    return !data?.value ? data : data.expires > Date.now() ? data.value : this.defVal;
+    if (!data?.value) return this.parser(data); // 不带过期时间的数据
+    return this.parser(data.expires > Date.now() ? data.value : this.defVal);
   }
 
   /**
-   * 读取并解析存储数据
+   * 读取原始存储数据
    * @param {string} key 最终存储键名
    * @returns {any} 解析后的数据 | 默认值
    */
   #get(key) {
-    const value = this.storage.getItem(key);
+    const raw = this.storage.getItem(key);
+    if (raw === null) return this.defVal;
+
     try {
-      return JSON.parse(value) ?? this.defVal;
+      return JSON.parse(raw) ?? raw;
     } catch {
-      return this.parser(value ?? this.defVal);
+      return raw;
     }
   }
 
@@ -80,27 +83,25 @@ export default class BasicStorage {
    * @param {string} [key] 键名后缀（可选，不传则删除基础名对应数据）
    */
   del = (key) => this.storage.removeItem(this.#getKey(key));
-  fuzzyDel = (pattern) => this.fuzzyHandle(pattern, (key) => this.storage.removeItem(key));
 
-  fuzzyGet(pattern) {
-    const result = {};
-    this.fuzzyHandle(pattern, (key) => (result[key] = this.storage.getItem(key)));
-    return result;
-  }
-
+  /**
+   * 模糊匹配存储中的 key 并执行回调
+   * @param {string|RegExp} pattern - 匹配规则：字符串（包含匹配）或正则表达式
+   * @param {Function} callback - 匹配到 key 后执行的回调
+   */
   fuzzyHandle(pattern, callback) {
     const keys = Object.is(this.storage, localStorage) ? Object.keys(localStorage) : GM_listValues();
-    const keyMatcher = pattern instanceof RegExp ? (key) => pattern.test(key) : (key) => key.includes(pattern);
-    keys.filter(keyMatcher).forEach(callback);
+    const matcher = pattern instanceof RegExp ? (key) => pattern.test(key) : (key) => key.includes(pattern);
+    keys.filter(matcher).forEach(callback);
   }
 
   /**
    * 清理所有实例的过期数据
    */
   static cleanExpired() {
-    this.#instances.forEach((instance) => {
-      instance.fuzzyHandle(instance.name, (key) => {
-        if (instance.#get(key)?.expires < Date.now()) instance.del(key);
+    this.#instances.forEach((ins) => {
+      ins.fuzzyHandle(ins.name, (key) => {
+        if (ins.#get(key)?.expires < Date.now()) ins.storage.removeItem(key);
       });
     });
   }

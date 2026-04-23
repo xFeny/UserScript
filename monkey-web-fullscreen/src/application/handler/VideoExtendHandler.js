@@ -10,7 +10,7 @@ export default {
   setupLoadEventListener() {
     const handle = ({ type }) => this.executeCodeSnippet(Store.LOAD_CODE.get(this.host), type, this.player);
     document.addEventListener("DOMContentLoaded", handle);
-    window.addEventListener("load", handle);
+    unsafeWindow.addEventListener("load", handle);
   },
   shouldHideTime: () => !App.isFullscreen && !Store.CLOCK_WEB.get(),
   setupClockForPlayer() {

@@ -92,7 +92,12 @@ export default {
   getVideoHostContainer() {
     return this.player ? this.getVideoContainer() : this.getVideoIFrame();
   },
-  getVideoIFrame() {
+  /**
+   * 获取视频对应的 iframe 元素（优先匹配URL、其次匹配尺寸、最后匹配可见性）
+   * @param {number} tol - 尺寸匹配允许的误差值，默认 5px
+   * @returns {HTMLElement|null} 匹配到的 iframe 元素，未找到返回 null
+   */
+  getVideoIFrame(tol = 5) {
     if (!this.vMeta?.iFrame) return null;
     if (this.fsWrapper) return this.fsWrapper;
 
@@ -102,7 +107,6 @@ export default {
     const vFrame = Tools.query(`iframe[src*="${pathname + partial}"]`);
     if (vFrame) return vFrame;
 
-    const tol = 5; // 允许的偏差
     const iFrames = Tools.getIFrames();
     const matchSize = ({ offsetWidth: w, offsetHeight: h }) => Math.abs(w - vw) < tol && Math.abs(h - vh) < tol;
     return iFrames.find(matchSize) ?? iFrames.find(Tools.isVisible);
