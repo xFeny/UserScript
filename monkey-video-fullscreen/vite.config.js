@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import monkey from "vite-plugin-monkey";
+import monkey, { util, cdn } from "vite-plugin-monkey";
 import cleanup from "rollup-plugin-cleanup";
 
 const chinese = ["让所有视频网页全屏，快捷键：P - 网页全屏，Enter - 全屏", "支持侧边点击切换网页全屏", "支持自动网页全屏"];
@@ -22,7 +22,7 @@ export default defineConfig({
       entry: "src/main.js",
       userscript: {
         author: "Feny",
-        version: "3.10.2",
+        version: "3.10.3",
         match: ["*://*/*"],
         license: "GPL-3.0-only",
         "run-at": "document-start",
@@ -32,6 +32,12 @@ export default defineConfig({
         namespace: "npm/vite-plugin-monkey",
       },
       build: {
+        externalGlobals: {
+          sweetalert2: cdn.unpkg("Swal", "dist/sweetalert2.min.js"),
+        },
+        externalResource: {
+          "sweetalert2/dist/sweetalert2.min.css": cdn.unpkg("Swal"),
+        },
         cssSideEffects: () => {
           return (cssText) => {
             const added = Symbol("added");

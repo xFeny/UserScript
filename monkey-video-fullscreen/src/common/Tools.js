@@ -17,7 +17,7 @@ export default {
   attr: (el, name, val) => el && name && el[val ? "setAttribute" : "removeAttribute"](name, val),
   emitEvent: (type, detail = {}) => document.dispatchEvent(new CustomEvent(type, { detail })),
   isInputable: (el) => ["INPUT", "TEXTAREA"].includes(el?.tagName) || el?.isContentEditable,
-  createElement: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
+  newEle: (name, attrs = {}) => Object.assign(document.createElement(name), attrs),
   delCls: (el, ...cls) => el?.classList.remove(...cls),
   addCls: (el, ...cls) => el?.classList.add(...cls),
   freqTimes: new Map(),

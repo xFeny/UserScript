@@ -11,6 +11,7 @@
   "devDependencies": {
     "rollup-plugin-cleanup": "^3.2.1",
     "sass": "^1.96.0",
+    "sweetalert2": "^11.26.24",
     "vite": "^6.0.5",
     "vite-plugin-monkey": "^5.0.3"
   }

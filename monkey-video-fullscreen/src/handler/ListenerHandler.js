@@ -83,7 +83,7 @@ export default {
 
     // 复用元素创建逻辑
     const createEdge = (cls = "") => {
-      const element = Tools.createElement("div", { video, className: `__v_edge ${cls}` });
+      const element = Tools.newEle("div", { video, className: `__v_edge ${cls}` });
 
       element.onclick = (e) => {
         Tools.preventDefault(e);

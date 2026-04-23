@@ -28,15 +28,6 @@
   }
   ```
 
-  - 示例 `https://www.bilibili.com`：
-
-   ```js
-   if (type === "default") return;
-   setTimeout(() => {
-     document.querySelector('.bpx-player-mini-close')?.click();
-   }, 1000);
-   ```
-
 ## Features
 
 - [x] Support auto web full-screen
