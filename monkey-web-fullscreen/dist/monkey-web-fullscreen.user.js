@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.10.8
+// @version      3.10.9
 // @author       Feny
 // @description  支持所有H5视频的增强脚本，通用网页全屏｜倍速调节；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @license      GPL-3.0-only
@@ -334,7 +334,7 @@
     }
     #get(key) {
       const raw = this.storage.getItem(key);
-      if (raw === null) return this.defVal;
+      if ([null, void 0].includes(raw)) return this.defVal;
       try {
         return JSON.parse(raw) ?? raw;
       } catch {
