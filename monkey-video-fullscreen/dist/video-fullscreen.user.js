@@ -249,30 +249,6 @@
       return Tools.getParents(el, 2).every((e) => e && getComputedStyle(e).position === "static");
     }
   };
-  class BasicStorage {
-    constructor(name, defVal, parser = (v) => v) {
-      Object.assign(this, { name, defVal, parser });
-      this.storage = { getItem: GM_getValue, setItem: GM_setValue };
-    }
-    #getFinalKey(suffix) {
-      if (!suffix) throw new Error(`${this.name} 后缀不能为空！`);
-      return this.name + suffix;
-    }
-    set(value, key) {
-      this.storage.setItem(this.#getFinalKey(key), value);
-    }
-    get(key) {
-      const value = this.storage.getItem(this.#getFinalKey(key));
-      return this.parser(value ?? this.defVal);
-    }
-  }
-  const Store = {
-    IS_AUTO: new BasicStorage("IS_AUTO_", false, Boolean),
-    DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, Number),
-    V_WRAPPER: new BasicStorage("V_WRAPPER_", ""),
-    IGNORE_URLS: new BasicStorage("IGNORE_URLS_", ""),
-    FS_CODE: new BasicStorage("FS_CHANGE_CODE_", "")
-  };
   const Keydown = {
     dispatchShortcut: (key, isTrusted = false) => Tools.postMessage(window.top, { key: key.toUpperCase(), isTrusted }),
     setupKeydownListener() {
@@ -370,6 +346,30 @@
       const vFrame = this.getVideoIFrame();
       Tools.postMessage(vFrame?.contentWindow, data);
     }
+  };
+  class BasicStorage {
+    constructor(name, defVal, parser = (v) => v) {
+      Object.assign(this, { name, defVal, parser });
+      this.storage = { getItem: GM_getValue, setItem: GM_setValue };
+    }
+    #getFinalKey(suffix) {
+      if (!suffix) throw new Error(`${this.name} 后缀不能为空！`);
+      return this.name + suffix;
+    }
+    set(value, key) {
+      this.storage.setItem(this.#getFinalKey(key), value);
+    }
+    get(key) {
+      const value = this.storage.getItem(this.#getFinalKey(key));
+      return this.parser(value ?? this.defVal);
+    }
+  }
+  const Store = {
+    IS_AUTO: new BasicStorage("IS_AUTO_", false, Boolean),
+    DETACH_THRESHOLD: new BasicStorage("DETACH_THRESHOLD_", 20, Number),
+    V_WRAPPER: new BasicStorage("V_WRAPPER_", ""),
+    IGNORE_URLS: new BasicStorage("IGNORE_URLS_", ""),
+    FS_CODE: new BasicStorage("FS_CHANGE_CODE_", "")
   };
   const WebFull = {
     toggleFullscreen() {
