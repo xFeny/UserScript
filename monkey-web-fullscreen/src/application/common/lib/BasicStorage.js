@@ -9,15 +9,14 @@ export default class BasicStorage {
    * 构造函数
    * @param {string} name 存储键名前缀
    * @param {any} defVal 默认值
-   * @param {boolean} [useLocalStore=false] 是否使用localStorage（默认GM API）
+   * @param {boolean} [useLocal=false] 是否使用localStorage（默认GM API）
    * @param {Function} [parser=(v) => v] 数据解析函数
    * @param {boolean} [splice=false] 是否拼接键名（前缀+后缀）
    */
-  constructor(name, defVal, useLocalStore = false, parser = (v) => v, splice = false) {
-    Object.assign(this, { name, defVal, useLocalStore, parser, splice });
-    this.storage = useLocalStore ? localStorage : { getItem: GM_getValue, setItem: GM_setValue, removeItem: GM_deleteValue };
-
+  constructor(name, defVal, useLocal = false, parser = (v) => v, splice = false) {
     BasicStorage.#instances.push(this);
+    Object.assign(this, { name, defVal, useLocal, parser, splice });
+    this.storage = useLocal ? localStorage : { getItem: GM_getValue, setItem: GM_setValue, removeItem: GM_deleteValue };
     if (BasicStorage.#instances.length === 1) requestIdleCallback(() => BasicStorage.cleanExpired());
   }
 
@@ -90,7 +89,7 @@ export default class BasicStorage {
    * @param {Function} callback - 匹配到 key 后执行的回调
    */
   fuzzyHandle(pattern, callback) {
-    const keys = Object.is(this.storage, localStorage) ? Object.keys(localStorage) : GM_listValues();
+    const keys = this.useLocal ? Object.keys(localStorage) : GM_listValues();
     const matcher = pattern instanceof RegExp ? (key) => pattern.test(key) : (key) => key.includes(pattern);
     keys.filter(matcher).forEach(callback);
   }

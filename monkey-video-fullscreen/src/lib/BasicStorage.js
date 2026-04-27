@@ -19,17 +19,17 @@ export default class BasicStorage {
    * @param {string} [suffix] 后缀
    * @returns {string} 最终拼接后的键名
    */
-  #getFinalKey(suffix) {
+  #getKey(suffix) {
     if (!suffix) throw new Error(`${this.name} 后缀不能为空！`);
     return this.name + suffix;
   }
 
   set(value, key) {
-    this.storage.setItem(this.#getFinalKey(key), value);
+    this.storage.setItem(this.#getKey(key), value);
   }
 
   get(key) {
-    const value = this.storage.getItem(this.#getFinalKey(key));
+    const value = this.storage.getItem(this.#getKey(key));
     return this.parser(value ?? this.defVal);
   }
 }

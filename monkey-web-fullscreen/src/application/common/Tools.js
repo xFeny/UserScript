@@ -9,6 +9,7 @@ export default unsafeWindow.FyTools = {
   getRect: (el) => el?.getBoundingClientRect(),
   microTask: (fn) => Promise.resolve().then(fn),
   alert: (...data) => window.alert(data.join(" ")),
+  hasMoveBefore: () => "moveBefore" in Element.prototype,
   query: (selector, ctx) => querySelector(selector, ctx),
   querys: (selector, ctx) => querySelectorAll(selector, ctx),
   clamp: (value, min, max) => Math.min(Math.max(value, min), max),

@@ -6,6 +6,7 @@ export default {
   scrollTop: (top) => window.scrollTo({ top }),
   getRect: (el) => el?.getBoundingClientRect(),
   microTask: (fn) => Promise.resolve().then(fn),
+  hasMoveBefore: () => "moveBefore" in Element.prototype,
   query: (selector, ctx) => querySelector(selector, ctx),
   querys: (selector, ctx) => querySelectorAll(selector, ctx),
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),

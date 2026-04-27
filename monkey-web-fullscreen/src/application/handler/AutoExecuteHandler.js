@@ -31,6 +31,8 @@ export default {
   },
   autoExitFullscreen() {
     if (!Site.isBili() && !Site.isAcFun()) return;
+    if (Tools.query(".video-pod .switch-btn.on") && Tools.query('.pod-item:last-of-type:not([data-scrolled="true"])')) return;
+
     document.exitFullscreen().catch(async () => (await this.isWebFull(5)) && this.iconToFull(Site.icons.webFull));
     requestAnimationFrame(() => Tools.query(".bpx-player-ending-related-item-cancel")?.click()); // B站取消连播
   },

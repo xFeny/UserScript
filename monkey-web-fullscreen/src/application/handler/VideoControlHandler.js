@@ -8,7 +8,7 @@ import VideoEnhancer from "../VideoEnhancer";
  * 如：倍速、快进、缩放、移动等
  */
 export default {
-  playToggle: (v) => v?.[v?.paused ? "play" : "pause"](),
+  playToggle: (v) => v?.[v.paused ? "play" : "pause"](),
   remainTime: (v) => Math.floor(App.getRealDuration(v)) - Math.floor(v.currentTime),
   isLive() {
     if (!this.player) return false;

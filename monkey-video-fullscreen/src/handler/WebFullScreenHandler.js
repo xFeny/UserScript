@@ -25,21 +25,21 @@ export default {
 
     container.scrollY = window.scrollY;
     const parents = Tools.getParents(container);
-    const unDetach = container instanceof HTMLIFrameElement || parents.length < Store.DETACH_THRESHOLD.get(this.host);
-    unDetach ? parents.forEach((el) => this.setWebFullAttr(el)) : this.detachForFullscreen();
+    const threshold = Store.DETACH_THRESHOLD.get(this.host);
+
+    // 超过阈值 + (不是`iframe` 或 有`moveBefore`方法) → 执行分离
+    const detach = parents.length > threshold && (container.matches(":not(iframe)") || Tools.hasMoveBefore());
+    detach ? this.detachForFullscreen() : parents.forEach((el) => this.setWebFullAttr(el));
 
     // 视频容器宽高适应网页全屏变化
     this.adaptToWebFullscreen();
   },
   detachForFullscreen() {
     if (this.fsParent) return;
+    this.fsNext = this.fsWrapper.nextSibling;
     this.fsParent = Tools.getParent(this.fsWrapper);
-    this.fsPlaceholder = this.fsWrapper.cloneNode();
 
-    // 替换并移动视频容器
-    this.fsParent.replaceChild(this.fsPlaceholder, this.fsWrapper);
-    document.body.insertAdjacentElement("beforeend", this.fsWrapper);
-
+    document.body[Tools.hasMoveBefore() ? "moveBefore" : "insertBefore"](this.fsWrapper, null);
     this.fsWrapper.querySelector("video")?.play();
     this.setWebFullAttr(this.fsWrapper);
   },
@@ -50,20 +50,19 @@ export default {
     // 临时禁用平滑滚动：为了确保接下来的滚动操作是瞬间完成的（无动画）
     Tools.setStyle(this.docEle, "scroll-behavior", "auto", "important");
 
-    // 是脱离原结构式网页全屏时，将视频容器还原到它原来的DOM位置
-    if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
     Tools.querys(`[${Consts.webFull}]`).forEach((el) => Tools.attr(el, Consts.webFull));
+    this.fsParent?.[Tools.hasMoveBefore() ? "moveBefore" : "insertBefore"](this.fsWrapper, this.fsNext); // 还原
 
     // 滚动到全屏前位置、恢复默认滚动效果
     requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(this.docEle, "scroll-behavior")));
 
-    this.fsPlaceholder = this.fsWrapper = this.fsParent = null;
+    this.fsNext = this.fsWrapper = this.fsParent = null;
     this.videoParents.clear();
   },
   getVideoHostContainer() {
     return this.player ? this.getVideoContainer() : this.getVideoIFrame();
   },
-  getVideoIFrame() {
+  getVideoIFrame(tol = 5) {
     if (!this.vMeta?.iFrame) return null;
     if (this.fsWrapper) return this.fsWrapper;
 
@@ -73,7 +72,6 @@ export default {
     const vFrame = Tools.query(`iframe[src*="${pathname + partial}"]`);
     if (vFrame) return vFrame;
 
-    const tol = 5; // 偏差值
     const iFrames = Tools.getIFrames();
     const matchSize = ({ offsetWidth: w, offsetHeight: h }) => Math.abs(w - vw) < tol && Math.abs(h - vh) < tol;
     return iFrames.find(matchSize) ?? iFrames.find(Tools.isVisible);
