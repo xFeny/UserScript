@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.10.9
+// @version      3.11.0
 // @author       Feny
 // @description  支持所有H5视频的增强脚本，通用网页全屏｜倍速调节；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @license      GPL-3.0-only
@@ -107,6 +107,7 @@
     getRect: (el) => el?.getBoundingClientRect(),
     microTask: (fn) => Promise.resolve().then(fn),
     alert: (...data) => window.alert(data.join(" ")),
+    hasMoveBefore: () => "moveBefore" in Element.prototype,
     query: (selector, ctx) => querySelector(selector, ctx),
     querys: (selector, ctx) => querySelectorAll(selector, ctx),
     clamp: (value, min, max) => Math.min(Math.max(value, min), max),
@@ -312,10 +313,10 @@
   }
   class BasicStorage {
     static #instances = [];
-    constructor(name, defVal, useLocalStore = false, parser = (v) => v, splice = false) {
-      Object.assign(this, { name, defVal, useLocalStore, parser, splice });
-      this.storage = useLocalStore ? localStorage : { getItem: GM_getValue, setItem: GM_setValue, removeItem: GM_deleteValue };
+    constructor(name, defVal, useLocal = false, parser = (v) => v, splice = false) {
       BasicStorage.#instances.push(this);
+      Object.assign(this, { name, defVal, useLocal, parser, splice });
+      this.storage = useLocal ? localStorage : { getItem: GM_getValue, setItem: GM_setValue, removeItem: GM_deleteValue };
       if (BasicStorage.#instances.length === 1) requestIdleCallback(() => BasicStorage.cleanExpired());
     }
     #getKey(suffix) {
@@ -344,7 +345,7 @@
     toggle = (key) => this.set(!this.get(key), key);
     del = (key) => this.storage.removeItem(this.#getKey(key));
     fuzzyHandle(pattern, callback) {
-      const keys = Object.is(this.storage, localStorage) ? Object.keys(localStorage) : GM_listValues();
+      const keys = this.useLocal ? Object.keys(localStorage) : GM_listValues();
       const matcher = pattern instanceof RegExp ? (key) => pattern.test(key) : (key) => key.includes(pattern);
       keys.filter(matcher).forEach(callback);
     }
@@ -815,7 +816,7 @@
     }
   };
   const Control = {
-    playToggle: (v) => v?.[v?.paused ? "play" : "pause"](),
+    playToggle: (v) => v?.[v.paused ? "play" : "pause"](),
     remainTime: (v) => Math.floor(App.getRealDuration(v)) - Math.floor(v.currentTime),
     isLive() {
       if (!this.player) return false;
@@ -1013,16 +1014,16 @@
       if (!container || container.matches(":is(html, body)")) return this.adaptToWebFullscreen();
       container.scrollY = window.scrollY;
       const parents = Tools.getParents(container);
-      const unDetach = container instanceof HTMLIFrameElement || parents.length < Store.DETACH_THRESHOLD.get(this.host);
-      unDetach ? parents.forEach((el) => this.setWebFullAttr(el)) : this.detachForFullscreen();
+      const threshold = Store.DETACH_THRESHOLD.get(this.host);
+      const detach = parents.length > threshold && (container.matches(":not(iframe)") || Tools.hasMoveBefore());
+      detach ? this.detachForFullscreen() : parents.forEach((el) => this.setWebFullAttr(el));
       this.adaptToWebFullscreen();
     },
     detachForFullscreen() {
       if (this.fsParent) return;
+      this.fsNext = this.fsWrapper.nextSibling;
       this.fsParent = Tools.getParent(this.fsWrapper);
-      this.fsPlaceholder = this.fsWrapper.cloneNode();
-      this.fsParent.replaceChild(this.fsPlaceholder, this.fsWrapper);
-      document.body.insertAdjacentElement("beforeend", this.fsWrapper);
+      document.body[Tools.hasMoveBefore() ? "moveBefore" : "insertBefore"](this.fsWrapper, null);
       this.fsWrapper.querySelector("video")?.play();
       this.setWebFullAttr(this.fsWrapper);
     },
@@ -1030,10 +1031,10 @@
       if (!this.fsWrapper) return;
       const { scrollY } = this.fsWrapper;
       Tools.setStyle(this.docEle, "scroll-behavior", "auto", "important");
-      if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
       Tools.querys(`[${Consts.webFull}]`).forEach((el) => Tools.attr(el, Consts.webFull));
+      this.fsParent?.[Tools.hasMoveBefore() ? "moveBefore" : "insertBefore"](this.fsWrapper, this.fsNext);
       requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(this.docEle, "scroll-behavior")));
-      this.fsPlaceholder = this.fsWrapper = this.fsParent = null;
+      this.fsNext = this.fsWrapper = this.fsParent = null;
       this.videoParents.clear();
     },
     getVideoHostContainer() {
@@ -1124,6 +1125,7 @@
     },
     autoExitFullscreen() {
       if (!Site.isBili() && !Site.isAcFun()) return;
+      if (Tools.query(".video-pod .switch-btn.on") && Tools.query('.pod-item:last-of-type:not([data-scrolled="true"])')) return;
       document.exitFullscreen().catch(async () => await this.isWebFull(5) && this.iconToFull(Site.icons.webFull));
       requestAnimationFrame(() => Tools.query(".bpx-player-ending-related-item-cancel")?.click());
     }

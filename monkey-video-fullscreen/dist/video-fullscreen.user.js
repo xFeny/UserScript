@@ -2,7 +2,7 @@
 // @name            视频网页全屏
 // @name:en         Video Fullscreen
 // @namespace       npm/vite-plugin-monkey
-// @version         3.10.3
+// @version         3.10.4
 // @author          Feny
 // @description     让所有视频网页全屏，快捷键：P - 网页全屏，Enter - 全屏; 支持侧边点击切换网页全屏; 支持自动网页全屏
 // @description:en  Maximize all video players; Shortcut keys: P - Web Fullscreen, Enter - Fullscreen; Support side click to web fullscreen; Support auto web fullscreen
@@ -80,6 +80,7 @@
     scrollTop: (top) => window.scrollTo({ top }),
     getRect: (el) => el?.getBoundingClientRect(),
     microTask: (fn) => Promise.resolve().then(fn),
+    hasMoveBefore: () => "moveBefore" in Element.prototype,
     query: (selector, ctx) => querySelector(selector, ctx),
     querys: (selector, ctx) => querySelectorAll(selector, ctx),
     sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
@@ -352,15 +353,15 @@
       Object.assign(this, { name, defVal, parser });
       this.storage = { getItem: GM_getValue, setItem: GM_setValue };
     }
-    #getFinalKey(suffix) {
+    #getKey(suffix) {
       if (!suffix) throw new Error(`${this.name} 后缀不能为空！`);
       return this.name + suffix;
     }
     set(value, key) {
-      this.storage.setItem(this.#getFinalKey(key), value);
+      this.storage.setItem(this.#getKey(key), value);
     }
     get(key) {
-      const value = this.storage.getItem(this.#getFinalKey(key));
+      const value = this.storage.getItem(this.#getKey(key));
       return this.parser(value ?? this.defVal);
     }
   }
@@ -389,16 +390,16 @@
       if (!container || container.matches(":is(html, body)")) return this.adaptToWebFullscreen();
       container.scrollY = window.scrollY;
       const parents = Tools.getParents(container);
-      const unDetach = container instanceof HTMLIFrameElement || parents.length < Store.DETACH_THRESHOLD.get(this.host);
-      unDetach ? parents.forEach((el) => this.setWebFullAttr(el)) : this.detachForFullscreen();
+      const threshold = Store.DETACH_THRESHOLD.get(this.host);
+      const detach = parents.length > threshold && (container.matches(":not(iframe)") || Tools.hasMoveBefore());
+      detach ? this.detachForFullscreen() : parents.forEach((el) => this.setWebFullAttr(el));
       this.adaptToWebFullscreen();
     },
     detachForFullscreen() {
       if (this.fsParent) return;
+      this.fsNext = this.fsWrapper.nextSibling;
       this.fsParent = Tools.getParent(this.fsWrapper);
-      this.fsPlaceholder = this.fsWrapper.cloneNode();
-      this.fsParent.replaceChild(this.fsPlaceholder, this.fsWrapper);
-      document.body.insertAdjacentElement("beforeend", this.fsWrapper);
+      document.body[Tools.hasMoveBefore() ? "moveBefore" : "insertBefore"](this.fsWrapper, null);
       this.fsWrapper.querySelector("video")?.play();
       this.setWebFullAttr(this.fsWrapper);
     },
@@ -406,16 +407,16 @@
       if (!this.fsWrapper) return;
       const { scrollY } = this.fsWrapper;
       Tools.setStyle(this.docEle, "scroll-behavior", "auto", "important");
-      if (this.fsParent?.contains(this.fsPlaceholder)) this.fsParent?.replaceChild(this.fsWrapper, this.fsPlaceholder);
       Tools.querys(`[${Consts.webFull}]`).forEach((el) => Tools.attr(el, Consts.webFull));
+      this.fsParent?.[Tools.hasMoveBefore() ? "moveBefore" : "insertBefore"](this.fsWrapper, this.fsNext);
       requestAnimationFrame(() => (Tools.scrollTop(scrollY), Tools.setStyle(this.docEle, "scroll-behavior")));
-      this.fsPlaceholder = this.fsWrapper = this.fsParent = null;
+      this.fsNext = this.fsWrapper = this.fsParent = null;
       this.videoParents.clear();
     },
     getVideoHostContainer() {
       return this.player ? this.getVideoContainer() : this.getVideoIFrame();
     },
-    getVideoIFrame() {
+    getVideoIFrame(tol = 5) {
       if (!this.vMeta?.iFrame) return null;
       if (this.fsWrapper) return this.fsWrapper;
       const { vw, vh, iFrame } = this.vMeta;
@@ -423,7 +424,6 @@
       const partial = ((s) => s.slice(0, Math.floor(s.length * 0.8)))(decodeURIComponent(search));
       const vFrame = Tools.query(`iframe[src*="${pathname + partial}"]`);
       if (vFrame) return vFrame;
-      const tol = 5;
       const iFrames = Tools.getIFrames();
       const matchSize = ({ offsetWidth: w, offsetHeight: h }) => Math.abs(w - vw) < tol && Math.abs(h - vh) < tol;
       return iFrames.find(matchSize) ?? iFrames.find(Tools.isVisible);
