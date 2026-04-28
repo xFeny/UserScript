@@ -86,9 +86,8 @@ export default class NanoFloatWindow {
    */
   setSize(w = this.width, h = this.height) {
     if (!this.content) return;
-    this.header.style.width = `${w}px`;
-    this.content.style.width = `${w}px`;
-    this.content.style.height = `${h}px`;
+    this.header.style.width = this.content.style.width = `${w > 0 ? w : this.width}px`;
+    this.content.style.height = `${h > 0 ? h : this.height}px`;
   }
 
   /**
@@ -104,20 +103,25 @@ export default class NanoFloatWindow {
       this[show ? "content" : "originParent"]?.moveBefore(this.target, show ? null : this.originNext);
     } catch (err) {
       console.warn("页内小窗切换异常：", err);
-      this.#resetState();
+      this.#resetContent();
     }
   }
 
-  updateTarget(target) {
+  /**
+   * 更新目标元素
+   * @param {HTMLElement} target
+   * @returns
+   */
+  setTarget(target) {
     if (!(target instanceof HTMLElement)) return;
     if (this.target === target) return;
 
-    this.#resetState();
+    this.#resetContent();
     this.target = target;
     this.#cacheOrigin();
   }
 
-  #resetState() {
+  #resetContent() {
     try {
       this.content?.replaceChildren();
       this.wrap?.classList.remove("active");

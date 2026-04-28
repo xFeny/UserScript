@@ -27,7 +27,7 @@ export default {
 
     // 更新小窗内容
     this.nano ??= new FloatWindow({ target });
-    if (this.observer) this.nano.updateTarget(target);
+    if (this.observer) this.nano.setTarget(target);
 
     // 设置观察元素
     const obsNode = this.getInter(target, FyTools.getParent(target));
