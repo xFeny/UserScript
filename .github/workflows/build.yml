@@ -42,6 +42,11 @@ jobs:
           cd monkey-video-fullscreen
           pnpm install
           pnpm build
+      - name: Build monkey-nano-player
+        run: |
+          cd monkey-nano-player
+          pnpm install
+          pnpm build
       - name: Build monkey-scrollbar
         run: |
           cd monkey-scrollbar

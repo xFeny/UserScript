@@ -1,0 +1,18 @@
+{
+  "name": "nano-player",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "draggable": "^4.2.0",
+    "rollup-plugin-cleanup": "^3.2.1",
+    "sass": "^1.83.4",
+    "vite": "^6.0.5",
+    "vite-plugin-monkey": "^5.0.3"
+  }
+}

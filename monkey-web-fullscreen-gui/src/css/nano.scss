@@ -1,0 +1,56 @@
+/** ========== 悬浮小窗 ========== **/
+.vc-nano-wrap {
+  bottom: 80px;
+  display: none;
+  position: fixed;
+  min-width: 500px;
+  min-height: 300px;
+  left: calc(100vw - 580px);
+  z-index: 2147483646 !important;
+
+  &.active {
+    display: block;
+  }
+
+  &:hover {
+    .vc-nano-header {
+      background-color: #373535;
+    }
+  }
+}
+
+.vc-nano-header {
+  cursor: move;
+  height: 30px;
+  position: relative;
+  background-color: transparent;
+}
+
+.vc-nano-close {
+  top: 0;
+  right: 0;
+  color: #fff;
+  height: 30px;
+  padding: 0 10px;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 30px;
+  position: absolute;
+  z-index: 999999999999999999;
+}
+
+.vc-nano-content {
+  position: absolute !important;
+  background: #000 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.vc-nano-player {
+  width: inherit !important;
+  height: inherit !important;
+
+  video {
+    max-width: 100% !important;
+    max-height: 100% !important;
+  }
+}
