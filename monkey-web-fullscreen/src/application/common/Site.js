@@ -48,7 +48,7 @@ export default class Site {
         this.selectors = { ...this.selectors, ...remoteConf };
         Store.ICONS_SELECTOR.set(this.selectors, Consts.EMPTY, 1 / 3); // 缓存8小时
       })
-      .catch((e) => console.error("加载远程配置失败", e));
+      .catch((e) => console.warn("加载远程配置失败", e));
   }
 
   /**
