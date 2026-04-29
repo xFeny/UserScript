@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         页内视频小窗
 // @namespace    http://tampermonkey.net/
-// @version      0.9.1
+// @version      0.9.2
 // @author       Feny
-// @description  为「视频自动网页全屏｜倍速播放」脚本的功能扩展，提供通用页内悬浮视频小窗支持。
+// @description  「视频自动网页全屏｜倍速播放」脚本的功能扩展，提供全站通用页内悬浮视频小窗支持，可自由拖拽摆放位置。
 // @license      GPL-3.0-only
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAhBJREFUWEfdl79PFEEUx7/v+BtMCMZIRXE35HYuFiY0xz9Ad3aKBewQE6koTcTa2LMLJIodJJqQkBgbaSB0c4Y5OwtLKPwDIOwzc2RlOe529ti948e2+953PvN9M2/fEm74oRteH7cLQEi1RsBTBioFObMHpjemubLbS++/A0LOPwdKG2B+B5R6JvQDxsQBARN2Qy0d/OqWmwBQ2wA/Njqs9rNIWqyUrx+c4uQY4CWjww8ugB82wOhguigAqyOkYuuqaYbLdw9AeP4yiMpGB8+S9EL668T4dtgMt1xu5XJg0vMbTLQJYCsJ4RK9DJuzBN0ghgpgd9MJMXSATggAjbSTXWgJhLdQvxCM6gyME9HsUACEVPYANrqe9JS7PUAHLqTT+nsSoOKpVyDsZmnFA+mErj6R/BZcG6DsLbwsIRp3LQbi33wS7bRa63/j2NwA7SvZ73N6NmrM2pFNywUgauo9GEvgaMo0V/ddHBWpygR8B/DF6GAxP4BUfZdNdOTkc+B+AdTUVzA/Mjp84qpl/L7Tzix5vUtw/u1/m2UmjJtQoQDt8SmGcGzFaDtrtset4g5hvGa1Oj9xRiNjaQwJBzYJNHWoVx5msf8c2v8J0B+jg5lL1zCrQDJusub7zBQw4SNF9MmtEdXbZUb0wujVz7kB4jnBimb5mSGgxcCB0cHclVbsph9MxO36NxzMHtNV/wFo/XswLTIqPQAAAABJRU5ErkJggg==
 // @match        *://*/*
@@ -53,18 +53,17 @@
       this.setupMenuCmds();
     },
     setupMenuCmds() {
-      const isHide = !FyTools.hasMoveBefore();
-      const enableNano = `此站${Store.ENABLE_NANO.get(this.host) ? "禁" : "启"}用悬浮小窗`;
+      const enTle = `此站${Store.ENABLE_NANO.get(this.host) ? "禁" : "启"}用悬浮小窗`;
       const configs = [
-        { title: "设置小窗的宽高", cache: Store.NANO_SIZE, isHide, fn: this.inputNanoSize },
-        { title: "小窗视口监测元素", cache: Store.INTERSECT_ELEMENT, useHost: true, isHide, fn: this.setIntersect },
-        { title: enableNano, cache: Store.ENABLE_NANO, useHost: true, isHide, fn: this.setNanoEnabled },
-        { title: "此站网址黑名单", cache: Store.IGNORE_URLS, useHost: true, isHide }
+        { title: "设置小窗的宽高", cache: Store.NANO_SIZE, fn: this.inputNanoSize },
+        { title: "小窗视口监测元素", cache: Store.INTERSECT_ELEMENT, useHost: true, fn: this.setIntersect },
+        { title: enTle, cache: Store.ENABLE_NANO, useHost: true, fn: this.setNanoEnabled },
+        { title: "此站网址黑名单", cache: Store.IGNORE_URLS, useHost: true }
       ];
-      configs.forEach(({ title, isHide: isHide2, useHost, cache, fn }) => {
+      configs.forEach(({ title, isHide, useHost, cache, fn }) => {
         const id = `${cache.name}_MENU_ID`;
         GM_unregisterMenuCommand(this[id]);
-        if (isHide2) return;
+        if (isHide) return;
         const host = useHost ? this.host : "";
         this[id] = GM_registerMenuCommand(title, () => {
           if (fn) return fn.call(this, { host, cache, title });
@@ -187,10 +186,11 @@
     FS: null,
     init() {
       Utils.waitFor(() => unsafeWindow.GM_E9X_FS).then(() => {
-        this.host = location.host;
+        if (!FyTools.hasMoveBefore()) return console.warn("浏览器不支持！！");
         this.FS = unsafeWindow.GM_E9X_FS;
         this.setupUrlChangeListener();
         this.setupFunctionHooks();
+        this.host = location.host;
       }).catch(() => console.warn("未安装依赖，脚本无法正常运行！！"));
     },
     setupUrlChangeListener() {
@@ -210,7 +210,6 @@
       this.createNanoObserver();
     },
     createNanoObserver() {
-      if (!FyTools.hasMoveBefore()) return console.warn("浏览器环境不支持，脚本无法显示页内小窗！！");
       this.activateNano(false);
       const target = this.FS.getVideoHostContainer();
       this.nano ??= new NanoFloatWindow({ target });
