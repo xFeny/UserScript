@@ -10,4 +10,6 @@ export default {
   INTERSECT_ELEMENT: new BasicStorage("INTERSECT_ELEMENT_", ""),
   /** 页内小窗大小 */
   NANO_SIZE: new BasicStorage("ENABLE_NANO", "500,300", (v) => v.split(",")),
+  /** 指定前缀忽略显示小窗 */
+  IGNORE_URLS: new BasicStorage("IGNORE_URLS_", "", (v) => v.split(/[,;]/).map((s) => s.trim())),
 };

@@ -104,7 +104,7 @@ export default {
 
       // 插入元素
       header.append(Tools.newEle("div", { tabId, className: `vpx-tab ${cur}`, textContent }));
-      content.append(Tools.newEle("div", { className: `vpx-tab-panel ${tabId} ${cur}`, innerHTML: html }));
+      content.append(Tools.newEle("div", { className: `vpx-tab-panel ${tabId} ${cur}`, innerHTML: Tools.safeHTML(html) }));
 
       // 合并缓存映射到总cacheMap
       Object.assign(cacheMap, eCache);
@@ -192,7 +192,7 @@ export default {
   },
   renderFull() {
     const confs = [
-      { name: "vWrap", text: "此站 (网页)全屏视频容器", cache: Store.V_WRAPPER, disable: this.isGMatch(), useHost: true },
+      { name: "vWrap", text: "此站 (网页)全屏视频容器", cache: Store.V_WRAPPER, useHost: true },
       { name: "fsCode", text: "此站 (网页)全屏切换 事件代码", cache: Store.FS_CODE, useHost: true, attrs: ["send"] },
     ];
 

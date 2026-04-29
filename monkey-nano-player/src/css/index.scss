@@ -51,7 +51,12 @@
   height: inherit !important;
 
   video {
-    max-width: 100% !important;
-    max-height: 100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    position: unset !important;
+
+    &:not(.__tsr) {
+      transform: none !important;
+    }
   }
 }

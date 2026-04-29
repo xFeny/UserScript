@@ -9,15 +9,27 @@ export default {
       .then(() => {
         this.host = location.host;
         this.FS = unsafeWindow.GM_E9X_FS;
+        this.setupUrlChangeListener();
         this.setupFunctionHooks();
       })
       .catch(() => console.warn("未安装依赖，脚本无法正常运行！！"));
   },
-  setupFunctionHooks() {
-    Utils.onBefore(this.FS, "syncMetaToParentWin", () => {
-      this.createNanoObserver();
-      this.initMenuCmds();
+  setupUrlChangeListener() {
+    window.addEventListener("urlchange", () => {
+      if (!this.nano) return;
+      this.activateNano(false);
+      FyTools.scrollTop(0);
     });
+  },
+  setupFunctionHooks() {
+    Utils.onBefore(this.FS, "syncMetaToParentWin", () => this.setupNanoFeatures());
+    Utils.waitFor(() => this.FS.vMeta, { interval: 500, timeout: 5000 })
+      .then(() => this.setupNanoFeatures())
+      .catch(() => {});
+  },
+  setupNanoFeatures() {
+    this.initMenuCmds();
+    this.createNanoObserver();
   },
   createNanoObserver() {
     if (!FyTools.hasMoveBefore()) return console.warn("浏览器环境不支持，脚本无法显示页内小窗！！");
@@ -44,7 +56,8 @@ export default {
     this.observer?.disconnect();
     this.observer = new IntersectionObserver(
       ([entry]) => {
-        if (!Store.ENABLE_NANO.get(this.host)) return;
+        if (this.isBlackUrl() || !Store.ENABLE_NANO.get(this.host)) return;
+
         this.activateNano(!entry.isIntersecting);
         this.setNanoStyleSize();
       },
@@ -70,5 +83,11 @@ export default {
    */
   activateNano(active) {
     this.nano?.activate(active);
+  },
+  isBlackUrl() {
+    const { href, pathname } = location;
+    const uris = Store.IGNORE_URLS.get(this.host);
+    const isBlack = uris.some((prefix) => prefix && href.startsWith(prefix));
+    return isBlack || Object.is(pathname, "/");
   },
 };

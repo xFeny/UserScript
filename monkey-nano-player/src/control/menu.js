@@ -15,6 +15,7 @@ export default {
       { title: "设置小窗的宽高", cache: Store.NANO_SIZE, isHide, fn: this.inputNanoSize },
       { title: "小窗视口监测元素", cache: Store.INTERSECT_ELEMENT, useHost: true, isHide, fn: this.setIntersect },
       { title: enableNano, cache: Store.ENABLE_NANO, useHost: true, isHide, fn: this.setNanoEnabled },
+      { title: "此站网址黑名单", cache: Store.IGNORE_URLS, useHost: true, isHide },
     ];
 
     // 注册菜单项
@@ -26,6 +27,10 @@ export default {
       const host = useHost ? this.host : "";
       this[id] = GM_registerMenuCommand(title, () => {
         if (fn) return fn.call(this, { host, cache, title }); // 自定义逻辑
+
+        // 弹出输入框对话框
+        const input = prompt(title, cache.get(host));
+        if (input !== null) cache.set(input, host);
       });
     });
   },
