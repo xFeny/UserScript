@@ -7,10 +7,11 @@ export default {
   init() {
     Utils.waitFor(() => unsafeWindow.GM_E9X_FS)
       .then(() => {
-        this.host = location.host;
+        if (!FyTools.hasMoveBefore()) return console.warn("浏览器不支持！！");
         this.FS = unsafeWindow.GM_E9X_FS;
         this.setupUrlChangeListener();
         this.setupFunctionHooks();
+        this.host = location.host;
       })
       .catch(() => console.warn("未安装依赖，脚本无法正常运行！！"));
   },
@@ -32,8 +33,6 @@ export default {
     this.createNanoObserver();
   },
   createNanoObserver() {
-    if (!FyTools.hasMoveBefore()) return console.warn("浏览器环境不支持，脚本无法显示页内小窗！！");
-
     this.activateNano(false);
     const target = this.FS.getVideoHostContainer();
 

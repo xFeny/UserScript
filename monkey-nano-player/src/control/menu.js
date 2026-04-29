@@ -7,15 +7,14 @@ export default {
     this.setupMenuCmds();
   },
   setupMenuCmds() {
-    const isHide = !FyTools.hasMoveBefore();
-    const enableNano = `此站${Store.ENABLE_NANO.get(this.host) ? "禁" : "启"}用悬浮小窗`;
+    const enTle = `此站${Store.ENABLE_NANO.get(this.host) ? "禁" : "启"}用悬浮小窗`;
 
     // 菜单配置项
     const configs = [
-      { title: "设置小窗的宽高", cache: Store.NANO_SIZE, isHide, fn: this.inputNanoSize },
-      { title: "小窗视口监测元素", cache: Store.INTERSECT_ELEMENT, useHost: true, isHide, fn: this.setIntersect },
-      { title: enableNano, cache: Store.ENABLE_NANO, useHost: true, isHide, fn: this.setNanoEnabled },
-      { title: "此站网址黑名单", cache: Store.IGNORE_URLS, useHost: true, isHide },
+      { title: "设置小窗的宽高", cache: Store.NANO_SIZE, fn: this.inputNanoSize },
+      { title: "小窗视口监测元素", cache: Store.INTERSECT_ELEMENT, useHost: true, fn: this.setIntersect },
+      { title: enTle, cache: Store.ENABLE_NANO, useHost: true, fn: this.setNanoEnabled },
+      { title: "此站网址黑名单", cache: Store.IGNORE_URLS, useHost: true },
     ];
 
     // 注册菜单项
