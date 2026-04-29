@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.11.0
+// @version      3.11.1
 // @author       Feny
 // @description  支持所有H5视频的增强脚本，通用网页全屏｜倍速调节；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @license      GPL-3.0-only
@@ -1506,7 +1506,7 @@
         const [textContent, method] = conf.split(":");
         const { html, eCache } = this[`render${method}`]();
         header.append(Tools.newEle("div", { tabId, className: `vpx-tab ${cur}`, textContent }));
-        content.append(Tools.newEle("div", { className: `vpx-tab-panel ${tabId} ${cur}`, innerHTML: html }));
+        content.append(Tools.newEle("div", { className: `vpx-tab-panel ${tabId} ${cur}`, innerHTML: Tools.safeHTML(html) }));
         Object.assign(cacheMap, eCache);
       });
       const tabs = Tools.newEle("div", { className: "vpx-tabs" });
@@ -1581,7 +1581,7 @@
     },
     renderFull() {
       const confs = [
-        { name: "vWrap", text: "此站 (网页)全屏视频容器", cache: Store.V_WRAPPER, disable: this.isGMatch(), useHost: true },
+        { name: "vWrap", text: "此站 (网页)全屏视频容器", cache: Store.V_WRAPPER, useHost: true },
         { name: "fsCode", text: "此站 (网页)全屏切换 事件代码", cache: Store.FS_CODE, useHost: true, attrs: ["send"] }
       ];
       return this.renderConfs(confs);
