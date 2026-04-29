@@ -796,7 +796,7 @@
         const handler = this.codeSnippetCache.get(type) || this.codeSnippetCache.set(type, new Function(...args, code)).get(type);
         handler(type, video, Tools, unsafeWindow);
       } catch (e) {
-        const unsafe = e.message.includes("unsafe-eval");
+        const unsafe = e.message.includes("unsafe-eval") || e.message.includes("Trusted");
         unsafe ? this.injectCodeSnippet(jsCode, type, video) : console.error("代码执行出错：", e);
       }
     },
