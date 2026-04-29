@@ -32,6 +32,7 @@
 // @resource     Swal   https://unpkg.com/sweetalert2@11.20.0/dist/sweetalert2.min.css
 // @resource     notyf  https://unpkg.com/notyf@3.10.0/notyf.min.css
 // @connect      gitee.com
+// @connect      raw.giteeusercontent.com
 // @grant        GM.xmlHttpRequest
 // @grant        GM_addElement
 // @grant        GM_addStyle
@@ -622,7 +623,7 @@
         const remoteConf = JSON.parse(res.responseText ?? "{}");
         this.selectors = { ...this.selectors, ...remoteConf };
         Store.ICONS_SELECTOR.set(this.selectors, Consts.EMPTY, 1 / 3);
-      }).catch((e) => console.error("加载远程配置失败", e));
+      }).catch((e) => console.warn("加载远程配置失败", e));
     }
     static #convertGmMatch() {
       const { matches, includes: excluded } = GM_info.script;
