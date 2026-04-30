@@ -14,7 +14,7 @@ export default defineConfig({
       entry: "src/main.js",
       userscript: {
         author: "Feny",
-        version: "0.9.2",
+        version: "0.9.3",
         name: "页内视频小窗",
         namespace: "http://tampermonkey.net/",
         description: "「视频自动网页全屏｜倍速播放」脚本的功能扩展，提供全站通用页内悬浮视频小窗支持，可自由拖拽摆放位置。",

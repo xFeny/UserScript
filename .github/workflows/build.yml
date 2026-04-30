@@ -22,11 +22,11 @@ jobs:
           version: 9.12.1
           run_install: true
       # 进入monkey-jsonviewer目录执行命令
-      - name: Build monkey-jsonviewer
-        run: |
-          cd monkey-jsonviewer
-          pnpm install
-          pnpm build
+      # - name: Build monkey-jsonviewer
+      #   run: |
+      #     cd monkey-jsonviewer
+      #     pnpm install
+      #     pnpm build
       - name: Build monkey-web-fullscreen
         run: |
           cd monkey-web-fullscreen

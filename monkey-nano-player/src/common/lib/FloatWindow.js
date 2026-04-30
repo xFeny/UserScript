@@ -59,10 +59,23 @@ export default class NanoFloatWindow {
    * 构建头部 + 关闭按钮
    */
   #buildHeader() {
-    const close = this.#newEle("span", { textContent: "×", className: "vc-nano-close", onclick: () => this.activate(false) });
-    const header = this.#newEle("div", { className: "vc-nano-header", title: "按住拖动位置" });
-    header.appendChild(close);
+    const close = this.#newEle("span", { title: "关闭", className: "vc-nano-close", onclick: () => this.#close() });
+    const back = this.#newEle("span", { title: "返回", className: "vc-nano-back", onclick: () => this.#goBack() });
+    const header = this.#newEle("div", { className: "vc-nano-header" });
+    header.append(close, back);
     return header;
+  }
+
+  #close() {
+    const y = window.scrollY;
+    this.activate(false);
+    window.scrollTo(0, y);
+  }
+
+  #goBack() {
+    this.activate(false);
+    if (!this.target?.isConnected) return;
+    this.target.scrollIntoView({ block: "center" });
   }
 
   /**

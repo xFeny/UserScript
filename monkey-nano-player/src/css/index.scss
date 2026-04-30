@@ -1,12 +1,12 @@
 /** ========== 悬浮小窗 ========== **/
 .vc-nano-wrap {
+  right: 80px;
   bottom: 80px;
   display: none;
   position: fixed;
   min-width: 500px;
-  min-height: 300px;
+  min-height: 330px;
   pointer-events: none;
-  left: calc(100vw - 580px);
   z-index: 2147483646 !important;
 
   &.active {
@@ -15,7 +15,15 @@
 
   &:hover {
     .vc-nano-header {
-      background-color: #373535;
+      background-color: #202124;
+    }
+
+    .vc-nano-close {
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAHRJREFUOE+tU0EOgCAMa19mfJn4MuPLapZgMmUYw+DIutJ2jEgeJvsxl0DSAeAkWSJlkux+Ibne9YeCCtgA7G+SXq2x4ICF5G4vfRGHGfiGKjVUZbVuiI7EcI2lMAMfXIogZSEK7HeI6TGmP9LIXszdhREFF1FhUBFxTxg9AAAAAElFTkSuQmCC);
+    }
+
+    .vc-nano-back {
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAANFJREFUOE/Vkz0OgUEQhp/3AjqnUDoACoVGR6emkSh1PqVSqyJRcQii1qodZWRkN1ksvkRlqk3mnWd+V/xo8ngzOwP1hHUB+kAN2GVyrIGNpGMEWBDNgJO/3RngzQygETTzFOAZPdtU0uJTZ2bm0IPcQhavoAVUA2QiafkO8hbgZZtZL0CGklY5SA7Qk7SP4gQykLR9huQAhaQiFUZIbPPJl59BnPy30/g4g2/ByWpft/DfFVz9toH7+ZawNlCRNI6X2AVGQKdEsEseP1PJoKzsBhX1hhF94V4PAAAAAElFTkSuQmCC);
     }
   }
 }
@@ -28,15 +36,30 @@
   background-color: transparent;
 }
 
+.vc-nano-back,
 .vc-nano-close {
-  top: 0;
-  right: 0;
-  color: #fff;
-  padding: 0 10px;
+  top: 3px;
+  width: 24px;
+  height: 24px;
   cursor: pointer;
-  font-size: 20px;
-  line-height: 30px;
   position: absolute;
+  border-radius: 50%;
+  display: inline-block;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 13px;
+
+  &:hover {
+    background-color: #3c3d3f;
+  }
+}
+
+.vc-nano-close {
+  right: 5px;
+}
+
+.vc-nano-back {
+  right: 29px;
 }
 
 .vc-nano-content {
