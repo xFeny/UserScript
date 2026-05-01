@@ -50,6 +50,7 @@
   };
   const Main = {
     FS: null,
+    noop() {},
     /**
      * GM_E9X_FS 依赖脚本的核心实现
      * FyStorage 依赖脚本内部的缓存
@@ -58,9 +59,15 @@
     init() {
       if (!unsafeWindow.GM_E9X_FS) return console.warn("未安装依赖，无法正常运行！！");
       this.FS = unsafeWindow.GM_E9X_FS;
+      this.overwriteRelatedMethod();
       this.setupKeydownListener();
       this.interceptKeyActions();
       this.host = location.host;
+    },
+    overwriteRelatedMethod() {
+      this.FS.autoWebFullscreen = this.noop;
+      this.FS.autoExitFullscreen = this.noop;
+      this.FS.renderProgress = this.noop;
     },
     /**
      * 设置按键监听
