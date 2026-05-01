@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GUI-悬浮图形控制面板
 // @namespace    http://tampermonkey.net/
-// @version      1.1.3
+// @version      1.1.4
 // @author       Feny
 // @description  为「视频自动网页全屏｜倍速播放」脚本提供悬浮图形控制面板，支持自由拖拽定位、深色/浅色主题切换
 // @license      GPL-3.0-only
@@ -227,19 +227,16 @@
   const Control = {
     FS: null,
     init() {
-      Utils.waitFor(() => unsafeWindow.GM_E9X_FS).then(() => {
-        this.host = location.host;
-        this.FS = unsafeWindow.GM_E9X_FS;
-        this.hookAddEventListener();
-        this.setupFunctionHooks();
-        this.watchPlayerChange();
-      }).catch(() => console.error("未安装关联的脚本"));
+      if (!unsafeWindow.GM_E9X_FS) return console.warn("未安装依赖，无法正常运行！！");
+      this.host = location.host;
+      this.FS = unsafeWindow.GM_E9X_FS;
+      this.hookAddEventListener();
+      this.setupPlayerListener();
+      this.setupFunctionHooks();
     },
-    watchPlayerChange() {
-      Object.defineProperty(this.FS, "player", {
-        set: (value) => (this.FS.$player = value, this.initControlPanel(value)),
-        get: () => this.FS.$player
-      });
+    setupPlayerListener() {
+      unsafeWindow.addEventListener("load", () => this.initControlPanel());
+      document.addEventListener("setPlayer", () => this.initControlPanel());
     },
     setupFunctionHooks() {
       Utils.onBefore(this.FS, "ratechange", () => this.renderRateToPanel());
@@ -249,12 +246,16 @@
       if (!this.FS.player || !this.panel) return;
       this.rate.textContent = this.slider.value = this.FS.player.playbackRate;
     },
-    initControlPanel(video) {
-      if (!video || this.wrapper) return;
-      this.createPanelWrapper();
-      this.setControlPanelTheme();
-      this.setupPanelTrigger();
-      this.setupDraggable();
+    initControlPanel() {
+      if (!this.FS.player || this.wrapper) return;
+      try {
+        this.createPanelWrapper();
+        this.setControlPanelTheme();
+        this.setupPanelTrigger();
+        this.setupDraggable();
+      } catch (err) {
+        console.warn(err);
+      }
     },
     setControlPanelTheme(isDark = Store.DARK_THEME.get()) {
       this.wrapper.classList.toggle("light-mode", !isDark);

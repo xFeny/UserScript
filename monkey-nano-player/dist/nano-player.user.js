@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         页内视频小窗
+// @name         视频小窗
 // @namespace    http://tampermonkey.net/
-// @version      0.9.2
+// @version      0.9.3
 // @author       Feny
 // @description  「视频自动网页全屏｜倍速播放」脚本的功能扩展，提供全站通用页内悬浮视频小窗支持，可自由拖拽摆放位置。
 // @license      GPL-3.0-only
@@ -15,12 +15,11 @@
 // @grant        GM_setValue
 // @grant        GM_unregisterMenuCommand
 // @grant        unsafeWindow
-// @grant        window.onurlchange
 // @run-at       document-body
 // @noframes
 // ==/UserScript==
 
-(t=>{if(typeof GM_addStyle=="function"){GM_addStyle(t);return}const n=document.createElement("style");n.textContent=t,document.head.append(n)})(' @charset "UTF-8";.vc-nano-wrap{bottom:80px;display:none;position:fixed;min-width:500px;min-height:300px;pointer-events:none;left:calc(100vw - 580px);z-index:2147483646!important}.vc-nano-wrap.active{display:block}.vc-nano-wrap:hover .vc-nano-header{background-color:#373535}.vc-nano-header{cursor:move;height:30px;position:relative;pointer-events:all!important;background-color:transparent}.vc-nano-close{top:0;right:0;color:#fff;padding:0 10px;cursor:pointer;font-size:20px;line-height:30px;position:absolute}.vc-nano-content{position:absolute!important;background:#000!important;pointer-events:all!important;box-shadow:0 2px 8px #00000080}.vc-nano-player{width:inherit!important;height:inherit!important}.vc-nano-player video{width:100%!important;height:100%!important;position:unset!important}.vc-nano-player video:not(.__tsr){transform:none!important} ');
+(n=>{if(typeof GM_addStyle=="function"){GM_addStyle(n);return}const o=document.createElement("style");o.textContent=n,document.head.append(o)})(' @charset "UTF-8";.vc-nano-wrap{right:80px;bottom:80px;display:none;position:fixed;min-width:500px;min-height:330px;pointer-events:none;z-index:2147483646!important}.vc-nano-wrap.active{display:block}.vc-nano-wrap:hover .vc-nano-header{background-color:#202124}.vc-nano-wrap:hover .vc-nano-close{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAHRJREFUOE+tU0EOgCAMa19mfJn4MuPLapZgMmUYw+DIutJ2jEgeJvsxl0DSAeAkWSJlkux+Ibne9YeCCtgA7G+SXq2x4ICF5G4vfRGHGfiGKjVUZbVuiI7EcI2lMAMfXIogZSEK7HeI6TGmP9LIXszdhREFF1FhUBFxTxg9AAAAAElFTkSuQmCC)}.vc-nano-wrap:hover .vc-nano-back{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAANFJREFUOE/Vkz0OgUEQhp/3AjqnUDoACoVGR6emkSh1PqVSqyJRcQii1qodZWRkN1ksvkRlqk3mnWd+V/xo8ngzOwP1hHUB+kAN2GVyrIGNpGMEWBDNgJO/3RngzQygETTzFOAZPdtU0uJTZ2bm0IPcQhavoAVUA2QiafkO8hbgZZtZL0CGklY5SA7Qk7SP4gQykLR9huQAhaQiFUZIbPPJl59BnPy30/g4g2/ByWpft/DfFVz9toH7+ZawNlCRNI6X2AVGQKdEsEseP1PJoKzsBhX1hhF94V4PAAAAAElFTkSuQmCC)}.vc-nano-header{cursor:move;height:30px;position:relative;pointer-events:all!important;background-color:transparent}.vc-nano-back,.vc-nano-close{top:3px;width:24px;height:24px;cursor:pointer;position:absolute;border-radius:50%;display:inline-block;background-position:center;background-repeat:no-repeat;background-size:13px}.vc-nano-back:hover,.vc-nano-close:hover{background-color:#3c3d3f}.vc-nano-close{right:5px}.vc-nano-back{right:29px}.vc-nano-content{position:absolute!important;background:#000!important;pointer-events:all!important;box-shadow:0 2px 8px #00000080}.vc-nano-player{width:inherit!important;height:inherit!important}.vc-nano-player video{width:100%!important;height:100%!important;position:unset!important}.vc-nano-player video:not(.__tsr){transform:none!important} ');
 
 (function (Draggable) {
   'use strict';
@@ -134,10 +133,21 @@
       document.body.prepend(this.wrap);
     }
     #buildHeader() {
-      const close = this.#newEle("span", { textContent: "×", className: "vc-nano-close", onclick: () => this.activate(false) });
-      const header = this.#newEle("div", { className: "vc-nano-header", title: "按住拖动位置" });
-      header.appendChild(close);
+      const close = this.#newEle("span", { title: "关闭", className: "vc-nano-close", onclick: () => this.#close() });
+      const back = this.#newEle("span", { title: "返回", className: "vc-nano-back", onclick: () => this.#goBack() });
+      const header = this.#newEle("div", { className: "vc-nano-header" });
+      header.append(close, back);
       return header;
+    }
+    #close() {
+      const y = window.scrollY;
+      this.activate(false);
+      window.scrollTo(0, y);
+    }
+    #goBack() {
+      this.activate(false);
+      if (!this.target?.isConnected) return;
+      this.target.scrollIntoView({ block: "center" });
     }
     #bindDraggable() {
       if (!this.header || !this.content) return;
@@ -155,11 +165,14 @@
       this.content.style.height = `${h > 0 ? h : this.height}px`;
     }
     activate(show) {
-      if (!this.wrap || !this.target) return;
+      const { target } = this;
+      if (!this.wrap || !target) return;
       try {
+        const parent = show ? this.content : this.originParent;
+        if (!target?.isConnected || !parent?.isConnected) return;
+        parent?.moveBefore(target, show ? null : this.originNext);
+        target.classList.toggle("vc-nano-player", show);
         this.wrap.classList.toggle("active", show);
-        this.target.classList.toggle("vc-nano-player", show);
-        this[show ? "content" : "originParent"]?.moveBefore(this.target, show ? null : this.originNext);
       } catch (err) {
         console.warn("页内小窗切换异常：", err);
         this.#resetContent();
@@ -185,33 +198,32 @@
   const Main = {
     FS: null,
     init() {
-      Utils.waitFor(() => unsafeWindow.GM_E9X_FS).then(() => {
-        if (!FyTools.hasMoveBefore()) return console.warn("浏览器不支持！！");
-        this.FS = unsafeWindow.GM_E9X_FS;
-        this.setupUrlChangeListener();
-        this.setupFunctionHooks();
-        this.host = location.host;
-      }).catch(() => console.warn("未安装依赖，脚本无法正常运行！！"));
+      if (!Element.prototype.moveBefore) return console.warn("浏览器不支持！！");
+      if (!unsafeWindow.GM_E9X_FS) return console.warn("未安装依赖，无法正常运行！！");
+      this.FS = unsafeWindow.GM_E9X_FS;
+      this.setupNavigateListener();
+      this.setupTopWinListener();
+      this.host = location.host;
     },
-    setupUrlChangeListener() {
-      window.addEventListener("urlchange", () => {
+    setupNavigateListener() {
+      navigation.addEventListener("navigate", () => {
         if (!this.nano) return;
         this.activateNano(false);
         FyTools.scrollTop(0);
       });
     },
-    setupFunctionHooks() {
+    setupTopWinListener() {
       Utils.onBefore(this.FS, "syncMetaToParentWin", () => this.setupNanoFeatures());
-      Utils.waitFor(() => this.FS.vMeta, { interval: 500, timeout: 5e3 }).then(() => this.setupNanoFeatures()).catch(() => {
-      });
+      unsafeWindow.addEventListener("load", () => this.FS.topWin && this.setupNanoFeatures());
     },
     setupNanoFeatures() {
       this.initMenuCmds();
       this.createNanoObserver();
     },
     createNanoObserver() {
-      this.activateNano(false);
+      if (this.nano) this.activateNano(false);
       const target = this.FS.getVideoHostContainer();
+      if (!target?.isConnected) return console.warn("元素不存在或已销毁");
       this.nano ??= new NanoFloatWindow({ target });
       if (this.observer) this.nano.setTarget(target);
       const obsNode = this.getInter(target, FyTools.getParent(target));
@@ -222,6 +234,7 @@
       this.observer?.disconnect();
       this.observer = new IntersectionObserver(
         ([entry]) => {
+          if (!obsNode?.isConnected) return this.createNanoObserver();
           if (this.isBlackUrl() || !Store.ENABLE_NANO.get(this.host)) return;
           this.activateNano(!entry.isIntersecting);
           this.setNanoStyleSize();
@@ -232,7 +245,7 @@
     },
     getInter(ctx, defVal) {
       const selector = Store.INTERSECT_ELEMENT.get(this.host);
-      return selector ? ctx.closest(selector) ?? FyTools.query(selector) : defVal;
+      return selector ? ctx?.closest(selector) ?? FyTools.query(selector) : defVal;
     },
     setNanoStyleSize() {
       const [w, h] = Store.NANO_SIZE.get();
