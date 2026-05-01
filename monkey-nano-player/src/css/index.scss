@@ -73,6 +73,11 @@
   width: inherit !important;
   height: inherit !important;
 
+  *:has(> video) {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
   video {
     width: 100% !important;
     height: 100% !important;
