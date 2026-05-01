@@ -19,7 +19,7 @@ export default {
   setupNavigateListener() {
     navigation.addEventListener("navigate", () => {
       if (!this.nano) return;
-      this.activateNano(false, true);
+      this.activateNano(false);
       FyTools.scrollTop(0);
     });
   },
