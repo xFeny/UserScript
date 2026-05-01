@@ -62,6 +62,7 @@ export default {
   setPlayer(video) {
     this.player = video;
     const vMeta = this.vMeta ?? { vw: innerWidth, vh: innerHeight };
+    setTimeout(Tools.emitEvent, 100, "setPlayer", { video });
     this.syncMetaToParentWin(vMeta);
   },
   syncMetaToParentWin(vMeta) {
@@ -195,6 +196,7 @@ export default {
     return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
   createEdgeElement(video) {
+    if (document.readyState !== "complete") return;
     const container = this.getEdgeContainer(video);
 
     // 父容器未发生变化，不更新位置

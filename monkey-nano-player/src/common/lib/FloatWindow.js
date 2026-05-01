@@ -108,12 +108,18 @@ export default class NanoFloatWindow {
    * @param {boolean} show true=开启小窗 / false=还原原位
    */
   activate(show) {
-    if (!this.wrap || !this.target) return;
+    const { target } = this;
+    if (!this.wrap || !target) return;
 
     try {
+      // 移动元素到指定元素内
+      const parent = show ? this.content : this.originParent;
+      if (!target?.isConnected || !parent?.isConnected) return;
+      parent?.moveBefore(target, show ? null : this.originNext);
+
+      // 添加class
+      target.classList.toggle("vc-nano-player", show);
       this.wrap.classList.toggle("active", show);
-      this.target.classList.toggle("vc-nano-player", show);
-      this[show ? "content" : "originParent"]?.moveBefore(this.target, show ? null : this.originNext);
     } catch (err) {
       console.warn("页内小窗切换异常：", err);
       this.#resetContent();

@@ -5,42 +5,38 @@ import FloatWindow from "../common/lib/FloatWindow";
 export default {
   FS: null,
   init() {
-    Utils.waitFor(() => unsafeWindow.GM_E9X_FS)
-      .then(() => {
-        if (!FyTools.hasMoveBefore()) return console.warn("浏览器不支持！！");
-        this.FS = unsafeWindow.GM_E9X_FS;
-        this.setupUrlChangeListener();
-        this.setupFunctionHooks();
-        this.host = location.host;
-      })
-      .catch(() => console.warn("未安装依赖，脚本无法正常运行！！"));
+    if (!Element.prototype.moveBefore) return console.warn("浏览器不支持！！");
+    if (!unsafeWindow.GM_E9X_FS) return console.warn("未安装依赖，无法正常运行！！");
+    this.FS = unsafeWindow.GM_E9X_FS;
+    this.setupNavigateListener();
+    this.setupTopWinListener();
+    this.host = location.host;
   },
-  setupUrlChangeListener() {
-    window.addEventListener("urlchange", () => {
+  setupNavigateListener() {
+    navigation.addEventListener("navigate", () => {
       if (!this.nano) return;
       this.activateNano(false);
       FyTools.scrollTop(0);
     });
   },
-  setupFunctionHooks() {
+  setupTopWinListener() {
     Utils.onBefore(this.FS, "syncMetaToParentWin", () => this.setupNanoFeatures());
-    Utils.waitFor(() => this.FS.vMeta, { interval: 500, timeout: 5000 })
-      .then(() => this.setupNanoFeatures())
-      .catch(() => {});
+    unsafeWindow.addEventListener("load", () => this.FS.topWin && this.setupNanoFeatures());
   },
   setupNanoFeatures() {
     this.initMenuCmds();
     this.createNanoObserver();
   },
   createNanoObserver() {
-    this.activateNano(false);
+    if (this.nano) this.activateNano(false);
     const target = this.FS.getVideoHostContainer();
+    if (!target?.isConnected) return console.warn("元素不存在或已销毁");
 
-    // 更新小窗内容
+    // 创建小窗或更新小窗目标视频元素
     this.nano ??= new FloatWindow({ target });
     if (this.observer) this.nano.setTarget(target);
 
-    // 设置观察元素
+    // 设置可视观察元素
     const obsNode = this.getInter(target, FyTools.getParent(target));
     this.setupNanoObserver(obsNode);
   },
@@ -55,6 +51,7 @@ export default {
     this.observer?.disconnect();
     this.observer = new IntersectionObserver(
       ([entry]) => {
+        if (!obsNode?.isConnected) return this.createNanoObserver();
         if (this.isBlackUrl() || !Store.ENABLE_NANO.get(this.host)) return;
 
         this.activateNano(!entry.isIntersecting);
@@ -67,7 +64,7 @@ export default {
   },
   getInter(ctx, defVal) {
     const selector = Store.INTERSECT_ELEMENT.get(this.host);
-    return selector ? (ctx.closest(selector) ?? FyTools.query(selector)) : defVal;
+    return selector ? (ctx?.closest(selector) ?? FyTools.query(selector)) : defVal;
   },
   /**
    *   设置小窗宽高

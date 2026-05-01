@@ -47,7 +47,7 @@ export default defineConfig({
       userscript: {
         match,
         author: "Feny",
-        version: "3.11.1",
+        version: "3.11.2",
         license: "GPL-3.0-only",
         name: "视频自动网页全屏｜倍速播放",
         description: description.join("；"),

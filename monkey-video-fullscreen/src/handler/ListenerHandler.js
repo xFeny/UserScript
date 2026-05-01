@@ -67,6 +67,7 @@ export default {
     return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
   createEdgeElement(video) {
+    if (document.readyState !== "complete") return;
     const container = this.getEdgeContainer(video);
 
     // 父容器未发生变化，不更新位置
