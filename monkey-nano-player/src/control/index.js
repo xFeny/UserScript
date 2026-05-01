@@ -10,13 +10,26 @@ export default {
     this.FS = unsafeWindow.GM_E9X_FS;
     this.setupNavigateListener();
     this.setupTopWinListener();
+    this.lockedWebFullscreen();
     this.host = location.host;
   },
+  /**
+   * url发生变化时隐藏小窗
+   */
   setupNavigateListener() {
     navigation.addEventListener("navigate", () => {
       if (!this.nano) return;
-      this.activateNano(false);
+      this.activateNano(false, true);
       FyTools.scrollTop(0);
+    });
+  },
+  /**
+   * 小窗显示时禁止切换(网页)全屏
+   */
+  lockedWebFullscreen() {
+    Utils.around(this.FS, "processEvent", (originFn, args) => {
+      if (this.nano?.isActive() && ["P", "ENTER"].includes(args[0]?.key)) return;
+      return originFn(...args);
     });
   },
   setupTopWinListener() {
@@ -24,8 +37,12 @@ export default {
     unsafeWindow.addEventListener("load", () => this.FS.topWin && this.setupNanoFeatures());
   },
   setupNanoFeatures() {
-    this.initMenuCmds();
-    this.createNanoObserver();
+    try {
+      this.initMenuCmds();
+      this.createNanoObserver();
+    } catch (err) {
+      console.warn(err);
+    }
   },
   createNanoObserver() {
     if (this.nano) this.activateNano(false);
@@ -79,6 +96,8 @@ export default {
    */
   activateNano(active) {
     this.nano?.activate(active);
+    (this.isNotFirst || this.nano?.isActive()) && this.FS.sendToVideoIFrame({ key: "P" });
+    this.isNotFirst = true;
   },
   isBlackUrl() {
     const { href, pathname } = location;

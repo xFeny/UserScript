@@ -127,6 +127,12 @@ export default class NanoFloatWindow {
   }
 
   /**
+   * 是否为显示状态
+   * @returns true-显示，false-不显示
+   */
+  isActive = () => this.content.hasChildNodes();
+
+  /**
    * 更新目标元素
    * @param {HTMLElement} target
    * @returns
