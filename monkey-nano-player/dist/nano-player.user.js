@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频小窗
 // @namespace    http://tampermonkey.net/
-// @version      0.9.3
+// @version      0.9.4
 // @author       Feny
 // @description  「视频自动网页全屏｜倍速播放」脚本的功能扩展，提供全站通用页内悬浮视频小窗支持，可自由拖拽摆放位置。
 // @license      GPL-3.0-only
@@ -86,22 +86,16 @@
     }
   };
   const Utils = {
-    waitFor(condition, opts = {}) {
-      const start = Date.now();
-      const { immediate = false, interval = 50, timeout = 3e3 } = opts;
-      return new Promise((resolve, reject) => {
-        const checkCondition = () => {
-          if (Date.now() - start > timeout) return reject(new Error("waitFor 预期条件未满足"));
-          condition() ? resolve() : setTimeout(checkCondition, interval);
-        };
-        immediate ? checkCondition() : setTimeout(checkCondition, interval);
+    onBefore(target, funcName, exec) {
+      this.around(target, funcName, (original, args) => {
+        Promise.resolve().then(() => exec.apply(this, args));
+        return original(...args);
       });
     },
-    onBefore(target, funcName, preExec) {
+    around(target, funcName, wrapper) {
       const original = target[funcName];
       target[funcName] = function(...args) {
-        Promise.resolve().then(() => preExec.apply(this, args));
-        return original.apply(this, args);
+        return wrapper.call(this, original.bind(this), args);
       };
     }
   };
@@ -178,6 +172,7 @@
         this.#resetContent();
       }
     }
+    isActive = () => this.content.hasChildNodes();
     setTarget(target) {
       if (!(target instanceof HTMLElement)) return;
       if (this.target === target) return;
@@ -203,13 +198,20 @@
       this.FS = unsafeWindow.GM_E9X_FS;
       this.setupNavigateListener();
       this.setupTopWinListener();
+      this.lockedWebFullscreen();
       this.host = location.host;
     },
     setupNavigateListener() {
       navigation.addEventListener("navigate", () => {
         if (!this.nano) return;
-        this.activateNano(false);
+        this.activateNano(false, true);
         FyTools.scrollTop(0);
+      });
+    },
+    lockedWebFullscreen() {
+      Utils.around(this.FS, "processEvent", (original, args) => {
+        if (this.nano?.isActive() && ["P", "ENTER"].includes(args[0]?.key)) return;
+        return original(...args);
       });
     },
     setupTopWinListener() {
@@ -217,8 +219,12 @@
       unsafeWindow.addEventListener("load", () => this.FS.topWin && this.setupNanoFeatures());
     },
     setupNanoFeatures() {
-      this.initMenuCmds();
-      this.createNanoObserver();
+      try {
+        this.initMenuCmds();
+        this.createNanoObserver();
+      } catch (err) {
+        console.warn(err);
+      }
     },
     createNanoObserver() {
       if (this.nano) this.activateNano(false);
@@ -253,6 +259,8 @@
     },
     activateNano(active) {
       this.nano?.activate(active);
+      (this.isNotFirst || this.nano?.isActive()) && this.FS.sendToVideoIFrame({ key: "P" });
+      this.isNotFirst = true;
     },
     isBlackUrl() {
       const { href, pathname } = location;
