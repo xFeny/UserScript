@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         自定义快捷键
+// @name         自定义扩展功能
 // @namespace    http://tampermonkey.net/
 // @version      0.1.0
 // @author       Feny
-// @description  「视频自动网页全屏｜倍速播放」脚本的功能扩展，自定义快捷键操作逻辑。实现视频模糊、标记当前时间点
+// @description  在「视频自动网页全屏｜倍速播放」脚本的基础上扩展功能。自定义快捷键功能，实现视频模糊、标记当前时间点等。
 // @license      GPL-3.0-only
 // @match        *://*/*
 // @grant        GM_getValue
@@ -19,14 +19,28 @@
     /**
      * AOP 前置拦截：原方法执行前执行
      * @param {object} target - 目标对象
-     * @param {string} funcName - 要拦截的方法名
-     * @param {Function} preExec - 前置操作
+     * @param {string} func - 要拦截的方法名
+     * @param {Function} exec - 前置操作
      */
-    onBefore(target, funcName, preExec) {
-      const original = target[funcName];
-      target[funcName] = function (...args) {
-        preExec.apply(this, args);
+    onBefore(target, func, exec) {
+      const original = target[func];
+      target[func] = function (...args) {
+        exec.apply(this, args);
         return original.apply(this, args);
+      };
+    },
+    /**
+     * AOP 后置拦截：原方法执行后执行
+     * @param {object} target - 目标对象
+     * @param {string} func - 要拦截的方法名
+     * @param {Function} exec - 后置操作
+     */
+    onAfter(target, func, exec) {
+      const original = target[func];
+      target[func] = function (...args) {
+        const res = original.apply(this, args);
+        exec.apply(this, args);
+        return res;
       };
     },
   };
@@ -65,9 +79,23 @@
       this.host = location.host;
     },
     overwriteRelatedMethod() {
+      this.FS.renderProgress = this.noop;
       this.FS.autoWebFullscreen = this.noop;
       this.FS.autoExitFullscreen = this.noop;
-      this.FS.renderProgress = this.noop;
+
+      Utils.onAfter(this.FS, "horizFlip", function () {
+        const mirror = this.player.tsr.mirror;
+        this.customToast("已", mirror == -1 ? "开启" : "取消", "镜像");
+      });
+
+      Utils.onAfter(this.FS, "rotateVideo", function () {
+        const rotate = this.player.tsr.rotate;
+        this.customToast("旋转", `${rotate}°`, "");
+      });
+
+      Utils.onAfter(this.FS, "resetTsr", function () {
+        this.showToast("已恢复视频变换");
+      });
     },
     /**
      * 设置按键监听
