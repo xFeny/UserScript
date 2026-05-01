@@ -668,7 +668,7 @@
       if (this.skipKeyEvent(e)) return;
       this.preventEvent(e);
       const emitKeys = [HotKey.N, HotKey.P, HotKey.Enter, HotKey.NumEnter];
-      if (emitKeys.includes(code)) return this.dispatchShortcut(key, { isTrusted });
+      if (emitKeys.includes(code)) return this.dispatchShortcut(key, isTrusted);
       this.processEvent({ key: this.processShortcutKey(e), isTrusted });
     },
     processEvent(data) {
