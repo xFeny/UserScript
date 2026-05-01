@@ -27,9 +27,9 @@ export default {
    * 小窗显示时禁止切换(网页)全屏
    */
   lockedWebFullscreen() {
-    Utils.around(this.FS, "processEvent", (originFn, args) => {
+    Utils.around(this.FS, "processEvent", (original, args) => {
       if (this.nano?.isActive() && ["P", "ENTER"].includes(args[0]?.key)) return;
-      return originFn(...args);
+      return original(...args);
     });
   },
   setupTopWinListener() {
