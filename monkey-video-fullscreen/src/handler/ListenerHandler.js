@@ -67,20 +67,17 @@ export default {
     return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
   createEdgeElement(video) {
-    if (document.readyState !== "complete") return;
+    if (document.readyState === "loading" || video.readyState < 2) return;
     const container = this.getEdgeContainer(video);
 
     // 父容器未发生变化，不更新位置
-    if (video.lArea?.parentNode === container) return;
+    if (video._vEdge?.[0]?.parentNode === container) return;
 
     // 避免元素定位异常
-    if (container instanceof Element && this.lacksRelativePosition(container)) {
-      Tools.setStyle(container, "position", "relative");
-    }
+    if (this.lacksRelativePosition(container)) Tools.setStyle(container, "position", "relative");
 
     // 已创建过侧边元素，重新插入到父容器中
-    Tools.querys(".__v_edge", container).forEach((el) => el.remove());
-    if (video.lArea) return container.prepend(video.lArea, video.rArea);
+    if (video._vEdge) return container.prepend(...video._vEdge);
 
     // 复用元素创建逻辑
     const createEdge = (cls = "") => {
@@ -95,9 +92,9 @@ export default {
       return element;
     };
 
-    // 解构赋值批量创建边缘元素
-    [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
-    container.prepend(video.lArea, video.rArea);
+    // 创建边缘元素
+    video._vEdge = [createEdge(), createEdge("right")];
+    container.prepend(...video._vEdge);
   },
   getEdgeContainer(video) {
     if (this.fsWrapper) return video.closest(`[${Consts.webFull}]`) ?? this.fsWrapper;
@@ -107,6 +104,7 @@ export default {
     return sroot ? parent : this.findVideoContainer(parent, undefined, false);
   },
   lacksRelativePosition(el) {
+    if (!(el instanceof Element)) return false;
     return Tools.getParents(el, 2).every((e) => e && getComputedStyle(e).position === "static");
   },
 };
