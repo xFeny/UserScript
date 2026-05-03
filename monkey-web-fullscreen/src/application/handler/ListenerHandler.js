@@ -178,14 +178,18 @@ export default {
 
     document.addEventListener("mousemove", handle, { passive: true });
   },
+  /**
+   * 切换鼠标光标的显隐
+   * @param {Element} target 当前鼠标光标下的元素
+   * @param {string} cls 样式类名
+   */
   toggleCursor(target, cls = "__hc") {
     clearTimeout(this._cursorTid);
-    Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
+    target = Tools.isAboveElement(this.player, target) ? target : null;
+    const eles = [target, this.player, ...(this.player?._vEdge || [])];
 
-    this._cursorTid = setTimeout(() => {
-      const eles = [Tools.isAboveElement(this.player, target) && target, this.player, ...Tools.querys(".__v_edge")];
-      eles.forEach((el) => el && (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
-    }, Consts.TWO_SEC);
+    this._cursorTid = setTimeout(() => eles.forEach((el) => el && Tools.addCls(el, cls)), Consts.TWO_SEC); // 2秒后添加样式
+    eles.forEach((el) => el && Tools.delCls(el, cls)); // 立即移除样式
   },
   // ====================⇓⇓⇓ 侧边点击相关逻辑 ⇓⇓⇓====================
   getVideoForCoord(x, y) {
