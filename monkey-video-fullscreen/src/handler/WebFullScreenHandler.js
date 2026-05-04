@@ -158,7 +158,7 @@ export default {
       const handler = (this.codeSnippetCache ??= new Function(...args, code));
       handler(type, video, Tools, unsafeWindow);
     } catch (e) {
-      const unsafe = e.message.includes("unsafe-eval");
+      const unsafe = /unsafe-eval|Trusted/.test(e.message);
       unsafe ? this.injectCodeSnippet(jsCode, type, video) : console.error("代码执行出错：", e);
     }
   },
