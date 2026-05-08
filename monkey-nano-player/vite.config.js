@@ -14,7 +14,7 @@ export default defineConfig({
       entry: "src/main.js",
       userscript: {
         author: "Feny",
-        version: "0.9.4",
+        version: "0.9.5",
         name: "视频小窗",
         namespace: "http://tampermonkey.net/",
         description: "「视频自动网页全屏｜倍速播放」脚本的功能扩展，提供全站通用页内悬浮视频小窗支持，可自由拖拽摆放位置。",
@@ -23,6 +23,16 @@ export default defineConfig({
         license: "GPL-3.0-only",
         match: ["*://*/*"],
         noframes: true,
+        exclude: [
+          "*://x.com/*",
+          "*://weibo.com/*",
+          "*://www.reddit.com/*",
+          "*://www.douyin.com/*",
+          "*://www.tiktok.com/*",
+          "*://www.kuaishou.com/*",
+          "*://www.facebook.com/*",
+          "*://www.instagram.com/*",
+        ],
       },
       build: {
         externalGlobals: {
