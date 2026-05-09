@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.11.2
+// @version      3.11.3
 // @author       Feny
 // @description  支持所有H5视频的增强脚本，通用网页全屏｜倍速调节；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @license      GPL-3.0-only
@@ -543,11 +543,10 @@
     },
     toggleCursor(target, cls = "__hc") {
       clearTimeout(this._cursorTid);
-      Tools.querys(`.${cls}`).forEach((el) => Tools.delCls(el, cls));
-      this._cursorTid = setTimeout(() => {
-        const eles = [Tools.isAboveElement(this.player, target) && target, this.player, ...Tools.querys(".__v_edge")];
-        eles.forEach((el) => el && (Tools.addCls(el, cls), Tools.fireMouseEvt(el, "mouseleave")));
-      }, Consts.TWO_SEC);
+      target = Tools.isAboveElement(this.player, target) ? target : null;
+      const eles = [target, this.player, ...this.player?._vEdge || []];
+      this._cursorTid = setTimeout(() => eles.forEach((el) => el && Tools.addCls(el, cls)), Consts.TWO_SEC);
+      eles.forEach((el) => el && Tools.delCls(el, cls));
     },
     getVideoForCoord(x, y) {
       if (Tools.pointInElement(x, y, this.player)) return this.player;
@@ -556,14 +555,11 @@
       return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
     },
     createEdgeElement(video) {
-      if (document.readyState !== "complete") return;
+      if (document.readyState === "loading" || video.readyState < 2) return;
       const container = this.getEdgeContainer(video);
-      if (video.lArea?.parentNode === container) return;
-      if (container instanceof Element && this.lacksRelativePosition(container)) {
-        Tools.setStyle(container, "position", "relative");
-      }
-      Tools.querys(".__v_edge", container).forEach((el) => el.remove());
-      if (video.lArea) return container.prepend(video.lArea, video.rArea);
+      if (video._vEdge?.[0]?.parentNode === container) return;
+      if (this.lacksRelativePosition(container)) Tools.setStyle(container, "position", "relative");
+      if (video._vEdge) return container.prepend(...video._vEdge);
       const createEdge = (cls = "") => {
         const element = Tools.newEle("div", { video, className: `__v_edge ${cls}` });
         element.onclick = (e) => {
@@ -573,8 +569,8 @@
         };
         return element;
       };
-      [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
-      container.prepend(video.lArea, video.rArea);
+      video._vEdge = [createEdge(), createEdge("right")];
+      container.prepend(...video._vEdge);
     },
     getEdgeContainer(video) {
       if (this.fsWrapper) return video.closest(`[${Consts.webFull}]`) ?? this.fsWrapper;
@@ -583,6 +579,7 @@
       return sroot ? parent : this.findVideoContainer(parent, void 0, false);
     },
     lacksRelativePosition(el) {
+      if (!(el instanceof Element)) return false;
       return Tools.getParents(el, 2).every((e) => e && getComputedStyle(e).position === "static");
     }
   };
@@ -799,7 +796,7 @@
         const handler = this.codeSnippetCache.get(type) || this.codeSnippetCache.set(type, new Function(...args, code)).get(type);
         handler(type, video, Tools, unsafeWindow);
       } catch (e) {
-        const unsafe = e.message.includes("unsafe-eval") || e.message.includes("Trusted");
+        const unsafe = /unsafe-eval|Trusted/.test(e.message);
         unsafe ? this.injectCodeSnippet(jsCode, type, video) : console.error("代码执行出错：", e);
       }
     },

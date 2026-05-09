@@ -2,7 +2,7 @@
 // @name            视频网页全屏
 // @name:en         Video Fullscreen
 // @namespace       npm/vite-plugin-monkey
-// @version         3.10.5
+// @version         3.10.6
 // @author          Feny
 // @description     让所有视频网页全屏，快捷键：P - 网页全屏，Enter - 全屏; 支持侧边点击切换网页全屏; 支持自动网页全屏
 // @description:en  Maximize all video players; Shortcut keys: P - Web Fullscreen, Enter - Fullscreen; Support side click to web fullscreen; Support auto web fullscreen
@@ -221,14 +221,11 @@
       return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
     },
     createEdgeElement(video) {
-      if (document.readyState !== "complete") return;
+      if (document.readyState === "loading" || video.readyState < 2) return;
       const container = this.getEdgeContainer(video);
-      if (video.lArea?.parentNode === container) return;
-      if (container instanceof Element && this.lacksRelativePosition(container)) {
-        Tools.setStyle(container, "position", "relative");
-      }
-      Tools.querys(".__v_edge", container).forEach((el) => el.remove());
-      if (video.lArea) return container.prepend(video.lArea, video.rArea);
+      if (video._vEdge?.[0]?.parentNode === container) return;
+      if (this.lacksRelativePosition(container)) Tools.setStyle(container, "position", "relative");
+      if (video._vEdge) return container.prepend(...video._vEdge);
       const createEdge = (cls = "") => {
         const element = Tools.newEle("div", { video, className: `__v_edge ${cls}` });
         element.onclick = (e) => {
@@ -238,8 +235,8 @@
         };
         return element;
       };
-      [video.lArea, video.rArea] = [createEdge(), createEdge("right")];
-      container.prepend(video.lArea, video.rArea);
+      video._vEdge = [createEdge(), createEdge("right")];
+      container.prepend(...video._vEdge);
     },
     getEdgeContainer(video) {
       if (this.fsWrapper) return video.closest(`[${Consts.webFull}]`) ?? this.fsWrapper;
@@ -248,6 +245,7 @@
       return sroot ? parent : this.findVideoContainer(parent, void 0, false);
     },
     lacksRelativePosition(el) {
+      if (!(el instanceof Element)) return false;
       return Tools.getParents(el, 2).every((e) => e && getComputedStyle(e).position === "static");
     }
   };
@@ -503,7 +501,7 @@
         const handler = this.codeSnippetCache ??= new Function(...args, code);
         handler(type, video, Tools, unsafeWindow);
       } catch (e) {
-        const unsafe = e.message.includes("unsafe-eval");
+        const unsafe = /unsafe-eval|Trusted/.test(e.message);
         unsafe ? this.injectCodeSnippet(jsCode, type, video) : console.error("代码执行出错：", e);
       }
     },
