@@ -15,35 +15,6 @@
 (function () {
   "use strict";
 
-  const Utils = {
-    /**
-     * AOP 前置拦截：原方法执行前执行
-     * @param {object} target - 目标对象
-     * @param {string} func - 要拦截的方法名
-     * @param {Function} exec - 前置操作
-     */
-    onBefore(target, func, exec) {
-      const original = target[func];
-      target[func] = function (...args) {
-        exec.apply(this, args);
-        return original.apply(this, args);
-      };
-    },
-    /**
-     * AOP 后置拦截：原方法执行后执行
-     * @param {object} target - 目标对象
-     * @param {string} func - 要拦截的方法名
-     * @param {Function} exec - 后置操作
-     */
-    onAfter(target, func, exec) {
-      const original = target[func];
-      target[func] = function (...args) {
-        const res = original.apply(this, args);
-        exec.apply(this, args);
-        return res;
-      };
-    },
-  };
   class BasicStorage {
     constructor(name, defVal, parser = (v) => v) {
       Object.assign(this, { name, defVal, parser });
@@ -83,18 +54,23 @@
       this.FS.autoWebFullscreen = this.noop;
       this.FS.autoExitFullscreen = this.noop;
 
-      Utils.onAfter(this.FS, "horizFlip", function () {
+      // AOP 环绕拦截器，后置钩子
+      FyTools.around(this.FS, "horizFlip", null, function () {
         const mirror = this.player.tsr.mirror;
         this.customToast("已", mirror == -1 ? "开启" : "取消", "镜像");
       });
 
-      Utils.onAfter(this.FS, "rotateVideo", function () {
+      FyTools.around(this.FS, "rotateVideo", null, function () {
         const rotate = this.player.tsr.rotate;
         this.customToast("旋转", `${rotate}°`, "");
       });
 
-      Utils.onAfter(this.FS, "resetTsr", function () {
+      FyTools.around(this.FS, "resetTsr", null, function () {
         this.showToast("已恢复视频变换");
+      });
+
+      FyTools.around(this.FS, "freezeFrame", null, function (_, [dir]) {
+        this.showToast(dir < 0 ? "上一帧" : "下一帧");
       });
     },
     /**
@@ -119,7 +95,9 @@
      */
     interceptKeyActions() {
       const step = FyStorage.RATE_STEP.get(); // 原脚本的倍速步长
-      Utils.onBefore(this.FS, "execKeyActions", ({ key }) => {
+
+      // AOP 环绕拦截器，前置钩子
+      FyTools.around(this.FS, "execKeyActions", ([{ key }]) => {
         // 改写原脚本的按键操作
         this.FS.keyMapp["A"] = () => this.FS.adjustPlayRate(-step);
         this.FS.keyMapp["D"] = () => this.FS.adjustPlayRate(step);
@@ -127,6 +105,8 @@
 
         // 执行个人定义的按键操作
         this.execCustomKey({ key });
+
+        return true; // 返回 false，不执行原方法
       });
     },
     /**
