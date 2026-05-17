@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频小窗
 // @namespace    http://tampermonkey.net/
-// @version      0.9.5
+// @version      0.9.6
 // @author       Feny
 // @description  「视频自动网页全屏｜倍速播放」脚本的功能扩展，提供全站通用页内悬浮视频小窗支持，可自由拖拽摆放位置。
 // @license      GPL-3.0-only
@@ -91,20 +91,6 @@
     inputNanoSize({ host, cache, title }) {
       const input = prompt(title, cache.get(host));
       if (input !== null) cache.set(input, host), this.setNanoStyleSize();
-    }
-  };
-  const Utils = {
-    onBefore(target, funcName, exec) {
-      this.around(target, funcName, (original, args) => {
-        Promise.resolve().then(() => exec.apply(this, args));
-        return original(...args);
-      });
-    },
-    around(target, funcName, wrapper) {
-      const original = target[funcName];
-      target[funcName] = function(...args) {
-        return wrapper.call(this, original.bind(this), args);
-      };
     }
   };
   class NanoFloatWindow {
@@ -217,19 +203,21 @@
       });
     },
     lockedWebFullscreen() {
-      Utils.around(this.FS, "processEvent", (original, args) => {
-        if (this.nano?.isActive() && ["P", "ENTER"].includes(args[0]?.key)) return;
-        return original(...args);
+      FyTools.around(this.FS, "processEvent", () => {
+        return this.nano?.isActive() && ["P", "ENTER"].includes(args[0]?.key) ? false : true;
       });
     },
     setupTopWinListener() {
-      Utils.onBefore(this.FS, "syncMetaToParentWin", () => this.setupNanoFeatures());
-      unsafeWindow.addEventListener("load", () => this.FS.topWin && this.setupNanoFeatures());
+      const handle = () => this.setupNanoFeatures();
+      FyTools.waitFor(() => ["interactive", "complete"].includes(document.readyState), { interval: 500 }).then(handle);
+      unsafeWindow.addEventListener("load", handle, { once: true });
+      FyTools.around(this.FS, "syncMetaToParentWin", null, handle);
     },
     setupNanoFeatures() {
       try {
-        this.initMenuCmds();
+        if (!this.FS.topWin) return;
         this.createNanoObserver();
+        this.initMenuCmds();
       } catch (err) {
         console.warn(err);
       }
@@ -266,8 +254,10 @@
       this.nano?.setSize(w, h);
     },
     activateNano(active) {
-      this.nano?.activate(active);
-      (this.isNotFirst || this.nano?.isActive()) && this.FS.sendToVideoIFrame({ key: "P" });
+      if (!this.nano) return;
+      this.nano.activate(active);
+      if (this.isNotFirst || this.nano.isActive()) this.FS.sendToVideoIFrame({ key: "P" });
+      this.closeSiteNative();
       this.isNotFirst = true;
     },
     isBlackUrl() {
@@ -275,6 +265,10 @@
       const uris = Store.IGNORE_URLS.get(this.host);
       const isBlack = uris.some((prefix) => prefix && href.startsWith(prefix));
       return isBlack || Object.is(pathname, "/");
+    },
+    closeSiteNative() {
+      if (!this.nano.isActive()) return;
+      requestAnimationFrame(() => FyTools.querys('[class*="close"]', this.nano.target).forEach((el) => el.click()));
     }
   };
   const App = { ...Main, ...Menu };

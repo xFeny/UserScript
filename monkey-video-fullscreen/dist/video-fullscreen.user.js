@@ -2,7 +2,7 @@
 // @name            视频网页全屏
 // @name:en         Video Fullscreen
 // @namespace       npm/vite-plugin-monkey
-// @version         3.10.6
+// @version         3.10.7
 // @author          Feny
 // @description     让所有视频网页全屏，快捷键：P - 网页全屏，Enter - 全屏; 支持侧边点击切换网页全屏; 支持自动网页全屏
 // @description:en  Maximize all video players; Shortcut keys: P - Web Fullscreen, Enter - Fullscreen; Support side click to web fullscreen; Support auto web fullscreen
@@ -171,7 +171,7 @@
   }
   VideoEnhancer.hackAttachShadow();
   const Listen = {
-    isNoVideo: () => !window.vMeta && !window.topWin,
+    isNoVideo: () => !App.vMeta && !App.topWin,
     isMutedLoop: (video) => video?.muted && video?.loop,
     init(isNonFirst = false) {
       this.host = location.host;
@@ -221,16 +221,18 @@
       return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
     },
     createEdgeElement(video) {
-      if (document.readyState === "loading" || video.readyState < 2) return;
+      if (document.readyState === "loading") return;
       const container = this.getEdgeContainer(video);
       if (video._vEdge?.[0]?.parentNode === container) return;
       if (this.lacksRelativePosition(container)) Tools.setStyle(container, "position", "relative");
+      Tools.querys(".__v_edge", container).forEach((el) => el.remove());
       if (video._vEdge) return container.prepend(...video._vEdge);
       const createEdge = (cls = "") => {
         const element = Tools.newEle("div", { video, className: `__v_edge ${cls}` });
         element.onclick = (e) => {
           Tools.preventDefault(e);
-          this.setPlayer(e.target.video);
+          const v = e.target.video;
+          if (!Object.is(this.player, v)) this.setPlayer(v);
           Tools.sleep(5).then(() => this.dispatchShortcut(Consts.P, true));
         };
         return element;
@@ -265,10 +267,10 @@
     },
     handleMessage(data) {
       if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
-      if (data?.topWin) window.topWin = this.topWin = data.topWin;
       if (data?.vMeta) return this.syncMetaToParentWin(data.vMeta);
       if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
       if (data?.sw_fsCode) this.codeSnippetCache = null;
+      if (data?.topWin) this.topWin = data.topWin;
       this.processEvent(data);
     },
     processEvent(data) {
@@ -330,17 +332,15 @@
       this.syncMetaToParentWin(vMeta);
     },
     syncMetaToParentWin(vMeta) {
-      window.vMeta = this.vMeta = { ...vMeta, timestamp: Date.now() };
+      this.vMeta = { ...vMeta, timestamp: Date.now() };
       if (!Tools.isTopWin()) return Tools.postMessage(unsafeWindow.parent, { vMeta: { ...vMeta, iFrame: location.href } });
       Tools.microTask(() => this.initMenuCmds());
       this.sendTopWinInfo();
     },
     sendTopWinInfo() {
       const { host, href: url } = location;
-      const { innerWidth: vw, innerHeight: vh } = window;
-      const topWin = { vw, vh, url, host };
-      window.topWin = this.topWin = topWin;
-      this.sendToVideoIFrame({ topWin });
+      this.topWin = { vw: innerWidth, vh: innerHeight, url, host };
+      this.sendToVideoIFrame({ topWin: this.topWin });
     },
     sendToVideoIFrame(data) {
       const vFrame = this.getVideoIFrame();
@@ -577,7 +577,7 @@
     static t = (key) => this.#langPacks[this.#getLang()][key];
   }
   const Menu = {
-    isAuto: () => Store.IS_AUTO.get(window.topWin?.host ?? location.host),
+    isAuto: () => Store.IS_AUTO.get(App.topWin?.host ?? location.host),
     initMenuCmds() {
       if (this.hasMenu || !Tools.isTopWin()) return;
       GM_addValueChangeListener(Store.IS_AUTO.name + this.host, () => this.setupMenuCmds());
