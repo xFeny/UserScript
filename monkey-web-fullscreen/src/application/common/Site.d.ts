@@ -29,17 +29,8 @@ declare const Site: {
   /** 是否为AcFun视频页 */
   isAcFun(): boolean;
 
-  /** 是否为腾讯视频页 */
-  isTencent(): boolean;
-
   /** 是否为爱奇艺视频页 */
   isQiyi(): boolean;
-
-  /** 是否为芒果TV视频页 */
-  isMgtv(): boolean;
-
-  /** 是否为斗鱼视频页 */
-  isDouyu(): boolean;
 
   /** 是否为B站视频页 */
   isBili(): boolean;

@@ -23,10 +23,10 @@ export default {
   handleMessage(data) {
     // console.log(location.href, "接收到消息：", data);
     if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
-    if (data?.topWin) window.topWin = this.topWin = data.topWin;
     if (data?.vMeta) return this.syncMetaToParentWin(data.vMeta);
     if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
     if (data?.sw_fsCode) this.codeSnippetCache = null;
+    if (data?.topWin) this.topWin = data.topWin;
 
     // 处理键盘按键消息和继续分发消息
     this.processEvent(data);

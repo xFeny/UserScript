@@ -14,8 +14,9 @@ export default {
   player: null,
   fsWrapper: null,
   isFullscreen: false,
-  isNoVideo: () => !window.vMeta && !window.topWin,
+  isNoVideo: () => !App.vMeta && !App.topWin,
   isMutedLoop: (video) => video?.muted && video?.loop,
+  hasTopInfo: () => Tools.waitFor(() => App.topWin, { immediate: true, interval: 10, timeout: 100 }),
   init(isNonFirst = false) {
     this.host = location.host;
     this.setupVideoListeners();
@@ -62,11 +63,11 @@ export default {
   setPlayer(video) {
     this.player = video;
     const vMeta = this.vMeta ?? { vw: innerWidth, vh: innerHeight };
-    setTimeout(Tools.emitEvent, 100, "setPlayer", { video });
+    Tools.emitEvent("setPlayer", { video });
     this.syncMetaToParentWin(vMeta);
   },
   syncMetaToParentWin(vMeta) {
-    window.vMeta = this.vMeta = { ...vMeta, timestamp: Date.now() };
+    this.vMeta = { ...vMeta, timestamp: Date.now() };
     if (!Tools.isTopWin()) return Tools.postMessage(unsafeWindow.parent, { vMeta: { ...vMeta, iFrame: location.href } });
     Tools.microTask(() => (this.initMenuCmds(), this.setupPickerListener()));
     this.sendTopWinInfo();
@@ -75,9 +76,8 @@ export default {
     // 向iframe传递顶级窗口信息
     const { host, href: url } = location;
     const { innerWidth: vw, innerHeight: vh } = window;
-    const topWin = { vw, vh, url, host, urlHash: Tools.hashCode(url) };
-    window.topWin = this.topWin = topWin;
-    this.sendToVideoIFrame({ topWin });
+    this.topWin = { vw, vh, url, host, urlHash: Tools.hashCode(url) };
+    this.sendToVideoIFrame({ topWin: this.topWin });
   },
   sendToVideoIFrame(data) {
     const vFrame = this.getVideoIFrame();
@@ -200,7 +200,7 @@ export default {
     return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
   createEdgeElement(video) {
-    if (document.readyState === "loading" || video.readyState < 2) return;
+    if (document.readyState === "loading") return;
     const container = this.getEdgeContainer(video);
 
     // 父容器未发生变化，不更新位置
@@ -210,6 +210,7 @@ export default {
     if (this.lacksRelativePosition(container)) Tools.setStyle(container, "position", "relative");
 
     // 已创建过侧边元素，重新插入到父容器中
+    Tools.querys(".__v_edge", container).forEach((el) => el.remove());
     if (video._vEdge) return container.prepend(...video._vEdge);
 
     // 复用元素创建逻辑
@@ -218,8 +219,9 @@ export default {
 
       element.onclick = (e) => {
         Tools.preventEvent(e);
-        this.setPlayer(e.target.video);
-        Tools.sleep(5).then(() => this.dispatchShortcut(HotKey.P, true));
+        const v = e.target.video;
+        if (!Object.is(this.player, v)) this.setPlayer(v);
+        this.hasTopInfo().then(() => this.dispatchShortcut(HotKey.P, true));
       };
 
       return element;

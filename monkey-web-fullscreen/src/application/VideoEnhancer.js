@@ -63,18 +63,9 @@ export default class VideoEnhancer {
   }
 
   static hackAttachShadow() {
-    if (Element.prototype.__attachShadow) return;
-    Element.prototype.__attachShadow = Element.prototype.attachShadow;
-    Element.prototype.attachShadow = function (options) {
-      if (this._shadowRoot) return this._shadowRoot;
-
-      const shadowRoot = (this._shadowRoot = this.__attachShadow.call(this, options));
-      VideoEnhancer.detectShadowVideo();
-
-      return shadowRoot;
-    };
-
-    Element.prototype.attachShadow.toString = () => Element.prototype.__attachShadow.toString();
+    Tools.around(Element.prototype, "attachShadow", null, function (res) {
+      ((this._shadowRoot = res), VideoEnhancer.detectShadowVideo());
+    });
   }
 
   static detectShadowVideo() {
@@ -91,10 +82,9 @@ export default class VideoEnhancer {
   }
 
   static hookActiveVideo() {
-    const original = HTMLMediaElement.prototype.play;
-    HTMLMediaElement.prototype.play = function () {
+    Tools.around(HTMLMediaElement.prototype, "play", function () {
       VideoEnhancer.dispatchShadowVideo(this);
-      return original.apply(this, arguments);
-    };
+      return true;
+    });
   }
 }

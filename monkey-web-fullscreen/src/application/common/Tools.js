@@ -165,15 +165,32 @@ export default unsafeWindow.FyTools = {
    */
   waitFor(condition, opts = {}) {
     const start = Date.now();
+    const err = new Error(`waitFor 条件未满足`);
     const { immediate = false, interval = 50, timeout = 3000 } = opts;
 
     return new Promise((resolve, reject) => {
       const checkCondition = () => {
-        if (Date.now() - start > timeout) return reject(new Error("waitFor 预期条件未满足"));
+        if (Date.now() - start > timeout) return reject(err);
         condition() ? resolve() : setTimeout(checkCondition, interval);
       };
 
       immediate ? checkCondition() : setTimeout(checkCondition, interval); // 执行第一次检测
     });
+  },
+  /**
+   * AOP 环绕拦截：前置拦截 + 后置回调
+   * @param {Object} target - 目标对象
+   * @param {string} name - 目标方法名
+   * @param {Function} before - 前置钩子：返回 true 才执行原方法
+   * @param {Function} after - 后置钩子：接收参数、返回值
+   */
+  around(target, name, before, after) {
+    const original = target[name];
+    target[name] = function (...args) {
+      if (before instanceof Function && !before.call(this, args)) return;
+      const result = original.call(this, ...args);
+      after?.call?.(this, result);
+      return result;
+    };
   },
 };

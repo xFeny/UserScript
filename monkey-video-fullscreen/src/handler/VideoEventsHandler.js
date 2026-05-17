@@ -63,7 +63,7 @@ export default {
     this.syncMetaToParentWin(vMeta);
   },
   syncMetaToParentWin(vMeta) {
-    window.vMeta = this.vMeta = { ...vMeta, timestamp: Date.now() };
+    this.vMeta = { ...vMeta, timestamp: Date.now() };
     if (!Tools.isTopWin()) return Tools.postMessage(unsafeWindow.parent, { vMeta: { ...vMeta, iFrame: location.href } });
     Tools.microTask(() => this.initMenuCmds());
     this.sendTopWinInfo();
@@ -71,10 +71,8 @@ export default {
   sendTopWinInfo() {
     // 向iframe传递顶级窗口信息
     const { host, href: url } = location;
-    const { innerWidth: vw, innerHeight: vh } = window;
-    const topWin = { vw, vh, url, host };
-    window.topWin = this.topWin = topWin;
-    this.sendToVideoIFrame({ topWin });
+    this.topWin = { vw: innerWidth, vh: innerHeight, url, host };
+    this.sendToVideoIFrame({ topWin: this.topWin });
   },
   sendToVideoIFrame(data) {
     const vFrame = this.getVideoIFrame();

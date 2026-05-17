@@ -89,7 +89,7 @@ export default {
     if (!data?.source?.includes(Consts.MSG_SOURCE)) return;
     if (data?.vMeta) return this.syncMetaToParentWin(data.vMeta);
     if ("isFullscreen" in data) this.isFullscreen = data.isFullscreen;
-    if (data?.topWin) window.topWin = this.topWin = data.topWin;
+    if (data?.topWin) this.topWin = data.topWin;
 
     // 处理设置时传递过来的消息
     this.handleConfsMessage(data);

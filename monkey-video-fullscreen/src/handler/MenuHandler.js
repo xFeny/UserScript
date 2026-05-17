@@ -7,7 +7,7 @@ import Tools from "../common/Tools";
  * 脚本菜单相关逻辑处理
  */
 export default {
-  isAuto: () => Store.IS_AUTO.get(window.topWin?.host ?? location.host),
+  isAuto: () => Store.IS_AUTO.get(App.topWin?.host ?? location.host),
   initMenuCmds() {
     if (this.hasMenu || !Tools.isTopWin()) return;
     GM_addValueChangeListener(Store.IS_AUTO.name + this.host, () => this.setupMenuCmds());

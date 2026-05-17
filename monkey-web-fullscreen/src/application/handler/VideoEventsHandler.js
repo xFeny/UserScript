@@ -66,7 +66,7 @@ export default {
   playing(video) {
     this.setCurrentVideo(video);
     video.tsr ??= { ...Consts.DEF_TSR };
-    Tools.waitFor(() => this.topWin).then(() => this.applySettings(video));
+    this.hasTopInfo().then(() => this.applySettings(video));
   },
   ended(video) {
     this.autoExitFullscreen();

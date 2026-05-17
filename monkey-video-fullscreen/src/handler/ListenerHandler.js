@@ -6,7 +6,7 @@ import VideoEnhancer from "../lib/VideoEnhancer";
  * 应用程序初始化
  */
 export default {
-  isNoVideo: () => !window.vMeta && !window.topWin,
+  isNoVideo: () => !App.vMeta && !App.topWin,
   isMutedLoop: (video) => video?.muted && video?.loop,
   init(isNonFirst = false) {
     this.host = location.host;
@@ -67,7 +67,7 @@ export default {
     return videos.sort((a, b) => getZIndex(b) - getZIndex(a)).shift();
   },
   createEdgeElement(video) {
-    if (document.readyState === "loading" || video.readyState < 2) return;
+    if (document.readyState === "loading") return;
     const container = this.getEdgeContainer(video);
 
     // 父容器未发生变化，不更新位置
@@ -77,6 +77,7 @@ export default {
     if (this.lacksRelativePosition(container)) Tools.setStyle(container, "position", "relative");
 
     // 已创建过侧边元素，重新插入到父容器中
+    Tools.querys(".__v_edge", container).forEach((el) => el.remove());
     if (video._vEdge) return container.prepend(...video._vEdge);
 
     // 复用元素创建逻辑
@@ -85,7 +86,8 @@ export default {
 
       element.onclick = (e) => {
         Tools.preventDefault(e);
-        this.setPlayer(e.target.video);
+        const v = e.target.video;
+        if (!Object.is(this.player, v)) this.setPlayer(v);
         Tools.sleep(5).then(() => this.dispatchShortcut(Consts.P, true));
       };
 

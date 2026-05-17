@@ -10,7 +10,7 @@ import Consts from "../common/Consts";
 export default {
   unUsedRate: () => Store.DISABLE_RATE.get(),
   isOverrideKey: () => Store.OVERRIDE_KEY.get(),
-  isAutoSite: () => Store.SITE_AUTO.get(window.topWin?.host ?? location.host),
+  isAutoSite: () => Store.SITE_AUTO.get(App.topWin?.host ?? location.host),
   initMenuCmds() {
     if (Tools.isExecuted("hasMenu") || !Tools.isTopWin()) return;
     this.setupMenuChangeListener();

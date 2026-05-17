@@ -33,6 +33,6 @@ body[web-fullscr] [web-fullscr] video {
 }
 
 /** 隐藏后面的兄弟元素 */
-[web-fullscr] ~ *:not(.vpx-popup) {
+[web-fullscr] ~ *:not(.vpx-popup, .monkey-toast) {
   display: none !important;
 }

@@ -1,4 +1,3 @@
-import Utils from "../common/Utils";
 import Store from "../common/Store";
 import FloatWindow from "../common/lib/FloatWindow";
 
@@ -27,19 +26,21 @@ export default {
    * 小窗显示时禁止切换(网页)全屏
    */
   lockedWebFullscreen() {
-    Utils.around(this.FS, "processEvent", (original, args) => {
-      if (this.nano?.isActive() && ["P", "ENTER"].includes(args[0]?.key)) return;
-      return original(...args);
+    FyTools.around(this.FS, "processEvent", () => {
+      return this.nano?.isActive() && ["P", "ENTER"].includes(args[0]?.key) ? false : true;
     });
   },
   setupTopWinListener() {
-    Utils.onBefore(this.FS, "syncMetaToParentWin", () => this.setupNanoFeatures());
-    unsafeWindow.addEventListener("load", () => this.FS.topWin && this.setupNanoFeatures());
+    const handle = () => this.setupNanoFeatures();
+    FyTools.waitFor(() => ["interactive", "complete"].includes(document.readyState), { interval: 500 }).then(handle);
+    unsafeWindow.addEventListener("load", handle, { once: true });
+    FyTools.around(this.FS, "syncMetaToParentWin", null, handle);
   },
   setupNanoFeatures() {
     try {
-      this.initMenuCmds();
+      if (!this.FS.topWin) return;
       this.createNanoObserver();
+      this.initMenuCmds();
     } catch (err) {
       console.warn(err);
     }
@@ -95,8 +96,10 @@ export default {
    * @param {Boolean} active true=小窗 / false=还原
    */
   activateNano(active) {
-    this.nano?.activate(active);
-    (this.isNotFirst || this.nano?.isActive()) && this.FS.sendToVideoIFrame({ key: "P" });
+    if (!this.nano) return;
+    this.nano.activate(active);
+    if (this.isNotFirst || this.nano.isActive()) this.FS.sendToVideoIFrame({ key: "P" });
+    this.closeSiteNative();
     this.isNotFirst = true;
   },
   isBlackUrl() {
@@ -104,5 +107,9 @@ export default {
     const uris = Store.IGNORE_URLS.get(this.host);
     const isBlack = uris.some((prefix) => prefix && href.startsWith(prefix));
     return isBlack || Object.is(pathname, "/");
+  },
+  closeSiteNative() {
+    if (!this.nano.isActive()) return;
+    requestAnimationFrame(() => FyTools.querys('[class*="close"]', this.nano.target).forEach((el) => el.click()));
   },
 };

@@ -17,27 +17,15 @@ export default class Site {
 
   static _siteRegExps = {
     acFun: /acfun.cn\/v/,
-    tencent: /v.qq.com\/x/,
     qiyi: /iqiyi.com\/v_*/,
-    mgtv: /www.mgtv.com\/b/,
-    douyu: /v.douyu.com\/show/,
     bili: /bilibili.com\/video/,
-    biliLive: /live.bilibili.com\/*/,
+    biliLive: /live.bilibili.com\/.*/,
   };
 
   static {
     const selectors = Store.ICONS_SELECTOR.get();
     selectors ? (this.selectors = selectors) : this.#loadRemote();
     Tools.microTask(() => (this.#createSiteTests(), this.#convertGmMatch()));
-  }
-
-  static getIcons(domain = location.host) {
-    if (!Store.ICONS_SELECTOR.get()) this.#loadRemote();
-    return this.selectors[domain];
-  }
-
-  static isGmMatch() {
-    return this.gmMatches.some((m) => m.test(location.href.replace(location.search, Consts.EMPTY)));
   }
 
   static #loadRemote() {
@@ -55,9 +43,8 @@ export default class Site {
    * 将 GM 脚本的 @match 规则转换为 JS 正则表达式数组
    */
   static #convertGmMatch() {
-    const { matches, includes: excluded } = GM_info.script;
-    const isValid = (s) => s !== "*://*/*" && !excluded.includes(s);
-    this.gmMatches = matches.filter(isValid).map((s) => new RegExp(s.replace(/\*/g, "\\S+")));
+    const matches = GM_info.scriptMetaStr.match(/(?<=\/\/\s*@match\s)(?!.*:\/\/\*\/\*).+/gm);
+    this.gmMatches = matches.map((m) => new RegExp(m.trim().replace(/\*/g, ".*")));
   }
 
   /**
@@ -67,7 +54,18 @@ export default class Site {
   static #createSiteTests() {
     Object.entries(this._siteRegExps).forEach(([name, regex]) => {
       const method = `is${name.charAt(0).toUpperCase()}${name.slice(1)}`;
-      this[method] ??= () => regex.test(location.href);
+      this[method] ??= () => regex.test(this.getCleanUrl());
     });
   }
+
+  static getIcons(domain = location.host) {
+    if (!Store.ICONS_SELECTOR.get()) this.#loadRemote();
+    return this.selectors[domain];
+  }
+
+  static isGmMatch() {
+    return this.gmMatches.some((m) => m.test(this.getCleanUrl()));
+  }
+
+  static getCleanUrl = () => location.origin + location.pathname;
 }
