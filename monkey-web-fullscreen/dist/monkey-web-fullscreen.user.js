@@ -246,7 +246,7 @@
       target[name] = function(...args) {
         if (before instanceof Function && !before.call(this, args)) return;
         const result = original.call(this, ...args);
-        after?.call?.(this, result);
+        after?.call?.(this, result, args);
         return result;
       };
     }
