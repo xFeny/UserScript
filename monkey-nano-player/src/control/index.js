@@ -26,7 +26,7 @@ export default {
    * 小窗显示时禁止切换(网页)全屏
    */
   lockedWebFullscreen() {
-    FyTools.around(this.FS, "processEvent", () => {
+    FyTools.around(this.FS, "processEvent", (args) => {
       return this.nano?.isActive() && ["P", "ENTER"].includes(args[0]?.key) ? false : true;
     });
   },
