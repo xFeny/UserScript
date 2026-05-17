@@ -203,7 +203,7 @@
       });
     },
     lockedWebFullscreen() {
-      FyTools.around(this.FS, "processEvent", () => {
+      FyTools.around(this.FS, "processEvent", (args) => {
         return this.nano?.isActive() && ["P", "ENTER"].includes(args[0]?.key) ? false : true;
       });
     },
