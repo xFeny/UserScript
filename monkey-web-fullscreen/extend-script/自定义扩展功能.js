@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         自定义扩展功能
 // @namespace    http://tampermonkey.net/
-// @version      0.1.0
+// @version      0.2.0
 // @author       Feny
 // @description  在「视频自动网页全屏｜倍速播放」脚本的基础上扩展功能。自定义快捷键功能，实现视频模糊、标记当前时间点等。
 // @license      GPL-3.0-only
@@ -46,7 +46,7 @@
       this.FS = unsafeWindow.GM_E9X_FS;
       this.overwriteRelatedMethod();
       this.setupKeydownListener();
-      this.interceptKeyActions();
+      this.improveKeysAction();
       this.host = location.host;
     },
     overwriteRelatedMethod() {
@@ -91,39 +91,23 @@
       unsafeWindow.addEventListener("keydown", handle, true);
     },
     /**
-     * 拦截原脚本的按键执行，处理个人逻辑
+     * 增加自定义按键操作
      */
-    interceptKeyActions() {
+    improveKeysAction() {
       const step = FyStorage.RATE_STEP.get(); // 原脚本的倍速步长
-
-      // AOP 环绕拦截器，前置钩子
-      FyTools.around(this.FS, "execKeyActions", ([{ key }]) => {
-        // 改写原脚本的按键操作
-        this.FS.keyMapp["A"] = () => this.FS.adjustPlayRate(-step);
-        this.FS.keyMapp["D"] = () => this.FS.adjustPlayRate(step);
-        this.FS.keyMapp["S"] = () => this.FS.setPlaybackRate(1);
-
-        // 执行个人定义的按键操作
-        this.execCustomKey({ key });
-
-        return true; // 返回 false，不执行原方法
-      });
-    },
-    /**
-     *自定义按键操作
-     */
-    execCustomKey({ key }) {
-      this.dict ??= {
+      Object.assign(this.FS.keyMapp, {
         I: () => this.setBlur(1),
         U: () => this.setBlur(-1),
+        T: () => this.seekToTime(),
+        SHIFT_T: () => this.setSkipTime(),
         X: () => this.FS.skipPlayback(10),
         Z: () => this.FS.skipPlayback(-10),
         B: () => this.FS.setPlaybackRate(1.25),
         G: () => this.FS.setPlaybackRate(1.5),
-        SHIFT_T: () => this.setSkipTime(),
-        T: () => this.seekToTime(),
-      };
-      this.dict[key]?.();
+        A: () => this.FS.adjustPlayRate(-step),
+        D: () => this.FS.adjustPlayRate(step),
+        S: () => this.FS.setPlaybackRate(1),
+      });
     },
     seekToTime() {
       const { player, secToTime, customToast } = this.FS;
