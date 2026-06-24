@@ -36,10 +36,12 @@ export default {
     VideoEnhancer.hookActiveVideo();
   },
   setupVisibleListener() {
+    const getHidden = VideoEnhancer.getPropertyDescriptor(document, "hidden").get;
     unsafeWindow.addEventListener("visibilitychange", () => {
       const video = this.player;
-      if (!video || video.ended || Store.INVIS_PAUSE.get()) return;
-      document.hidden ? video.pause() : video.play();
+      const isPip = window.documentPictureInPicture?.window || document.pictureInPictureElement;
+      if (!video || video.ended || isPip || Store.INVIS_PAUSE.get()) return;
+      getHidden.call(document) ? video.pause() : video.play();
     });
   },
   /**
