@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.11.5
+// @version      3.11.6
 // @author       Feny
 // @description  支持所有H5视频的增强脚本，通用网页全屏｜倍速调节；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @license      GPL-3.0-only
@@ -1129,9 +1129,12 @@
     },
     autoExitFullscreen() {
       if (!Site.isBili() && !Site.isAcFun()) return;
-      if (Tools.query(".video-pod .switch-btn.on") && Tools.query('.pod-item:last-of-type:not([data-scrolled="true"])')) return;
-      document.exitFullscreen().catch(async () => await this.isWebFull(5) && this.iconToFull(Site.icons.webFull));
-      requestAnimationFrame(() => Tools.query(".bpx-player-ending-related-item-cancel")?.click());
+      const doExit = () => document.exitFullscreen().catch(async () => await this.isWebFull(5) && this.toggleWebFullscreen());
+      requestAnimationFrame(() => {
+        const cancel = Tools.query(".bpx-player-ending-related-item-cancel");
+        if (cancel || Site.isAcFun()) doExit();
+        cancel?.click?.();
+      });
     }
   };
   const Episode = {
