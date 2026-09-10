@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         视频自动网页全屏｜倍速播放
 // @namespace    http://tampermonkey.net/
-// @version      3.11.6
+// @version      3.11.7
 // @author       Feny
 // @description  支持所有H5视频的增强脚本，通用网页全屏｜倍速调节；B站(含直播) / 腾讯视频 / 优酷 / 爱奇艺 / 芒果TV / AcFun 默认自动网页全屏，其他网站可手动开启；自动网页全屏 + 记忆倍速 + 下集切换，减少鼠标操作，让追剧更省心、更沉浸；支持视频旋转、截图、镜像翻转、缩放与移动、记忆播放进度等功能
 // @license      GPL-3.0-only
@@ -644,10 +644,11 @@
     isInputFocus: (e) => Tools.isInputable(e.composedPath()[0]),
     isUndefinedKey: ({ key, code }) => !Object.values(HotKey).includes(code) && !Tools.isNumber(key),
     skipKeyEvent: (e) => App.isNoVideo() || App.isInputFocus(e) || App.isUndefinedKey(e),
-    preventEvent(e, { code, altKey } = e) {
+    noModKey: (e) => ![e.metaKey, e.ctrlKey, e.shiftKey, e.altKey].some(Boolean),
+    preventEvent(e, { code, ctrlKey, shiftKey, altKey } = e) {
       const isNum = Tools.isNumber(e.key) && !this.unUsedRate();
-      const isOverride = this.isOverrideKey() && [HotKey.Space, HotKey.Left, HotKey.Right].includes(code);
-      const isBlock = [HotKey.K, HotKey.L, HotKey.M, HotKey.N, HotKey.P, HotKey.R].includes(code);
+      const isOverride = this.noModKey(e) && this.isOverrideKey() && [HotKey.Space, HotKey.Left, HotKey.Right].includes(code);
+      const isBlock = this.noModKey(e) && [HotKey.K, HotKey.L, HotKey.M, HotKey.N, HotKey.P, HotKey.R].includes(code);
       const isMove = altKey && [HotKey.Up, HotKey.Down, HotKey.Left, HotKey.Right].includes(code);
       if (isNum || isOverride || isBlock || isMove) Tools.preventEvent(e);
     },
@@ -655,9 +656,9 @@
       const data = { key: this.processShortcutKey({ code }), isTrusted };
       Tools.isTopWin() ? this.processEvent(data) : Tools.postMessage(window.top, data);
     },
-    processShortcutKey({ key, code, ctrlKey, shiftKey, altKey }) {
+    processShortcutKey({ key, code, metaKey, ctrlKey, shiftKey, altKey }) {
       code = code.replace(/key|arrow|numpad|tract/gi, Consts.EMPTY);
-      const keys = [ctrlKey && "ctrl", shiftKey && "shift", altKey && "alt", /[0-9]/.test(key) ? key : code];
+      const keys = [metaKey && "meta", ctrlKey && "ctrl", shiftKey && "shift", altKey && "alt", /[0-9]/.test(key) ? key : code];
       return keys.filter(Boolean).join("_").toUpperCase();
     },
     setupKeydownListener() {
@@ -665,12 +666,12 @@
       unsafeWindow.addEventListener("keyup", (e) => !this.skipKeyEvent(e) && this.preventEvent(e), true);
       unsafeWindow.addEventListener("message", ({ data }) => this.handleMessage(data));
     },
-    handleKeydown(e, { key, code, isTrusted } = e) {
+    handleKeydown(e, { code, isTrusted } = e) {
       if (this.skipKeyEvent(e)) return;
       this.preventEvent(e);
+      const key = this.processShortcutKey(e);
       const emitKeys = [HotKey.N, HotKey.P, HotKey.Enter, HotKey.NumEnter];
-      if (emitKeys.includes(code)) return this.dispatchShortcut(key, isTrusted);
-      this.processEvent({ key: this.processShortcutKey(e), isTrusted });
+      emitKeys.includes(code) ? this.dispatchShortcut(key, isTrusted) : this.processEvent({ key, isTrusted });
     },
     processEvent(data) {
       if (this.vMeta?.iFrame && this.player) delete this.player;
